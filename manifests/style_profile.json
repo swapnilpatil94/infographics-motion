@@ -1,0 +1,43 @@
+{
+  "version": "1.0",
+  "name": "gate1_night_intimate",
+  "description": "Restrained NPR look for Gate 1 proof: warm/cold night contrast, toon shading with soft ramp, clean Line Art outlines, filmic-but-punchy color via AgX, light grain + halation around practicals.",
+  "palette": {
+    "shadow": [0.03, 0.035, 0.06],
+    "midtone": [0.25, 0.22, 0.28],
+    "warm_key": [1.0, 0.62, 0.32],
+    "cold_ambient": [0.25, 0.35, 0.55],
+    "skin_base": [0.85, 0.65, 0.52]
+  },
+  "line_art": {
+    "line_weight_px": 1.4,
+    "color": [0.02, 0.02, 0.03],
+    "crease_angle_deg": 40,
+    "use_contour": true,
+    "use_material_boundary": true
+  },
+  "shading": {
+    "type": "toon_ramp",
+    "ramp_steps": 3,
+    "specular": "minimal",
+    "roughness_default": 0.75
+  },
+  "color_management": {
+    "view_transform": "AgX",
+    "look": "AgX - Punchy",
+    "exposure": 0.8
+  },
+  "camera": {
+    "default_lens_mm": 35,
+    "dof_default_fstop": 2.8,
+    "motion_blur": true,
+    "motion_blur_shutter": 0.4
+  },
+  "post": {
+    "grain_amount": 0.035,
+    "halation_threshold": 0.75,
+    "halation_intensity": 0.18,
+    "halation_radius_px": 12,
+    "vignette": 0.12
+  }
+}

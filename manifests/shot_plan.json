@@ -1,0 +1,89 @@
+{
+  "version": "1.1",
+  "story_id": "gate1_rahul_notification",
+  "narration": "उस रात राहुल को बिल्कुल अंदाज़ा नहीं था कि उसके फोन पर आया वो छोटा सा मैसेज उसकी ज़िंदगी बदलने वाला था।",
+  "beat_ladder": [
+    "NIGHT", "RAHUL_IS_ALONE", "NORMAL_MOMENT", "PHONE_NOTIFICATION",
+    "HE_NOTICES_IT", "SOMETHING_FEELS_WRONG", "SOMETHING_IMPORTANT_IS_ABOUT_TO_HAPPEN"
+  ],
+  "world": "bedroom_night",
+  "characters": ["rahul"],
+  "shots": [
+    {
+      "shot_id": "S01",
+      "start_s": 0.0,
+      "end_s": 3.2,
+      "intent": "isolation_normality",
+      "beats": ["NIGHT", "RAHUL_IS_ALONE", "NORMAL_MOMENT"],
+      "characters": [{"id": "rahul", "pose": "base", "action": "idle_breathing", "emotion": "relaxed"}],
+      "environment": "bedroom_night",
+      "props": ["phone"],
+      "camera": {"shot_type": "wide_3q", "lens_mm": 28, "movement": "static_hold"},
+      "lighting": {"key": "window_moon", "fill": "room_ambient"},
+      "phone_screen": "off",
+      "transition_out": "hard_cut",
+      "sound_cues": []
+    },
+    {
+      "shot_id": "S02",
+      "start_s": 3.2,
+      "end_s": 5.0,
+      "intent": "notification_and_notice",
+      "beats": ["PHONE_NOTIFICATION", "HE_NOTICES_IT"],
+      "characters": [{"id": "rahul", "pose": "notice", "action": "attention_shift", "emotion": "curious"}],
+      "environment": "bedroom_night",
+      "props": ["phone"],
+      "camera": {"shot_type": "medium_push", "lens_mm": 32, "movement": "slow_push"},
+      "lighting": {"key": "phone_glow", "fill": "window_moon"},
+      "phone_screen": "on",
+      "phone_screen_ignite_at_s": 3.55,
+      "transition_out": "hard_cut",
+      "sound_cues": [{"cue": "notification_ding", "at_s": 3.55}]
+    },
+    {
+      "shot_id": "S03",
+      "start_s": 5.0,
+      "end_s": 7.4,
+      "intent": "raises_phone_to_look",
+      "beats": ["HE_NOTICES_IT"],
+      "characters": [{"id": "rahul", "pose": "phone", "action": "look_at_phone", "emotion": "curious"}],
+      "environment": "bedroom_night",
+      "props": ["phone"],
+      "camera": {"shot_type": "closeup", "lens_mm": 55, "movement": "static_hold", "focus_target": "phone"},
+      "lighting": {"key": "phone_glow", "fill": "window_moon"},
+      "phone_screen": "on",
+      "transition_out": "hard_cut",
+      "sound_cues": []
+    },
+    {
+      "shot_id": "S04",
+      "start_s": 7.4,
+      "end_s": 10.0,
+      "intent": "unease",
+      "beats": ["SOMETHING_FEELS_WRONG"],
+      "characters": [{"id": "rahul", "pose": "phone", "action": "look_at_phone", "emotion": "uneasy"}],
+      "environment": "bedroom_night",
+      "props": ["phone"],
+      "camera": {"shot_type": "closeup", "lens_mm": 70, "movement": "static_hold", "focus_target": "rahul_face"},
+      "lighting": {"key": "phone_glow", "fill": "window_moon"},
+      "phone_screen": "on",
+      "transition_out": "rack_focus",
+      "sound_cues": []
+    },
+    {
+      "shot_id": "S05",
+      "start_s": 10.0,
+      "end_s": 13.5,
+      "intent": "realization_and_isolation_reveal",
+      "beats": ["SOMETHING_IMPORTANT_IS_ABOUT_TO_HAPPEN"],
+      "characters": [{"id": "rahul", "pose": "realization", "action": "hold", "emotion": "realization"}],
+      "environment": "bedroom_night",
+      "props": ["phone"],
+      "camera": {"shot_type": "medium_wide_pullback", "lens_mm": 28, "movement": "slow_pull"},
+      "lighting": {"key": "phone_glow", "fill": "window_moon"},
+      "phone_screen": "on",
+      "transition_out": "end",
+      "sound_cues": []
+    }
+  ]
+}
