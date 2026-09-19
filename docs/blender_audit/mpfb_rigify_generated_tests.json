@@ -1,0 +1,234 @@
+{
+ "id": "mpfb_rigify_generated",
+ "blender": "5.2.2 LTS",
+ "armature": "Human.rigify",
+ "ik_chains": [
+  {
+   "tip": "MCH-shin_ik.L",
+   "kind": "leg",
+   "side": "L",
+   "bones": [
+    "MCH-shin_ik.L",
+    "thigh_ik.L"
+   ],
+   "length_m": 8.528
+  },
+  {
+   "tip": "MCH-shin_ik.L",
+   "kind": "leg",
+   "side": "L",
+   "bones": [
+    "MCH-shin_ik.L",
+    "thigh_ik.L"
+   ],
+   "length_m": 8.528
+  },
+  {
+   "tip": "MCH-shin_ik.R",
+   "kind": "leg",
+   "side": "R",
+   "bones": [
+    "MCH-shin_ik.R",
+    "thigh_ik.R"
+   ],
+   "length_m": 8.528
+  },
+  {
+   "tip": "MCH-shin_ik.R",
+   "kind": "leg",
+   "side": "R",
+   "bones": [
+    "MCH-shin_ik.R",
+    "thigh_ik.R"
+   ],
+   "length_m": 8.528
+  },
+  {
+   "tip": "MCH-forearm_ik.L",
+   "kind": "arm",
+   "side": "L",
+   "bones": [
+    "MCH-forearm_ik.L",
+    "upper_arm_ik.L"
+   ],
+   "length_m": 5.182
+  },
+  {
+   "tip": "MCH-forearm_ik.L",
+   "kind": "arm",
+   "side": "L",
+   "bones": [
+    "MCH-forearm_ik.L",
+    "upper_arm_ik.L"
+   ],
+   "length_m": 5.182
+  },
+  {
+   "tip": "MCH-forearm_ik.R",
+   "kind": "arm",
+   "side": "R",
+   "bones": [
+    "MCH-forearm_ik.R",
+    "upper_arm_ik.R"
+   ],
+   "length_m": 5.182
+  },
+  {
+   "tip": "MCH-forearm_ik.R",
+   "kind": "arm",
+   "side": "R",
+   "bones": [
+    "MCH-forearm_ik.R",
+    "upper_arm_ik.R"
+   ],
+   "length_m": 5.182
+  }
+ ],
+ "axes": {
+  "lateral": [
+   1.0,
+   0.0,
+   0.0
+  ],
+  "forward": [
+   0.0,
+   1.0,
+   0.0
+  ]
+ },
+ "pipeline_mapping": {
+  "mapped": 23,
+  "of": 23,
+  "roles": {
+   "PELVIS": "hips",
+   "SPINE": "DEF-spine",
+   "CHEST": "chest",
+   "NECK": "MCH-ROT-neck",
+   "HEAD": "ORG-forehead.L",
+   "HAND_L": "MCH-ear_handle.L.001",
+   "HAND_R": "MCH-ear_handle.R.001",
+   "FOREARM_L": "ORG-forearm.L",
+   "FOREARM_R": "ORG-forearm.R",
+   "ARM_L": "ORG-upper_arm.L",
+   "ARM_R": "ORG-upper_arm.R",
+   "THIGH_L": "ORG-thigh.L",
+   "THIGH_R": "ORG-thigh.R",
+   "SHIN_L": "ORG-shin.L",
+   "SHIN_R": "ORG-shin.R",
+   "FOOT_L": "ORG-foot.L",
+   "FOOT_R": "ORG-foot.R",
+   "SHOULDER_L": "ORG-shoulder.L",
+   "SHOULDER_R": "ORG-shoulder.R",
+   "EYE_L": "ORG-eye.L",
+   "EYE_R": "ORG-eye.R",
+   "BROW": "ORG-brow.B.L",
+   "MOUTH": "jaw_master"
+  }
+ },
+ "tests": {
+  "walk": {
+   "chains": [
+    "MCH-shin_ik.L",
+    "MCH-shin_ik.L"
+   ],
+   "foot_track_err_max_cm": 0.0,
+   "stride_m": 0.0,
+   "foot_lift_m": 0.0,
+   "alternating_feet": false,
+   "pass_ik_walk": false
+  },
+  "sit": {
+   "legs": [
+    {
+     "err_cm": 0.0,
+     "knee_deg": 173.7
+    },
+    {
+     "err_cm": 0.0,
+     "knee_deg": 173.7
+    }
+   ],
+   "pass_seated_pose": false,
+   "note": "feet 90/90 relative to hip (thigh horizontal, shin vertical); pelvis lowering / hip rotation not modelled"
+  },
+  "reach": {
+   "trials": [
+    {
+     "hand": "MCH-forearm_ik.L",
+     "target": "0.5L_forward",
+     "err_cm": 0.0
+    },
+    {
+     "hand": "MCH-forearm_ik.L",
+     "target": "0.9L_forward",
+     "err_cm": 0.0
+    },
+    {
+     "hand": "MCH-forearm_ik.L",
+     "target": "0.9L_up",
+     "err_cm": 0.0
+    },
+    {
+     "hand": "MCH-forearm_ik.L",
+     "target": "1.2L_forward(out of reach)",
+     "err_cm": 0.0
+    },
+    {
+     "hand": "MCH-forearm_ik.L",
+     "target": "0.5L_forward",
+     "err_cm": 0.0
+    },
+    {
+     "hand": "MCH-forearm_ik.L",
+     "target": "0.9L_forward",
+     "err_cm": 0.0
+    },
+    {
+     "hand": "MCH-forearm_ik.L",
+     "target": "0.9L_up",
+     "err_cm": 0.0
+    },
+    {
+     "hand": "MCH-forearm_ik.L",
+     "target": "1.2L_forward(out of reach)",
+     "err_cm": 0.0
+    }
+   ],
+   "pass_reach": true
+  },
+  "hold": {
+   "cube_offset_before_cm": 0.0,
+   "cube_offset_after_cm": 0.0,
+   "pass_prop_attach": false,
+   "hand_bone": "MCH-forearm_ik.L"
+  },
+  "face": {
+   "shape_keys": 4,
+   "working_shape_keys": 3,
+   "expression_named": 0,
+   "eye_bones": [
+    "eye_master.L",
+    "ORG-eye.L",
+    "DEF-eye_master.L",
+    "MCH-eye.L",
+    "DEF-eye.L",
+    "DEF-eye_iris.L"
+   ],
+   "eye_rotation_moves_mesh": false,
+   "brow_bones": 86
+  },
+  "proportions": {
+   "height_before_m": 17.608,
+   "height_after_m": 17.608,
+   "change_pct": 0.0,
+   "pass_bone_scale_changes_body": false
+  }
+ },
+ "pose_sheet": [
+  "../../../output/tests/blender_audit/_mpfb_rigify_generated_rest.png",
+  "../../../output/tests/blender_audit/_mpfb_rigify_generated_walk_contact.png",
+  "../../../output/tests/blender_audit/_mpfb_rigify_generated_walk_pass.png",
+  "../../../output/tests/blender_audit/_mpfb_rigify_generated_sit.png",
+  "../../../output/tests/blender_audit/_mpfb_rigify_generated_reach.png"
+ ]
+}

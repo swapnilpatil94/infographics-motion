@@ -1,0 +1,748 @@
+{
+ "id": "mpfb_rigify_generated",
+ "blender": "5.2.2 LTS",
+ "file_blender_version": "5.2.45",
+ "errors": [],
+ "scene": {
+  "frame_range": [
+   1,
+   250
+  ],
+  "fps": 24,
+  "engine": "BLENDER_EEVEE",
+  "unit_scale": 1.0
+ },
+ "objects": {
+  "MESH": 235,
+  "ARMATURE": 2
+ },
+ "datablocks": {
+  "meshes": 138,
+  "armatures": 2,
+  "actions": 0,
+  "materials": 0,
+  "images": 0,
+  "grease_pencils": 0,
+  "grease_pencils_v3": 0,
+  "texts": 1,
+  "node_groups": 0,
+  "collections": 1,
+  "libraries": 0
+ },
+ "embedded_text_scripts": [
+  "Human.rigify_ui.py"
+ ],
+ "missing_images": [],
+ "armatures": [
+  {
+   "name": "Human.metarig",
+   "bones": 185,
+   "pose_bones": 185,
+   "bone_names_sample": [
+    "DEF-elbow-helper.L",
+    "DEF-elbow-helper.R",
+    "DEF-knee-helper.L",
+    "DEF-knee-helper.R",
+    "MCH-breast-parent",
+    "breast.L",
+    "breast.R",
+    "spine",
+    "DEF-pelvis-helper.L",
+    "DEF-pelvis-helper.front.L",
+    "DEF-pelvis-helper.R",
+    "DEF-pelvis-helper.front.R",
+    "pelvis.L",
+    "pelvis.R",
+    "spine.001",
+    "spine.002",
+    "spine.003",
+    "spine.004",
+    "shoulder.L",
+    "DEF-shoulder-helper.L",
+    "upper_arm.L",
+    "forearm.L",
+    "hand.L",
+    "palm.01.L",
+    "f_index.01.L",
+    "f_index.02.L",
+    "f_index.03.L",
+    "thumb.01.L",
+    "thumb.02.L",
+    "thumb.03.L",
+    "palm.02.L",
+    "f_middle.01.L",
+    "f_middle.02.L",
+    "f_middle.03.L",
+    "palm.03.L",
+    "f_ring.01.L",
+    "f_ring.02.L",
+    "f_ring.03.L",
+    "palm.04.L",
+    "f_pinky.01.L",
+    "f_pinky.02.L",
+    "f_pinky.03.L",
+    "shoulder.R",
+    "DEF-shoulder-helper.R",
+    "upper_arm.R",
+    "forearm.R",
+    "hand.R",
+    "palm.01.R",
+    "f_index.01.R",
+    "f_index.02.R",
+    "f_index.03.R",
+    "thumb.01.R",
+    "thumb.02.R",
+    "thumb.03.R",
+    "palm.02.R",
+    "f_middle.01.R",
+    "f_middle.02.R",
+    "f_middle.03.R",
+    "palm.03.R",
+    "f_ring.01.R"
+   ],
+   "roots": [
+    "DEF-elbow-helper.L",
+    "DEF-elbow-helper.R",
+    "DEF-knee-helper.L",
+    "DEF-knee-helper.R",
+    "MCH-breast-parent",
+    "spine"
+   ],
+   "depth_max": 12,
+   "deform_bones": 185,
+   "finger_bones": 30,
+   "eye_bones": [
+    "eye.L",
+    "eye.R"
+   ],
+   "brow_bones": [
+    "brow.B.L",
+    "brow.B.L.001",
+    "brow.B.L.002",
+    "brow.B.L.003",
+    "brow.B.L.004",
+    "brow.B.R",
+    "brow.B.R.001",
+    "brow.B.R.002",
+    "brow.B.R.003",
+    "brow.B.R.004",
+    "brow.T.L",
+    "brow.T.L.001",
+    "brow.T.L.002",
+    "brow.T.L.003",
+    "brow.T.R",
+    "brow.T.R.001",
+    "brow.T.R.002",
+    "brow.T.R.003",
+    "brow_glue.B.L.002",
+    "brow_glue.B.R.002"
+   ],
+   "mouth_bones": [
+    "jaw_master",
+    "jaw",
+    "jaw.L",
+    "jaw.L.001",
+    "jaw.R",
+    "jaw.R.001",
+    "lip.B.L",
+    "lip.B.L.001",
+    "lip.B.R",
+    "lip.B.R.001",
+    "lip.T.L",
+    "lip.T.L.001",
+    "lip.T.R",
+    "lip.T.R.001",
+    "teeth.B",
+    "tongue",
+    "tongue.001",
+    "tongue.002",
+    "teeth.T"
+   ],
+   "face_bones_total": 84,
+   "constraints": {
+    "ARMATURE": 5,
+    "TRANSFORM": 18,
+    "COPY_TRANSFORMS": 4
+   },
+   "ik": [],
+   "drivers": 0,
+   "python_drivers": 0,
+   "action": null,
+   "custom_props": [
+    "MPFB_SKEL_extra_bones"
+   ]
+  },
+  {
+   "name": "Human.rigify",
+   "bones": 930,
+   "pose_bones": 930,
+   "bone_names_sample": [
+    "DEF-elbow-helper.L",
+    "DEF-elbow-helper.R",
+    "DEF-knee-helper.L",
+    "DEF-knee-helper.R",
+    "MCH-breast-parent",
+    "ORG-breast.L",
+    "DEF-breast.L",
+    "ORG-breast.R",
+    "DEF-breast.R",
+    "breast.L",
+    "breast.R",
+    "root",
+    "DEF-spine",
+    "DEF-spine.001",
+    "DEF-spine.002",
+    "DEF-spine.003",
+    "DEF-spine.004",
+    "DEF-spine.005",
+    "DEF-spine.006",
+    "VIS_upper_arm_ik_pole.L",
+    "VIS_upper_arm_ik_pole.R",
+    "VIS_thigh_ik_pole.L",
+    "VIS_thigh_ik_pole.R",
+    "MCH-torso.parent",
+    "torso",
+    "hips",
+    "chest",
+    "MCH-spine.001",
+    "spine_fk.001",
+    "MCH-spine",
+    "spine_fk",
+    "tweak_spine",
+    "ORG-spine",
+    "DEF-pelvis-helper.L",
+    "DEF-pelvis-helper.front.L",
+    "DEF-pelvis-helper.R",
+    "DEF-pelvis-helper.front.R",
+    "ORG-pelvis.L",
+    "DEF-pelvis.L",
+    "ORG-pelvis.R",
+    "DEF-pelvis.R",
+    "ORG-thigh.L",
+    "ORG-shin.L",
+    "ORG-foot.L",
+    "ORG-heel.02.L",
+    "ORG-toe.L",
+    "MCH-foot_tweak.L",
+    "foot_tweak.L",
+    "MCH-shin_tweak.L",
+    "shin_tweak.L",
+    "MCH-shin_tweak.L.001",
+    "shin_tweak.L.001",
+    "MCH-thigh_parent_widget.L",
+    "MCH-thigh_tweak.L.001",
+    "thigh_tweak.L.001",
+    "ORG-thigh.R",
+    "ORG-shin.R",
+    "ORG-foot.R",
+    "ORG-heel.02.R",
+    "ORG-toe.R"
+   ],
+   "roots": [
+    "DEF-elbow-helper.L",
+    "DEF-elbow-helper.R",
+    "DEF-knee-helper.L",
+    "DEF-knee-helper.R",
+    "MCH-breast-parent",
+    "root",
+    "MCH-torso.parent",
+    "MCH-hand_ik.parent.L",
+    "MCH-upper_arm_ik_target.parent.L",
+    "MCH-hand_ik.parent.R",
+    "MCH-upper_arm_ik_target.parent.R",
+    "MCH-eye_common.parent",
+    "MCH-foot_ik.parent.L",
+    "MCH-thigh_ik_target.parent.L",
+    "MCH-foot_ik.parent.R",
+    "MCH-thigh_ik_target.parent.R",
+    "MCH-lip_arm.B.L.001",
+    "MCH-lip_arm.B.R.001",
+    "MCH-lip_arm.T.L.001",
+    "MCH-lip_arm.T.R.001"
+   ],
+   "depth_max": 23,
+   "deform_bones": 181,
+   "finger_bones": 172,
+   "eye_bones": [
+    "eye_master.L",
+    "ORG-eye.L",
+    "DEF-eye_master.L",
+    "MCH-eye.L",
+    "DEF-eye.L",
+    "DEF-eye_iris.L",
+    "MCH-eye_track.L",
+    "eye_master.R",
+    "ORG-eye.R",
+    "DEF-eye_master.R",
+    "MCH-eye.R",
+    "DEF-eye.R",
+    "DEF-eye_iris.R",
+    "MCH-eye_track.R",
+    "MCH-eye_common.parent",
+    "eye_common",
+    "eye.L",
+    "eye.R"
+   ],
+   "brow_bones": [
+    "ORG-brow.B.L",
+    "ORG-brow.B.L.001",
+    "ORG-brow.B.L.002",
+    "ORG-brow.B.L.003",
+    "ORG-brow.B.L.004",
+    "ORG-brow.B.R",
+    "ORG-brow.B.R.001",
+    "ORG-brow.B.R.002",
+    "ORG-brow.B.R.003",
+    "ORG-brow.B.R.004",
+    "ORG-brow.T.L",
+    "ORG-brow.T.L.001",
+    "ORG-brow.T.L.002",
+    "ORG-brow.T.L.003",
+    "ORG-brow.T.R",
+    "ORG-brow.T.R.001",
+    "ORG-brow.T.R.002",
+    "ORG-brow.T.R.003",
+    "MCH-brow_handle.B.L",
+    "MCH-brow_handle.B.L.001",
+    "MCH-brow_handle.B.L.002",
+    "MCH-brow_handle.B.L.003",
+    "DEF-brow.B.L",
+    "DEF-brow.B.L.001",
+    "DEF-brow.B.L.002",
+    "DEF-brow.B.L.003",
+    "MCH-brow_handle.B.L.004",
+    "DEF-brow.B.L.004",
+    "MCH-brow_handle.B.R",
+    "MCH-brow_handle.B.R.001",
+    "MCH-brow_handle.B.R.002",
+    "MCH-brow_handle.B.R.003",
+    "DEF-brow.B.R",
+    "DEF-brow.B.R.001",
+    "DEF-brow.B.R.002",
+    "DEF-brow.B.R.003",
+    "MCH-brow_handle.B.R.004",
+    "DEF-brow.B.R.004",
+    "MCH-brow_handle.T.L",
+    "DEF-brow.T.L",
+    "MCH-brow_handle.T.L.001",
+    "MCH-brow_handle.T.L.002",
+    "DEF-brow.T.L.001",
+    "DEF-brow.T.L.002",
+    "MCH-brow_handle.T.L.003",
+    "MCH-brow_end_handle.T.L.003",
+    "DEF-brow.T.L.003",
+    "MCH-brow_handle.T.R",
+    "DEF-brow.T.R",
+    "MCH-brow_handle.T.R.001",
+    "MCH-brow_handle.T.R.002",
+    "DEF-brow.T.R.001",
+    "DEF-brow.T.R.002",
+    "MCH-brow_handle.T.R.003",
+    "MCH-brow_end_handle.T.R.003",
+    "DEF-brow.T.R.003",
+    "brow.B.L",
+    "MCH-brow_offset.B.L.001",
+    "brow.B.L.001",
+    "MCH-brow_offset.B.L.002",
+    "brow.B.L.002",
+    "ORG-brow_glue.B.L.002",
+    "MCH-brow_offset.B.L.003",
+    "brow.B.L.003",
+    "brow.B.L.004",
+    "brow.B.R",
+    "MCH-brow_offset.B.R.001",
+    "brow.B.R.001",
+    "MCH-brow_offset.B.R.002",
+    "brow.B.R.002",
+    "ORG-brow_glue.B.R.002",
+    "MCH-brow_offset.B.R.003",
+    "brow.B.R.003",
+    "brow.B.R.004",
+    "brow.T.L",
+    "brow.T.L.001",
+    "MCH-brow_reparent.T.L.002",
+    "MCH-brow_offset.T.L.002",
+    "brow.T.L.002",
+    "brow.T.L.003",
+    "brow.T.R",
+    "brow.T.R.001",
+    "MCH-brow_reparent.T.R.002",
+    "MCH-brow_offset.T.R.002",
+    "brow.T.R.002",
+    "brow.T.R.003"
+   ],
+   "mouth_bones": [
+    "ORG-teeth.T",
+    "DEF-teeth.T",
+    "jaw_master",
+    "ORG-jaw_master",
+    "ORG-jaw",
+    "ORG-jaw.L",
+    "ORG-jaw.L.001",
+    "ORG-jaw.R",
+    "ORG-jaw.R.001",
+    "ORG-teeth.B",
+    "DEF-teeth.B",
+    "ORG-tongue",
+    "ORG-tongue.001",
+    "ORG-tongue.002",
+    "teeth.B",
+    "tongue",
+    "tweak_tongue",
+    "DEF-tongue",
+    "DEF-tongue.001",
+    "DEF-tongue.002",
+    "DEF-jaw_master",
+    "MCH-jaw_handle",
+    "DEF-jaw",
+    "MCH-jaw_handle.L",
+    "MCH-jaw_handle.L.001",
+    "DEF-jaw.L",
+    "DEF-jaw.L.001",
+    "MCH-jaw_handle.R",
+    "MCH-jaw_handle.R.001",
+    "DEF-jaw.R",
+    "DEF-jaw.R.001",
+    "tweak_tongue.003",
+    "MCH-tongue.001",
+    "tweak_tongue.001",
+    "MCH-tongue.002",
+    "tweak_tongue.002",
+    "jaw",
+    "jaw.L.001",
+    "jaw.R.001",
+    "MCH-jaw_master_lock",
+    "MCH-jaw_master_top",
+    "ORG-lip.T.L",
+    "ORG-lip.T.L.001",
+    "ORG-lip.T.R",
+    "ORG-lip.T.R.001",
+    "MCH-jaw_master_middle",
+    "jaw_master_mouth",
+    "MCH-jaw_master_top_out",
+    "MCH-lip_arm.T.L",
+    "lip.T",
+    "MCH-jaw_master_bottom_out",
+    "MCH-lip_arm.B.L",
+    "lip.B",
+    "MCH-jaw_master_middle_out",
+    "MCH-lip_end_arm.B.L.001",
+    "lip_end.L.001",
+    "MCH-lip_end_arm.B.R.001",
+    "lip_end.R.001",
+    "MCH-lip_handle.T.L",
+    "MCH-lip_handle.T.L.001",
+    "MCH-lip_end_handle.T.L.001",
+    "DEF-lip.T.L",
+    "DEF-lip.T.L.001",
+    "MCH-lip_handle.T.R",
+    "MCH-lip_handle.T.R.001",
+    "MCH-lip_end_handle.T.R.001",
+    "DEF-lip.T.R",
+    "DEF-lip.T.R.001",
+    "MCH-jaw_master_bottom",
+    "ORG-lip.B.L",
+    "ORG-lip.B.L.001",
+    "ORG-lip.B.R",
+    "ORG-lip.B.R.001",
+    "MCH-lip_handle.B.L",
+    "MCH-lip_handle.B.L.001",
+    "MCH-lip_end_handle.B.L.001",
+    "DEF-lip.B.L",
+    "DEF-lip.B.L.001",
+    "MCH-lip_handle.B.R",
+    "MCH-lip_handle.B.R.001",
+    "MCH-lip_end_handle.B.R.001",
+    "DEF-lip.B.R",
+    "DEF-lip.B.R.001",
+    "teeth.T",
+    "jaw.L",
+    "jaw.R",
+    "MCH-lip_arm.B.L.001",
+    "MCH-lip_offset.B.L.001",
+    "lip.B.L.001",
+    "MCH-lip_arm.B.R.001",
+    "MCH-lip_offset.B.R.001",
+    "lip.B.R.001",
+    "MCH-lip_arm.T.L.001",
+    "MCH-lip_offset.T.L.001",
+    "lip.T.L.001",
+    "MCH-lip_arm.T.R.001",
+    "MCH-lip_offset.T.R.001",
+    "lip.T.R.001"
+   ],
+   "face_bones_total": 401,
+   "constraints": {
+    "ARMATURE": 19,
+    "TRANSFORM": 18,
+    "COPY_TRANSFORMS": 409,
+    "STRETCH_TO": 146,
+    "COPY_LOCATION": 314,
+    "COPY_SCALE": 58,
+    "DAMPED_TRACK": 132,
+    "COPY_ROTATION": 28,
+    "IK": 8,
+    "LIMIT_ROTATION": 124,
+    "LOCKED_TRACK": 20,
+    "LIMIT_DISTANCE": 20
+   },
+   "ik": [
+    {
+     "bone": "MCH-shin_ik.L",
+     "chain": 2,
+     "target": "Human.rigify",
+     "subtarget": "MCH-thigh_ik_target.L",
+     "pole": null
+    },
+    {
+     "bone": "MCH-shin_ik.L",
+     "chain": 2,
+     "target": "Human.rigify",
+     "subtarget": "MCH-thigh_ik_target.L",
+     "pole": "Human.rigify"
+    },
+    {
+     "bone": "MCH-shin_ik.R",
+     "chain": 2,
+     "target": "Human.rigify",
+     "subtarget": "MCH-thigh_ik_target.R",
+     "pole": null
+    },
+    {
+     "bone": "MCH-shin_ik.R",
+     "chain": 2,
+     "target": "Human.rigify",
+     "subtarget": "MCH-thigh_ik_target.R",
+     "pole": "Human.rigify"
+    },
+    {
+     "bone": "MCH-forearm_ik.L",
+     "chain": 2,
+     "target": "Human.rigify",
+     "subtarget": "MCH-upper_arm_ik_target.L",
+     "pole": null
+    },
+    {
+     "bone": "MCH-forearm_ik.L",
+     "chain": 2,
+     "target": "Human.rigify",
+     "subtarget": "MCH-upper_arm_ik_target.L",
+     "pole": "Human.rigify"
+    },
+    {
+     "bone": "MCH-forearm_ik.R",
+     "chain": 2,
+     "target": "Human.rigify",
+     "subtarget": "MCH-upper_arm_ik_target.R",
+     "pole": null
+    },
+    {
+     "bone": "MCH-forearm_ik.R",
+     "chain": 2,
+     "target": "Human.rigify",
+     "subtarget": "MCH-upper_arm_ik_target.R",
+     "pole": "Human.rigify"
+    }
+   ],
+   "drivers": 152,
+   "python_drivers": 110,
+   "action": null,
+   "custom_props": [
+    "rig_ui"
+   ]
+  }
+ ],
+ "shape_keys": [
+  {
+   "obj": "Human",
+   "keys": [
+    "Basis",
+    "$md-$as-$ma-$yn",
+    "$md-$ca-$ma-$yn",
+    "$md-$af-$ma-$yn",
+    "$md-universal-$ma-$yn-$av$mu-$av$wg"
+   ],
+   "n": 5
+  }
+ ],
+ "mesh_summary": {
+  "objects": 235,
+  "skinned": 1,
+  "tris": 18486
+ },
+ "grease_pencil": [],
+ "actions": [],
+ "n_actions": 0,
+ "tests": {
+  "ik_response": [
+   {
+    "armature": "Human.rigify",
+    "bone": "MCH-shin_ik.L",
+    "chain": 2,
+    "rest_err_cm": 0.0,
+    "moves": [
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 0.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 0.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 0.0
+     }
+    ]
+   },
+   {
+    "armature": "Human.rigify",
+    "bone": "MCH-shin_ik.L",
+    "chain": 2,
+    "rest_err_cm": 0.0,
+    "moves": [
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 0.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 0.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 0.0
+     }
+    ]
+   },
+   {
+    "armature": "Human.rigify",
+    "bone": "MCH-shin_ik.R",
+    "chain": 2,
+    "rest_err_cm": 0.0,
+    "moves": [
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 0.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 0.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 0.0
+     }
+    ]
+   },
+   {
+    "armature": "Human.rigify",
+    "bone": "MCH-shin_ik.R",
+    "chain": 2,
+    "rest_err_cm": 0.0,
+    "moves": [
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 0.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 0.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 0.0
+     }
+    ]
+   },
+   {
+    "armature": "Human.rigify",
+    "bone": "MCH-forearm_ik.L",
+    "chain": 2,
+    "rest_err_cm": 0.0,
+    "moves": [
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 0.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 0.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 0.0
+     }
+    ]
+   },
+   {
+    "armature": "Human.rigify",
+    "bone": "MCH-forearm_ik.L",
+    "chain": 2,
+    "rest_err_cm": 0.0,
+    "moves": [
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 0.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 0.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 0.0
+     }
+    ]
+   },
+   {
+    "armature": "Human.rigify",
+    "bone": "MCH-forearm_ik.R",
+    "chain": 2,
+    "rest_err_cm": 0.0,
+    "moves": [
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 0.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 0.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 0.0
+     }
+    ]
+   },
+   {
+    "armature": "Human.rigify",
+    "bone": "MCH-forearm_ik.R",
+    "chain": 2,
+    "rest_err_cm": 0.0,
+    "moves": [
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 0.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 0.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 0.0
+     }
+    ]
+   }
+  ],
+  "reach": null,
+  "prop_attach": null,
+  "walk": null,
+  "sit": null
+ },
+ "render": {
+  "ok": true,
+  "frame": null
+ }
+}

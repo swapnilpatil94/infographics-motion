@@ -18,9 +18,10 @@ from engine.animation.grammar import STYLES, _style
 from engine.shorts.performance import Channel, ease
 from engine.skeleton import rig_def as R
 
-FACE_CH = ["gaze_x", "gaze_y", "blink", "wide", "lid", "brow_raise", "brow_tilt", "brow_asym", "mouth_open", "mouth_smile"]
+FACE_CH = ["gaze_x", "gaze_y", "blink", "wide", "lid", "narrow", "brow_raise", "brow_tilt", "brow_asym", "mouth_open", "mouth_smile", "mouth_worried",
+           "vis_A", "vis_E", "vis_I", "vis_O", "vis_U", "vis_shocked"]
 POSE_CH = ["root_x", "root_y", "pelvis_dx", "pelvis_dy", "spine_rot", "chest_rot", "neck_rot", "head_rot", "hair_rot", "hand_L_rot", "hand_R_rot", "shrug",
-           "foot_L_rot", "foot_R_rot", "phone_vis", "fingers_vis", "phone_glow"]
+           "foot_L_rot", "foot_R_rot", "phone_vis", "fingers_vis", "phone_glow", "card_vis", "money_vis", "hand_L_pose_id", "hand_R_pose_id"]
 IK_CH = ["hand_L_x", "hand_L_y", "hand_R_x", "hand_R_y", "foot_L_x", "foot_L_y", "foot_R_x", "foot_R_y"]
 
 # emotion -> face parameters (same table the bust rig uses: one expression vocabulary for both rigs)
@@ -29,31 +30,63 @@ EMO = {
     "happy": dict(raise_=0.4, tilt=0.0, asym=0, wide=0.0, lid=0.0, smile=1.0, mopen=0.35), "tired": dict(raise_=-0.25, tilt=0.35, asym=0, wide=0.0, lid=0.7, smile=-0.15, mopen=0.0),
     "blank": dict(raise_=0.0, tilt=0.0, asym=0, wide=0.0, lid=0.15, smile=0.0, mopen=0.0), "serious": dict(raise_=-0.55, tilt=-0.45, asym=0, wide=0.0, lid=0.25, smile=-0.2, mopen=0.0),
     "concerned": dict(raise_=0.5, tilt=0.9, asym=0, wide=0.0, lid=0.0, smile=-0.5, mopen=0.1), "uneasy": dict(raise_=0.6, tilt=1.0, asym=0, wide=0.15, lid=0.0, smile=-0.6, mopen=0.18),
+    # ---- the 11 semantic emotions of Factory V2 (eyes state, brow state, mouth state)
+    "neutral": dict(raise_=0.0, tilt=0.0, asym=0, wide=0.0, lid=0.05, smile=0.0, mopen=0.0), "curious": dict(raise_=0.45, tilt=-0.1, asym=0.35, wide=0.2, lid=0.0, smile=0.15, mopen=0.0),
+    "worried": dict(raise_=0.45, tilt=1.0, asym=0, wide=0.1, lid=0.0, smile=0.0, mopen=0.06, worried=1.0), "surprise": dict(raise_=1.0, tilt=0.2, asym=0, wide=1.0, lid=0.0, smile=0.0, mopen=0.8),
+    "realization": dict(raise_=0.9, tilt=0.3, asym=0, wide=0.85, lid=0.0, smile=-0.1, mopen=0.5), "relief": dict(raise_=0.15, tilt=0.5, asym=0, wide=0.0, lid=0.35, smile=0.55, mopen=0.1),
+    "sadness": dict(raise_=-0.15, tilt=1.0, asym=0, wide=0.0, lid=0.55, smile=-0.6, mopen=0.0, worried=0.6), "anger": dict(raise_=-0.85, tilt=-1.0, asym=0, wide=0.0, lid=0.0, narrow=0.85, smile=-0.8, mopen=0.15),
+    "determination": dict(raise_=-0.55, tilt=-0.6, asym=0, wide=0.0, lid=0.0, narrow=0.5, smile=-0.05, mopen=0.0),
     "shock": dict(raise_=1.0, tilt=0.4, asym=0, wide=1.0, lid=0.0, smile=-0.1, mopen=0.85), "fear": dict(raise_=0.9, tilt=1.0, asym=0, wide=0.85, lid=0.0, smile=-0.7, mopen=0.5),
     "angry": dict(raise_=-0.9, tilt=-1.0, asym=0, wide=0.0, lid=0.3, smile=-0.85, mopen=0.2), "suspicious": dict(raise_=-0.2, tilt=-0.2, asym=0.9, wide=0.0, lid=0.5, smile=-0.2, mopen=0.0),
     "confused": dict(raise_=0.3, tilt=0.5, asym=0.8, wide=0.1, lid=0.0, smile=-0.35, mopen=0.1), "realize": dict(raise_=0.85, tilt=0.2, asym=0, wide=0.9, lid=0.0, smile=-0.15, mopen=0.55),
     "dread": dict(raise_=0.4, tilt=1.0, asym=0, wide=0.4, lid=0.05, smile=-0.8, mopen=0.1), "determined": dict(raise_=-0.6, tilt=-0.5, asym=0, wide=0.0, lid=0.2, smile=-0.1, mopen=0.0),
 }
-FACE_MAP = dict(raise_="brow_raise", tilt="brow_tilt", asym="brow_asym", wide="wide", lid="lid", smile="mouth_smile", mopen="mouth_open")
+FACE_MAP = dict(raise_="brow_raise", tilt="brow_tilt", asym="brow_asym", wide="wide", lid="lid", smile="mouth_smile", mopen="mouth_open", narrow="narrow", worried="mouth_worried")
 
 
 class Performance:
     """Channels + geometry of ONE character. `world` gives the props/furniture the actions relate to (seat height, phone position ...), all in rig space."""
 
-    def __init__(self, P, seed=0, world=None, facing=1):
+    def __init__(self, P, seed=0, world=None, facing=1, origin=(0.0, 0.0), resolver=None, personality=None):
         self.P, self.J = P, R.rest_joints(P)
         self.seed = seed
         self.rng = random.Random(seed)
+        self.facing, self.origin = facing, tuple(origin)
+        self.resolver = resolver                              # (target_id, t) -> WORLD (x, y): the scene's spatial-target registry
+        self.personality = personality or dict(amp=1.0, speed=1.0)
+        self.so = R.side_offsets(P)
         self.world = dict(seat_h=P["hip_y"] * 0.56, floor=0.0)
         self.world.update(world or {})
         self.ch = {n: Channel(0.0) for n in POSE_CH + FACE_CH}
-        J = self.J
-        for n, v in dict(hand_L_x=J["wrist"][0], hand_L_y=J["wrist"][1], hand_R_x=J["wrist"][0], hand_R_y=J["wrist"][1],
-                         foot_L_x=J["ankle"][0] - 16, foot_L_y=P["foot_h"], foot_R_x=J["ankle"][0] + 24, foot_R_y=P["foot_h"]).items():
+        JL, JR = R.side_joints(P, "L"), R.side_joints(P, "R")
+        for n, v in dict(hand_L_x=JL["wrist"][0], hand_L_y=JL["wrist"][1], hand_R_x=JR["wrist"][0], hand_R_y=JR["wrist"][1],
+                         foot_L_x=JL["ankle"][0] - 16, foot_L_y=P["foot_h"], foot_R_x=JR["ankle"][0] + 24, foot_R_y=P["foot_h"]).items():
             self.ch[n] = Channel(v)
         self.events = []                                  # (t, kind, data) - prop/sfx cues for the compositor
         self.no_blink = []
         self.mood = "blank"
+        self.hand_pose = {"L": "closed", "R": "closed"}
+        self.ch["hand_L_pose_id"] = Channel(1.0)                  # relaxed hands by default (pose id 1 = closed)
+        self.ch["hand_R_pose_id"] = Channel(1.0)
+
+    def to_rig(self, world_xy):
+        return ((world_xy[0] - self.origin[0]) * self.facing, self.origin[1] - world_xy[1])
+
+    def to_world(self, rig_xy):
+        return (self.origin[0] + self.facing * rig_xy[0], self.origin[1] - rig_xy[1])
+
+    def target_rig(self, target, t):
+        """A semantic target (id string like 'PHONE' / 'PERSON_B', {'world': (x, y)}, {'rig': (x, y)} or a bare rig tuple) -> rig-space point."""
+        if isinstance(target, dict):
+            if "rig" in target:
+                return tuple(target["rig"])
+            if "world" in target:
+                return self.to_rig(target["world"])
+        if isinstance(target, (list, tuple)):                 # a bare tuple is ALREADY rig space (v1 convention)
+            return tuple(target)
+        if self.resolver is None:
+            raise KeyError(f"no target resolver installed (target {target!r})")
+        return self.to_rig(self.resolver(target, t))
 
     # ---- helpers
     def v(self, name, t):
@@ -82,7 +115,7 @@ class Performance:
     def emotion(self, t, name, dur=0.25, amount=1.0):
         e = EMO[name]
         for k, ch_name in FACE_MAP.items():
-            self.to(ch_name, t, t + dur, e[k] * amount, "smooth")
+            self.to(ch_name, t, t + dur, e.get(k, 0.0) * amount, "smooth")
         self.mood = name
 
 
@@ -595,9 +628,9 @@ def pose_stand(perf, t=-1.0, x=0.0):
     perf.ch["root_x"].key(t, x, "linear")
     perf.ch["pelvis_dy"].key(t, -9.0 * P["k"], "linear")
     for side, off in (("L", -16.0), ("R", 24.0)):
-        perf.ch[f"foot_{side}_x"].key(t, x + off * P["k"], "linear")
-    perf.ch["hand_L_x"].key(t, x + 22 * P["k"], "linear")
-    perf.ch["hand_R_x"].key(t, x + 26 * P["k"], "linear")
+        perf.ch[f"foot_{side}_x"].key(t, x + off * P["k"] + perf.so["h" + side], "linear")
+    perf.ch["hand_L_x"].key(t, x + 22 * P["k"] + perf.so["sL"], "linear")
+    perf.ch["hand_R_x"].key(t, x + 26 * P["k"] + perf.so["sR"], "linear")
     for side in ("L", "R"):
         sh_y = P["shoulder_joint_y"] - 9.0 * P["k"]
         perf.ch[f"hand_{side}_y"].key(t, sh_y - (P["upper_arm"] + P["forearm"]) * 0.93, "linear")
@@ -610,8 +643,8 @@ def pose_sit(perf, t=-1.0, seat=None, x=0.0):
     perf.ch["root_x"].key(t, x, "linear")
     perf.ch["pelvis_dy"].key(t, sit_hip - P["hip_y"], "linear")
     knee_x = math.sqrt(max(P["thigh"] ** 2 - (sit_hip - (P["foot_h"] + P["shin"])) ** 2, 1.0))
-    perf.ch["foot_L_x"].key(t, x + knee_x - 22 * P["k"], "linear")
-    perf.ch["foot_R_x"].key(t, x + knee_x + 14 * P["k"], "linear")
+    perf.ch["foot_L_x"].key(t, x + knee_x - 22 * P["k"] + perf.so["hL"], "linear")
+    perf.ch["foot_R_x"].key(t, x + knee_x + 14 * P["k"] + perf.so["hR"], "linear")
     perf.ch["spine_rot"].key(t, 4.0, "linear")
     for side, dx in (("L", 0.12), ("R", 0.2)):
         perf.ch[f"hand_{side}_x"].key(t, x + knee_x * dx, "linear")
@@ -646,8 +679,11 @@ def sample(perf, fps, t0, t1):
     for side in ("L", "R"):
         loc = []
         for i in range(n):
-            hip = (out["root_x"][i] + out["pelvis_dx"][i], P["hip_y"] + out["root_y"][i] + out["pelvis_dy"][i])
+            hip = (out["root_x"][i] + out["pelvis_dx"][i] + perf.so["h" + side], P["hip_y"] + out["root_y"][i] + out["pelvis_dy"][i])
             _, _, a1, a2 = R.two_bone(hip, (out[f"foot_{side}_x"][i], out[f"foot_{side}_y"][i] + out["root_y"][i] * 0), P["thigh"], P["shin"], bend=+1)
             loc.append(out[f"foot_{side}_rot"][i] - (a2 - rest_shin))
         out[f"foot_{side}_local"] = loc
     return out
+
+
+from engine.skeleton import motion_v2  # noqa: E402,F401  (registers the V2 actions on ACTIONS)

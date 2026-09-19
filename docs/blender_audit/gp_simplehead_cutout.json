@@ -1,0 +1,98 @@
+{
+ "id": "gp_simplehead_cutout",
+ "blender": "5.2.2 LTS",
+ "file_blender_version": "2.83.15",
+ "errors": [],
+ "scene": {
+  "frame_range": [
+   1,
+   250
+  ],
+  "fps": 24,
+  "engine": "BLENDER_EEVEE",
+  "unit_scale": 1.0
+ },
+ "objects": {
+  "EMPTY": 16,
+  "GREASEPENCIL": 1
+ },
+ "datablocks": {
+  "meshes": 0,
+  "armatures": 0,
+  "actions": 1,
+  "materials": 6,
+  "images": 3,
+  "grease_pencils": 1,
+  "grease_pencils_v3": 0,
+  "texts": 1,
+  "node_groups": 0,
+  "collections": 2,
+  "libraries": 0
+ },
+ "embedded_text_scripts": [
+  "Text"
+ ],
+ "missing_images": [],
+ "armatures": [],
+ "shape_keys": [],
+ "mesh_summary": {
+  "objects": 0,
+  "skinned": 0,
+  "tris": 0
+ },
+ "grease_pencil": [
+  {
+   "obj": "Head",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "Head Bace",
+    "Nose",
+    "Mustache01",
+    "Mustache02",
+    "Chin",
+    "Eyebrow",
+    "Eyes",
+    "Collar",
+    "Neck",
+    "Left Ear",
+    "Right Ear",
+    "Hair Front00",
+    "Hair Front01",
+    "Hair Front02",
+    "Hair Back",
+    "Mouth"
+   ],
+   "n_layers": 16,
+   "modifiers": [
+    "GREASE_PENCIL_SUBDIV",
+    "GREASE_PENCIL_COLOR"
+   ],
+   "parent": null,
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 39
+  }
+ ],
+ "actions": [
+  {
+   "name": "Head ControllerAction",
+   "frames": [
+    11,
+    196
+   ],
+   "fcurves": -1
+  }
+ ],
+ "n_actions": 1,
+ "tests": {
+  "ik_response": [],
+  "reach": null,
+  "prop_attach": null,
+  "walk": null,
+  "sit": null
+ },
+ "render": {
+  "ok": true,
+  "frame": 103
+ }
+}

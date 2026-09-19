@@ -1,0 +1,201 @@
+{
+ "id": "oga_old_lady",
+ "blender": "5.2.2 LTS",
+ "armature": "Armature",
+ "base_pose_from_action": "Sitting",
+ "ik_chains": [
+  {
+   "tip": "shin.L",
+   "kind": "leg",
+   "side": "L",
+   "bones": [
+    "shin.L",
+    "thigh.L"
+   ],
+   "length_m": 74.999
+  },
+  {
+   "tip": "shin.R",
+   "kind": "leg",
+   "side": "R",
+   "bones": [
+    "shin.R",
+    "thigh.R"
+   ],
+   "length_m": 74.999
+  },
+  {
+   "tip": "chest",
+   "kind": "other",
+   "side": "?",
+   "bones": [
+    "chest",
+    "Bone"
+   ],
+   "length_m": 23.577
+  },
+  {
+   "tip": "forearm.R",
+   "kind": "arm",
+   "side": "R",
+   "bones": [
+    "forearm.R",
+    "upper_arm.R"
+   ],
+   "length_m": 43.646
+  },
+  {
+   "tip": "forearm.L",
+   "kind": "arm",
+   "side": "L",
+   "bones": [
+    "forearm.L",
+    "upper_arm.L"
+   ],
+   "length_m": 43.646
+  }
+ ],
+ "axes": {
+  "lateral": [
+   1.0,
+   0.0,
+   0.0
+  ],
+  "forward": [
+   0.0,
+   1.0,
+   0.0
+  ]
+ },
+ "pipeline_mapping": {
+  "mapped": 22,
+  "of": 23,
+  "roles": {
+   "PELVIS": "hips",
+   "SPINE": null,
+   "CHEST": "chest",
+   "NECK": "neck",
+   "HEAD": "head",
+   "HAND_L": "hand.L",
+   "HAND_R": "hand.R",
+   "FOREARM_L": "forearm.L",
+   "FOREARM_R": "forearm.R",
+   "ARM_L": "upper_arm.L",
+   "ARM_R": "upper_arm.R",
+   "THIGH_L": "thigh.L",
+   "THIGH_R": "thigh.R",
+   "SHIN_L": "shin.L",
+   "SHIN_R": "shin.R",
+   "FOOT_L": "foot.L",
+   "FOOT_R": "foot.R",
+   "SHOULDER_L": "shoulder.L",
+   "SHOULDER_R": "shoulder.R",
+   "EYE_L": "eye.L",
+   "EYE_R": "eye.R",
+   "BROW": "Brow2_L",
+   "MOUTH": "Mouth_L"
+  }
+ },
+ "tests": {
+  "walk": {
+   "chains": [
+    "shin.L",
+    "shin.R"
+   ],
+   "foot_track_err_max_cm": 0.81,
+   "stride_m": 36.67,
+   "foot_lift_m": 10.004,
+   "alternating_feet": true,
+   "pass_ik_walk": true
+  },
+  "sit": {
+   "legs": [
+    {
+     "err_cm": 0.36,
+     "knee_deg": 90.0
+    },
+    {
+     "err_cm": 0.37,
+     "knee_deg": 90.0
+    }
+   ],
+   "pass_seated_pose": true,
+   "note": "feet 90/90 relative to hip (thigh horizontal, shin vertical); pelvis lowering / hip rotation not modelled"
+  },
+  "reach": {
+   "trials": [
+    {
+     "hand": "forearm.R",
+     "target": "0.5L_forward",
+     "err_cm": 0.06
+    },
+    {
+     "hand": "forearm.R",
+     "target": "0.9L_forward",
+     "err_cm": 0.0
+    },
+    {
+     "hand": "forearm.R",
+     "target": "0.9L_up",
+     "err_cm": 0.0
+    },
+    {
+     "hand": "forearm.R",
+     "target": "1.2L_forward(out of reach)",
+     "err_cm": 996.46
+    },
+    {
+     "hand": "forearm.L",
+     "target": "0.5L_forward",
+     "err_cm": 0.06
+    },
+    {
+     "hand": "forearm.L",
+     "target": "0.9L_forward",
+     "err_cm": 0.0
+    },
+    {
+     "hand": "forearm.L",
+     "target": "0.9L_up",
+     "err_cm": 0.0
+    },
+    {
+     "hand": "forearm.L",
+     "target": "1.2L_forward(out of reach)",
+     "err_cm": 996.46
+    }
+   ],
+   "pass_reach": true
+  },
+  "hold": {
+   "cube_offset_before_cm": 0.0,
+   "cube_offset_after_cm": 0.0,
+   "pass_prop_attach": true,
+   "hand_bone": "forearm.R"
+  },
+  "face": {
+   "shape_keys": 0,
+   "working_shape_keys": 0,
+   "expression_named": 0,
+   "eye_bones": [
+    "eye.R",
+    "eye.L"
+   ],
+   "eye_rotation_moves_mesh": false,
+   "brow_bones": 4
+  },
+  "proportions": {
+   "height_before_m": 130.822,
+   "height_after_m": 138.064,
+   "change_pct": 5.5,
+   "pass_bone_scale_changes_body": true
+  }
+ },
+ "pose_sheet": [
+  "../../../output/tests/blender_audit/_oga_old_lady_rest.png",
+  "../../../output/tests/blender_audit/_oga_old_lady_walk_contact.png",
+  "../../../output/tests/blender_audit/_oga_old_lady_walk_pass.png",
+  "../../../output/tests/blender_audit/_oga_old_lady_sit.png",
+  "../../../output/tests/blender_audit/_oga_old_lady_reach.png"
+ ]
+}

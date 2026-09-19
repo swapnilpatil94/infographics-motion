@@ -1,0 +1,167 @@
+{
+ "id": "gp_eye_cutout_282",
+ "blender": "5.2.2 LTS",
+ "file_blender_version": "2.80.75",
+ "errors": [],
+ "scene": {
+  "frame_range": [
+   1,
+   250
+  ],
+  "fps": 24,
+  "engine": "BLENDER_EEVEE",
+  "unit_scale": 1.0
+ },
+ "objects": {
+  "CAMERA": 1,
+  "GREASEPENCIL": 1,
+  "ARMATURE": 1
+ },
+ "datablocks": {
+  "meshes": 0,
+  "armatures": 1,
+  "actions": 1,
+  "materials": 9,
+  "images": 1,
+  "grease_pencils": 1,
+  "grease_pencils_v3": 0,
+  "texts": 1,
+  "node_groups": 0,
+  "collections": 2,
+  "libraries": 0
+ },
+ "embedded_text_scripts": [
+  "Considerations"
+ ],
+ "missing_images": [],
+ "armatures": [
+  {
+   "name": "eyeArmature",
+   "bones": 22,
+   "pose_bones": 22,
+   "bone_names_sample": [
+    "ctrl_upperLid.L",
+    "PALPsUP2",
+    "PALPsUP1",
+    "ctrl_bottonLid.R",
+    "ctrl_bottonLid.L",
+    "PALPiNF2",
+    "PALPiNF1",
+    "iris",
+    "shine",
+    "pupil",
+    "base_cilia.002",
+    "Bone.002",
+    "peak_cilia.001",
+    "base_cilia.001",
+    "Bone.005",
+    "peak_cilia.002",
+    "PINsUP2.001",
+    "ctrl_upperLid",
+    "PINsUP2.002",
+    "ctrl_bottonLid",
+    "PINsUP1.001",
+    "ctrl_upperLid.R"
+   ],
+   "roots": [
+    "ctrl_upperLid.L",
+    "PALPsUP2",
+    "PALPsUP1",
+    "ctrl_bottonLid.R",
+    "ctrl_bottonLid.L",
+    "PALPiNF2",
+    "PALPiNF1",
+    "iris",
+    "pupil",
+    "base_cilia.002",
+    "Bone.002",
+    "peak_cilia.001",
+    "base_cilia.001",
+    "Bone.005",
+    "peak_cilia.002",
+    "PINsUP2.001",
+    "PINsUP2.002",
+    "PINsUP1.001"
+   ],
+   "depth_max": 1,
+   "deform_bones": 13,
+   "finger_bones": 0,
+   "eye_bones": [
+    "iris",
+    "pupil"
+   ],
+   "brow_bones": [],
+   "mouth_bones": [],
+   "face_bones_total": 8,
+   "constraints": {
+    "COPY_LOCATION": 8,
+    "STRETCH_TO": 6,
+    "TRACK_TO": 1
+   },
+   "ik": [],
+   "drivers": 6,
+   "python_drivers": 6,
+   "action": "eyeArmatureAction",
+   "custom_props": []
+  }
+ ],
+ "shape_keys": [],
+ "mesh_summary": {
+  "objects": 0,
+  "skinned": 0,
+  "tris": 0
+ },
+ "grease_pencil": [
+  {
+   "obj": "eye",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "eye_mask",
+    "eye",
+    "eyeVein",
+    "botton_eyeFlesh",
+    "iris",
+    "pupil",
+    "eyeShine",
+    "bottonLid_mask",
+    "bottpon_cilia",
+    "upperLid_mask",
+    "upper_cilia",
+    "cilia_002",
+    "cilia_001"
+   ],
+   "n_layers": 13,
+   "modifiers": [
+    "GREASE_PENCIL_MIRROR",
+    "GREASE_PENCIL_ARMATURE",
+    "GREASE_PENCIL_SMOOTH"
+   ],
+   "parent": "eyeArmature",
+   "parent_type": "OBJECT",
+   "vgroups": 9,
+   "strokes": 62
+  }
+ ],
+ "actions": [
+  {
+   "name": "eyeArmatureAction",
+   "frames": [
+    21,
+    131
+   ],
+   "fcurves": -1
+  }
+ ],
+ "n_actions": 1,
+ "tests": {
+  "ik_response": [],
+  "reach": null,
+  "prop_attach": null,
+  "walk": null,
+  "sit": null
+ },
+ "render": {
+  "ok": true,
+  "frame": 76
+ }
+}

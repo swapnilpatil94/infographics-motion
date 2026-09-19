@@ -1,0 +1,113 @@
+{
+ "id": "gp_brush_pack_v2",
+ "blender": "5.2.2 LTS",
+ "file_blender_version": "2.91.1",
+ "errors": [],
+ "scene": {
+  "frame_range": [
+   1,
+   250
+  ],
+  "fps": 24,
+  "engine": "BLENDER_EEVEE",
+  "unit_scale": 1.0
+ },
+ "objects": {
+  "CAMERA": 1,
+  "GREASEPENCIL": 2
+ },
+ "datablocks": {
+  "meshes": 0,
+  "armatures": 0,
+  "actions": 2,
+  "materials": 16,
+  "images": 14,
+  "grease_pencils": 2,
+  "grease_pencils_v3": 0,
+  "texts": 0,
+  "node_groups": 0,
+  "collections": 2,
+  "libraries": 2
+ },
+ "embedded_text_scripts": [],
+ "missing_images": [],
+ "armatures": [],
+ "shape_keys": [],
+ "mesh_summary": {
+  "objects": 0,
+  "skinned": 0,
+  "tris": 0
+ },
+ "grease_pencil": [
+  {
+   "obj": "Catalog",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "Brushes",
+    "GP_Layer"
+   ],
+   "n_layers": 2,
+   "modifiers": [],
+   "parent": null,
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 509
+  },
+  {
+   "obj": "Drawing",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "Sky",
+    "Clouds",
+    "Tree",
+    "Ground",
+    "Character",
+    "Testing"
+   ],
+   "n_layers": 6,
+   "modifiers": [
+    "GREASE_PENCIL_NOISE",
+    "GREASE_PENCIL_NOISE",
+    "GREASE_PENCIL_NOISE",
+    "GREASE_PENCIL_NOISE",
+    "GREASE_PENCIL_OFFSET",
+    "GREASE_PENCIL_OFFSET",
+    "GREASE_PENCIL_NOISE"
+   ],
+   "parent": null,
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 646
+  }
+ ],
+ "actions": [
+  {
+   "name": "StrokeAction",
+   "frames": [
+    1,
+    302
+   ],
+   "fcurves": -1
+  },
+  {
+   "name": "StrokeAction.001",
+   "frames": [
+    1,
+    302
+   ],
+   "fcurves": -1
+  }
+ ],
+ "n_actions": 2,
+ "tests": {
+  "ik_response": [],
+  "reach": null,
+  "prop_attach": null,
+  "walk": null,
+  "sit": null
+ },
+ "render": {
+  "ok": true,
+  "frame": 151
+ }
+}

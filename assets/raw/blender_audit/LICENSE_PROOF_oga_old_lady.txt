@@ -1,0 +1,9 @@
+source page: https://opengameart.org/content/old-lady
+fetched: 2026-09-19T18:38:05.599985+00:00
+matched licence text:
+  - cc0.png' alt='' title=''>
+  - CC0
+  - cc0">3d Humanoids under CC0
+  - cc0-uploader-cdmir">All CC0 - Uploader: CDmir
+  - cc0-3d-humans-players">CC0 - 3D Humans / Players
+  - cc0-characters">CC0 Characters

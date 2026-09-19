@@ -1,0 +1,94 @@
+{
+ "id": "gp_pepe_cutout",
+ "blender": "5.2.2 LTS",
+ "armature": "Armature",
+ "base_pose_from_action": "ArmatureAction",
+ "ik_chains": [],
+ "axes": {
+  "lateral": [
+   1.0,
+   0.0,
+   0.0
+  ],
+  "forward": [
+   0.0,
+   1.0,
+   0.0
+  ]
+ },
+ "pipeline_mapping": {
+  "mapped": 6,
+  "of": 23,
+  "roles": {
+   "PELVIS": null,
+   "SPINE": null,
+   "CHEST": null,
+   "NECK": null,
+   "HEAD": "head",
+   "HAND_L": null,
+   "HAND_R": null,
+   "FOREARM_L": null,
+   "FOREARM_R": null,
+   "ARM_L": "armL",
+   "ARM_R": "armR",
+   "THIGH_L": null,
+   "THIGH_R": null,
+   "SHIN_L": null,
+   "SHIN_R": null,
+   "FOOT_L": null,
+   "FOOT_R": null,
+   "SHOULDER_L": null,
+   "SHOULDER_R": null,
+   "EYE_L": "DEF_eye.L.001",
+   "EYE_R": "DEF_eye.R.001",
+   "BROW": null,
+   "MOUTH": "DEF_mouth.001"
+  }
+ },
+ "tests": {
+  "walk": {
+   "pass_ik_walk": false,
+   "reason": "no 2-bone leg IK chains with a target (walking would need hand-keyed FK)"
+  },
+  "sit": {
+   "pass_seated_pose": false,
+   "reason": "no leg IK"
+  },
+  "reach": {
+   "pass_reach": false,
+   "reason": "no arm IK"
+  },
+  "hold": {
+   "pass_prop_attach": false,
+   "reason": "no arm IK; hand bone present: False"
+  },
+  "face": {
+   "shape_keys": 0,
+   "working_shape_keys": 0,
+   "expression_named": 0,
+   "eye_bones": [
+    "DEF_eye.L.001",
+    "eye.L",
+    "pupil.L",
+    "DEF_eye.R.001",
+    "eye.R",
+    "pupil.R"
+   ],
+   "eye_rotation_moves_mesh": false,
+   "brow_bones": 0
+  },
+  "proportions": {
+   "height_before_m": 2.0,
+   "height_after_m": 2.0,
+   "change_pct": 0.0,
+   "pass_bone_scale_changes_body": false
+  }
+ },
+ "pose_sheet": [
+  "../../../output/tests/blender_audit/_gp_pepe_cutout_rest.png",
+  "../../../output/tests/blender_audit/_gp_pepe_cutout_walk_contact.png",
+  "../../../output/tests/blender_audit/_gp_pepe_cutout_walk_pass.png",
+  "../../../output/tests/blender_audit/_gp_pepe_cutout_sit.png",
+  "../../../output/tests/blender_audit/_gp_pepe_cutout_reach.png"
+ ]
+}

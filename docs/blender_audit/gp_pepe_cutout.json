@@ -1,0 +1,169 @@
+{
+ "id": "gp_pepe_cutout",
+ "blender": "5.2.2 LTS",
+ "file_blender_version": "2.83.15",
+ "errors": [],
+ "scene": {
+  "frame_range": [
+   1,
+   105
+  ],
+  "fps": 24,
+  "engine": "BLENDER_EEVEE",
+  "unit_scale": 1.0
+ },
+ "objects": {
+  "ARMATURE": 1,
+  "CAMERA": 2,
+  "MESH": 1,
+  "EMPTY": 2,
+  "LIGHT": 1,
+  "GREASEPENCIL": 1
+ },
+ "datablocks": {
+  "meshes": 1,
+  "armatures": 1,
+  "actions": 2,
+  "materials": 23,
+  "images": 0,
+  "grease_pencils": 1,
+  "grease_pencils_v3": 0,
+  "texts": 0,
+  "node_groups": 0,
+  "collections": 4,
+  "libraries": 0
+ },
+ "embedded_text_scripts": [],
+ "missing_images": [],
+ "armatures": [
+  {
+   "name": "Armature",
+   "bones": 22,
+   "pose_bones": 22,
+   "bone_names_sample": [
+    "head",
+    "DEF_mouth.001",
+    "mouth",
+    "DEF_ear.L.001",
+    "ear.L",
+    "DEF_ear.R.001",
+    "ear.R",
+    "DEF_eye.L.001",
+    "eye.L",
+    "pupil.L",
+    "DEF_eye.R.001",
+    "eye.R",
+    "pupil.R",
+    "DEF_nose",
+    "nose",
+    "Bone.002",
+    "body",
+    "armR",
+    "armL",
+    "body.001",
+    "armL.001",
+    "armR.001"
+   ],
+   "roots": [
+    "head",
+    "Bone.002",
+    "body",
+    "body.001",
+    "armL.001",
+    "armR.001"
+   ],
+   "depth_max": 3,
+   "deform_bones": 22,
+   "finger_bones": 0,
+   "eye_bones": [
+    "DEF_eye.L.001",
+    "eye.L",
+    "pupil.L",
+    "DEF_eye.R.001",
+    "eye.R",
+    "pupil.R"
+   ],
+   "brow_bones": [],
+   "mouth_bones": [
+    "DEF_mouth.001",
+    "mouth"
+   ],
+   "face_bones_total": 10,
+   "constraints": {
+    "STRETCH_TO": 4
+   },
+   "ik": [],
+   "drivers": 0,
+   "python_drivers": 0,
+   "action": "ArmatureAction",
+   "custom_props": []
+  }
+ ],
+ "shape_keys": [],
+ "mesh_summary": {
+  "objects": 1,
+  "skinned": 0,
+  "tris": 6
+ },
+ "grease_pencil": [
+  {
+   "obj": "Pepe",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "bg",
+    "body",
+    "armL",
+    "armR",
+    "earL",
+    "earR",
+    "head",
+    "eyeL",
+    "eyeR",
+    "pupilL",
+    "pupilR",
+    "eyelidR",
+    "eyelidL",
+    "mouth",
+    "nose"
+   ],
+   "n_layers": 15,
+   "modifiers": [
+    "GREASE_PENCIL_THICKNESS"
+   ],
+   "parent": null,
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 349
+  }
+ ],
+ "actions": [
+  {
+   "name": "ArmatureAction",
+   "frames": [
+    -11,
+    97
+   ],
+   "fcurves": -1
+  },
+  {
+   "name": "Camera.001Action",
+   "frames": [
+    0,
+    0
+   ],
+   "fcurves": -1
+  }
+ ],
+ "n_actions": 2,
+ "tests": {
+  "ik_response": [],
+  "reach": null,
+  "prop_attach": null,
+  "walk": null,
+  "sit": null
+ },
+ "render": {
+  "ok": true,
+  "frame": 43
+ }
+}

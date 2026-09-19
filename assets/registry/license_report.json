@@ -1,0 +1,121 @@
+{
+ "policy_source": "engine/licensing/policy.py",
+ "summary": {
+  "ACCEPT": 13,
+  "ACCEPT_WITH_OBLIGATIONS": 5,
+  "QUARANTINE": 12
+ },
+ "usable_in_films": [
+  "open_peeps_flat_v1"
+ ],
+ "evaluated_downloaded": [
+  "kenney_platformer_characters_v1",
+  "kenney_modular_characters_v1",
+  "oga_creomoto_stickman_fixed_v1",
+  "oga_lowpoly_rigged_man_v1",
+  "oga_old_lady_rigged_v1",
+  "oga_puppet_base_rigged_v1",
+  "blenderstudio_gp_cutout_pepe_v1",
+  "blenderstudio_gp_cutout_cowboy_v1",
+  "blenderstudio_gp_cutout_boyhead282_v1",
+  "blenderstudio_gp_brush_pack_v2",
+  "artell_mike_rig_v1",
+  "blender_human_base_meshes_v1_4_1",
+  "mpfb2_generated_humans_cc0"
+ ],
+ "external_tools": [
+  "mpfb2_extension_2_0_17"
+ ],
+ "blocked_not_downloaded": [
+  {
+   "asset_id": "blendswap_stickman_basic_rig_30507",
+   "status": "BLOCKED_LOGIN"
+  },
+  {
+   "asset_id": "blendswap_2d_stickman_rig_v2_15217",
+   "status": "BLOCKED_LOGIN"
+  },
+  {
+   "asset_id": "gumroad_gp_spider_rig_dantti",
+   "status": "BLOCKED_CHECKOUT"
+  },
+  {
+   "asset_id": "gumroad_super_stickman_ahmad",
+   "status": "BLOCKED_CHECKOUT"
+  },
+  {
+   "asset_id": "gumroad_gp_character_rigs_yadoob",
+   "status": "BLOCKED_CHECKOUT"
+  },
+  {
+   "asset_id": "quaternius_universal_base_characters",
+   "status": "BLOCKED_GATED"
+  },
+  {
+   "asset_id": "stickman_v4gp_2d",
+   "status": "NOT_FOUND"
+  }
+ ],
+ "quarantined": [
+  {
+   "asset_id": "coa_tools2",
+   "reason": "copyleft CODE must not be vendored into the core; reimplement concepts or run as an external tool"
+  },
+  {
+   "asset_id": "tiny_2d_rig_tools",
+   "reason": "license unknown/unasserted or no license file (README claims are not proof)"
+  },
+  {
+   "asset_id": "puppet_mode",
+   "reason": "license unknown/unasserted or no license file (README claims are not proof)"
+  },
+  {
+   "asset_id": "skeleton_rig_frycz",
+   "reason": "license unknown/unasserted or no license file (README claims are not proof)"
+  },
+  {
+   "asset_id": "mpfb2_extension_2_0_17",
+   "reason": "copyleft CODE must not be vendored into the core; reimplement concepts or run as an external tool"
+  },
+  {
+   "asset_id": "gumroad_gp_spider_rig_dantti",
+   "reason": "license unknown/unasserted or no license file (README claims are not proof)"
+  },
+  {
+   "asset_id": "gumroad_super_stickman_ahmad",
+   "reason": "license unknown/unasserted or no license file (README claims are not proof)"
+  },
+  {
+   "asset_id": "gumroad_gp_character_rigs_yadoob",
+   "reason": "license unknown/unasserted or no license file (README claims are not proof)"
+  },
+  {
+   "asset_id": "stickman_v4gp_2d",
+   "reason": "license unknown/unasserted or no license file (README claims are not proof)"
+  },
+  {
+   "asset_id": "blenderstudio_gp_cutout_suzanno_v1",
+   "reason": "license unknown/unasserted or no license file (README claims are not proof)"
+  },
+  {
+   "asset_id": "blenderstudio_gp_cutout_simplehead_v1",
+   "reason": "license unknown/unasserted or no license file (README claims are not proof)"
+  },
+  {
+   "asset_id": "blenderstudio_gp_cutout_eye282_v1",
+   "reason": "license unknown/unasserted or no license file (README claims are not proof)"
+  }
+ ],
+ "rejected": [],
+ "attribution_required": [
+  "blenderstudio_gp_cutout_pepe_v1",
+  "blenderstudio_gp_cutout_cowboy_v1",
+  "blenderstudio_gp_cutout_boyhead282_v1",
+  "blenderstudio_gp_brush_pack_v2",
+  "blendswap_2d_stickman_rig_v2_15217"
+ ],
+ "share_alike": [
+  "coa_tools2",
+  "mpfb2_extension_2_0_17"
+ ]
+}

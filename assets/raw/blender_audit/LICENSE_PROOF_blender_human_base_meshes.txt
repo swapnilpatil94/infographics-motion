@@ -1,0 +1,9 @@
+source page: https://www.blender.org/download/demo-files/
+fetched: 2026-09-19T18:38:11.609844+00:00
+matched licence text:
+  - CC0
+  - CC0
+  - CC0, 32 MB)
+  - CC0 &#8211;
+  - CC0 &#8211;
+  - CC0 &#8211;

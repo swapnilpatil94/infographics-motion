@@ -86,7 +86,7 @@ class PartsArtTests(unittest.TestCase):
 class MotionGrammarTests(unittest.TestCase):
     def perf(self, arch="young_man", seed=1):
         man = PA.bake(dna(arch, "m", "male" if "man" in arch else "female"))
-        p = M.Performance(man["P"], seed=seed, world=dict(seat_h=270))
+        p = M.Performance(man["P"], seed=seed, world=dict(seat_h=270), resolver=lambda tid, t: (500.0, 900.0))
         M.pose_stand(p, -1.0, 0.0)
         return p
 

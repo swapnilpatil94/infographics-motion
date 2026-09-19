@@ -1,0 +1,6 @@
+source page: https://opengameart.org/content/low-poly-rigged-man
+fetched: 2026-09-19T18:38:04.205662+00:00
+matched licence text:
+  - cc0.png' alt='' title=''>
+  - CC0
+  - cc0">3d Humanoids under CC0

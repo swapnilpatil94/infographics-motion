@@ -1,0 +1,188 @@
+{
+ "id": "oga_lowpoly_rigged_man",
+ "blender": "5.2.2 LTS",
+ "armature": "Armature",
+ "base_pose_from_action": "ArmatureAction",
+ "ik_chains": [
+  {
+   "tip": "LowerArm.L",
+   "kind": "arm",
+   "side": "L",
+   "bones": [
+    "LowerArm.L",
+    "UpperArm.L"
+   ],
+   "length_m": 1.123
+  },
+  {
+   "tip": "LowerLeg.L",
+   "kind": "leg",
+   "side": "L",
+   "bones": [
+    "LowerLeg.L",
+    "UpperLeg.L"
+   ],
+   "length_m": 1.172
+  },
+  {
+   "tip": "LowerArm.R",
+   "kind": "arm",
+   "side": "R",
+   "bones": [
+    "LowerArm.R",
+    "UpperArm.R"
+   ],
+   "length_m": 1.123
+  },
+  {
+   "tip": "LowerLeg.R",
+   "kind": "leg",
+   "side": "R",
+   "bones": [
+    "LowerLeg.R",
+    "UpperLeg.R"
+   ],
+   "length_m": 1.18
+  }
+ ],
+ "axes": {
+  "lateral": [
+   0.995,
+   -0.104,
+   0.0
+  ],
+  "forward": [
+   0.104,
+   0.995,
+   -0.0
+  ]
+ },
+ "pipeline_mapping": {
+  "mapped": 15,
+  "of": 23,
+  "roles": {
+   "PELVIS": null,
+   "SPINE": "Torso",
+   "CHEST": "UpperArm.L",
+   "NECK": null,
+   "HEAD": "Head",
+   "HAND_L": "Hand.L",
+   "HAND_R": "Hand.R",
+   "FOREARM_L": "LowerArm.L",
+   "FOREARM_R": "LowerArm.R",
+   "ARM_L": "UpperArm.L",
+   "ARM_R": "UpperArm.R",
+   "THIGH_L": "UpperLeg.L",
+   "THIGH_R": "UpperLeg.R",
+   "SHIN_L": "LowerLeg.L",
+   "SHIN_R": "LowerLeg.R",
+   "FOOT_L": "Foot.L",
+   "FOOT_R": "Foot.R",
+   "SHOULDER_L": null,
+   "SHOULDER_R": null,
+   "EYE_L": null,
+   "EYE_R": null,
+   "BROW": null,
+   "MOUTH": null
+  }
+ },
+ "tests": {
+  "walk": {
+   "chains": [
+    "LowerLeg.L",
+    "LowerLeg.R"
+   ],
+   "foot_track_err_max_cm": 6.11,
+   "stride_m": 0.556,
+   "foot_lift_m": 0.156,
+   "alternating_feet": true,
+   "pass_ik_walk": false
+  },
+  "sit": {
+   "legs": [
+    {
+     "err_cm": 0.01,
+     "knee_deg": 90.0
+    },
+    {
+     "err_cm": 0.01,
+     "knee_deg": 90.0
+    }
+   ],
+   "pass_seated_pose": true,
+   "note": "feet 90/90 relative to hip (thigh horizontal, shin vertical); pelvis lowering / hip rotation not modelled"
+  },
+  "reach": {
+   "trials": [
+    {
+     "hand": "LowerArm.L",
+     "target": "0.5L_forward",
+     "err_cm": 0.0
+    },
+    {
+     "hand": "LowerArm.L",
+     "target": "0.9L_forward",
+     "err_cm": 0.0
+    },
+    {
+     "hand": "LowerArm.L",
+     "target": "0.9L_up",
+     "err_cm": 0.0
+    },
+    {
+     "hand": "LowerArm.L",
+     "target": "1.2L_forward(out of reach)",
+     "err_cm": 22.45
+    },
+    {
+     "hand": "LowerArm.R",
+     "target": "0.5L_forward",
+     "err_cm": 0.0
+    },
+    {
+     "hand": "LowerArm.R",
+     "target": "0.9L_forward",
+     "err_cm": 0.0
+    },
+    {
+     "hand": "LowerArm.R",
+     "target": "0.9L_up",
+     "err_cm": 0.0
+    },
+    {
+     "hand": "LowerArm.R",
+     "target": "1.2L_forward(out of reach)",
+     "err_cm": 22.45
+    }
+   ],
+   "pass_reach": true
+  },
+  "hold": {
+   "cube_offset_before_cm": 0.0,
+   "cube_offset_after_cm": 0.0,
+   "pass_prop_attach": true,
+   "hand_bone": "LowerArm.L"
+  },
+  "face": {
+   "shape_keys": 0,
+   "working_shape_keys": 0,
+   "expression_named": 0,
+   "eye_bones": [],
+   "eye_rotation_moves_mesh": false,
+   "brow_bones": 0
+  },
+  "proportions": {
+   "height_before_m": 3.121,
+   "height_after_m": 3.402,
+   "change_pct": 9.0,
+   "pass_bone_scale_changes_body": true
+  }
+ },
+ "pose_sheet": [
+  "../../../output/tests/blender_audit/_oga_lowpoly_rigged_man_rest.png",
+  "../../../output/tests/blender_audit/_oga_lowpoly_rigged_man_walk_contact.png",
+  "../../../output/tests/blender_audit/_oga_lowpoly_rigged_man_walk_pass.png",
+  "../../../output/tests/blender_audit/_oga_lowpoly_rigged_man_sit.png",
+  "../../../output/tests/blender_audit/_oga_lowpoly_rigged_man_reach.png"
+ ]
+}

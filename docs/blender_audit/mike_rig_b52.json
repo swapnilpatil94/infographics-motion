@@ -1,0 +1,833 @@
+{
+ "id": "mike_rig_b52",
+ "blender": "5.2.2 LTS",
+ "file_blender_version": "5.2.44",
+ "errors": [],
+ "scene": {
+  "frame_range": [
+   94,
+   95
+  ],
+  "fps": 60,
+  "engine": "CYCLES",
+  "unit_scale": 1.0
+ },
+ "objects": {
+  "FONT": 11,
+  "MESH": 255,
+  "CAMERA": 2,
+  "EMPTY": 3,
+  "ARMATURE": 1,
+  "LIGHT": 3
+ },
+ "datablocks": {
+  "meshes": 229,
+  "armatures": 1,
+  "actions": 4,
+  "materials": 32,
+  "images": 5,
+  "grease_pencils": 0,
+  "grease_pencils_v3": 0,
+  "texts": 2,
+  "node_groups": 2,
+  "collections": 4,
+  "libraries": 0
+ },
+ "embedded_text_scripts": [
+  "reset_2.2.py",
+  "Text"
+ ],
+ "missing_images": [],
+ "armatures": [
+  {
+   "name": "mike_rig",
+   "bones": 956,
+   "pose_bones": 956,
+   "bone_names_sample": [
+    "Picker",
+    "c_eye_proxy.r",
+    "c_eye_ref_proxy.r",
+    "c_eyelid_top_proxy.r",
+    "c_eye_proxy.l",
+    "c_eye_ref_proxy.l",
+    "c_eyelid_top_proxy.l",
+    "c_jawbone_proxy.x",
+    "c_eyebrow_01_proxy.l",
+    "c_eyebrow_01_proxy.r",
+    "c_eyelid_bot_proxy.r",
+    "c_eyelid_bot_proxy.l",
+    "c_eyebrow_02_proxy.l",
+    "c_eyebrow_03_proxy.l",
+    "c_eyebrow_02_proxy.r",
+    "c_eyebrow_03_proxy.r",
+    "c_eyebrow_01_end_proxy.l",
+    "c_eyebrow_01_end_proxy.r",
+    "c_eyebrow_full_proxy.l",
+    "c_eyebrow_full_proxy.r",
+    "c_index1_proxy.r",
+    "c_index2_proxy.r",
+    "c_index3_proxy.r",
+    "c_middle1_proxy.r",
+    "c_middle2_proxy.r",
+    "c_middle3_proxy.r",
+    "c_ring1_proxy.r",
+    "c_ring2_proxy.r",
+    "c_ring3_proxy.r",
+    "c_pinky1_proxy.r",
+    "c_pinky2_proxy.r",
+    "c_pinky3_proxy.r",
+    "c_thumb1_proxy.r",
+    "c_thumb2_proxy.r",
+    "c_thumb3_proxy.r",
+    "c_index1_proxy.l",
+    "c_index2_proxy.l",
+    "c_index3_proxy.l",
+    "c_middle1_proxy.l",
+    "c_middle2_proxy.l",
+    "c_middle3_proxy.l",
+    "c_ring1_proxy.l",
+    "c_ring2_proxy.l",
+    "c_ring3_proxy.l",
+    "c_pinky1_proxy.l",
+    "c_pinky2_proxy.l",
+    "c_pinky3_proxy.l",
+    "c_thumb1_proxy.l",
+    "c_thumb2_proxy.l",
+    "c_thumb3_proxy.l",
+    "c_head_proxy.x",
+    "c_neck_proxy.x",
+    "c_spine_02_proxy.x",
+    "c_spine_01_proxy.x",
+    "c_root_proxy.x",
+    "c_shoulder_proxy.l",
+    "c_shoulder_proxy.r",
+    "c_arm_fk_proxy.l",
+    "c_forearm_fk_proxy.l",
+    "c_arms_pole_proxy.l"
+   ],
+   "roots": [
+    "Picker",
+    "c_pos",
+    "c_eye_target.x",
+    "c_arms_pole.l",
+    "c_arms_pole.r",
+    "c_foot_ik.r",
+    "c_leg_pole.r",
+    "c_foot_ik.l",
+    "c_leg_pole.l",
+    "c_hand_ik.r",
+    "c_hand_ik.l",
+    "eyebrow_full_ref.r",
+    "eyebrow_full_ref.l",
+    "lips_top_ref.x",
+    "lips_bot_ref.x",
+    "lips_roll_top_ref.x",
+    "lips_roll_bot_ref.x",
+    "tong_01_ref.x",
+    "teeth_bot_ref.x",
+    "chin_02_ref.x",
+    "teeth_top_ref.x",
+    "eye_offset_ref.l",
+    "eye_offset_ref.r",
+    "cheek_smile_ref.l",
+    "cheek_smile_ref.r",
+    "nose_01_ref.x",
+    "root_ref.x"
+   ],
+   "depth_max": 17,
+   "deform_bones": 171,
+   "finger_bones": 196,
+   "eye_bones": [
+    "c_eye_proxy.r",
+    "c_eye_ref_proxy.r",
+    "c_eyelid_top_proxy.r",
+    "c_eye_proxy.l",
+    "c_eye_ref_proxy.l",
+    "c_eyelid_top_proxy.l",
+    "c_eyebrow_01_proxy.l",
+    "c_eyebrow_01_proxy.r",
+    "c_eyelid_bot_proxy.r",
+    "c_eyelid_bot_proxy.l",
+    "c_eyebrow_02_proxy.l",
+    "c_eyebrow_03_proxy.l",
+    "c_eyebrow_02_proxy.r",
+    "c_eyebrow_03_proxy.r",
+    "c_eyebrow_01_end_proxy.l",
+    "c_eyebrow_01_end_proxy.r",
+    "c_eyebrow_full_proxy.l",
+    "c_eyebrow_full_proxy.r",
+    "c_eye_offset_proxy.l",
+    "c_eye_offset_proxy.r",
+    "c_eyelid_corner_02_proxy.r",
+    "c_eyelid_corner_02_proxy.l",
+    "c_eyelid_corner_01_proxy.r",
+    "c_eyelid_corner_01_proxy.l",
+    "c_eyelid_top_03_proxy.r",
+    "c_eyelid_top_03_proxy.l",
+    "c_eyelid_top_02_proxy.r",
+    "c_eyelid_top_02_proxy.l",
+    "c_eyelid_top_01_proxy.r",
+    "c_eyelid_top_01_proxy.l",
+    "c_eyelid_bot_01_proxy.r",
+    "c_eyelid_bot_01_proxy.l",
+    "c_eyelid_bot_02_proxy.r",
+    "c_eyelid_bot_02_proxy.l",
+    "c_eyelid_bot_03_proxy.r",
+    "c_eyelid_bot_03_proxy.l",
+    "c_eye_target_proxy.r",
+    "c_eye_target_proxy.l",
+    "c_eye_target_proxy.x",
+    "c_eye_ref_track.l",
+    "c_eye_ref_track.r",
+    "c_eye_offset.l",
+    "eyelid_base_top.l",
+    "eyelid_top.l",
+    "c_eyelid_top_01.l",
+    "c_eyelid_top_02.l",
+    "c_eyelid_top_03.l",
+    "c_eye.l",
+    "c_eye_ref.l",
+    "c_eyelid_corner_01.l",
+    "c_eyelid_corner_02.l",
+    "c_eyelid_top.l",
+    "c_eyelid_bot.l",
+    "eyelid_base_bot.l",
+    "eyelid_bot.l",
+    "c_eyelid_bot_01.l",
+    "c_eyelid_bot_02.l",
+    "c_eyelid_bot_03.l",
+    "c_eye_offset.r",
+    "c_eyelid_corner_01.r",
+    "c_eyelid_corner_02.r",
+    "eyelid_base_top.r",
+    "eyelid_top.r",
+    "c_eyelid_top_01.r",
+    "c_eyelid_top_02.r",
+    "c_eyelid_top_03.r",
+    "c_eye.r",
+    "c_eye_ref.r",
+    "c_eyelid_top.r",
+    "c_eyelid_bot.r",
+    "eyelid_base_bot.r",
+    "eyelid_bot.r",
+    "c_eyelid_bot_01.r",
+    "c_eyelid_bot_02.r",
+    "c_eyelid_bot_03.r",
+    "c_eyebrow_full.r",
+    "c_eyebrow_03.r",
+    "c_eyebrow_02.r",
+    "c_eyebrow_01.r",
+    "c_eyebrow_01_end.r",
+    "c_eyebrow_full.l",
+    "c_eyebrow_03.l",
+    "c_eyebrow_02.l",
+    "c_eyebrow_01.l",
+    "c_eyebrow_01_end.l",
+    "c_eye_target.x",
+    "c_eye_target.l",
+    "c_eye_target.r",
+    "eyebrow_full_ref.r",
+    "eyebrow_03_ref.r",
+    "eyebrow_02_ref.r",
+    "eyebrow_01_ref.r",
+    "eyebrow_01_end_ref.r",
+    "eyebrow_full_ref.l",
+    "eyebrow_03_ref.l",
+    "eyebrow_02_ref.l",
+    "eyebrow_01_ref.l",
+    "eyebrow_01_end_ref.l",
+    "eye_offset_ref.l",
+    "eyelid_top_ref.l",
+    "eyelid_bot_ref.l",
+    "eyelid_top_01_ref.l",
+    "eyelid_top_02_ref.l",
+    "eyelid_top_03_ref.l",
+    "eyelid_bot_01_ref.l",
+    "eyelid_bot_02_ref.l",
+    "eyelid_bot_03_ref.l",
+    "eyelid_corner_01_ref.l",
+    "eyelid_corner_02_ref.l",
+    "eye_offset_ref.r",
+    "eyelid_top_ref.r",
+    "eyelid_bot_ref.r",
+    "eyelid_top_01_ref.r",
+    "eyelid_top_02_ref.r",
+    "eyelid_top_03_ref.r",
+    "eyelid_bot_01_ref.r",
+    "eyelid_bot_02_ref.r",
+    "eyelid_bot_03_ref.r",
+    "eyelid_corner_01_ref.r",
+    "eyelid_corner_02_ref.r"
+   ],
+   "brow_bones": [
+    "c_eyebrow_01_proxy.l",
+    "c_eyebrow_01_proxy.r",
+    "c_eyebrow_02_proxy.l",
+    "c_eyebrow_03_proxy.l",
+    "c_eyebrow_02_proxy.r",
+    "c_eyebrow_03_proxy.r",
+    "c_eyebrow_01_end_proxy.l",
+    "c_eyebrow_01_end_proxy.r",
+    "c_eyebrow_full_proxy.l",
+    "c_eyebrow_full_proxy.r",
+    "c_eyebrow_full.r",
+    "c_eyebrow_03.r",
+    "c_eyebrow_02.r",
+    "c_eyebrow_01.r",
+    "c_eyebrow_01_end.r",
+    "c_eyebrow_full.l",
+    "c_eyebrow_03.l",
+    "c_eyebrow_02.l",
+    "c_eyebrow_01.l",
+    "c_eyebrow_01_end.l",
+    "eyebrow_full_ref.r",
+    "eyebrow_03_ref.r",
+    "eyebrow_02_ref.r",
+    "eyebrow_01_ref.r",
+    "eyebrow_01_end_ref.r",
+    "eyebrow_full_ref.l",
+    "eyebrow_03_ref.l",
+    "eyebrow_02_ref.l",
+    "eyebrow_01_ref.l",
+    "eyebrow_01_end_ref.l"
+   ],
+   "mouth_bones": [
+    "c_jawbone_proxy.x",
+    "c_lips_smile_proxy.l",
+    "c_lips_corner_mini_proxy.l",
+    "c_lips_smile_proxy.r",
+    "c_lips_corner_mini_proxy.r",
+    "c_lips_top_proxy.x",
+    "c_lips_bot_proxy.x",
+    "c_lips_roll_bot_proxy.x",
+    "c_teeth_top_master_proxy.x",
+    "c_teeth_bot_master_proxy.x",
+    "c_lips_bot_01_proxy.l",
+    "c_lips_bot_01_proxy.r",
+    "c_lips_roll_top_proxy.x",
+    "c_lips_top_proxy.l",
+    "c_lips_top_proxy.r",
+    "c_lips_bot_proxy.l",
+    "c_lips_bot_proxy.r",
+    "c_lips_top_01_proxy.l",
+    "c_lips_top_01_proxy.r",
+    "c_teeth_top_proxy.l",
+    "c_teeth_top_proxy.r",
+    "c_teeth_top_proxy.x",
+    "c_teeth_bot_proxy.l",
+    "c_teeth_bot_proxy.r",
+    "c_teeth_bot_proxy.x",
+    "c_jawbone.x",
+    "jawbone.x",
+    "c_teeth_bot_master.x",
+    "c_teeth_bot.x",
+    "c_teeth_bot.l",
+    "c_teeth_bot.r",
+    "c_lips_roll_bot.x",
+    "c_lips_bot_offset.l",
+    "c_lips_bot.l",
+    "lips_bot_follow.l",
+    "c_lips_bot_offset.r",
+    "c_lips_bot.r",
+    "lips_bot_follow.r",
+    "c_lips_bot_offset.x",
+    "c_lips_bot.x",
+    "c_lips_bot_01_offset.l",
+    "c_lips_bot_01.l",
+    "lips_bot_01_follow.l",
+    "c_lips_bot_01_offset.r",
+    "c_lips_bot_01.r",
+    "lips_bot_01_follow.r",
+    "c_lips_roll_top.x",
+    "c_teeth_top_master.x",
+    "c_teeth_top.x",
+    "c_teeth_top.l",
+    "c_teeth_top.r",
+    "jaw_ret_bone.x",
+    "c_lips_top_retain.x",
+    "c_lips_top_retain.l",
+    "c_lips_top_retain.r",
+    "c_lips_top_01_retain.l",
+    "c_lips_top_01_retain.r",
+    "c_lips_smile_retain.l",
+    "c_lips_smile_retain.r",
+    "c_lips_bot_01_retain.l",
+    "c_lips_bot_01_retain.r",
+    "c_lips_bot_retain.l",
+    "c_lips_bot_retain.r",
+    "c_lips_bot_retain.x",
+    "c_lips_top_offset.x",
+    "c_lips_top.x",
+    "c_lips_top_offset.l",
+    "c_lips_top.l",
+    "lips_top_follow.l",
+    "c_lips_top_offset.r",
+    "c_lips_top.r",
+    "lips_top_follow.r",
+    "c_lips_top_01_offset.l",
+    "c_lips_top_01.l",
+    "lips_top_01_follow.l",
+    "c_lips_top_01_offset.r",
+    "c_lips_top_01.r",
+    "lips_top_01_follow.r",
+    "c_lips_smile_offset.l",
+    "c_lips_smile.l",
+    "c_lips_corner_mini.l",
+    "c_lips_smile_offset.r",
+    "c_lips_smile.r",
+    "c_lips_corner_mini.r",
+    "jawbone_track.x",
+    "lips_top_ref.x",
+    "lips_top_ref.l",
+    "lips_top_01_ref.l",
+    "lips_smile_ref.l",
+    "lips_corner_mini_ref.l",
+    "lips_top_ref.r",
+    "lips_top_01_ref.r",
+    "lips_smile_ref.r",
+    "lips_corner_mini_ref.r",
+    "lips_bot_ref.x",
+    "lips_bot_ref.l",
+    "lips_bot_01_ref.l",
+    "lips_bot_ref.r",
+    "lips_bot_01_ref.r",
+    "lips_roll_top_ref.x",
+    "lips_roll_bot_ref.x",
+    "teeth_bot_ref.x",
+    "teeth_bot_ref.l",
+    "teeth_bot_ref.r",
+    "teeth_top_ref.x",
+    "teeth_top_ref.l",
+    "teeth_top_ref.r",
+    "jaw_ref.x"
+   ],
+   "face_bones_total": 249,
+   "constraints": {
+    "LIMIT_LOCATION": 117,
+    "COPY_SCALE": 80,
+    "IK": 11,
+    "COPY_ROTATION": 135,
+    "COPY_LOCATION": 130,
+    "DAMPED_TRACK": 51,
+    "STRETCH_TO": 32,
+    "COPY_TRANSFORMS": 33,
+    "ACTION": 40,
+    "LOCKED_TRACK": 4,
+    "CHILD_OF": 15,
+    "LIMIT_ROTATION": 12,
+    "TRANSFORM": 12,
+    "TRACK_TO": 4
+   },
+   "ik": [
+    {
+     "bone": "root.x",
+     "chain": 1,
+     "target": "mike_rig",
+     "subtarget": "c_root.x",
+     "pole": null
+    },
+    {
+     "bone": "leg_ik.l",
+     "chain": 2,
+     "target": "mike_rig",
+     "subtarget": "foot_ik_target.l",
+     "pole": null
+    },
+    {
+     "bone": "leg_ik_nostr.l",
+     "chain": 2,
+     "target": "mike_rig",
+     "subtarget": "foot_ik_target.l",
+     "pole": "mike_rig"
+    },
+    {
+     "bone": "leg_ik.r",
+     "chain": 2,
+     "target": "mike_rig",
+     "subtarget": "foot_ik_target.r",
+     "pole": null
+    },
+    {
+     "bone": "leg_ik_nostr.r",
+     "chain": 2,
+     "target": "mike_rig",
+     "subtarget": "foot_ik_target.r",
+     "pole": "mike_rig"
+    },
+    {
+     "bone": "forearm_ik.r",
+     "chain": 2,
+     "target": "mike_rig",
+     "subtarget": "c_hand_ik.r",
+     "pole": null
+    },
+    {
+     "bone": "forearm_ik_nostr.r",
+     "chain": 2,
+     "target": "mike_rig",
+     "subtarget": "c_hand_ik.r",
+     "pole": "mike_rig"
+    },
+    {
+     "bone": "forearm_ik.l",
+     "chain": 2,
+     "target": "mike_rig",
+     "subtarget": "c_hand_ik.l",
+     "pole": null
+    },
+    {
+     "bone": "forearm_ik_nostr.l",
+     "chain": 2,
+     "target": "mike_rig",
+     "subtarget": "c_hand_ik.l",
+     "pole": "mike_rig"
+    },
+    {
+     "bone": "c_eye_ref_track.l",
+     "chain": 1,
+     "target": "mike_rig",
+     "subtarget": "c_eye_ref.l",
+     "pole": null
+    },
+    {
+     "bone": "c_eye_ref_track.r",
+     "chain": 1,
+     "target": "mike_rig",
+     "subtarget": "c_eye_ref.r",
+     "pole": null
+    }
+   ],
+   "drivers": 371,
+   "python_drivers": 371,
+   "action": null,
+   "custom_props": [
+    "cycles",
+    "rig_spine_count",
+    "ant_landscape",
+    "flip_fluid",
+    "animation_retarget",
+    "arp_secondary_type",
+    "arp_rig_type",
+    "HG",
+    "layers_sets",
+    "layers_sets_idx",
+    "arp_previous_secondaries"
+   ]
+  }
+ ],
+ "shape_keys": [
+  {
+   "obj": "mike_body",
+   "keys": [
+    "00_Basis",
+    "lips_side_out.l",
+    "smile_up.l",
+    "lips_side_out.r",
+    "smile_up.r",
+    "open_mouth.x",
+    "00_modif",
+    "hide",
+    "eyebrow_full_down.l",
+    "eyebrow_01_end.l",
+    "eyebrow_01.l",
+    "eyebrow_02.l",
+    "eyebrow_03.l",
+    "eyebrow_full_up.l",
+    "eyebrow_full_down.r",
+    "eyebrow_01_end.r",
+    "eyebrow_01.r",
+    "eyebrow_02.r",
+    "eyebrow_03.r",
+    "eyebrow_full_up.r",
+    "eyelid_top_down.l",
+    "eyelid_bot_up.l",
+    "eyelid_top_down.r",
+    "eyelid_bot_up.r",
+    "eyebrow_side_int.l",
+    "eyebrow_side_ext.l",
+    "eyebrow_side_int.r",
+    "eyebrow_side_ext.r",
+    "jaw_open.l",
+    "lips_roll_bot",
+    "lips_roll_up",
+    "lips_side_in.l",
+    "lips_side_in.r",
+    "jaw_open.r"
+   ],
+   "n": 34
+  }
+ ],
+ "mesh_summary": {
+  "objects": 255,
+  "skinned": 9,
+  "tris": 12190
+ },
+ "grease_pencil": [],
+ "actions": [
+  {
+   "name": "Mike_Crouch",
+   "frames": [
+    2,
+    2
+   ],
+   "fcurves": -1
+  },
+  {
+   "name": "Mike_Run",
+   "frames": [
+    1,
+    1
+   ],
+   "fcurves": -1
+  },
+  {
+   "name": "rig_fist",
+   "frames": [
+    0,
+    10
+   ],
+   "fcurves": -1
+  },
+  {
+   "name": "walk",
+   "frames": [
+    101,
+    125
+   ],
+   "fcurves": -1
+  }
+ ],
+ "n_actions": 4,
+ "tests": {
+  "ik_response": [
+   {
+    "armature": "mike_rig",
+    "bone": "root.x",
+    "chain": 1,
+    "rest_err_cm": 17.04,
+    "moves": [
+     {
+      "err_px_equiv_cm": 17.04,
+      "moved_cm": 15.0
+     },
+     {
+      "err_px_equiv_cm": 17.04,
+      "moved_cm": 18.0
+     },
+     {
+      "err_px_equiv_cm": 17.04,
+      "moved_cm": 15.81
+     }
+    ]
+   },
+   {
+    "armature": "mike_rig",
+    "bone": "leg_ik.l",
+    "chain": 2,
+    "rest_err_cm": 0.0,
+    "moves": [
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 15.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 18.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 15.81
+     }
+    ]
+   },
+   {
+    "armature": "mike_rig",
+    "bone": "leg_ik_nostr.l",
+    "chain": 2,
+    "rest_err_cm": 0.0,
+    "moves": [
+     {
+      "err_px_equiv_cm": 0.01,
+      "moved_cm": 15.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 18.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 15.81
+     }
+    ]
+   },
+   {
+    "armature": "mike_rig",
+    "bone": "leg_ik.r",
+    "chain": 2,
+    "rest_err_cm": 0.0,
+    "moves": [
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 15.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 18.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 15.81
+     }
+    ]
+   },
+   {
+    "armature": "mike_rig",
+    "bone": "leg_ik_nostr.r",
+    "chain": 2,
+    "rest_err_cm": 0.0,
+    "moves": [
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 15.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 18.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 15.81
+     }
+    ]
+   },
+   {
+    "armature": "mike_rig",
+    "bone": "forearm_ik.r",
+    "chain": 2,
+    "rest_err_cm": 0.0,
+    "moves": [
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 15.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 18.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 15.81
+     }
+    ]
+   },
+   {
+    "armature": "mike_rig",
+    "bone": "forearm_ik_nostr.r",
+    "chain": 2,
+    "rest_err_cm": 0.0,
+    "moves": [
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 15.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 18.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 15.81
+     }
+    ]
+   },
+   {
+    "armature": "mike_rig",
+    "bone": "forearm_ik.l",
+    "chain": 2,
+    "rest_err_cm": 0.0,
+    "moves": [
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 15.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 18.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 15.81
+     }
+    ]
+   },
+   {
+    "armature": "mike_rig",
+    "bone": "forearm_ik_nostr.l",
+    "chain": 2,
+    "rest_err_cm": 0.0,
+    "moves": [
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 15.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 18.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 15.81
+     }
+    ]
+   },
+   {
+    "armature": "mike_rig",
+    "bone": "c_eye_ref_track.l",
+    "chain": 1,
+    "rest_err_cm": 3.7,
+    "moves": [
+     {
+      "err_px_equiv_cm": 14.56,
+      "moved_cm": 1.43
+     },
+     {
+      "err_px_equiv_cm": 12.1,
+      "moved_cm": 2.39
+     },
+     {
+      "err_px_equiv_cm": 15.05,
+      "moved_cm": 1.49
+     }
+    ]
+   },
+   {
+    "armature": "mike_rig",
+    "bone": "c_eye_ref_track.r",
+    "chain": 1,
+    "rest_err_cm": 3.69,
+    "moves": [
+     {
+      "err_px_equiv_cm": 14.63,
+      "moved_cm": 1.41
+     },
+     {
+      "err_px_equiv_cm": 12.17,
+      "moved_cm": 2.38
+     },
+     {
+      "err_px_equiv_cm": 15.23,
+      "moved_cm": 1.46
+     }
+    ]
+   }
+  ],
+  "reach": null,
+  "prop_attach": null,
+  "walk": null,
+  "sit": null
+ },
+ "render": {
+  "ok": true,
+  "frame": 113
+ }
+}

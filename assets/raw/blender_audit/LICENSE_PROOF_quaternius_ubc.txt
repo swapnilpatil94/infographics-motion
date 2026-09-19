@@ -1,0 +1,6 @@
+source page: https://quaternius.com/packs/universalbasecharacters.html
+fetched: 2026-09-19T18:38:24.527198+00:00
+matched licence text:
+  - publicdomain/zero/1.0/
+  - CC0
+  - CC0 License)

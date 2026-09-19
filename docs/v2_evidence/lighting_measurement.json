@@ -1,0 +1,72 @@
+{
+ "video": "lighting_test.mp4",
+ "states": [
+  {
+   "state": "1 daylight",
+   "t": 1.75,
+   "luma": 0.698,
+   "mean_rgb": [
+    183.6,
+    177.6,
+    166.4
+   ],
+   "b_over_r": 0.906
+  },
+  {
+   "state": "2 dusk",
+   "t": 5.25,
+   "luma": 0.454,
+   "mean_rgb": [
+    118.3,
+    114.2,
+    123.6
+   ],
+   "b_over_r": 1.045
+  },
+  {
+   "state": "3 night",
+   "t": 8.75,
+   "luma": 0.23,
+   "mean_rgb": [
+    51.6,
+    57.9,
+    87.6
+   ],
+   "b_over_r": 1.697
+  },
+  {
+   "state": "4 phone light on face",
+   "t": 12.5,
+   "luma": 0.276,
+   "mean_rgb": [
+    58.1,
+    70.7,
+    102.9
+   ],
+   "b_over_r": 1.772
+  },
+  {
+   "state": "5 lamp + hall",
+   "t": 16.5,
+   "luma": 0.456,
+   "mean_rgb": [
+    120.8,
+    114.4,
+    121.3
+   ],
+   "b_over_r": 1.004
+  }
+ ],
+ "monotonic_day_dusk_night": true,
+ "lamp_hall_brighter_than_night_by": 0.226,
+ "phone_shot_bluer_than_night": true,
+ "lamp_hall_warmer_than_night": true,
+ "face_crop": {
+  "luma_night": 0.135,
+  "luma_phone": 0.474,
+  "luma_delta": 0.339,
+  "b_over_r_night": 1.121,
+  "b_over_r_phone": 1.033
+ },
+ "luma_span": 0.468
+}

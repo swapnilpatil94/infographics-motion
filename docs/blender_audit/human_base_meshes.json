@@ -1,0 +1,75 @@
+{
+ "id": "human_base_meshes",
+ "blender": "5.2.2 LTS",
+ "file_blender_version": "4.2.67",
+ "errors": [],
+ "scene": {
+  "frame_range": [
+   1,
+   250
+  ],
+  "fps": 24,
+  "engine": "CYCLES",
+  "unit_scale": 1.0
+ },
+ "objects": {
+  "MESH": 382,
+  "CAMERA": 25
+ },
+ "datablocks": {
+  "meshes": 227,
+  "armatures": 0,
+  "actions": 0,
+  "materials": 0,
+  "images": 1,
+  "grease_pencils": 0,
+  "grease_pencils_v3": 0,
+  "texts": 2,
+  "node_groups": 0,
+  "collections": 19,
+  "libraries": 0
+ },
+ "embedded_text_scripts": [
+  "License",
+  "README"
+ ],
+ "missing_images": [],
+ "armatures": [],
+ "shape_keys": [
+  {
+   "obj": "Head - Generic Topology",
+   "keys": [
+    "Basis",
+    "Real_MALE",
+    "Real_FEMALE",
+    "Real_Kid",
+    "Toon_MALE",
+    "Toon_FEMALE",
+    "Toon_Anime_Kid",
+    "Toon Animal",
+    "Ork",
+    "Suzanne"
+   ],
+   "n": 10
+  }
+ ],
+ "mesh_summary": {
+  "objects": 382,
+  "skinned": 0,
+  "tris": 150133
+ },
+ "grease_pencil": [],
+ "actions": [],
+ "n_actions": 0,
+ "tests": {
+  "ik_response": [],
+  "reach": null,
+  "prop_attach": null,
+  "walk": null,
+  "sit": null
+ },
+ "render": {
+  "ok": true,
+  "frame": null
+ }
+}

@@ -1,0 +1,396 @@
+{
+ "id": "oga_old_lady",
+ "blender": "5.2.2 LTS",
+ "file_blender_version": "2.76.0",
+ "errors": [],
+ "scene": {
+  "frame_range": [
+   0,
+   2051
+  ],
+  "fps": 24,
+  "engine": "BLENDER_EEVEE",
+  "unit_scale": 0.25
+ },
+ "objects": {
+  "LIGHT": 4,
+  "ARMATURE": 1,
+  "CAMERA": 1,
+  "MESH": 15
+ },
+ "datablocks": {
+  "meshes": 15,
+  "armatures": 1,
+  "actions": 1,
+  "materials": 2,
+  "images": 4,
+  "grease_pencils": 0,
+  "grease_pencils_v3": 0,
+  "texts": 1,
+  "node_groups": 0,
+  "collections": 8,
+  "libraries": 0
+ },
+ "embedded_text_scripts": [
+  "Text"
+ ],
+ "missing_images": [],
+ "armatures": [
+  {
+   "name": "Armature",
+   "bones": 84,
+   "pose_bones": 84,
+   "bone_names_sample": [
+    "Root",
+    "hips",
+    "thigh.L",
+    "shin.L",
+    "thigh.R",
+    "shin.R",
+    "Bone",
+    "chest",
+    "chest-1",
+    "shoulder.R",
+    "upper_arm.R",
+    "forearm.R",
+    "hand.R",
+    "f_pinky.01.R",
+    "f_pinky.02.R",
+    "f_pinky.03.R",
+    "f_middle.01.R",
+    "f_middle.02.R",
+    "f_middle.03.R",
+    "f_ring.01.R",
+    "f_ring.02.R",
+    "f_ring.03.R",
+    "thumb.01.R",
+    "thumb.02.R",
+    "thumb.03.R",
+    "f_index.01.R",
+    "f_index.02.R",
+    "f_index.03.R",
+    "shoulder.L",
+    "upper_arm.L",
+    "forearm.L",
+    "hand.L",
+    "f_pinky.01.L",
+    "f_pinky.02.L",
+    "f_pinky.03.L",
+    "f_middle.01.L",
+    "f_middle.02.L",
+    "f_middle.03.L",
+    "f_index.01.L",
+    "f_index.02.L",
+    "f_index.03.L",
+    "f_ring.01.L",
+    "f_ring.02.L",
+    "f_ring.03.L",
+    "thumb.01.L",
+    "thumb.02.L",
+    "thumb.03.L",
+    "neck",
+    "head",
+    "eye.R",
+    "uplid.L",
+    "uplid.R",
+    "eye.L",
+    "lolid.L",
+    "lolid.R",
+    "Target_uplid.L",
+    "Target_uplid.R",
+    "Target_lolid.L",
+    "Target_lolid.R",
+    "Brow2_L"
+   ],
+   "roots": [
+    "Root"
+   ],
+   "depth_max": 11,
+   "deform_bones": 67,
+   "finger_bones": 30,
+   "eye_bones": [
+    "eye.R",
+    "eye.L",
+    "Target_Eye_R",
+    "Target_Eye_L"
+   ],
+   "brow_bones": [
+    "Brow2_L",
+    "Brow2_R",
+    "Brow1_L",
+    "Brow1_R"
+   ],
+   "mouth_bones": [
+    "Mouth_L",
+    "Mouth_R"
+   ],
+   "face_bones_total": 18,
+   "constraints": {
+    "IK": 8,
+    "COPY_ROTATION": 27,
+    "TRACK_TO": 6
+   },
+   "ik": [
+    {
+     "bone": "shin.L",
+     "chain": 2,
+     "target": "Armature",
+     "subtarget": "IK_Foot_L",
+     "pole": "Armature"
+    },
+    {
+     "bone": "shin.R",
+     "chain": 2,
+     "target": "Armature",
+     "subtarget": "IK_Foot_R",
+     "pole": "Armature"
+    },
+    {
+     "bone": "chest",
+     "chain": 2,
+     "target": "Armature",
+     "subtarget": "IK_Chest",
+     "pole": null
+    },
+    {
+     "bone": "forearm.R",
+     "chain": 2,
+     "target": "Armature",
+     "subtarget": "IK_hand.R",
+     "pole": "Armature"
+    },
+    {
+     "bone": "forearm.L",
+     "chain": 2,
+     "target": "Armature",
+     "subtarget": "IK_hand.L",
+     "pole": "Armature"
+    },
+    {
+     "bone": "neck",
+     "chain": 1,
+     "target": "Armature",
+     "subtarget": "IK_Head",
+     "pole": null
+    },
+    {
+     "bone": "head_L",
+     "chain": 1,
+     "target": "Armature",
+     "subtarget": "Brow2_L",
+     "pole": null
+    },
+    {
+     "bone": "head_R",
+     "chain": 1,
+     "target": "Armature",
+     "subtarget": "Brow2_R",
+     "pole": null
+    }
+   ],
+   "drivers": 0,
+   "python_drivers": 0,
+   "action": "Sitting",
+   "custom_props": [
+    "MhxVersion",
+    "MhxScale",
+    "MhVersion",
+    "MhBaseMesh",
+    "MhxRig",
+    "MhxVersionStr",
+    "MhxShapekeyDrivers",
+    "MhxRigify"
+   ]
+  }
+ ],
+ "shape_keys": [],
+ "mesh_summary": {
+  "objects": 15,
+  "skinned": 2,
+  "tris": 2005
+ },
+ "grease_pencil": [],
+ "actions": [
+  {
+   "name": "Sitting",
+   "frames": [
+    0,
+    2051
+   ],
+   "fcurves": -1
+  }
+ ],
+ "n_actions": 1,
+ "tests": {
+  "ik_response": [
+   {
+    "armature": "Armature",
+    "bone": "shin.L",
+    "chain": 2,
+    "rest_err_cm": 0.2,
+    "moves": [
+     {
+      "err_px_equiv_cm": 0.2,
+      "moved_cm": 15.0
+     },
+     {
+      "err_px_equiv_cm": 0.21,
+      "moved_cm": 18.0
+     },
+     {
+      "err_px_equiv_cm": 0.22,
+      "moved_cm": 15.79
+     }
+    ]
+   },
+   {
+    "armature": "Armature",
+    "bone": "shin.R",
+    "chain": 2,
+    "rest_err_cm": 0.18,
+    "moves": [
+     {
+      "err_px_equiv_cm": 0.18,
+      "moved_cm": 15.0
+     },
+     {
+      "err_px_equiv_cm": 0.18,
+      "moved_cm": 18.0
+     },
+     {
+      "err_px_equiv_cm": 0.18,
+      "moved_cm": 15.81
+     }
+    ]
+   },
+   {
+    "armature": "Armature",
+    "bone": "chest",
+    "chain": 2,
+    "rest_err_cm": 465.13,
+    "moves": [
+     {
+      "err_px_equiv_cm": 463.66,
+      "moved_cm": 12.46
+     },
+     {
+      "err_px_equiv_cm": 464.61,
+      "moved_cm": 15.06
+     },
+     {
+      "err_px_equiv_cm": 450.06,
+      "moved_cm": 4.01
+     }
+    ]
+   },
+   {
+    "armature": "Armature",
+    "bone": "forearm.R",
+    "chain": 2,
+    "rest_err_cm": 0.0,
+    "moves": [
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 15.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 18.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 15.81
+     }
+    ]
+   },
+   {
+    "armature": "Armature",
+    "bone": "forearm.L",
+    "chain": 2,
+    "rest_err_cm": 0.0,
+    "moves": [
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 15.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 18.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 15.81
+     }
+    ]
+   },
+   {
+    "armature": "Armature",
+    "bone": "neck",
+    "chain": 1,
+    "rest_err_cm": 335.51,
+    "moves": [
+     {
+      "err_px_equiv_cm": 335.04,
+      "moved_cm": 11.54
+     },
+     {
+      "err_px_equiv_cm": 347.54,
+      "moved_cm": 10.25
+     },
+     {
+      "err_px_equiv_cm": 327.71,
+      "moved_cm": 10.61
+     }
+    ]
+   },
+   {
+    "armature": "Armature",
+    "bone": "head_L",
+    "chain": 1,
+    "rest_err_cm": 11.17,
+    "moves": [
+     {
+      "err_px_equiv_cm": 1.69,
+      "moved_cm": 7.63
+     },
+     {
+      "err_px_equiv_cm": 7.12,
+      "moved_cm": 17.09
+     },
+     {
+      "err_px_equiv_cm": 16.84,
+      "moved_cm": 14.18
+     }
+    ]
+   },
+   {
+    "armature": "Armature",
+    "bone": "head_R",
+    "chain": 1,
+    "rest_err_cm": 13.26,
+    "moves": [
+     {
+      "err_px_equiv_cm": 26.2,
+      "moved_cm": 7.18
+     },
+     {
+      "err_px_equiv_cm": 8.83,
+      "moved_cm": 16.9
+     },
+     {
+      "err_px_equiv_cm": 18.79,
+      "moved_cm": 14.15
+     }
+    ]
+   }
+  ],
+  "reach": null,
+  "prop_attach": null,
+  "walk": null,
+  "sit": null
+ },
+ "render": {
+  "ok": true,
+  "frame": 1025
+ }
+}

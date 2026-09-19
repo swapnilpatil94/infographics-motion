@@ -1,0 +1,244 @@
+{
+ "id": "oga_lowpoly_rigged_man",
+ "blender": "5.2.2 LTS",
+ "file_blender_version": "2.67.0",
+ "errors": [],
+ "scene": {
+  "frame_range": [
+   1,
+   60
+  ],
+  "fps": 25,
+  "engine": "BLENDER_EEVEE",
+  "unit_scale": 1.0
+ },
+ "objects": {
+  "LIGHT": 1,
+  "ARMATURE": 1,
+  "MESH": 4,
+  "CAMERA": 1
+ },
+ "datablocks": {
+  "meshes": 4,
+  "armatures": 1,
+  "actions": 2,
+  "materials": 2,
+  "images": 1,
+  "grease_pencils": 0,
+  "grease_pencils_v3": 0,
+  "texts": 2,
+  "node_groups": 0,
+  "collections": 1,
+  "libraries": 0
+ },
+ "embedded_text_scripts": [
+  "Text",
+  "Text.001"
+ ],
+ "missing_images": [],
+ "armatures": [
+  {
+   "name": "Armature",
+   "bones": 19,
+   "pose_bones": 19,
+   "bone_names_sample": [
+    "Torso",
+    "Spine",
+    "Head",
+    "UpperArm.L",
+    "LowerArm.L",
+    "UpperLeg.L",
+    "LowerLeg.L",
+    "UpperArm.R",
+    "LowerArm.R",
+    "UpperLeg.R",
+    "LowerLeg.R",
+    "Hand.L",
+    "Foot.L",
+    "Elbow.L",
+    "Knee.L",
+    "Hand.R",
+    "Foot.R",
+    "Elbow.R",
+    "Knee.R"
+   ],
+   "roots": [
+    "Torso",
+    "UpperArm.L",
+    "UpperLeg.L",
+    "UpperArm.R",
+    "UpperLeg.R",
+    "Hand.L",
+    "Foot.L",
+    "Elbow.L",
+    "Knee.L",
+    "Hand.R",
+    "Foot.R",
+    "Elbow.R",
+    "Knee.R"
+   ],
+   "depth_max": 2,
+   "deform_bones": 11,
+   "finger_bones": 0,
+   "eye_bones": [],
+   "brow_bones": [],
+   "mouth_bones": [],
+   "face_bones_total": 0,
+   "constraints": {
+    "IK": 4
+   },
+   "ik": [
+    {
+     "bone": "LowerArm.L",
+     "chain": 4,
+     "target": "Armature",
+     "subtarget": "Hand.L",
+     "pole": "Armature"
+    },
+    {
+     "bone": "LowerLeg.L",
+     "chain": 2,
+     "target": "Armature",
+     "subtarget": "Foot.L",
+     "pole": "Armature"
+    },
+    {
+     "bone": "LowerArm.R",
+     "chain": 2,
+     "target": "Armature",
+     "subtarget": "Hand.R",
+     "pole": "Armature"
+    },
+    {
+     "bone": "LowerLeg.R",
+     "chain": 4,
+     "target": "Armature",
+     "subtarget": "Foot.R",
+     "pole": "Armature"
+    }
+   ],
+   "drivers": 0,
+   "python_drivers": 0,
+   "action": "ArmatureAction",
+   "custom_props": []
+  }
+ ],
+ "shape_keys": [],
+ "mesh_summary": {
+  "objects": 4,
+  "skinned": 1,
+  "tris": 222
+ },
+ "grease_pencil": [],
+ "actions": [
+  {
+   "name": "ArmatureAction",
+   "frames": [
+    1,
+    10
+   ],
+   "fcurves": -1
+  },
+  {
+   "name": "stand",
+   "frames": [
+    1,
+    8
+   ],
+   "fcurves": -1
+  }
+ ],
+ "n_actions": 2,
+ "tests": {
+  "ik_response": [
+   {
+    "armature": "Armature",
+    "bone": "LowerArm.L",
+    "chain": 4,
+    "rest_err_cm": 0.0,
+    "moves": [
+     {
+      "err_px_equiv_cm": 10.01,
+      "moved_cm": 7.1
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 18.0
+     },
+     {
+      "err_px_equiv_cm": 0.45,
+      "moved_cm": 15.67
+     }
+    ]
+   },
+   {
+    "armature": "Armature",
+    "bone": "LowerLeg.L",
+    "chain": 2,
+    "rest_err_cm": 0.0,
+    "moves": [
+     {
+      "err_px_equiv_cm": 0.28,
+      "moved_cm": 14.96
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 18.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 15.81
+     }
+    ]
+   },
+   {
+    "armature": "Armature",
+    "bone": "LowerArm.R",
+    "chain": 2,
+    "rest_err_cm": 0.0,
+    "moves": [
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 15.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 18.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 15.81
+     }
+    ]
+   },
+   {
+    "armature": "Armature",
+    "bone": "LowerLeg.R",
+    "chain": 4,
+    "rest_err_cm": 0.61,
+    "moves": [
+     {
+      "err_px_equiv_cm": 1.07,
+      "moved_cm": 14.89
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 17.39
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 15.62
+     }
+    ]
+   }
+  ],
+  "reach": null,
+  "prop_attach": null,
+  "walk": null,
+  "sit": null
+ },
+ "render": {
+  "ok": true,
+  "frame": 5
+ }
+}

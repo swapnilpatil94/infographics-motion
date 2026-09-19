@@ -1,0 +1,110 @@
+{
+ "id": "oga_puppet_base",
+ "blender": "5.2.2 LTS",
+ "file_blender_version": "2.76.0",
+ "errors": [],
+ "scene": {
+  "frame_range": [
+   1,
+   250
+  ],
+  "fps": 24,
+  "engine": "BLENDER_EEVEE",
+  "unit_scale": 1.0
+ },
+ "objects": {
+  "ARMATURE": 1,
+  "MESH": 1,
+  "CAMERA": 1,
+  "LIGHT": 1
+ },
+ "datablocks": {
+  "meshes": 1,
+  "armatures": 1,
+  "actions": 0,
+  "materials": 2,
+  "images": 4,
+  "grease_pencils": 0,
+  "grease_pencils_v3": 0,
+  "texts": 0,
+  "node_groups": 0,
+  "collections": 1,
+  "libraries": 0
+ },
+ "embedded_text_scripts": [],
+ "missing_images": [],
+ "armatures": [
+  {
+   "name": "Armature",
+   "bones": 26,
+   "pose_bones": 26,
+   "bone_names_sample": [
+    "root",
+    "pelvis.r",
+    "legtop.r",
+    "legbot.r",
+    "foot.r",
+    "spine.0",
+    "spine.1",
+    "spine.2",
+    "spine.3",
+    "neck",
+    "headbot",
+    "headtop",
+    "eye.r",
+    "eye.l",
+    "clavicle.r",
+    "armtop.r",
+    "armbot.r",
+    "hand.r",
+    "clavicle.l",
+    "armtop.l",
+    "armbot.l",
+    "hand.l",
+    "pelvis.l",
+    "legtop.l",
+    "legbot.l",
+    "foot.l"
+   ],
+   "roots": [
+    "root"
+   ],
+   "depth_max": 8,
+   "deform_bones": 26,
+   "finger_bones": 0,
+   "eye_bones": [
+    "eye.r",
+    "eye.l"
+   ],
+   "brow_bones": [],
+   "mouth_bones": [],
+   "face_bones_total": 2,
+   "constraints": {},
+   "ik": [],
+   "drivers": 0,
+   "python_drivers": 0,
+   "action": null,
+   "custom_props": []
+  }
+ ],
+ "shape_keys": [],
+ "mesh_summary": {
+  "objects": 1,
+  "skinned": 1,
+  "tris": 2717
+ },
+ "grease_pencil": [],
+ "actions": [],
+ "n_actions": 0,
+ "tests": {
+  "ik_response": [],
+  "reach": null,
+  "prop_attach": null,
+  "walk": null,
+  "sit": null
+ },
+ "render": {
+  "ok": true,
+  "frame": null
+ }
+}

@@ -1,0 +1,9 @@
+source page: https://blendswap.com/blend/15217
+fetched: 2026-09-19T18:38:24.475424+00:00
+matched licence text:
+  - CC-BY on BlendSwap.">
+  - CC-BY
+  - cc-by
+  - cc-by
+  - cc-by
+  - cc-by

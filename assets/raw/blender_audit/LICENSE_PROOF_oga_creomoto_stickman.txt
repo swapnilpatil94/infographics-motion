@@ -1,0 +1,8 @@
+source page: https://opengameart.org/content/creomotos-stick-man-fixed-up
+fetched: 2026-09-19T18:38:02.772093+00:00
+matched licence text:
+  - cc0.png' alt='' title=''>
+  - CC0
+  - cc0">3D Assets (CC0)
+  - cc0">3d Humanoids under CC0
+  - cc0-3d-humans-players">CC0 - 3D Humans / Players

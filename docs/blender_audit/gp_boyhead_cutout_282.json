@@ -1,0 +1,204 @@
+{
+ "id": "gp_boyhead_cutout_282",
+ "blender": "5.2.2 LTS",
+ "file_blender_version": "2.81.14",
+ "errors": [],
+ "scene": {
+  "frame_range": [
+   1,
+   250
+  ],
+  "fps": 24,
+  "engine": "CYCLES",
+  "unit_scale": 1.0
+ },
+ "objects": {
+  "GREASEPENCIL": 6,
+  "EMPTY": 10,
+  "MESH": 11,
+  "LATTICE": 1
+ },
+ "datablocks": {
+  "meshes": 11,
+  "armatures": 0,
+  "actions": 2,
+  "materials": 21,
+  "images": 4,
+  "grease_pencils": 6,
+  "grease_pencils_v3": 0,
+  "texts": 1,
+  "node_groups": 1,
+  "collections": 4,
+  "libraries": 0
+ },
+ "embedded_text_scripts": [
+  "Text"
+ ],
+ "missing_images": [],
+ "armatures": [],
+ "shape_keys": [],
+ "mesh_summary": {
+  "objects": 11,
+  "skinned": 0,
+  "tris": 0
+ },
+ "grease_pencil": [
+  {
+   "obj": "Body",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "Body Fill",
+    "Body Fill 2",
+    "Face Shadow",
+    "Body Stroke",
+    "Texture"
+   ],
+   "n_layers": 5,
+   "modifiers": [
+    "GREASE_PENCIL_TIME",
+    "GREASE_PENCIL_SIMPLIFY",
+    "GREASE_PENCIL_THICKNESS"
+   ],
+   "parent": null,
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 261
+  },
+  {
+   "obj": "Eyebrow",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "Eyebrow"
+   ],
+   "n_layers": 1,
+   "modifiers": [
+    "GREASE_PENCIL_TIME",
+    "GREASE_PENCIL_SIMPLIFY",
+    "NODES"
+   ],
+   "parent": null,
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 86
+  },
+  {
+   "obj": "Eyes",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "Eyes",
+    "Left",
+    "Right"
+   ],
+   "n_layers": 3,
+   "modifiers": [
+    "GREASE_PENCIL_TIME",
+    "GREASE_PENCIL_SIMPLIFY",
+    "GREASE_PENCIL_THICKNESS"
+   ],
+   "parent": null,
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 492
+  },
+  {
+   "obj": "Head",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "Face Fill",
+    "Hair Fill",
+    "Hair Stroke",
+    "Hair Mask",
+    "Ears Fill",
+    "Eras Stroke 01",
+    "Ears Strok 02",
+    "Face Fill Mask",
+    "Face Stroke",
+    "Texture"
+   ],
+   "n_layers": 10,
+   "modifiers": [
+    "GREASE_PENCIL_TIME",
+    "GREASE_PENCIL_SIMPLIFY",
+    "GREASE_PENCIL_LATTICE",
+    "NODES",
+    "NODES",
+    "GREASE_PENCIL_THICKNESS"
+   ],
+   "parent": null,
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 789
+  },
+  {
+   "obj": "Mouth",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "Mouth"
+   ],
+   "n_layers": 1,
+   "modifiers": [
+    "GREASE_PENCIL_TIME",
+    "GREASE_PENCIL_SIMPLIFY",
+    "GREASE_PENCIL_THICKNESS"
+   ],
+   "parent": null,
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 82
+  },
+  {
+   "obj": "Nose",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "Fill",
+    "Texture",
+    "Stroke1",
+    "Stroke2"
+   ],
+   "n_layers": 4,
+   "modifiers": [
+    "GREASE_PENCIL_TIME",
+    "GREASE_PENCIL_SUBDIV",
+    "GREASE_PENCIL_THICKNESS",
+    "GREASE_PENCIL_THICKNESS",
+    "GREASE_PENCIL_SIMPLIFY",
+    "NODES",
+    "GREASE_PENCIL_THICKNESS"
+   ],
+   "parent": null,
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 308
+  }
+ ],
+ "actions": [
+  {
+   "name": "Head Left and Right ControllerAction",
+   "frames": [
+    1,
+    135
+   ],
+   "fcurves": -1
+  },
+  {
+   "name": "Head Up and Down ControllerAction",
+   "frames": [
+    1,
+    135
+   ],
+   "fcurves": -1
+  }
+ ],
+ "n_actions": 2,
+ "tests": {
+  "ik_response": [],
+  "reach": null,
+  "prop_attach": null,
+  "walk": null,
+  "sit": null
+ },
+ "render": {
+  "ok": true,
+  "frame": 68
+ }
+}

@@ -1,0 +1,20 @@
+{
+ "id": "oga_stickman",
+ "kind": "stick",
+ "armature": "Armature",
+ "scale": 0.0019,
+ "frames": 120,
+ "blender": "5.2.2 LTS",
+ "foot_target_err_rigunits_max": 0.073,
+ "foot_target_err_pct_of_hip_height_max": 0.02,
+ "planted_foot_slide_m_max": 0.216,
+ "planted_foot_slide_pct_of_hip_height": 25.12,
+ "fwd_axis": [
+  -0.919,
+  0.394,
+  0.0
+ ],
+ "hand_target_err_rigunits_max": 0.076,
+ "hand_target_err_pct_of_hip_height_max": 0.02,
+ "frames_dir": "../../../output/tests/blender_audit/oga_stickman_drive"
+}

@@ -1,0 +1,60 @@
+{
+ "id": "mpfb_rigify_generated",
+ "armature": "Human.rigify",
+ "blender": "5.2.2 LTS",
+ "controls_found": {
+  "foot_ik.L": true,
+  "foot_ik.R": true,
+  "hand_ik.L": true,
+  "hand_ik.R": true,
+  "thigh_parent.L": true,
+  "upper_arm_parent.L": true,
+  "torso": true,
+  "eye.L": true,
+  "eye.R": true,
+  "jaw_master": true,
+  "head": true,
+  "chest": true,
+  "hips": true
+ },
+ "tests": {
+  "walk": {
+   "stride": 2.791,
+   "lift": 0.761,
+   "foot_to_control_err_cm_max": 0.2,
+   "alternating": true,
+   "pass_ik_walk": true
+  },
+  "sit": {
+   "knee_deg": [
+    124.0,
+    124.0
+   ],
+   "pass_seated_pose": false
+  },
+  "reach": {
+   "trials": [
+    {
+     "target": "0.5L_fwd",
+     "err_cm": 131.19
+    },
+    {
+     "target": "0.9L_fwd",
+     "err_cm": 131.68
+    },
+    {
+     "target": "0.9L_up",
+     "err_cm": 131.68
+    }
+   ],
+   "pass_reach": false
+  },
+  "face": {
+   "face_control_bones": 94,
+   "brow_controls": 18,
+   "eye_rotation_moves_mesh": false,
+   "eye_max_disp": 0,
+   "jaw_rotation_moves_mesh": true
+  }
+ }
+}

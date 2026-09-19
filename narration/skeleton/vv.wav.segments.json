@@ -1,0 +1,83 @@
+{
+  "segments": [
+    {
+      "beat_id": "n01",
+      "text": "रात के ग्यारह बजे। फ़ोन जगमगाया।",
+      "start_seconds": 0.0,
+      "end_seconds": 1.886
+    },
+    {
+      "beat_id": "n02",
+      "text": "अनजान नंबर। स्क्रीन पर लिखा था: बैंक।",
+      "start_seconds": 1.886,
+      "end_seconds": 3.826
+    },
+    {
+      "beat_id": "n03",
+      "text": "उसने काँपते हाथ से फ़ोन उठाया।",
+      "start_seconds": 3.826,
+      "end_seconds": 6.046
+    },
+    {
+      "beat_id": "n04",
+      "text": "मैसेज था: आपका खाता तीस मिनट में ब्लॉक हो जाएगा!",
+      "start_seconds": 6.046,
+      "end_seconds": 9.222
+    },
+    {
+      "beat_id": "n05",
+      "text": "अभी वेरिफ़ाई करें। वरना सारा पैसा गया।",
+      "start_seconds": 9.222,
+      "end_seconds": 11.613
+    },
+    {
+      "beat_id": "n06",
+      "text": "वो झटके से उठ खड़ा हुआ।",
+      "start_seconds": 11.613,
+      "end_seconds": 13.558
+    },
+    {
+      "beat_id": "n07",
+      "text": "दिल तेज़ धड़क रहा था। कमरे में तेज़ क़दम।",
+      "start_seconds": 13.558,
+      "end_seconds": 16.584
+    },
+    {
+      "beat_id": "n08",
+      "text": "तभी माँ अंदर आईं। बेटा, क्या हुआ?",
+      "start_seconds": 16.584,
+      "end_seconds": 18.652
+    },
+    {
+      "beat_id": "n09",
+      "text": "और तभी, दूसरी कॉल! मैं बैंक मैनेजर बोल रहा हूँ। ओटीपी बताइए!",
+      "start_seconds": 18.652,
+      "end_seconds": 23.041
+    },
+    {
+      "beat_id": "n10",
+      "text": "सेकंड भाग रहे थे। दुनिया सिकुड़ती जा रही थी।",
+      "start_seconds": 23.041,
+      "end_seconds": 26.26
+    },
+    {
+      "beat_id": "n11",
+      "text": "एक ओटीपी। और पूरी बचत, हमेशा के लिए ग़ायब।",
+      "start_seconds": 26.26,
+      "end_seconds": 29.347
+    },
+    {
+      "beat_id": "n12",
+      "text": "रुको! असली बैंक कभी ओटीपी नहीं माँगता।",
+      "start_seconds": 29.347,
+      "end_seconds": 30.288
+    },
+    {
+      "beat_id": "n13",
+      "text": "उसने कॉल काट दी। एक कॉल ने सब बदल दिया, क्योंकि उसने रुककर सोचा।",
+      "start_seconds": 30.288,
+      "end_seconds": 30.288
+    }
+  ],
+  "duration_seconds": 30.288
+}

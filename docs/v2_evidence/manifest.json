@@ -1,0 +1,78 @@
+{
+ "title": "एक गलत कॉल",
+ "kind": "skeleton_short",
+ "version": 2,
+ "story_id": "galat_38c82",
+ "seed": 11,
+ "render_seconds": 536.4,
+ "stages": {
+  "rig+motion+blender": 174.8,
+  "audio": 1.3,
+  "composite+encode": 346.4
+ },
+ "blender": {
+  "version": "5.2.2 LTS",
+  "frames_rendered": 1189,
+  "objects": 111,
+  "bones": {
+   "A": 26,
+   "D": 26
+  },
+  "ik_constraints": {
+   "A": 4,
+   "D": 4
+  },
+  "actions": 71,
+  "render_seconds": 161.1,
+  "keyframed": true
+ },
+ "characters": {
+  "A": {
+   "dna_id": "cdna_46e7839794",
+   "archetype": "young_man",
+   "parts": 40,
+   "part_dir": "assets/character/skeleton/generated_v2/78f1a04dffb5"
+  },
+  "D": {
+   "dna_id": "cdna_79dfd65318",
+   "archetype": "middle_aged_woman",
+   "parts": 40,
+   "part_dir": "assets/character/skeleton/generated_v2/352aa17d14ea"
+  }
+ },
+ "environment": {
+  "family": "bedroom_wide",
+  "variation": {
+   "palette": 0
+  },
+  "seed": 813,
+  "set_id": "bedroom_wide_28733b1a"
+ },
+ "narration": {
+  "tts": "chatterbox",
+  "tempo": 1.08,
+  "audio": "output/shorts/skeleton_factory_v2/narration/paced.wav"
+ },
+ "commands": {
+  "render": "python3 studio.py --skeleton-short",
+  "from_plan": "python3 studio.py --from-plan output/shorts/skeleton_factory_v2/plan.json"
+ },
+ "files": {
+  "final": "final.mp4",
+  "contact_sheet": "contact_sheet.png",
+  "plan": "plan.json",
+  "qc": "qc_report.json"
+ },
+ "sha256_plan": "462d800acce358e900a1bb297405c89d631b995fe638ad92e592f1c4164d3b5b",
+ "performance": {
+  "planning_s": 0.1,
+  "asset_generation_s": 0.4,
+  "blender_build_and_render_s": 174.8,
+  "blender_render_only_s": 161.1,
+  "compositing_encode_s": 346.4,
+  "total_s": 537.0,
+  "peak_ram_python_mb": 4585,
+  "peak_ram_largest_child_mb": 1786,
+  "output_mb": 62.6
+ }
+}

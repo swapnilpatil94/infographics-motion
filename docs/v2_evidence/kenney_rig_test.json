@@ -1,0 +1,36 @@
+{
+ "generated (ours)": {
+  "bones": 26,
+  "ik_constraints": 4,
+  "ik_max_error_px": {
+   "IK_HAND_L": 0.0,
+   "IK_HAND_R": 0.0,
+   "IK_FOOT_L": 0.0,
+   "IK_FOOT_R": 0.0
+  },
+  "parts": 27
+ },
+ "kenney_platformer_female": {
+  "bones": 26,
+  "ik_constraints": 4,
+  "ik_max_error_px": {
+   "IK_HAND_L": 0.0,
+   "IK_HAND_R": 0.0,
+   "IK_FOOT_L": 0.0,
+   "IK_FOOT_R": 0.0
+  },
+  "parts": 26
+ },
+ "criteria": {
+  "accepts_26_bone_rig": true,
+  "ik_reaches_targets_(<1px)": true,
+  "two_segment_limbs_(elbow_and_knee_shape)": false,
+  "separable_face_features_(eyes_brows_mouth)": false,
+  "wardrobe_swappable_(top/bottom/shoes)": false,
+  "views_(profile/3q/front)": false,
+  "art_style_matches_editorial_line": false,
+  "resolution_>=_our_2x_textures": false
+ },
+ "adopted": false,
+ "conclusion": "Kenney limbs ARE rig-compatible in the mechanical sense (same 26 bones, IK converges) but fail on face separation, joint art, wardrobe, views, style and resolution. Not adopted; Open Peeps heads/faces + generated limbs remain the foundation."
+}

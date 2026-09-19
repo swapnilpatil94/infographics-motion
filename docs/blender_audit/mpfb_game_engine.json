@@ -1,0 +1,144 @@
+{
+ "id": "mpfb_game_engine",
+ "blender": "5.2.2 LTS",
+ "file_blender_version": "5.2.45",
+ "errors": [],
+ "scene": {
+  "frame_range": [
+   1,
+   250
+  ],
+  "fps": 24,
+  "engine": "BLENDER_EEVEE",
+  "unit_scale": 1.0
+ },
+ "objects": {
+  "MESH": 1,
+  "ARMATURE": 1
+ },
+ "datablocks": {
+  "meshes": 1,
+  "armatures": 1,
+  "actions": 0,
+  "materials": 0,
+  "images": 0,
+  "grease_pencils": 0,
+  "grease_pencils_v3": 0,
+  "texts": 0,
+  "node_groups": 0,
+  "collections": 0,
+  "libraries": 0
+ },
+ "embedded_text_scripts": [],
+ "missing_images": [],
+ "armatures": [
+  {
+   "name": "Human.rig",
+   "bones": 53,
+   "pose_bones": 53,
+   "bone_names_sample": [
+    "Root",
+    "pelvis",
+    "spine_01",
+    "spine_02",
+    "spine_03",
+    "clavicle_l",
+    "upperarm_l",
+    "lowerarm_l",
+    "hand_l",
+    "index_01_l",
+    "index_02_l",
+    "index_03_l",
+    "middle_01_l",
+    "middle_02_l",
+    "middle_03_l",
+    "pinky_01_l",
+    "pinky_02_l",
+    "pinky_03_l",
+    "ring_01_l",
+    "ring_02_l",
+    "ring_03_l",
+    "thumb_01_l",
+    "thumb_02_l",
+    "thumb_03_l",
+    "clavicle_r",
+    "upperarm_r",
+    "lowerarm_r",
+    "hand_r",
+    "index_01_r",
+    "index_02_r",
+    "index_03_r",
+    "middle_01_r",
+    "middle_02_r",
+    "middle_03_r",
+    "pinky_01_r",
+    "pinky_02_r",
+    "pinky_03_r",
+    "ring_01_r",
+    "ring_02_r",
+    "ring_03_r",
+    "thumb_01_r",
+    "thumb_02_r",
+    "thumb_03_r",
+    "neck_01",
+    "head",
+    "thigh_l",
+    "calf_l",
+    "foot_l",
+    "ball_l",
+    "thigh_r",
+    "calf_r",
+    "foot_r",
+    "ball_r"
+   ],
+   "roots": [
+    "Root"
+   ],
+   "depth_max": 11,
+   "deform_bones": 53,
+   "finger_bones": 30,
+   "eye_bones": [],
+   "brow_bones": [],
+   "mouth_bones": [],
+   "face_bones_total": 0,
+   "constraints": {},
+   "ik": [],
+   "drivers": 0,
+   "python_drivers": 0,
+   "action": null,
+   "custom_props": []
+  }
+ ],
+ "shape_keys": [
+  {
+   "obj": "Human",
+   "keys": [
+    "Basis",
+    "$md-$as-$fe-$yn",
+    "$md-$ca-$fe-$yn",
+    "$md-$af-$fe-$yn",
+    "$md-universal-$fe-$yn-$av$mu-$av$wg"
+   ],
+   "n": 5
+  }
+ ],
+ "mesh_summary": {
+  "objects": 1,
+  "skinned": 1,
+  "tris": 18486
+ },
+ "grease_pencil": [],
+ "actions": [],
+ "n_actions": 0,
+ "tests": {
+  "ik_response": [],
+  "reach": null,
+  "prop_attach": null,
+  "walk": null,
+  "sit": null
+ },
+ "render": {
+  "ok": true,
+  "frame": null
+ }
+}

@@ -106,6 +106,8 @@ def main():
     parser.add_argument("--allow-fallbacks", action="store_true", help="FACTORY: continue even if required assets are missing")
     parser.add_argument("--api-request", metavar="REQUEST_JSON", help='FACTORY API: {"story","narration_segments","style","aspect_ratio"} -> film (what a UI would call)')
     parser.add_argument("--skeleton-short", action="store_true", help="SKELETON PROOF: build + render the full-body 2D skeleton short (narration -> plan -> Blender rig -> film)")
+    parser.add_argument("--skeleton-short-v2", action="store_true", help="FACTORY V2: render the 'एक गलत कॉल' Short (CharacterDNA v2, 3/4 views, hand poses, gaze targets, hand-over, lighting)")
+    parser.add_argument("--out-dir", default=None, help="With --skeleton-short-v2: output folder (default output/shorts/skeleton_factory_v2)")
     parser.add_argument("--tts", default="chatterbox", choices=["chatterbox", "vibevoice"], help="With --skeleton-short: narration engine used to (re)generate the voice")
     parser.add_argument("--tempo", type=float, default=1.16, help="With --skeleton-short: pacing speed-up (1.0 = natural)")
     parser.add_argument("--contact-sheet", action="store_true", help="Regenerate the asset contact sheet from the registry")
@@ -114,6 +116,11 @@ def main():
     if args.from_plan and _is_skeleton_plan(args.from_plan):
         code = ("import sys, json; sys.path.insert(0, '.'); from engine.skeleton import build;"
                 f"build.from_plan({args.from_plan!r})")
+        subprocess.run([os.path.join(ROOT, ".venv/bin/python"), "-c", code], cwd=ROOT, check=True, env=dict(os.environ, PYTHONPATH=ROOT, PYTHONUNBUFFERED="1"))
+        return
+    if args.skeleton_short_v2:
+        code = ("import sys; sys.path.insert(0, '.'); from engine.skeleton import build_v2;"
+                f"build_v2.make(out_dir={args.out_dir!r}, tempo={args.tempo if args.tempo != 1.16 else 1.08})")
         subprocess.run([os.path.join(ROOT, ".venv/bin/python"), "-c", code], cwd=ROOT, check=True, env=dict(os.environ, PYTHONPATH=ROOT, PYTHONUNBUFFERED="1"))
         return
     if args.skeleton_short:

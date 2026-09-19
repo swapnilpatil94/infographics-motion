@@ -1,0 +1,15 @@
+{
+ "layers": [
+  "Eyes",
+  "Left",
+  "Right"
+ ],
+ "amp_units": 0.0173,
+ "renders": {
+  "center": "../../../output/tests/blender_audit/gp_boyhead_gaze_center.png",
+  "left": "../../../output/tests/blender_audit/gp_boyhead_gaze_left.png",
+  "right": "../../../output/tests/blender_audit/gp_boyhead_gaze_right.png",
+  "up": "../../../output/tests/blender_audit/gp_boyhead_gaze_up.png",
+  "down": "../../../output/tests/blender_audit/gp_boyhead_gaze_down.png"
+ }
+}

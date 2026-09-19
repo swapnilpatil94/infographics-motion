@@ -23,19 +23,48 @@ AGE_K = {"young": 0.97, "adult": 1.0, "elder": 0.94}
 REST = dict(arm=7.0, elbow=11.0, wrist=8.0, thigh=3.0, knee=-7.0)
 
 
-def proportions(dna, height_scale=1.0):
-    k = AGE_K[dna["age_group"]] * (0.95 if dna["gender"] == "female" else 1.0) * height_scale
-    b = BUILD[dna["body_type"]]
-    P = dict(head=200 * k, neck=34 * k, torso=286 * k, upper_arm=176 * k, forearm=160 * k, hand=64 * k, thigh=246 * k, shin=236 * k, foot_h=42 * k, foot_len=128 * k,
-             torso_w=b["torso_w"] * (0.94 if dna["gender"] == "female" else 1.0), limb=b["limb"] * (0.92 if dna["gender"] == "female" else 1.0), k=k)
+VIEWS = ("profile", "three_quarter", "front")
+VIEW_LAT = dict(profile=(0.0, 0.0, 0.0), three_quarter=(0.24, 0.10, 0.10), front=(0.50, 0.26, 0.35))   # (shoulder, hip) lateral offset as a fraction of torso width; face shift
+
+
+def _derive(P, view="profile"):
     P["hip_y"] = P["foot_h"] + P["shin"] + P["thigh"]
     P["shoulder_y"] = P["hip_y"] + P["torso"]
-    P["shoulder_joint_y"] = P["shoulder_y"] - 34 * k            # arm pivot sits a little below the top of the torso
+    P["shoulder_joint_y"] = P["shoulder_y"] - 34 * P["k"]        # arm pivot sits a little below the top of the torso
     P["neck_top_y"] = P["shoulder_y"] + P["neck"]
     P["hs"] = P["head"] / HEAD_CANVAS_H                          # head-shell canvas px -> rig px
     P["height"] = P["neck_top_y"] + P["head"]
     P["stride_max"] = 0.62 * (P["thigh"] + P["shin"])
+    ls, lh, fd = VIEW_LAT[view]
+    P["view"], P["lat_s"], P["lat_h"], P["face_dx"] = view, ls * P["torso_w"] * P.get("shoulder_k", 1.0), lh * P["torso_w"], fd
     return P
+
+
+def proportions(dna, height_scale=1.0, view="profile"):
+    k = AGE_K[dna["age_group"]] * (0.95 if dna["gender"] == "female" else 1.0) * height_scale
+    b = BUILD[dna["body_type"]]
+    P = dict(head=200 * k, neck=34 * k, torso=286 * k, upper_arm=176 * k, forearm=160 * k, hand=64 * k, thigh=246 * k, shin=236 * k, foot_h=42 * k, foot_len=128 * k,
+             torso_w=b["torso_w"] * (0.94 if dna["gender"] == "female" else 1.0), limb=b["limb"] * (0.92 if dna["gender"] == "female" else 1.0), k=k)
+    return _derive(P, view)
+
+
+def proportions_v2(d2, view="profile"):
+    """CharacterDNA v2 body parameters -> proportions (same skeleton, different lengths / widths / head size)."""
+    b = d2["body"]
+    age = d2["age"]
+    k = (0.90 + 0.10 * min(1.0, max(0.0, (age - 12) / 8.0))) * (0.985 if d2["gender_presentation"] == "feminine" else 1.0) * b["height"]
+    hs_ = b["head_size"] * (1.06 if age < 20 else 1.0)
+    fem = d2["gender_presentation"] == "feminine"
+    P = dict(head=200 * k * hs_, neck=34 * k * b["neck"], torso=286 * k, upper_arm=176 * k, forearm=160 * k, hand=64 * k * (0.94 if fem else 1.0), thigh=246 * k * b["leg_ratio"],
+             shin=236 * k * b["leg_ratio"], foot_h=42 * k, foot_len=128 * k * (0.94 if fem else 1.0), torso_w=128 * b["width"] * (0.94 if fem else 1.0) * (1.03 if age > 55 else 1.0),
+             limb=54 * (0.5 + 0.5 * b["width"]) * (0.93 if fem else 1.0), k=k, shoulder_k=b["shoulder"])
+    return _derive(P, view)
+
+
+def side_offsets(P):
+    """Lateral (screen-x) rest offsets of the far (L) and near (R) limbs in this view: 0 in profile, symmetric about the spine in front view."""
+    ls, lh = P.get("lat_s", 0.0), P.get("lat_h", 0.0)
+    return dict(sL=+ls, sR=-ls, hL=+lh, hR=-lh)
 
 
 def _dir(a_deg):
@@ -60,10 +89,25 @@ def rest_joints(P):
     return dict(hip=hip, knee=knee, ankle=ankle, toe=toe, shoulder=sh, elbow=elbow, wrist=wrist, tip=tip)
 
 
+def side_joints(P, side):
+    """rest_joints shifted by the view's lateral offset for one side (arm chain by lat_s, leg chain by lat_h)."""
+    J = rest_joints(P)
+    so = side_offsets(P)
+    a, l = so["s" + side], so["h" + side]
+    out = {}
+    for k_, v in J.items():
+        off = a if k_ in ("shoulder", "elbow", "wrist", "tip") else l
+        out[k_] = (v[0] + off, v[1])
+    return out
+
+
 def head_point(P, canvas_xy):
     """A point in the head-shell canvas -> rig-space rest position (the head sits on the neck top)."""
     hs = P["hs"]
-    return (P_neck_x(P) + (canvas_xy[0] - NECK_PIVOT_CANVAS[0]) * hs, P["neck_top_y"] - (canvas_xy[1] - NECK_PIVOT_CANVAS[1]) * hs)
+    dx = canvas_xy[0] - NECK_PIVOT_CANVAS[0]
+    if P.get("face_dx"):                                           # turn trick: in front / 3-4 views the features sit closer to the head's centre line
+        dx = dx - P["face_dx"] * (dx - (-5.0))
+    return (P_neck_x(P) + dx * hs, P["neck_top_y"] - (canvas_xy[1] - NECK_PIVOT_CANVAS[1]) * hs)
 
 
 def P_neck_x(P):
@@ -71,18 +115,19 @@ def P_neck_x(P):
 
 
 def bones(P):
-    """[(name, parent, head, tail)] in rig space. Order = parents first. Two limbs per side: L = far side, R = near side (facing +x)."""
-    J = rest_joints(P)
+    """[(name, parent, head, tail)] in rig space. Order = parents first. Two limbs per side: L = far side, R = near side (facing +x).
+    In 3/4 and front views the limbs of the two sides are laterally offset (side_joints); the bone LIST is identical in every view."""
     out = []
     add = lambda n, par, h, t: out.append((n, par, tuple(h), tuple(t)))
     add("ROOT", None, (0, 0), (0, 24 * P["k"]))
-    add("PELVIS", "ROOT", J["hip"], (0, P["hip_y"] + 42 * P["k"]))
+    add("PELVIS", "ROOT", (0, P["hip_y"]), (0, P["hip_y"] + 42 * P["k"]))
     add("SPINE", "PELVIS", (0, P["hip_y"]), (0, P["hip_y"] + P["torso"] * 0.5))
     add("CHEST", "SPINE", (0, P["hip_y"] + P["torso"] * 0.5), (0, P["shoulder_y"]))
     add("NECK", "CHEST", (0, P["shoulder_y"]), (0, P["neck_top_y"]))
     add("HEAD", "NECK", (0, P["neck_top_y"]), (0, P["neck_top_y"] + P["head"] * 0.9))
     add("HAIR", "HEAD", (0, P["neck_top_y"] + P["head"] * 0.55), (0, P["neck_top_y"] + P["head"] * 0.95))
     for side in ("L", "R"):
+        J = side_joints(P, side)
         add(f"SHOULDER_{side}", "CHEST", J["shoulder"], (J["shoulder"][0] + 14 * P["k"], J["shoulder"][1]))
         add(f"ARM_{side}", f"SHOULDER_{side}", J["shoulder"], J["elbow"])
         add(f"FOREARM_{side}", f"ARM_{side}", J["elbow"], J["wrist"])
@@ -105,11 +150,11 @@ IK = [("IK_HAND_L", "ARM_L", "FOREARM_L", "HAND_L", (-11.0, 150.0)), ("IK_HAND_R
       ("IK_FOOT_L", "THIGH_L", "SHIN_L", "FOOT_L", (-150.0, 7.0)), ("IK_FOOT_R", "THIGH_R", "SHIN_R", "FOOT_R", (-150.0, 7.0))]
 
 # draw order back -> front. (part, bone, layer_group). Face feature meshes sit between skull and hair.
-PART_ORDER = ["upperarm_L", "forearm_L", "hand_L", "thigh_L", "shin_L", "foot_L", "neck", "pelvis", "thigh_R", "shin_R", "foot_R", "torso",
-              "skull", "nose", "@face", "hair", "upperarm_R", "forearm_R", "hand_R", "phone", "fingers"]
+PART_ORDER = ["upperarm_L", "forearm_L", "hand_L", "thigh_L", "shin_L", "foot_L", "neck", "pelvis", "backpack", "thigh_R", "shin_R", "foot_R", "skirt", "torso",
+              "skull", "nose", "@face", "hair", "upperarm_R", "forearm_R", "hand_R", "bag", "phone", "fingers"]
 PART_BONE = dict(upperarm_L="ARM_L", forearm_L="FOREARM_L", hand_L="HAND_L", thigh_L="THIGH_L", shin_L="SHIN_L", foot_L="FOOT_L", neck="NECK", pelvis="PELVIS",
                  thigh_R="THIGH_R", shin_R="SHIN_R", foot_R="FOOT_R", torso="CHEST", skull="HEAD", nose="HEAD", hair="HAIR", upperarm_R="ARM_R",
-                 forearm_R="FOREARM_R", hand_R="HAND_R")
+                 forearm_R="FOREARM_R", hand_R="HAND_R", backpack="CHEST", skirt="PELVIS", bag="CHEST")
 
 
 # ---------------------------------------------------------------------------- 2-bone IK (analytic; the Blender IK solver must agree with this)

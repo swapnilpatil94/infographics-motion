@@ -209,7 +209,7 @@ def nose(P, dna):
 
 # ------------------------------------------------------------------------------------------------------------------ bake
 def _key(dna, fb, P):
-    return hashlib.sha1(json.dumps([dna, fb, {k: round(v, 2) for k, v in P.items()}, "art-v3"], sort_keys=True, default=str).encode()).hexdigest()[:12]
+    return hashlib.sha1(json.dumps([dna, fb, {k: (round(v, 2) if isinstance(v, (int, float)) else v) for k, v in P.items()}, "art-v3"], sort_keys=True, default=str).encode()).hexdigest()[:12]
 
 
 def bake(dna, force=False):

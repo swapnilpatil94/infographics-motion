@@ -1,0 +1,87 @@
+{
+ "id": "mpfb_game_engine",
+ "blender": "5.2.2 LTS",
+ "armature": "Human.rig",
+ "base_pose_from_action": null,
+ "ik_chains": [],
+ "axes": {
+  "lateral": [
+   1.0,
+   0.0,
+   0.0
+  ],
+  "forward": [
+   0.0,
+   1.0,
+   0.0
+  ]
+ },
+ "pipeline_mapping": {
+  "mapped": 19,
+  "of": 23,
+  "roles": {
+   "PELVIS": "pelvis",
+   "SPINE": "spine_01",
+   "CHEST": "upperarm_l",
+   "NECK": "neck_01",
+   "HEAD": "head",
+   "HAND_L": "hand_l",
+   "HAND_R": "hand_r",
+   "FOREARM_L": "lowerarm_l",
+   "FOREARM_R": "lowerarm_r",
+   "ARM_L": "upperarm_l",
+   "ARM_R": "upperarm_r",
+   "THIGH_L": "thigh_l",
+   "THIGH_R": "thigh_r",
+   "SHIN_L": "calf_l",
+   "SHIN_R": "calf_r",
+   "FOOT_L": "foot_l",
+   "FOOT_R": "foot_r",
+   "SHOULDER_L": "clavicle_l",
+   "SHOULDER_R": "clavicle_r",
+   "EYE_L": null,
+   "EYE_R": null,
+   "BROW": null,
+   "MOUTH": null
+  }
+ },
+ "tests": {
+  "walk": {
+   "pass_ik_walk": false,
+   "reason": "no 2-bone leg IK chains with a target (walking would need hand-keyed FK)"
+  },
+  "sit": {
+   "pass_seated_pose": false,
+   "reason": "no leg IK"
+  },
+  "reach": {
+   "pass_reach": false,
+   "reason": "no arm IK"
+  },
+  "hold": {
+   "pass_prop_attach": true,
+   "reason": "no arm IK; hand bone present: True"
+  },
+  "face": {
+   "shape_keys": 4,
+   "working_shape_keys": 3,
+   "expression_named": 0,
+   "eye_bones": [],
+   "eye_rotation_moves_mesh": false,
+   "brow_bones": 0
+  },
+  "proportions": {
+   "height_before_m": 15.912,
+   "height_after_m": 23.675,
+   "change_pct": 48.8,
+   "pass_bone_scale_changes_body": true
+  }
+ },
+ "pose_sheet": [
+  "../../../output/tests/blender_audit/_mpfb_game_engine_rest.png",
+  "../../../output/tests/blender_audit/_mpfb_game_engine_walk_contact.png",
+  "../../../output/tests/blender_audit/_mpfb_game_engine_walk_pass.png",
+  "../../../output/tests/blender_audit/_mpfb_game_engine_sit.png",
+  "../../../output/tests/blender_audit/_mpfb_game_engine_reach.png"
+ ]
+}

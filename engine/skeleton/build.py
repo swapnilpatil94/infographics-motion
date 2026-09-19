@@ -99,4 +99,7 @@ def make(tts="chatterbox", tempo=1.16, seed=7, log=print, force_tts=False, sampl
 
 def from_plan(path, log=print, samples=10):
     plan = json.load(open(path, encoding="utf-8"))
+    if plan.get("version", 1) >= 2:
+        from engine.skeleton import build_v2
+        return build_v2.from_plan(path, log, samples)
     return short.render_film(plan, os.path.dirname(os.path.abspath(path)), log, samples=samples)

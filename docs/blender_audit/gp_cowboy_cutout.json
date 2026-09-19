@@ -1,0 +1,1061 @@
+{
+ "id": "gp_cowboy_cutout",
+ "blender": "5.2.2 LTS",
+ "file_blender_version": "2.83.15",
+ "errors": [],
+ "scene": {
+  "frame_range": [
+   1,
+   29
+  ],
+  "fps": 24,
+  "engine": "CYCLES",
+  "unit_scale": 1.0
+ },
+ "objects": {
+  "ARMATURE": 6,
+  "CURVE": 1,
+  "EMPTY": 55,
+  "GREASEPENCIL": 40,
+  "MESH": 2,
+  "LATTICE": 1
+ },
+ "datablocks": {
+  "meshes": 2,
+  "armatures": 6,
+  "actions": 0,
+  "materials": 60,
+  "images": 3,
+  "grease_pencils": 40,
+  "grease_pencils_v3": 0,
+  "texts": 1,
+  "node_groups": 1,
+  "collections": 1,
+  "libraries": 0
+ },
+ "embedded_text_scripts": [
+  "Text"
+ ],
+ "missing_images": [],
+ "armatures": [
+  {
+   "name": "Armature",
+   "bones": 8,
+   "pose_bones": 8,
+   "bone_names_sample": [
+    "Bone",
+    "Bone.007",
+    "Bone.006",
+    "Bone.005",
+    "Bone.004",
+    "Bone.003",
+    "Bone.002",
+    "Bone.001"
+   ],
+   "roots": [
+    "Bone"
+   ],
+   "depth_max": 7,
+   "deform_bones": 8,
+   "finger_bones": 0,
+   "eye_bones": [],
+   "brow_bones": [],
+   "mouth_bones": [],
+   "face_bones_total": 0,
+   "constraints": {
+    "COPY_ROTATION": 1,
+    "IK": 1
+   },
+   "ik": [
+    {
+     "bone": "Bone.001",
+     "chain": 0,
+     "target": "Empty.002",
+     "subtarget": "Bone.001",
+     "pole": null
+    }
+   ],
+   "drivers": 7,
+   "python_drivers": 7,
+   "action": null,
+   "custom_props": [
+    "coa_tools"
+   ]
+  },
+  {
+   "name": "Armature.001",
+   "bones": 10,
+   "pose_bones": 10,
+   "bone_names_sample": [
+    "Bone",
+    "Bone.009",
+    "Bone.008",
+    "Bone.007",
+    "Bone.006",
+    "Bone.005",
+    "Bone.004",
+    "Bone.003",
+    "Bone.002",
+    "Bone.001"
+   ],
+   "roots": [
+    "Bone"
+   ],
+   "depth_max": 9,
+   "deform_bones": 10,
+   "finger_bones": 0,
+   "eye_bones": [],
+   "brow_bones": [],
+   "mouth_bones": [],
+   "face_bones_total": 0,
+   "constraints": {
+    "LIMIT_ROTATION": 5,
+    "IK": 1
+   },
+   "ik": [
+    {
+     "bone": "Bone.001",
+     "chain": 0,
+     "target": "Empty.032",
+     "subtarget": "Bone.001",
+     "pole": null
+    }
+   ],
+   "drivers": 0,
+   "python_drivers": 0,
+   "action": null,
+   "custom_props": [
+    "coa_tools"
+   ]
+  },
+  {
+   "name": "Armature.002",
+   "bones": 3,
+   "pose_bones": 3,
+   "bone_names_sample": [
+    "Bone",
+    "Bone.001",
+    "Bone.002"
+   ],
+   "roots": [
+    "Bone"
+   ],
+   "depth_max": 2,
+   "deform_bones": 3,
+   "finger_bones": 0,
+   "eye_bones": [],
+   "brow_bones": [],
+   "mouth_bones": [],
+   "face_bones_total": 0,
+   "constraints": {
+    "IK": 1
+   },
+   "ik": [
+    {
+     "bone": "Bone.002",
+     "chain": 0,
+     "target": "Horse Heel 01",
+     "subtarget": "",
+     "pole": null
+    }
+   ],
+   "drivers": 0,
+   "python_drivers": 0,
+   "action": null,
+   "custom_props": [
+    "coa_tools"
+   ]
+  },
+  {
+   "name": "Armature.003",
+   "bones": 3,
+   "pose_bones": 3,
+   "bone_names_sample": [
+    "Bone",
+    "Bone.001",
+    "Bone.002"
+   ],
+   "roots": [
+    "Bone"
+   ],
+   "depth_max": 2,
+   "deform_bones": 3,
+   "finger_bones": 0,
+   "eye_bones": [],
+   "brow_bones": [],
+   "mouth_bones": [],
+   "face_bones_total": 0,
+   "constraints": {
+    "IK": 1
+   },
+   "ik": [
+    {
+     "bone": "Bone.002",
+     "chain": 0,
+     "target": "Horse Heel 02",
+     "subtarget": "",
+     "pole": null
+    }
+   ],
+   "drivers": 0,
+   "python_drivers": 0,
+   "action": null,
+   "custom_props": [
+    "coa_tools"
+   ]
+  },
+  {
+   "name": "Armature.004",
+   "bones": 3,
+   "pose_bones": 3,
+   "bone_names_sample": [
+    "Bone",
+    "Bone.001",
+    "Bone.002"
+   ],
+   "roots": [
+    "Bone"
+   ],
+   "depth_max": 2,
+   "deform_bones": 3,
+   "finger_bones": 0,
+   "eye_bones": [],
+   "brow_bones": [],
+   "mouth_bones": [],
+   "face_bones_total": 0,
+   "constraints": {
+    "IK": 1
+   },
+   "ik": [
+    {
+     "bone": "Bone.002",
+     "chain": 0,
+     "target": "Horse Heel 03",
+     "subtarget": "",
+     "pole": null
+    }
+   ],
+   "drivers": 0,
+   "python_drivers": 0,
+   "action": null,
+   "custom_props": [
+    "coa_tools"
+   ]
+  },
+  {
+   "name": "Armature.005",
+   "bones": 3,
+   "pose_bones": 3,
+   "bone_names_sample": [
+    "Bone",
+    "Bone.001",
+    "Bone.002"
+   ],
+   "roots": [
+    "Bone"
+   ],
+   "depth_max": 2,
+   "deform_bones": 3,
+   "finger_bones": 0,
+   "eye_bones": [],
+   "brow_bones": [],
+   "mouth_bones": [],
+   "face_bones_total": 0,
+   "constraints": {
+    "IK": 1
+   },
+   "ik": [
+    {
+     "bone": "Bone.002",
+     "chain": 0,
+     "target": "Horse Heel 04",
+     "subtarget": "",
+     "pole": null
+    }
+   ],
+   "drivers": 0,
+   "python_drivers": 0,
+   "action": null,
+   "custom_props": [
+    "coa_tools"
+   ]
+  }
+ ],
+ "shape_keys": [],
+ "mesh_summary": {
+  "objects": 2,
+  "skinned": 0,
+  "tris": 0
+ },
+ "grease_pencil": [
+  {
+   "obj": "GP Bang",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "GP_Layer.001",
+    "GP_Layer"
+   ],
+   "n_layers": 2,
+   "modifiers": [
+    "GREASE_PENCIL_TIME"
+   ],
+   "parent": "Bullet Time",
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 126
+  },
+  {
+   "obj": "GP Gardokhak",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "GP_Layer"
+   ],
+   "n_layers": 1,
+   "modifiers": [
+    "GREASE_PENCIL_TIME"
+   ],
+   "parent": "Dust",
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 120
+  },
+  {
+   "obj": "GP-BG",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "Primitives"
+   ],
+   "n_layers": 1,
+   "modifiers": [],
+   "parent": null,
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 2
+  },
+  {
+   "obj": "GP-BG.001",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "Primitives"
+   ],
+   "n_layers": 1,
+   "modifiers": [],
+   "parent": null,
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 2
+  },
+  {
+   "obj": "GP-BG.002",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "Primitives"
+   ],
+   "n_layers": 1,
+   "modifiers": [],
+   "parent": null,
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 2
+  },
+  {
+   "obj": "GP-BG.003",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "Primitives"
+   ],
+   "n_layers": 1,
+   "modifiers": [],
+   "parent": null,
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 2
+  },
+  {
+   "obj": "GP-BG.004",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "Primitives"
+   ],
+   "n_layers": 1,
+   "modifiers": [],
+   "parent": null,
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 2
+  },
+  {
+   "obj": "GP-Cheshme Asb",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "GP_Layer.001",
+    "GP_Layer",
+    "GP_Layer.002",
+    "GP_Layer.003"
+   ],
+   "n_layers": 4,
+   "modifiers": [
+    "GREASE_PENCIL_SUBDIV",
+    "GREASE_PENCIL_HOOK",
+    "GREASE_PENCIL_TIME"
+   ],
+   "parent": "Horse Eye",
+   "parent_type": "OBJECT",
+   "vgroups": 1,
+   "strokes": 91
+  },
+  {
+   "obj": "GP-Dome Asb",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "GP_Layer",
+    "Primitives"
+   ],
+   "n_layers": 2,
+   "modifiers": [
+    "GREASE_PENCIL_ARMATURE",
+    "GREASE_PENCIL_SUBDIV",
+    "GREASE_PENCIL_THICKNESS"
+   ],
+   "parent": "Armature",
+   "parent_type": "OBJECT",
+   "vgroups": 8,
+   "strokes": 14
+  },
+  {
+   "obj": "GP-Dome Asb.001",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "GP_Layer.005",
+    "Primitives"
+   ],
+   "n_layers": 2,
+   "modifiers": [
+    "GREASE_PENCIL_THICKNESS"
+   ],
+   "parent": "Horse Mane",
+   "parent_type": "OBJECT",
+   "vgroups": 9,
+   "strokes": 16
+  },
+  {
+   "obj": "GP-Sare Asb",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "Primitives",
+    "GP_Layer",
+    "GP_Layer.001",
+    "GP_Layer.002",
+    "GP_Layer.003",
+    "GP_Layer.004",
+    "GP_Layer.005",
+    "GP_Layer.006",
+    "GP_Layer.007",
+    "GP_Layer.008",
+    "GP_Layer.009",
+    "GP_Layer.010"
+   ],
+   "n_layers": 12,
+   "modifiers": [
+    "GREASE_PENCIL_SUBDIV",
+    "GREASE_PENCIL_HOOK",
+    "GREASE_PENCIL_HOOK",
+    "GREASE_PENCIL_HOOK",
+    "GREASE_PENCIL_HOOK",
+    "GREASE_PENCIL_HOOK"
+   ],
+   "parent": null,
+   "parent_type": "OBJECT",
+   "vgroups": 1,
+   "strokes": 20
+  },
+  {
+   "obj": "GPencil",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "Primitives",
+    "GP_Layer.001",
+    "GP_Layer.002",
+    "GP_Layer",
+    "GP_Layer.003",
+    "GP_Layer.004",
+    "GP_Layer.005",
+    "GP_Layer.006"
+   ],
+   "n_layers": 8,
+   "modifiers": [
+    "GREASE_PENCIL_HOOK",
+    "GREASE_PENCIL_HOOK",
+    "GREASE_PENCIL_HOOK"
+   ],
+   "parent": "Horse Body",
+   "parent_type": "OBJECT",
+   "vgroups": 1,
+   "strokes": 10
+  },
+  {
+   "obj": "GPencil.001",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "GP_Layer",
+    "GP_Layer.002",
+    "Primitives",
+    "GP_Layer.001",
+    "GP_Layer.003"
+   ],
+   "n_layers": 5,
+   "modifiers": [
+    "GREASE_PENCIL_SUBDIV",
+    "NODES"
+   ],
+   "parent": "Saddle",
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 60
+  },
+  {
+   "obj": "GPencil.002",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "GP_Layer.005",
+    "GP_Layer.006",
+    "GP_Layer.001",
+    "Primitives",
+    "GP_Layer",
+    "GP_Layer.002",
+    "GP_Layer.003",
+    "GP_Layer.004"
+   ],
+   "n_layers": 8,
+   "modifiers": [
+    "GREASE_PENCIL_HOOK"
+   ],
+   "parent": "Leftt Wrist",
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 28
+  },
+  {
+   "obj": "GPencil.003",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "GP_Layer",
+    "GP_Layer.001"
+   ],
+   "n_layers": 2,
+   "modifiers": [
+    "GREASE_PENCIL_HOOK"
+   ],
+   "parent": "Leftt Wrist",
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 4
+  },
+  {
+   "obj": "GPencil.004",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "Primitives",
+    "GP_Layer",
+    "GP_Layer.001"
+   ],
+   "n_layers": 3,
+   "modifiers": [
+    "GREASE_PENCIL_SUBDIV",
+    "GREASE_PENCIL_TIME"
+   ],
+   "parent": "Left Hand",
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 89
+  },
+  {
+   "obj": "GPencil.005",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "Primitives",
+    "GP_Layer",
+    "GP_Layer.001"
+   ],
+   "n_layers": 3,
+   "modifiers": [
+    "GREASE_PENCIL_HOOK"
+   ],
+   "parent": "Leftt Wrist",
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 20
+  },
+  {
+   "obj": "GPencil.006",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "Primitives",
+    "GP_Layer",
+    "GP_Layer.001",
+    "GP_Layer.002"
+   ],
+   "n_layers": 4,
+   "modifiers": [
+    "GREASE_PENCIL_SUBDIV",
+    "GREASE_PENCIL_TIME"
+   ],
+   "parent": "Hat",
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 155
+  },
+  {
+   "obj": "GPencil.007",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "GP_Layer.001",
+    "GP_Layer",
+    "GP_Layer.002",
+    "Primitives"
+   ],
+   "n_layers": 4,
+   "modifiers": [
+    "GREASE_PENCIL_SUBDIV",
+    "GREASE_PENCIL_TIME"
+   ],
+   "parent": "Cowboy Head",
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 1131
+  },
+  {
+   "obj": "GPencil.008",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "Primitives",
+    "GP_Layer",
+    "GP_Layer.001",
+    "GP_Layer.002"
+   ],
+   "n_layers": 4,
+   "modifiers": [
+    "GREASE_PENCIL_HOOK",
+    "GREASE_PENCIL_HOOK"
+   ],
+   "parent": "Necklace 00",
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 42
+  },
+  {
+   "obj": "GPencil.009",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "GP_Layer",
+    "Primitives"
+   ],
+   "n_layers": 2,
+   "modifiers": [],
+   "parent": "Cowboy Ear",
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 6
+  },
+  {
+   "obj": "GPencil.010",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "GP_Layer",
+    "Primitives"
+   ],
+   "n_layers": 2,
+   "modifiers": [],
+   "parent": "Cowboy Hair",
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 10
+  },
+  {
+   "obj": "GPencil.011",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "GP_Layer.001",
+    "GP_Layer",
+    "Primitives"
+   ],
+   "n_layers": 3,
+   "modifiers": [
+    "GREASE_PENCIL_HOOK",
+    "GREASE_PENCIL_TIME"
+   ],
+   "parent": "Cowboy Eye",
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 406
+  },
+  {
+   "obj": "GPencil.012",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "Primitives"
+   ],
+   "n_layers": 1,
+   "modifiers": [],
+   "parent": "Cigarettes",
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 8
+  },
+  {
+   "obj": "GPencil.013",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "GP_Layer.001",
+    "GP_Layer",
+    "Primitives",
+    "GP_Layer.002"
+   ],
+   "n_layers": 4,
+   "modifiers": [],
+   "parent": "Cowboy Waist",
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 48
+  },
+  {
+   "obj": "GPencil.014",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "GP_Layer",
+    "Primitives",
+    "GP_Layer.002",
+    "GP_Layer.001"
+   ],
+   "n_layers": 4,
+   "modifiers": [],
+   "parent": "Sun",
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 10
+  },
+  {
+   "obj": "GPencil.015",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "GP_Layer",
+    "GP_Layer.002",
+    "GP_Layer.001",
+    "Primitives"
+   ],
+   "n_layers": 4,
+   "modifiers": [],
+   "parent": null,
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 20
+  },
+  {
+   "obj": "GPencil.016",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "Primitives",
+    "GP_Layer",
+    "GP_Layer.001",
+    "GP_Layer.002",
+    "GP_Layer.003",
+    "GP_Layer.004",
+    "GP_Layer.005",
+    "GP_Layer.006",
+    "GP_Layer.007",
+    "GP_Layer.008",
+    "GP_Layer.009",
+    "GP_Layer.010",
+    "GP_Layer.011",
+    "GP_Layer.012",
+    "GP_Layer.013"
+   ],
+   "n_layers": 15,
+   "modifiers": [
+    "GREASE_PENCIL_HOOK",
+    "GREASE_PENCIL_HOOK"
+   ],
+   "parent": null,
+   "parent_type": "OBJECT",
+   "vgroups": 2,
+   "strokes": 4
+  },
+  {
+   "obj": "GPencil.017",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "Primitives",
+    "Primitives.001"
+   ],
+   "n_layers": 2,
+   "modifiers": [
+    "GREASE_PENCIL_HOOK",
+    "GREASE_PENCIL_ARMATURE",
+    "GREASE_PENCIL_SUBDIV"
+   ],
+   "parent": "Armature.001",
+   "parent_type": "OBJECT",
+   "vgroups": 11,
+   "strokes": 2
+  },
+  {
+   "obj": "GPencil.018",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "GP_Layer.004",
+    "Primitives",
+    "GP_Layer.003",
+    "GP_Layer.002",
+    "GP_Layer.001",
+    "GP_Layer",
+    "GP_Layer.005"
+   ],
+   "n_layers": 7,
+   "modifiers": [
+    "GREASE_PENCIL_TIME"
+   ],
+   "parent": "Cowboy Controller",
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 1320
+  },
+  {
+   "obj": "GPencil.019",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "GP_Layer.002"
+   ],
+   "n_layers": 1,
+   "modifiers": [],
+   "parent": "GPencil.018",
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 52
+  },
+  {
+   "obj": "GPencil.020",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "GP_Layer.004",
+    "GP_Layer.001",
+    "GP_Layer.002",
+    "GP_Layer.003",
+    "Primitives",
+    "GP_Layer",
+    "Primitives.001",
+    "Primitives.002"
+   ],
+   "n_layers": 8,
+   "modifiers": [
+    "GREASE_PENCIL_SUBDIV",
+    "GREASE_PENCIL_HOOK",
+    "GREASE_PENCIL_TIME"
+   ],
+   "parent": "Right Hand",
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 42
+  },
+  {
+   "obj": "GPencil.021",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "Primitives",
+    "GP_Layer"
+   ],
+   "n_layers": 2,
+   "modifiers": [
+    "GREASE_PENCIL_SUBDIV",
+    "GREASE_PENCIL_LATTICE"
+   ],
+   "parent": "Horse Hed",
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 6
+  },
+  {
+   "obj": "GPencil.022",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "GP_Layer"
+   ],
+   "n_layers": 1,
+   "modifiers": [],
+   "parent": "Empty.026",
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 2
+  },
+  {
+   "obj": "GPencil.023",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "GP_Layer.003",
+    "GP_Layer.004",
+    "GP_Layer.005"
+   ],
+   "n_layers": 3,
+   "modifiers": [
+    "GREASE_PENCIL_ARMATURE",
+    "GREASE_PENCIL_TIME"
+   ],
+   "parent": "Armature.002",
+   "parent_type": "OBJECT",
+   "vgroups": 3,
+   "strokes": 93
+  },
+  {
+   "obj": "GPencil.024",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "GP_Layer",
+    "GP_Layer.001",
+    "GP_Layer.002"
+   ],
+   "n_layers": 3,
+   "modifiers": [
+    "GREASE_PENCIL_ARMATURE",
+    "GREASE_PENCIL_TIME"
+   ],
+   "parent": "Armature.003",
+   "parent_type": "OBJECT",
+   "vgroups": 3,
+   "strokes": 93
+  },
+  {
+   "obj": "GPencil.025",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "GP_Layer.011",
+    "GP_Layer.012",
+    "GP_Layer.013"
+   ],
+   "n_layers": 3,
+   "modifiers": [
+    "GREASE_PENCIL_ARMATURE",
+    "GREASE_PENCIL_TIME"
+   ],
+   "parent": "Armature.004",
+   "parent_type": "OBJECT",
+   "vgroups": 3,
+   "strokes": 88
+  },
+  {
+   "obj": "GPencil.026",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "GP_Layer.013"
+   ],
+   "n_layers": 1,
+   "modifiers": [],
+   "parent": "Empty.008",
+   "parent_type": "OBJECT",
+   "vgroups": 3,
+   "strokes": 1
+  },
+  {
+   "obj": "GPencil.027",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "GP_Layer.007",
+    "GP_Layer.008",
+    "GP_Layer.009"
+   ],
+   "n_layers": 3,
+   "modifiers": [
+    "GREASE_PENCIL_ARMATURE"
+   ],
+   "parent": "Armature.005",
+   "parent_type": "OBJECT",
+   "vgroups": 3,
+   "strokes": 4
+  },
+  {
+   "obj": "GPencil.028",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "GP_Layer.009"
+   ],
+   "n_layers": 1,
+   "modifiers": [],
+   "parent": "Empty.025",
+   "parent_type": "OBJECT",
+   "vgroups": 2,
+   "strokes": 1
+  }
+ ],
+ "actions": [],
+ "n_actions": 0,
+ "tests": {
+  "ik_response": [
+   {
+    "armature": "Armature",
+    "bone": "Bone.001",
+    "chain": 0,
+    "rest_err_cm": 243.03,
+    "moves": [
+     {
+      "err_px_equiv_cm": 244.04,
+      "moved_cm": 0.0
+     },
+     {
+      "err_px_equiv_cm": 247.55,
+      "moved_cm": 0.0
+     },
+     {
+      "err_px_equiv_cm": 244.32,
+      "moved_cm": 0.0
+     }
+    ]
+   },
+   {
+    "armature": "Armature.001",
+    "bone": "Bone.001",
+    "chain": 0,
+    "rest_err_cm": 0.0,
+    "moves": [
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 15.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 18.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 15.81
+     }
+    ]
+   },
+   {
+    "armature": "Armature.002",
+    "bone": "Bone.002",
+    "chain": 0,
+    "rest_err_cm": 0.0,
+    "moves": [
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 15.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 18.0
+     },
+     {
+      "err_px_equiv_cm": 0.0,
+      "moved_cm": 15.81
+     }
+    ]
+   }
+  ],
+  "reach": null,
+  "prop_attach": null,
+  "walk": null,
+  "sit": null
+ },
+ "render": {
+  "ok": true,
+  "frame": null
+ }
+}

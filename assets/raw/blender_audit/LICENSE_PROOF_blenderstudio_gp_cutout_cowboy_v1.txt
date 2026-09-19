@@ -1,0 +1,6 @@
+source page: https://studio.blender.org/training/grease-pencil-fundamentals/5d9c6ee20f9018baaca071c3/
+fetched: 2026-09-19T18:38:08.220912+00:00
+matched licence text:
+  - creativecommons.org/licenses/by/4.0/
+  - cc-by">
+  - CC-BY

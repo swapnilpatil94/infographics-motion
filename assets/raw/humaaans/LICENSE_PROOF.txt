@@ -1,0 +1,8 @@
+source page: https://www.humaaans.com/
+fetched: 2026-09-19T16:52:19.799853+00:00
+matched licence text:
+  - mmons.org/share-your-work/public-domain/cc0/" target="_blank" class="w-inline-block"
+  - CC0 Free for commercial or personal use by
+  - mmons.org/share-your-work/public-domain/cc0/" target="_blank" class="w-inline-block"
+  - mmons.org/share-your-work/public-domain/cc0/" target="_blank"
+  - CC0

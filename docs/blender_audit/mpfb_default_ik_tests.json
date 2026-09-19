@@ -1,0 +1,192 @@
+{
+ "id": "mpfb_default_ik",
+ "blender": "5.2.2 LTS",
+ "armature": "Human.rig",
+ "base_pose_from_action": null,
+ "ik_chains": [
+  {
+   "tip": "lowerleg02.L",
+   "kind": "leg",
+   "side": "L",
+   "bones": [
+    "lowerleg02.L",
+    "lowerleg01.L"
+   ],
+   "length_m": 3.792
+  },
+  {
+   "tip": "lowerleg02.R",
+   "kind": "leg",
+   "side": "R",
+   "bones": [
+    "lowerleg02.R",
+    "lowerleg01.R"
+   ],
+   "length_m": 3.792
+  },
+  {
+   "tip": "lowerarm02.L",
+   "kind": "arm",
+   "side": "L",
+   "bones": [
+    "lowerarm02.L",
+    "lowerarm01.L"
+   ],
+   "length_m": 2.111
+  },
+  {
+   "tip": "lowerarm02.R",
+   "kind": "arm",
+   "side": "R",
+   "bones": [
+    "lowerarm02.R",
+    "lowerarm01.R"
+   ],
+   "length_m": 2.111
+  }
+ ],
+ "axes": {
+  "lateral": [
+   1.0,
+   0.0,
+   0.0
+  ],
+  "forward": [
+   0.0,
+   1.0,
+   0.0
+  ]
+ },
+ "pipeline_mapping": {
+  "mapped": 12,
+  "of": 23,
+  "roles": {
+   "PELVIS": "pelvis.L",
+   "SPINE": "spine05",
+   "CHEST": "upperleg01.L",
+   "NECK": "neck01",
+   "HEAD": "head",
+   "HAND_L": null,
+   "HAND_R": null,
+   "FOREARM_L": null,
+   "FOREARM_R": null,
+   "ARM_L": null,
+   "ARM_R": null,
+   "THIGH_L": null,
+   "THIGH_R": null,
+   "SHIN_L": null,
+   "SHIN_R": null,
+   "FOOT_L": "foot.L",
+   "FOOT_R": "foot.R",
+   "SHOULDER_L": "clavicle.L",
+   "SHOULDER_R": "clavicle.R",
+   "EYE_L": "eye.L",
+   "EYE_R": "eye.R",
+   "BROW": null,
+   "MOUTH": "jaw"
+  }
+ },
+ "tests": {
+  "walk": {
+   "chains": [
+    "lowerleg02.L",
+    "lowerleg02.R"
+   ],
+   "foot_track_err_max_cm": 15.41,
+   "stride_m": 1.803,
+   "foot_lift_m": 0.505,
+   "alternating_feet": true,
+   "pass_ik_walk": false
+  },
+  "sit": {
+   "legs": [
+    {
+     "err_cm": 0.02,
+     "knee_deg": 90.0
+    },
+    {
+     "err_cm": 0.02,
+     "knee_deg": 90.0
+    }
+   ],
+   "pass_seated_pose": true,
+   "note": "feet 90/90 relative to hip (thigh horizontal, shin vertical); pelvis lowering / hip rotation not modelled"
+  },
+  "reach": {
+   "trials": [
+    {
+     "hand": "lowerarm02.L",
+     "target": "0.5L_forward",
+     "err_cm": 0.02
+    },
+    {
+     "hand": "lowerarm02.L",
+     "target": "0.9L_forward",
+     "err_cm": 0.01
+    },
+    {
+     "hand": "lowerarm02.L",
+     "target": "0.9L_up",
+     "err_cm": 0.0
+    },
+    {
+     "hand": "lowerarm02.L",
+     "target": "1.2L_forward(out of reach)",
+     "err_cm": 42.22
+    },
+    {
+     "hand": "lowerarm02.R",
+     "target": "0.5L_forward",
+     "err_cm": 0.02
+    },
+    {
+     "hand": "lowerarm02.R",
+     "target": "0.9L_forward",
+     "err_cm": 0.01
+    },
+    {
+     "hand": "lowerarm02.R",
+     "target": "0.9L_up",
+     "err_cm": 0.0
+    },
+    {
+     "hand": "lowerarm02.R",
+     "target": "1.2L_forward(out of reach)",
+     "err_cm": 42.22
+    }
+   ],
+   "pass_reach": true
+  },
+  "hold": {
+   "cube_offset_before_cm": 0.0,
+   "cube_offset_after_cm": 0.0,
+   "pass_prop_attach": true,
+   "hand_bone": "lowerarm02.L"
+  },
+  "face": {
+   "shape_keys": 4,
+   "working_shape_keys": 3,
+   "expression_named": 0,
+   "eye_bones": [
+    "eye.L",
+    "eye.R"
+   ],
+   "eye_rotation_moves_mesh": true,
+   "eye_max_disp_cm": 0.78,
+   "brow_bones": 0
+  },
+  "proportions": {
+   "height_before_m": 15.912,
+   "height_after_m": 27.908,
+   "change_pct": 75.4,
+   "pass_bone_scale_changes_body": true
+  }
+ },
+ "pose_sheet": [
+  "../../../output/tests/blender_audit/_mpfb_default_ik_rest.png",
+  "../../../output/tests/blender_audit/_mpfb_default_ik_walk_contact.png",
+  "../../../output/tests/blender_audit/_mpfb_default_ik_walk_pass.png",
+  "../../../output/tests/blender_audit/_mpfb_default_ik_sit.png",
+  "../../../output/tests/blender_audit/_mpfb_default_ik_reach.png"
+ ]
+}

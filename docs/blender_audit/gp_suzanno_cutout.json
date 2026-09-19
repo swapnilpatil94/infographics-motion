@@ -1,0 +1,111 @@
+{
+ "id": "gp_suzanno_cutout",
+ "blender": "5.2.2 LTS",
+ "file_blender_version": "2.83.15",
+ "errors": [],
+ "scene": {
+  "frame_range": [
+   1,
+   250
+  ],
+  "fps": 24,
+  "engine": "BLENDER_EEVEE",
+  "unit_scale": 1.0
+ },
+ "objects": {
+  "CAMERA": 1,
+  "EMPTY": 3,
+  "GREASEPENCIL": 1,
+  "LATTICE": 1,
+  "MESH": 1
+ },
+ "datablocks": {
+  "meshes": 1,
+  "armatures": 0,
+  "actions": 3,
+  "materials": 11,
+  "images": 2,
+  "grease_pencils": 1,
+  "grease_pencils_v3": 0,
+  "texts": 0,
+  "node_groups": 0,
+  "collections": 2,
+  "libraries": 0
+ },
+ "embedded_text_scripts": [],
+ "missing_images": [
+  "Suzanno.jpg"
+ ],
+ "armatures": [],
+ "shape_keys": [],
+ "mesh_summary": {
+  "objects": 1,
+  "skinned": 0,
+  "tris": 1
+ },
+ "grease_pencil": [
+  {
+   "obj": "GPencil",
+   "type": "GREASEPENCIL",
+   "layers": [
+    "color_cabeza",
+    "color_ojos",
+    "color_boca",
+    "nariz"
+   ],
+   "n_layers": 4,
+   "modifiers": [
+    "GREASE_PENCIL_TIME",
+    "GREASE_PENCIL_TIME",
+    "GREASE_PENCIL_TIME",
+    "GREASE_PENCIL_LATTICE",
+    "GREASE_PENCIL_OFFSET",
+    "GREASE_PENCIL_OFFSET",
+    "GREASE_PENCIL_TINT",
+    "GREASE_PENCIL_TINT"
+   ],
+   "parent": "Empty",
+   "parent_type": "OBJECT",
+   "vgroups": 0,
+   "strokes": 1576
+  }
+ ],
+ "actions": [
+  {
+   "name": "EmptyAction",
+   "frames": [
+    1,
+    38
+   ],
+   "fcurves": -1
+  },
+  {
+   "name": "GPencilAction",
+   "frames": [
+    1,
+    55
+   ],
+   "fcurves": -1
+  },
+  {
+   "name": "LatticeAction",
+   "frames": [
+    10,
+    10
+   ],
+   "fcurves": -1
+  }
+ ],
+ "n_actions": 3,
+ "tests": {
+  "ik_response": [],
+  "reach": null,
+  "prop_attach": null,
+  "walk": null,
+  "sit": null
+ },
+ "render": {
+  "ok": true,
+  "frame": 28
+ }
+}

@@ -133,6 +133,7 @@ def build_char(spec, idx):
     c = Char()
     c.spec, c.P, c.man, c.facing, c.origin = spec, P, man, facing, (ox, oy)
     c.J = R.rest_joints(P)
+    c.JS = {"L": R.side_joints(P, "L"), "R": R.side_joints(P, "R")}
     c.obj_y = -depth
     # ---- armature (in the character's stage frame; object placed at the stage origin)
     arm_d = bpy.data.armatures.new("rig_" + spec["id"])
@@ -179,9 +180,19 @@ def build_char(spec, idx):
         c.ik[name] = e
     # ---- part meshes
     c.parts = {}
+    c.handposes = {"L": [], "R": []}
     order = [p for p in R.PART_ORDER]
+    poses = man.get("hand_poses") or []
     for i, pname in enumerate(order):
         if pname in ("@face", "phone", "fingers"):
+            continue
+        if pname in ("hand_L", "hand_R") and pname not in man["parts"]:                      # v2: a SET of reusable hand poses per wrist
+            side = pname[-1]
+            for pose in poses:
+                ob = add_textured_part(c, f"hand_{side}_{pose}", i, bone_override="HAND_" + side)
+                c.handposes[side].append((pose, ob))
+            continue
+        if pname not in man["parts"]:
             continue
         add_textured_part(c, pname, i)
     add_face(c, order.index("@face"))
@@ -215,15 +226,22 @@ def rest_angle_deg(pname):
     return {"upperarm": Rr["arm"], "forearm": Rr["arm"] + Rr["elbow"], "hand": Rr["arm"] + Rr["elbow"] + Rr["wrist"], "thigh": Rr["thigh"], "shin": Rr["thigh"] + Rr["knee"]}.get(pname.split("_")[0], 0.0)
 
 
+def _side_of(pname):
+    t = pname.split("_")
+    return t[1] if len(t) > 1 and t[1] in ("L", "R") else None
+
+
 def joint_of(c, pname):
     P = c.P
-    J = R.rest_joints(P)
+    side = _side_of(pname)
+    J = R.side_joints(P, side) if side else R.rest_joints(P)
     base = pname.split("_")[0]
     return {"upperarm": J["shoulder"], "forearm": J["elbow"], "hand": J["wrist"], "thigh": J["hip"], "shin": J["knee"], "foot": J["ankle"], "pelvis": J["hip"], "torso": J["hip"],
+            "skirt": J["hip"], "backpack": J["hip"], "bag": J["hip"],
             "neck": (0.0, P["shoulder_y"]), "skull": (0.0, P["neck_top_y"]), "hair": (0.0, P["neck_top_y"]), "nose": (0.0, P["neck_top_y"])}[base]
 
 
-def add_textured_part(c, pname, order_i, extra=None):
+def add_textured_part(c, pname, order_i, extra=None, bone_override=None):
     p = c.man["parts"][pname]
     px, py = p["pivot"]
     w, h = p["size"]
@@ -241,7 +259,7 @@ def add_textured_part(c, pname, order_i, extra=None):
     ob = _obj_from_mesh(pname + "_" + c.spec["id"], verts, [(0, 1, 2, 3)], uvs)
     ob.location = (c.arm.location.x, c.obj_y - 0.004 * order_i, c.arm.location.z)
     ob.data.materials.append(tex_material(os.path.join(ROOT, p["png"])))
-    bone = R.PART_BONE[pname]
+    bone = bone_override or R.PART_BONE[pname]
     skin_to(c, ob, bone)
     c.parts[pname] = ob
     return ob
@@ -272,43 +290,65 @@ def flat_mesh(c, name, poly_rig, color_hex, bone, order_i, shape_keys=None):
     return ob
 
 
+def _rot(pts, cx, cy, deg):
+    a = math.radians(deg)
+    return [(cx + (x - cx) * math.cos(a) - (y - cy) * math.sin(a), cy + (x - cx) * math.sin(a) + (y - cy) * math.cos(a)) for x, y in pts]
+
+
+VISEMES = dict(A=(0.62, 24.0), E=(0.95, 13.0), I=(0.85, 9.0), O=(0.42, 22.0), U=(0.28, 15.0), shocked=(0.60, 32.0))
+
+
 def add_face(c, order_i):
+    """Face = flat-colour meshes on face bones. eyes: white (`wide` shape key) + ring + pupil (EYE bone: location = gaze, scale = blink/narrow/droop); brows: BROW bones;
+    mouth: lip line (shape keys smile / frown / worried) + cavity (shape keys A E I O U shocked, MOUTH bone scale = openness). Style comes from the DNA (`face_style`)."""
     P, hs, k = c.P, c.P["hs"], c.P["k"]
     st = c.man.get("face_style", {})
     eye_rx, eye_ry = 10.8 * hs * st.get("ex", 1.0), 19.0 * hs * st.get("ey", 1.0)                # canvas px -> rig px (hs)
+    tilt = st.get("tilt", 0.0)
     brow_t = st.get("brow", 13) * hs
+    arch = st.get("arch", 0.0)
     ink = "#000000"
     c.face = {}
     for side, ek, bk in (("L", "eye_l", "brow_l"), ("R", "eye_r", "brow_r")):
         e = R.head_point(P, R.FACE[ek])
-        wide = ellipse(e[0], e[1], eye_rx * 2.4, eye_ry * 1.55)
-        small = ellipse(e[0], e[1], eye_rx * 0.4, eye_ry * 0.32)
+        sg = -1 if side == "L" else 1
+        t = tilt * sg
+        wide = _rot(ellipse(e[0], e[1], eye_rx * 2.4, eye_ry * 1.55), e[0], e[1], t)
+        small = _rot(ellipse(e[0], e[1], eye_rx * 0.4, eye_ry * 0.32), e[0], e[1], t)
         c.face["eyewhite_" + side] = flat_mesh(c, "eyewhite_" + side, small, "#ffffff", "EYE_" + side, order_i, shape_keys={"wide": wide})
-        c.face["eyering_" + side] = flat_mesh(c, "eyering_" + side, ellipse(e[0], e[1], eye_rx * 0.45, eye_ry * 0.36), ink, "EYE_" + side, order_i, shape_keys={"wide": ellipse(e[0], e[1], eye_rx * 2.75, eye_ry * 1.78)})
-        c.face["eyering_" + side].location.y += 0.001                           # ring sits just BEHIND the white
-        c.face["eyering_" + side].location.y += 0.0004
-        c.face["pupil_" + side] = flat_mesh(c, "pupil_" + side, ellipse(e[0], e[1], eye_rx, eye_ry), ink, "EYE_" + side, order_i)
+        c.face["eyering_" + side] = flat_mesh(c, "eyering_" + side, _rot(ellipse(e[0], e[1], eye_rx * 0.45, eye_ry * 0.36), e[0], e[1], t), ink, "EYE_" + side, order_i,
+                                              shape_keys={"wide": _rot(ellipse(e[0], e[1], eye_rx * 2.75, eye_ry * 1.78), e[0], e[1], t)})
+        c.face["eyering_" + side].location.y += 0.0014
+        c.face["pupil_" + side] = flat_mesh(c, "pupil_" + side, _rot(ellipse(e[0], e[1], eye_rx, eye_ry), e[0], e[1], t), ink, "EYE_" + side, order_i)
         c.face["pupil_" + side].location.y -= 0.0012
+        if st.get("lash"):                                                         # lash flick at the outer top corner
+            lx = e[0] + eye_rx * 0.7
+            ly = e[1] + eye_ry * 0.9
+            c.face["lash_" + side] = flat_mesh(c, "lash_" + side, [(lx - 2 * hs, ly), (lx + 13 * hs, ly + 7 * hs), (lx + 2 * hs, ly - 3 * hs)], ink, "EYE_" + side, order_i)
+            c.face["lash_" + side].location.y -= 0.0013
         b = R.head_point(P, R.FACE[bk])
         half = 32 * hs
-        strip = [(b[0] - half, b[1] - brow_t / 2), (b[0] + half, b[1] - brow_t / 2), (b[0] + half + brow_t * 0.3, b[1]), (b[0] + half, b[1] + brow_t / 2), (b[0] - half, b[1] + brow_t / 2), (b[0] - half - brow_t * 0.3, b[1])]
+        ar = arch * 8 * hs
+        strip = [(b[0] - half, b[1] - brow_t / 2), (b[0], b[1] - brow_t / 2 + ar), (b[0] + half, b[1] - brow_t / 2), (b[0] + half + brow_t * 0.3, b[1]), (b[0] + half, b[1] + brow_t / 2),
+                 (b[0], b[1] + brow_t / 2 + ar), (b[0] - half, b[1] + brow_t / 2), (b[0] - half - brow_t * 0.3, b[1])]
         c.face["brow_" + side] = flat_mesh(c, "brow_" + side, strip, ink, "BROW_" + side, order_i)
     m = R.head_point(P, R.FACE["mouth"])
-    mw = 31 * hs * c.man.get("face_style", {}).get("mouth", 1.0)
-    th = 4.5 * hs
+    mw = 31 * hs * st.get("mouth", 1.0)
+    th = st.get("lip", 4.5) * hs
 
-    def lip(smile, n=9):
+    def lip(smile, worried=0.0, n=9):
         top, bot = [], []
         for i in range(n):
             u = i / (n - 1)
             x = m[0] + (u - 0.5) * 2 * mw
-            y = m[1] + smile * (-9.0 * hs) * (1 - (2 * u - 1) ** 2) + smile * (6.0 * hs) * ((2 * u - 1) ** 2)
+            y = m[1] + smile * (-15.0 * hs) * (1 - (2 * u - 1) ** 2) + smile * (10.0 * hs) * ((2 * u - 1) ** 2)
+            y += worried * (9.0 * hs * (1 - (2 * u - 1) ** 2) - 12.0 * hs * ((2 * u - 1) ** 2)) * -1
             top.append((x, y + th))
             bot.append((x, y - th))
         return top + bot[::-1]
-    c.face["mouth_line"] = flat_mesh(c, "mouth_line", lip(0.0), ink, "MOUTH", order_i, shape_keys={"smile": lip(1.0), "frown": lip(-1.0)})
-    cav = ellipse(m[0], m[1], mw * 0.8, 24.0 * hs)
-    c.face["mouth_cavity"] = flat_mesh(c, "mouth_cavity", cav, "#2a0f14", "MOUTH", order_i)
+    c.face["mouth_line"] = flat_mesh(c, "mouth_line", lip(0.0), ink, "MOUTH", order_i, shape_keys={"smile": lip(1.0), "frown": lip(-1.0), "worried": lip(-0.5, 1.0)})
+    cav = lambda rxf, ryv: ellipse(m[0], m[1], mw * rxf, ryv * hs)
+    c.face["mouth_cavity"] = flat_mesh(c, "mouth_cavity", cav(0.8, 24.0), "#2a0f14", "MOUTH", order_i, shape_keys={n: cav(*v) for n, v in VISEMES.items()})
     c.face["mouth_cavity"].location.y += 0.0009
     c.face["mouth_line"].location.y -= 0.0009
 
@@ -316,7 +356,9 @@ def add_face(c, order_i):
 def add_phone(c, order_i):
     """The held phone (part 'phone') rides the near-hand bone; 'fingers' wrap its edge. Visibility is keyframed via scale."""
     P = c.P
-    J = R.rest_joints(P)
+    J = R.side_joints(P, "R")
+    if "phone" not in c.man["parts"]:
+        return
     p = c.man["parts"]["phone"]
     hand_bone = "HAND_R"
     a = math.radians(R.REST["arm"] + R.REST["elbow"] + R.REST["wrist"])
@@ -325,8 +367,12 @@ def add_phone(c, order_i):
     px_, py_ = J["wrist"][0] + ax * off[0] + ay * off[1] * -1, J["wrist"][1] + ay * off[0] + ax * off[1]
     ob = add_textured_part_at(c, "phone", order_i, (px_, py_), 0.0, hand_bone)
     c.parts["phone"] = ob
-    f = add_textured_part_at(c, "fingers", order_i + 1, (J["wrist"][0] + ax * P["hand"] * 0.78, J["wrist"][1] + ay * P["hand"] * 0.78), rest_angle_deg("hand_R"), hand_bone)
-    c.parts["fingers"] = f
+    for extra in ("card", "money"):                                          # other held props share the grip point
+        if extra in c.man["parts"]:
+            c.parts[extra] = add_textured_part_at(c, extra, order_i, (px_ + 8 * ax, py_ + 8 * ay), rest_angle_deg("hand_R") - 90.0, hand_bone)
+    if "fingers" in c.man["parts"]:
+        f = add_textured_part_at(c, "fingers", order_i + 1, (J["wrist"][0] + ax * P["hand"] * 0.78, J["wrist"][1] + ay * P["hand"] * 0.78), rest_angle_deg("hand_R"), hand_bone)
+        c.parts["fingers"] = f
 
 
 def add_textured_part_at(c, pname, order_i, joint_xy, angle_deg, bone):
@@ -393,7 +439,7 @@ def key_pose(c, f, fi):
         key = name[3:].lower()                                                    # hand_l / foot_r
         e = c.ik[name]
         nm = key.replace("_l", "_L").replace("_r", "_R")
-        rj = c.J["wrist"] if key.startswith("hand") else c.J["ankle"]
+        rj = c.JS[key[-1].upper()]["wrist"] if key.startswith("hand") else c.JS[key[-1].upper()]["ankle"]
         tx, ty = g(nm + "_x", rj[0]), g(nm + "_y", rj[1])
         e.location = (c.arm.location.x + c.facing * tx * S, c.obj_y, c.arm.location.z + ty * S)
     # foot orientation: keep the sole flat (or pitched) in the WORLD regardless of the leg chain (compensated in Python from the analytic solution)
@@ -402,15 +448,18 @@ def key_pose(c, f, fi):
     # SEED the IK chains with the analytic 2-bone solution (branch selection): Blender's IK solver starts from this FK pose and refines it to the exact
     # target under the joint limits, so knees/elbows always bend the natural way; the final pose is Blender's IK, not the seed.
     P = c.P
-    hip = (g("root_x") + g("pelvis_dx"), P["hip_y"] + g("root_y") + g("pelvis_dy"))
+    hip0 = (g("root_x") + g("pelvis_dx"), P["hip_y"] + g("root_y") + g("pelvis_dy"))
     lean = math.radians(g("spine_rot") + g("chest_rot"))
     hh = P["shoulder_joint_y"] - P["hip_y"]
-    shoulder = (hip[0] + hh * math.sin(lean), hip[1] + hh * math.cos(lean))
+    sh0 = (hip0[0] + hh * math.sin(lean), hip0[1] + hh * math.cos(lean))
+    so = R.side_offsets(P)
+    hipL, hipR = (hip0[0] + so["hL"], hip0[1]), (hip0[0] + so["hR"], hip0[1])
+    shL, shR = (sh0[0] + so["sL"], sh0[1]), (sh0[0] + so["sR"], sh0[1])
     Rr = R.REST
-    chains = (("THIGH_L", "SHIN_L", hip, "foot_L", P["thigh"], P["shin"], +1, Rr["thigh"], Rr["thigh"] + Rr["knee"], 0.0, c.J["ankle"]),
-              ("THIGH_R", "SHIN_R", hip, "foot_R", P["thigh"], P["shin"], +1, Rr["thigh"], Rr["thigh"] + Rr["knee"], 0.0, c.J["ankle"]),
-              ("ARM_L", "FOREARM_L", shoulder, "hand_L", P["upper_arm"], P["forearm"], -1, Rr["arm"], Rr["arm"] + Rr["elbow"], -(g("spine_rot") + g("chest_rot")), c.J["wrist"]),
-              ("ARM_R", "FOREARM_R", shoulder, "hand_R", P["upper_arm"], P["forearm"], -1, Rr["arm"], Rr["arm"] + Rr["elbow"], -(g("spine_rot") + g("chest_rot")), c.J["wrist"]))
+    chains = (("THIGH_L", "SHIN_L", hipL, "foot_L", P["thigh"], P["shin"], +1, Rr["thigh"], Rr["thigh"] + Rr["knee"], 0.0, c.JS["L"]["ankle"]),
+              ("THIGH_R", "SHIN_R", hipR, "foot_R", P["thigh"], P["shin"], +1, Rr["thigh"], Rr["thigh"] + Rr["knee"], 0.0, c.JS["R"]["ankle"]),
+              ("ARM_L", "FOREARM_L", shL, "hand_L", P["upper_arm"], P["forearm"], -1, Rr["arm"], Rr["arm"] + Rr["elbow"], -(g("spine_rot") + g("chest_rot")), c.JS["L"]["wrist"]),
+              ("ARM_R", "FOREARM_R", shR, "hand_R", P["upper_arm"], P["forearm"], -1, Rr["arm"], Rr["arm"] + Rr["elbow"], -(g("spine_rot") + g("chest_rot")), c.JS["R"]["wrist"]))
     for up, low, base, key, l1, l2, bend, r1, r2, parent_ccw, rj in chains:
         tgt = (g(key + "_x", rj[0]), g(key + "_y", rj[1]))
         _, _, a1, a2 = R.two_bone(base, tgt, l1, l2, bend)
@@ -422,7 +471,7 @@ def key_pose(c, f, fi):
     ez = g("blink")
     wide = g("wide")
     lid = g("lid")
-    ey_scale = max(0.06, (1.0 - ez) * (1.0 - 0.45 * lid))
+    ey_scale = max(0.06, (1.0 - ez) * (1.0 - 0.45 * lid) * (1.0 - 0.42 * g("narrow")))
     for side in ("L", "R"):
         eb = pb["EYE_" + side]
         eb.location = local_vec(c, "EYE_" + side, g("gaze_x") * 8.5 * c.P["hs"], g("gaze_y") * 6.0 * c.P["hs"])
@@ -430,8 +479,8 @@ def key_pose(c, f, fi):
         sb = pb["BROW_" + side]
         sgn = -1.0 if side == "L" else 1.0
         asym = g("brow_asym") * (1.0 if side == "L" else -1.0)
-        sb.location = local_vec(c, "BROW_" + side, 0.0, (g("brow_raise") * 19.0 + asym * 7.0) * c.P["hs"])
-        sb.rotation_euler = (0.0, 0.0, rz(c, 24.0 * g("brow_tilt") * sgn))
+        sb.location = local_vec(c, "BROW_" + side, 0.0, (g("brow_raise") * 26.0 + asym * 9.0) * c.P["hs"])
+        sb.rotation_euler = (0.0, 0.0, rz(c, 32.0 * g("brow_tilt") * sgn))
         for kn in ("eyewhite_", "eyering_"):
             kb = c.face[kn + side].data.shape_keys.key_blocks["wide"]
             kb.value = max(0.0, min(1.0, wide))
@@ -439,9 +488,21 @@ def key_pose(c, f, fi):
     pb["MOUTH"].scale = (max(0.04, mo), 1.0, 1.0)
     mb = c.face["mouth_line"].data.shape_keys.key_blocks
     sm = g("mouth_smile")
-    mb["smile"].value, mb["frown"].value = max(0.0, sm), max(0.0, -sm)
+    wr = g("mouth_worried")
+    mb["smile"].value, mb["frown"].value, mb["worried"].value = max(0.0, sm), max(0.0, -sm) * (1.0 - wr), max(0.0, min(1.0, wr))
+    cb = c.face["mouth_cavity"].data.shape_keys.key_blocks
+    for vn in VISEMES:
+        cb[vn].value = max(0.0, min(1.0, g("vis_" + vn)))
+    # reusable hand poses: exactly one pose mesh per wrist is drawn (scale keyed)
+    for side in ("L", "R"):
+        idx = int(round(g("hand_%s_pose" % side, 0.0)))
+        for j, (pose, ob) in enumerate(c.handposes[side]):
+            v = 1.0 if j == idx else 0.0001
+            ob.scale = (v, v, v)
     # visibility of held phone / gripping fingers (scale to 0 = not drawn)
-    for pn, cn in (("phone", "phone_vis"), ("fingers", "fingers_vis")):
+    for pn, cn in (("phone", "phone_vis"), ("card", "card_vis"), ("money", "money_vis"), ("fingers", "fingers_vis")):
+        if pn not in c.parts:
+            continue
         v = 1.0 if g(cn) > 0.5 else 0.0
         c.parts[pn].scale = (v, v, v) if v else (0.0001, 0.0001, 0.0001)
     # keyframes
@@ -454,8 +515,12 @@ def key_pose(c, f, fi):
         if ob.data.shape_keys:
             for kb in ob.data.shape_keys.key_blocks[1:]:
                 kb.keyframe_insert("value", frame=f)
-    for pn in ("phone", "fingers"):
-        c.parts[pn].keyframe_insert("scale", frame=f)
+    for pn in ("phone", "card", "money", "fingers"):
+        if pn in c.parts:
+            c.parts[pn].keyframe_insert("scale", frame=f)
+    for side in ("L", "R"):
+        for pose, ob in c.handposes[side]:
+            ob.keyframe_insert("scale", frame=f)
 
 
 t0 = time.time()

@@ -46,7 +46,8 @@ def run(plan, actors, cam, rep, film, mp4, stats, frames_dir, log=print):
     # ---------------- technical
     checks["1080x1920"] = (v["width"], v["height"]) == (1080, 1920)
     checks["30fps"] = v["r_frame_rate"] == "30/1"
-    checks["duration_30_45s"] = 30.0 <= dur <= 45.0
+    lo, hi = plan.get("duration_range", (30.0, 45.0))
+    checks[f"duration_{int(lo)}_{int(hi)}s"] = lo <= dur <= hi
     checks["has_audio"] = au is not None
     checks["loudness_-19_to_-13_LUFS"] = loud["integrated_lufs"] is not None and -19 <= loud["integrated_lufs"] <= -13
     dips = [int(sh["t0"] * fps) for sh in plan["shots"] if sh.get("transition_in") == "dip"]
@@ -96,7 +97,7 @@ def run(plan, actors, cam, rep, film, mp4, stats, frames_dir, log=print):
     reach_px = 0.0
     if grab:
         g = int(grab[0] * fps)
-        s3 = next((sh for sh in plan["shots"] if sh["id"] == "S03"), None)
+        s3 = next((sh for sh in plan["shots"] if any(a["char"] == "A" and a["action"].startswith("reach") for a in sh.get("actions", []))), None)
         g0 = int(s3["t0"] * fps) if s3 else max(0, g - 40)                         # the reach starts with its shot: hand at rest -> hand on the phone
         reach_px = float(math.hypot(hx[g] - hx[g0], hy[g] - hy[g0]))
     arm_len = A.P["upper_arm"] + A.P["forearm"]
@@ -126,7 +127,8 @@ def run(plan, actors, cam, rep, film, mp4, stats, frames_dir, log=print):
     pars = sorted({round(l.par, 2) for l in layers.values()})
     checks["environment_layers_(>=10,_>=6_parallax_factors)"] = len(layers) >= 10 and len(pars) >= 6
     ev["layers"], ev["parallax_factors"] = len(layers), pars
-    sh10 = next(s for s in plan["shots"] if s.get("camera") and s["camera"]["move"] == "dolly_through") if any(s.get("camera") and s["camera"]["move"] == "dolly_through" for s in plan["shots"]) else None
+    depth_moves = ("dolly_through", "truck", "reveal")
+    sh10 = next((s for s in plan["shots"] if s.get("camera") and s["camera"]["move"] in depth_moves), None)
     par_shift = 0.0
     if sh10:
         f0, f1 = int(sh10["t0"] * fps) + 2, int(sh10["t1"] * fps) - 3
