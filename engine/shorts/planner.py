@@ -343,11 +343,14 @@ def write_story(brief, duration, report, log, attempts=3):
             + ", ".join(ladder) + f". About {n_words} words in total; every beat is ONE short spoken sentence of 5-13 words.\n"
             "Role meanings: hook = it is the middle of the night and his phone suddenly lights up in the dark (open with the mystery, "
             "not with scene-setting; no greeting); attention = he notices it, hesitates, then reaches for the phone; "
-            "curiosity = he lifts it and reads: a message from an unknown number; unease = something about the message feels wrong; "
-            "realization = he understands this is important and his life is about to change; "
+            + ("curiosity = he lifts it and reads: a message from an unknown number; unease = he can hardly believe what it says and reads it again; "
+               "realization = he understands it is real, it is GOOD news, and his life is about to change for the better; "
+               if brief.get("mood") == "hopeful" else
+               "curiosity = he lifts it and reads: a message from an unknown number; unease = something about the message feels wrong; "
+               "realization = he understands this is important and his life is about to change; ") +
             "takeaway = one understated closing line that leaves an open question.\n"
             "He lies in his BED (बिस्तर) inside his bedroom - never on a roof (छत). Say the time exactly in words as 'दो बजकर सैंतालीस मिनट' (the clock reads 2:47), never digits. "
-            "Do not exaggerate. Do not reveal what the message says beyond the fact that it is from an unknown number and important.\n"
+            "Do not exaggerate. Do not reveal what the message says before the realization beat; until then it is only a message from an unknown number.\n"
             f"{feedback}"
             'Return ONLY JSON: {"beats": [{"text": "...", "role": "<role>", "visual_idea": "one English sentence"}]}')
         try:
@@ -406,13 +409,17 @@ LAYERED_RULES = {          # role -> (face, face_end, pivot fraction). Body lang
     "hook": ("tired", None, 0.5), "attention": ("blank", "concerned", 0.5), "curiosity": ("concerned", None, 0.5),
     "unease": ("serious", "concerned", 0.5), "realization": ("uneasy", "shock", 0.3), "takeaway": ("solemn", None, 0.5),
 }
+HOPEFUL_RULES = {          # same acting grammar, different emotional arc: disbelief -> joy
+    "hook": ("tired", None, 0.5), "attention": ("blank", "concerned", 0.5), "curiosity": ("concerned", "blank", 0.6),
+    "unease": ("blank", "awe", 0.5), "realization": ("awe", "happy", 0.3), "takeaway": ("smile", None, 0.5),
+}
 
 
 def apply_layered_rules(out, brief, note):
     for e in out:
         if e["kind"] != "scene" or e["role"] not in LAYERED_RULES:
             continue
-        face, face_end, pv = LAYERED_RULES[e["role"]]
+        face, face_end, pv = (HOPEFUL_RULES if brief.get("mood") == "hopeful" else LAYERED_RULES)[e["role"]]
         sc = e["scene"]
         n = max(len(e["text"].split()), 2)
         if sc.get("face") != face:

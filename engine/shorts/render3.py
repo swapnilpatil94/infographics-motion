@@ -94,11 +94,13 @@ def render_video(film, out_mp4, limit=None, log=print):
     proc = subprocess.Popen(cmd, stdin=subprocess.PIPE)
     t0, stats, prev = time.time(), [], None
     for f in range(n):
+        tf = time.perf_counter()
         img, shot, (text, bbox) = frame_image(film, f / film.fps, f)
         small = img[::40, ::40]
         diff = float(np.abs(small - prev).mean()) if prev is not None else 1.0
         prev = small.copy()
-        stats.append(dict(f=f, shot=shot, mean=float(img.mean()), caption=text, bbox=bbox, diff=diff, rgb=[float(x) for x in img.mean(axis=(0, 1))]))
+        stats.append(dict(f=f, shot=shot, mean=float(img.mean()), caption=text, bbox=bbox, diff=diff, rgb=[float(x) for x in img.mean(axis=(0, 1))],
+                          ms=round((time.perf_counter() - tf) * 1000, 1)))
         proc.stdin.write((np.clip(img, 0, 1) * 255).astype(np.uint8).tobytes())
         if f % 150 == 0:
             log(f"[render] frame {f}/{n} ({time.time() - t0:.0f}s)")

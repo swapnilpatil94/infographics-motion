@@ -17,7 +17,7 @@ from types import SimpleNamespace
 
 import numpy as np
 
-from engine.shorts import ink_fx, performance as P, sets
+from engine.shorts import gp_bank, ink_fx, performance as P, sets
 from engine.shorts.dust import Dust
 from engine.shorts.film import Film, FPS, TAIL, _chunk_words, camera_at, fade_at
 from engine.shorts.insert import ScreenInsert
@@ -61,6 +61,12 @@ def compile(plan, voice, log=print):
     spec = sets.SETS["night_bedroom"]
     scene = Scene(rig, room=sets.layers_for("night_bedroom"), order=sets.order_for("night_bedroom"), ambient=spec["ambient"],
                   bloom_strength=spec["bloom"], post=film.post)
+    from engine.shorts.layers import Layer, premultiply
+    shaft = Layer("gp_shaft", np.zeros((4, 4, 4), np.uint8), (-20.0, 290.0), 1.0, par=0.85, depth=3.0, emissive=True)
+    shaft.opacity = 0.32
+    scene.room["gp_shaft"] = shaft
+    scene.order = list(scene.order)
+    scene.order.insert(scene.order.index("headboard") + 1, "gp_shaft")            # behind pillows/character/blanket, in front of wall
     ch = SimpleNamespace(stand=Channel(0.0), buzz=Channel(0.0), bright=Channel(0.0), banner=Channel(0.0), pulse=Channel(0.0),
                          amb=Channel(1.0), flash=Channel(0.0))
     base_amb = np.array(spec["ambient"], np.float32)
@@ -136,26 +142,41 @@ def compile(plan, voice, log=print):
     P.emotion(perf, T_read, une["spec"]["scene"]["face"], 0.4)
     piv = une["words"][min(len(une["words"]) - 1, max(1, len(une["words"]) // 2))]["start"]
     P.emotion(perf, piv, une["spec"]["scene"].get("face_end") or "concerned", 0.45)
-    P.tremble(perf, T_read + 0.4, max(1.5, rea["t0"] - T_read), 0.55, 0.9)
-    P.glance(perf, piv + 0.2, "away", 0.8, 0.8)
+    unease_neg = (une["spec"]["scene"].get("face_end") or "concerned") in ("concerned", "uneasy", "fear", "serious")
+    if unease_neg:
+        P.tremble(perf, T_read + 0.4, max(1.5, rea["t0"] - T_read), 0.55, 0.9)
+        P.glance(perf, piv + 0.2, "away", 0.8, 0.8)
+    else:                                                                       # disbelief: he re-reads, breath catches
+        P.glance(perf, piv + 0.15, "down", 0.6, 0.6)
     P.shrug(perf, piv, 0.7, 0.9)
     # ------------------------------------------------ realisation
     rp = rea["words"][min(len(rea["words"]) - 1, max(1, int(len(rea["words"]) * 0.3)))]["start"] - 0.05
-    P.emotion(perf, rea["t0"] - 0.1, "uneasy", 0.35)
-    P.emotion(perf, rp, "shock", 0.12)
-    P.startle(perf, rp, 0.9)
-    P.freeze(perf, rp + 0.25, max(0.8, rea["t1"] - rp))
-    perf.no_blink.append((rp - 0.3, rea["t1"] + 0.3))
-    for k in range(9):                                                          # the hand trembles after the jolt
-        P.arm_to(perf, "B", rp + 0.05 + 0.07 * k, rp + 0.12 + 0.07 * k, 770.0 + (7 if k % 2 == 0 else -7), 1012.0 + (5 if k % 2 else -5), "linear")
-    ch.pulse.key(rp - 0.001, 0.0)
-    ch.pulse.key(rp + 0.05, 1.0, "out")
-    ch.pulse.key(rp + 1.4, 0.15, "smooth")
-    ch.amb.key(rp - 0.001, 1.0)
-    ch.amb.key(rp + 1.2, 0.72, "smooth")                                        # the room drops away around the phone light
-    film.sfx += [(rp, "impact", 0.8), (rp + 0.45, "heartbeat", 0.9), (rp + 1.35, "heartbeat", 0.8)]
+    rsc = rea["spec"]["scene"]
+    r_from, r_to = rsc["face"], rsc.get("face_end") or rsc["face"]
+    jolt = r_to in ("shock", "fear")
+    P.emotion(perf, rea["t0"] - 0.1, r_from, 0.35)
+    P.emotion(perf, rp, r_to, 0.12 if jolt else 0.5)
+    if jolt:                                                                    # negative arc: a physical jolt, then held stillness
+        P.startle(perf, rp, 0.9)
+        P.freeze(perf, rp + 0.25, max(0.8, rea["t1"] - rp))
+        perf.no_blink.append((rp - 0.3, rea["t1"] + 0.3))
+        for k in range(9):                                                      # the hand trembles after the jolt
+            P.arm_to(perf, "B", rp + 0.05 + 0.07 * k, rp + 0.12 + 0.07 * k, 770.0 + (7 if k % 2 == 0 else -7), 1012.0 + (5 if k % 2 else -5), "linear")
+        ch.pulse.key(rp - 0.001, 0.0)
+        ch.pulse.key(rp + 0.05, 1.0, "out")
+        ch.pulse.key(rp + 1.4, 0.15, "smooth")
+        ch.amb.key(rp - 0.001, 1.0)
+        ch.amb.key(rp + 1.2, 0.72, "smooth")                                    # the room drops away around the phone light
+        film.sfx += [(rp, "impact", 0.8), (rp + 0.45, "heartbeat", 0.9), (rp + 1.35, "heartbeat", 0.8)]
+    else:                                                                       # positive arc: shoulders lift, the breath releases, a soft chime
+        P.shrug(perf, rp, 1.0, 1.3)
+        P.lean(perf, rp + 0.2, 1.4, -0.6)
+        ch.pulse.key(rp - 0.001, 0.0)
+        ch.pulse.key(rp + 0.3, 0.55, "smooth")
+        ch.pulse.key(rp + 2.0, 0.25, "smooth")
+        film.sfx += [(rp, "ding", 0.5), (rp + 0.35, "ding", 0.35)]
     # ------------------------------------------------ takeaway
-    P.emotion(perf, tak["t0"] - 0.1, "solemn", 0.7)
+    P.emotion(perf, tak["t0"] - 0.1, tak["spec"]["scene"]["face"], 0.7)
     P.look(perf, tak["t0"] + 0.2, "ahead", 1.2, 0.6, "smooth")
     P.blink_at(perf, tak["t0"] + 0.9)
     P.auto_blinks(perf, 0.0, film.duration, seed=seed + 1)
@@ -186,12 +207,50 @@ def compile(plan, voice, log=print):
     film.sfx += [(T_S4 - 0.06, "whoosh", 0.5), (T_S5 - 0.06, "whoosh", 0.4), (T_S3 - 0.05, "whoosh", 0.3)]
 
     # -------------------------------------------------------------------- fx
-    fx = [lambda c, cam, tt, o=STAND_WORLD: ink_fx.light_rays(c, cam, tt, (o[0], o[1] - 30), ch.stand(tt) * 0.9 if tt < T_grab else 0.0, spread=(-175, -5)),
-          lambda c, cam, tt, o=STAND_WORLD, te=T_EV: ink_fx.buzz_marks(c, cam, tt, (o[0], o[1] - 50), 1.0 if te <= tt <= te + 0.8 and ch.buzz(tt) != 0 else 0.0),
-          lambda c, cam, tt: ink_fx.light_rays(c, cam, tt, rig.anchor("phone"), (ch.bright(tt) * 0.5 if tt >= T_grab else 0.0), n=9, length=(70, 170), spread=(-200, -70)),
-          lambda c, cam, tt, tp=rp: ink_fx.impact_ticks(c, cam, tt, rig.anchor("eyes"), max(0.0, 1.0 - (tt - tp) / 0.75) if tp <= tt <= tp + 0.75 else 0.0)]
+    bank = gp_bank.ensure_bank(log)
+    film.gp = None if bank is None else dict(renders=bank.report["renders"], strokes=bank.report["strokes"], blender=bank.report["blender"],
+                                             build_seconds=bank.report["seconds"], built_now=bank.built_now, sprites=bank.report["sprites"])
+    if bank is not None:
+        S = lambda cam, par, p: gp_bank.screen_of(cam, par, p)
+
+        def gp_rays_stand(c, cam, tt):
+            lvl = ch.stand(tt) * 0.9 if tt < T_grab else 0.0
+            if lvl > 0.02:
+                x, y, z = S(cam, 0.95, (STAND_WORLD[0], STAND_WORLD[1] - 30))
+                bank.draw(c, "rays", tt, (x, y), z, opacity=0.62 * lvl)
+            return c
+
+        def gp_arcs_stand(c, cam, tt):
+            if T_EV <= tt <= T_EV + 0.8 and ch.buzz(tt) != 0:
+                x, y, z = S(cam, 0.95, (STAND_WORLD[0], STAND_WORLD[1] - 50))
+                bank.draw(c, "arcs", tt, (x, y), z, opacity=0.9)
+            return c
+
+        def gp_rays_held(c, cam, tt):
+            if T_grab <= tt <= T_A + 1.3:
+                x, y, z = S(cam, 1.0, rig.anchor("phone"))
+                bank.draw(c, "rays", tt, (x, y), z, opacity=0.34 * ch.bright(tt) * min(1.0, (T_A + 1.3 - tt) / 0.5))
+            return c
+
+        def gp_ticks(c, cam, tt, tp=rp):
+            if jolt and tp <= tt <= tp + 0.75:
+                x, y, z = S(cam, 1.0, rig.anchor("eyes"))
+                bank.draw(c, "ticks", tt, (x, y), min(z, 1.55), opacity=max(0.0, 1.0 - (tt - tp) / 0.75) * 0.95)     # clamp: the ECU zoom must not push the ring off-frame
+            return c
+
+        def gp_worry(c, cam, tt, tp=piv):
+            if unease_neg and tp + 0.1 <= tt <= tp + 1.0:
+                ex, ey = rig.anchor("eyes")
+                x, y, z = S(cam, 1.0, (ex + 105, ey - 75))
+                bank.draw(c, "worry", tt, (x, y), min(z, 1.6) * 1.25, opacity=min(1.0, (tt - tp - 0.1) / 0.12, (tp + 1.0 - tt) / 0.25) * 0.9)
+            return c
+
+        fx = [gp_rays_stand, gp_arcs_stand, gp_rays_held, gp_ticks, gp_worry]
+    else:
+        fx = [lambda c, cam, tt, o=STAND_WORLD: ink_fx.light_rays(c, cam, tt, (o[0], o[1] - 30), ch.stand(tt) * 0.9 if tt < T_grab else 0.0, spread=(-175, -5)),
+              lambda c, cam, tt, tp=rp: ink_fx.impact_ticks(c, cam, tt, rig.anchor("eyes"), max(0.0, 1.0 - (tt - tp) / 0.75) if tp <= tt <= tp + 0.75 else 0.0)]
     film.stage = SimpleNamespace(rig=rig, perf=perf, scene=scene, ch=ch, base_amb=base_amb, held=held, dust=dust, fx=fx, T_grab=T_grab,
-                                 ins=None, insert_window=(T_ins0, T_ins1), punch=(rea["spec"]["scene"].get("punch"), rp, rea["t1"] + 0.2))
+                                 ins=None, bank=bank, shaft=shaft, shaft_v=-1, insert_window=(T_ins0, T_ins1), punch=(rea["spec"]["scene"].get("punch"), rp, rea["t1"] + 0.2))
     film.sfx.append((T_ins0 - 0.02, "whoosh", 0.0))
     film.caption_track = []
     for ent in film.beats:
@@ -220,6 +279,13 @@ def render_frame(film, shot, t, f, fade):
         room[n].world_xf = np.array([[1, 0, 3.0 * ch.buzz(t)], [0, 1, 0], [0, 0, 1.0]])
     room["stand_screen"].opacity = float(min(1.0, ch.stand(t))) if vis else 0.0
     room["clouds"].world_xf = np.array([[1, 0, 16.0 * math.sin(0.13 * t + 0.6)], [0, 1, 0], [0, 0, 1.0]])
+    if st.bank is not None:                                                    # moonlight hatching: Blender-GP takes, boiling at 8 fps, behind the actor
+        from engine.shorts.layers import premultiply
+        v = int(t * gp_bank.BOIL_FPS) % 8
+        if v != st.shaft_v:
+            st.shaft.base = premultiply((st.bank.sprite("shaft", v) * 255).astype(np.uint8))
+            st.shaft._mips, st.shaft._blur, st.shaft_v = {0: st.shaft.base}, {}, v
+        st.shaft.opacity = 0.32 * float(ch.amb(t))
     scene.camera = camera_at(film, shot, t)
     film.post.exposure = 1.0 + 0.11 * ch.flash(t)
     t0, t1 = st.insert_window
@@ -235,4 +301,11 @@ def render_frame(film, shot, t, f, fade):
         ins = lambda c: st.ins.apply(c, t, u, 1.0, 1.0, 0.0, 0.04)
         img2 = scene.render(t, f, fade, insert=ins, dust=st.dust, fx=())
         img = img * (1 - a) + img2 * a
+        bank = st.bank
+        if bank is not None:                                                    # hand-drawn ring draws itself on around the sender (GP Build modifier)
+            t_on = t0 + 0.35
+            prog = (t - t_on) / 0.9
+            if prog > 0:
+                fade = min(1.0, (t1 + DISSOLVE * 0.5 - t) / 0.2)
+                img = bank.draw(img, "ring", t, (539.0, 949.0), 1.0, opacity=min(1.0, a * 1.4) * fade * 0.95, variant=min(15, int(prog * 15)))
     return img
