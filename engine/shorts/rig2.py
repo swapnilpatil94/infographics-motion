@@ -26,7 +26,7 @@ from engine.shorts.raster import rasterize, ROOT
 Z = SC * RES                                  # raster px per canvas px
 S_A, S_B = (262.0, 862.0), (872.0, 868.0)     # shoulder pivots (canvas)
 L1, L2 = 330.0, 300.0                         # upper arm, forearm (to wrist)
-REST_A, REST_B = (480.0, 1092.0), (700.0, 1096.0)
+REST_A, REST_B = (430.0, 1330.0), (760.0, 1330.0)     # resting hands drop behind desk/parapet/blanket instead of clasping in front of the chest
 REST_PIVOT = (300.0, 300.0)                   # where every limb part is DRAWN (its own rest frame)
 PHONE_REST = (760.0, 300.0)
 GRIP = 70.0                                   # wrist -> phone centre along the hand axis
@@ -92,16 +92,17 @@ def ik(shoulder, target, l1=L1, l2=L2, below=True):
 
 
 class LayeredRig:
-    def __init__(self, cast_id):
+    def __init__(self, cast_id, outfit=None):
+        outfit = outfit or dict(fill="#ffffff", seeds=True)
         spec = json.load(open(os.path.join(ROOT, "assets/character/cast/cast.json")))
         self.cast_id = cast_id
         self.head_path = spec["characters"][cast_id]["head_base"]
         self.nose_atom = os.path.join(A.__file__.rsplit("/asset_pipeline", 1)[0],
                                       "assets/character/raw/open_peeps/extracted/Flat Assets/Separate Atoms/face/Serious.svg")
         P = REST_PIVOT
-        self.torso = _place("torso", A.torso())
-        self.up = {"A": _place("armA_up", A.sleeve(P, L1, 128, 0, 11)), "B": _place("armB_up", A.sleeve(P, L1, 128, 0, 12))}
-        self.fore = {"A": _place("armA_fore", A.sleeve(P, L2 - 8, 112, 0, 13, cuff=True)), "B": _place("armB_fore", A.sleeve(P, L2 - 8, 112, 0, 14, cuff=True))}
+        self.torso = _place("torso", A.torso(fill=outfit["fill"], seeds_on=outfit["seeds"]))
+        self.up = {"A": _place("armA_up", A.sleeve(P, L1, 128, 0, 11, fill=outfit["fill"], seeds_on=outfit["seeds"])), "B": _place("armB_up", A.sleeve(P, L1, 128, 0, 12, fill=outfit["fill"], seeds_on=outfit["seeds"]))}
+        self.fore = {"A": _place("armA_fore", A.sleeve(P, L2 - 8, 112, 0, 13, cuff=True, fill=outfit["fill"], seeds_on=outfit["seeds"])), "B": _place("armB_fore", A.sleeve(P, L2 - 8, 112, 0, 14, cuff=True, fill=outfit["fill"], seeds_on=outfit["seeds"]))}
         self.handA = _place("handA", A.hand((P[0] + L2 - 8, P[1]), 0, curl=0.3, spread=0.4, thumb=0.4))
         self.handB = [_place(f"handB_{i}", A.hand((P[0] + L2 - 8, P[1]), 0, curl=c, spread=0.35 * (1 - c), thumb=0.6 - 0.4 * c)) for i, c in enumerate(CURL_STATES)]
         self.phone_body = _place("phone_body", A.phone_body(PHONE_REST))
@@ -213,8 +214,9 @@ class LayeredRig:
                 gp = (wrist[0] + GRIP * math.cos(math.radians(fa)), wrist[1] + GRIP * math.sin(math.radians(fa)))
                 # held phone stays upright-ish: it follows the grip point, not the forearm angle
                 pm = mb @ _xf_part(PHONE_REST, gp, rot)
-                for layer in (self.phone_body, self.phone_screen):
-                    layer.world_xf, layer.visible = pm, hold > 0.5
+                face_ear = perf.ch["aB_ear"](t) if "aB_ear" in perf.ch else 0.0
+                self.phone_body.world_xf, self.phone_body.visible = pm, hold > 0.5
+                self.phone_screen.world_xf, self.phone_screen.visible = pm, hold > 0.5 and face_ear < 0.5     # screen faces the ear -> dark back
                 self._hold, self._wrist_canvas, self._grip_canvas = hold, wrist, gp
                 self._mb = mb
         return s

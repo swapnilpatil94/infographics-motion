@@ -61,13 +61,13 @@ def seeds(rng, x0, x1, y0, y1, n, rot0=0.0):
 
 
 # ------------------------------------------------------------------ torso
-def torso(seed=3):
+def torso(seed=3, fill="#fff", seeds_on=True):
     """Chest + shoulders + crew collar (no arms; sleeves are separate parts). Canvas coords."""
     r = random.Random(seed)
     outline = [(470, 712), (405, 738), (330, 776), (268, 830), (232, 900), (236, 990), (262, 1120), (270, 1400),
                (620, 1420), (880, 1400), (884, 1120), (900, 990), (896, 900), (858, 830), (800, 782), (742, 742), (708, 720)]
-    body = f'<path d="{_d(outline, True)}" fill="#fff" stroke="{INK}" stroke-width="{OUT_W}" stroke-linejoin="round"/>'
-    body += seeds(r, 320, 830, 930, 1380, 22)
+    body = f'<path d="{_d(outline, True)}" fill="{fill}" stroke="{INK}" stroke-width="{OUT_W}" stroke-linejoin="round"/>'
+    body += seeds(r, 320, 830, 930, 1380, 22) if seeds_on else ""
     body += (f'<path d="{_d([(520, 640), (508, 690), (480, 726)])}" fill="none" stroke="{INK}" stroke-width="{OUT_W}" stroke-linecap="round"/>'
              f'<path d="{_d([(690, 662), (716, 700), (744, 728)])}" fill="none" stroke="{INK}" stroke-width="{OUT_W}" stroke-linecap="round"/>')
     # ribbed crew collar: two arcs + ribs (drawn OVER the neck column of the head, which ends ~y=720)
@@ -84,12 +84,12 @@ def torso(seed=3):
 
 
 # ------------------------------------------------------------------ sleeves
-def sleeve(pivot, length, width, angle_deg, seed, cuff=False, rest_end_width=None):
+def sleeve(pivot, length, width, angle_deg, seed, cuff=False, rest_end_width=None, fill="#fff", seeds_on=True):
     """A sleeve tube drawn from `pivot` along `angle_deg` for `length`. Pivot = the joint it rotates about."""
     r = random.Random(seed)
     g = (f'<g transform="rotate({angle_deg} {pivot[0]} {pivot[1]})">'
-         + capsule_line(pivot, (pivot[0] + length, pivot[1]), width)
-         + seeds(r, pivot[0] + 26, pivot[0] + length - (60 if cuff else 30), pivot[1] - width / 2 + 20, pivot[1] + width / 2 - 20, max(3, int(length / 78))))
+         + capsule_line(pivot, (pivot[0] + length, pivot[1]), width, fill=fill)
+         + (seeds(r, pivot[0] + 26, pivot[0] + length - (60 if cuff else 30), pivot[1] - width / 2 + 20, pivot[1] + width / 2 - 20, max(3, int(length / 78))) if seeds_on else ""))
     if cuff:                                            # ribbed cuff band at the wrist end
         cx = pivot[0] + length - 18
         for k in range(4):

@@ -1,0 +1,669 @@
+{
+  "id": "money_psychology",
+  "title": "Money Psychology x Scams x Human Behavior",
+  "version": 1,
+  "topic_keywords": {
+    "scam": [
+      "scam",
+      "fraud",
+      "phishing",
+      "otp",
+      "upi",
+      "ठग",
+      "धोखा",
+      "स्कैम",
+      "फ्रॉड",
+      "साइबर",
+      "सुरक्षित खाता",
+      "बैंक की फ्रॉड"
+    ],
+    "money": [
+      "रुपये",
+      "लाख",
+      "बैलेंस",
+      "खाता",
+      "पैसे",
+      "rupees",
+      "account",
+      "transfer",
+      "बैंक"
+    ],
+    "psychology": [
+      "डर",
+      "दबाव",
+      "भरोसा",
+      "अधिकार",
+      "बुद्धि",
+      "दिमाग",
+      "fear",
+      "authority",
+      "urgency",
+      "bias"
+    ]
+  },
+  "psychology": {
+    "authority": {
+      "label": "Authority bias",
+      "grammar": "authority",
+      "signals": [
+        "bank",
+        "police",
+        "official",
+        "senior officer",
+        "government",
+        "अधिकारी",
+        "पुलिस"
+      ]
+    },
+    "urgency": {
+      "label": "Urgency / scarcity of time",
+      "grammar": "scarcity",
+      "signals": [
+        "minutes",
+        "deadline",
+        "immediately",
+        "countdown",
+        "तुरंत",
+        "मिनट"
+      ]
+    },
+    "fear": {
+      "label": "Fear / threat",
+      "grammar": "fear",
+      "signals": [
+        "police case",
+        "money laundering",
+        "blocked",
+        "arrest",
+        "डर",
+        "धमकी"
+      ]
+    },
+    "isolation": {
+      "label": "Isolation / secrecy",
+      "grammar": "isolation",
+      "signals": [
+        "don't tell anyone",
+        "recorded line",
+        "secret",
+        "किसी को मत"
+      ]
+    },
+    "commitment": {
+      "label": "Commitment / sunk cost",
+      "grammar": "sunk_cost",
+      "signals": [
+        "already paid",
+        "one more verification",
+        "इतना दे चुकी"
+      ]
+    },
+    "social_proof": {
+      "label": "Social proof",
+      "grammar": "social_proof",
+      "signals": [
+        "everyone",
+        "crowd",
+        "others invested"
+      ]
+    },
+    "fomo": {
+      "label": "FOMO",
+      "grammar": "fomo",
+      "signals": [
+        "limited time offer",
+        "last chance",
+        "missing out"
+      ]
+    },
+    "overconfidence": {
+      "label": "Overconfidence",
+      "grammar": "overconfidence",
+      "signals": [
+        "I would never fall",
+        "confident",
+        "भरोसा"
+      ]
+    },
+    "shame": {
+      "label": "Shame / embarrassment",
+      "grammar": "shame",
+      "signals": [
+        "ashamed",
+        "hide",
+        "शर्म"
+      ]
+    }
+  },
+  "visual_grammars": {
+    "authority": {
+      "ingredients": [
+        "formal composition",
+        "hierarchy graphic",
+        "steady camera",
+        "cool desaturated light"
+      ],
+      "procedural": [
+        "authority_ladder"
+      ],
+      "camera": [
+        "medium",
+        "close"
+      ],
+      "lighting": "formal",
+      "gp": [
+        "ring"
+      ]
+    },
+    "scarcity": {
+      "ingredients": [
+        "countdown",
+        "compressing space",
+        "tick sound"
+      ],
+      "procedural": [
+        "countdown"
+      ],
+      "camera": [
+        "close",
+        "ecu"
+      ],
+      "lighting": "pressure",
+      "gp": [
+        "arcs"
+      ]
+    },
+    "fear": {
+      "ingredients": [
+        "tight framing",
+        "narrowing attention tunnel",
+        "darkening",
+        "tremble"
+      ],
+      "procedural": [
+        "tunnel"
+      ],
+      "camera": [
+        "close",
+        "ecu"
+      ],
+      "lighting": "fear",
+      "gp": [
+        "worry",
+        "ticks"
+      ]
+    },
+    "isolation": {
+      "ingredients": [
+        "person alone",
+        "connections cut",
+        "negative space"
+      ],
+      "procedural": [
+        "network_cut"
+      ],
+      "camera": [
+        "wide",
+        "medium"
+      ],
+      "lighting": "isolated",
+      "gp": []
+    },
+    "sunk_cost": {
+      "ingredients": [
+        "stacking blocks",
+        "increasing commitment",
+        "blocked exit"
+      ],
+      "procedural": [
+        "stack"
+      ],
+      "camera": [
+        "medium"
+      ],
+      "lighting": "pressure",
+      "gp": [
+        "ring"
+      ]
+    },
+    "social_proof": {
+      "ingredients": [
+        "one person",
+        "second person",
+        "crowd",
+        "follow"
+      ],
+      "procedural": [
+        "crowd"
+      ],
+      "camera": [
+        "wide"
+      ],
+      "lighting": "warm",
+      "gp": []
+    },
+    "fomo": {
+      "ingredients": [
+        "crowd",
+        "rapid movement",
+        "rising number",
+        "limited-time badge"
+      ],
+      "procedural": [
+        "counter",
+        "crowd"
+      ],
+      "camera": [
+        "medium"
+      ],
+      "lighting": "bright",
+      "gp": [
+        "rays"
+      ]
+    },
+    "overconfidence": {
+      "ingredients": [
+        "relaxed posture",
+        "warm even light",
+        "irony framing"
+      ],
+      "procedural": [],
+      "camera": [
+        "medium"
+      ],
+      "lighting": "neutral",
+      "gp": []
+    },
+    "shame": {
+      "ingredients": [
+        "head lowered",
+        "space around subject",
+        "dim light"
+      ],
+      "procedural": [],
+      "camera": [
+        "wide",
+        "close"
+      ],
+      "lighting": "dim",
+      "gp": []
+    }
+  },
+  "environments": {
+    "office": {
+      "set": "office_day",
+      "aliases": [
+        "office",
+        "desk",
+        "workplace",
+        "दफ़्तर",
+        "दफ्तर",
+        "ऑफिस",
+        "डेस्क"
+      ],
+      "time": "day"
+    },
+    "street": {
+      "set": "street_dusk",
+      "aliases": [
+        "street",
+        "roadside",
+        "road",
+        "outside",
+        "सड़क",
+        "बाहर"
+      ],
+      "time": "dusk"
+    },
+    "bedroom": {
+      "set": "night_bedroom",
+      "aliases": [
+        "bedroom",
+        "home at night",
+        "room",
+        "कमरा",
+        "घर"
+      ],
+      "time": "night"
+    }
+  },
+  "environments_missing": [
+    "bank_branch",
+    "police_station",
+    "call_centre",
+    "atm",
+    "living_room",
+    "mall"
+  ],
+  "characters": {
+    "protagonist_f": {
+      "cast": "priya",
+      "outfit": "blazer_navy"
+    },
+    "protagonist_m": {
+      "cast": "rahul",
+      "outfit": "sweater_speckled"
+    },
+    "elder_m": {
+      "cast": "uncle",
+      "outfit": "kurta_cream"
+    },
+    "elder_f": {
+      "cast": null,
+      "note": "no elder-female cast member yet"
+    },
+    "voice_only": {
+      "cast": null,
+      "render": "phone_ui_caller"
+    }
+  },
+  "outfits": {
+    "sweater_speckled": {
+      "fill": "#ffffff",
+      "seeds": true
+    },
+    "blazer_navy": {
+      "fill": "#7d8fc0",
+      "seeds": false
+    },
+    "kurta_cream": {
+      "fill": "#f1e4c3",
+      "seeds": false
+    }
+  },
+  "verbs": [
+    "idle",
+    "look_at",
+    "hesitate",
+    "shrug",
+    "startle",
+    "freeze",
+    "lean",
+    "tremble",
+    "shake_head",
+    "nod",
+    "pickup_phone",
+    "read_phone",
+    "phone_to_ear",
+    "phone_down",
+    "hand_to_chest",
+    "hands_to_face",
+    "gesture"
+  ],
+  "verbs_unsupported": [
+    "walk",
+    "run",
+    "sit_down",
+    "stand_up",
+    "hug",
+    "handshake",
+    "drive"
+  ],
+  "emotions": [
+    "calm",
+    "smile",
+    "happy",
+    "tired",
+    "blank",
+    "serious",
+    "concerned",
+    "uneasy",
+    "shock",
+    "fear",
+    "awe",
+    "angry",
+    "suspicious",
+    "contempt",
+    "driven",
+    "explaining",
+    "solemn",
+    "cheeky"
+  ],
+  "props": {
+    "phone": "available",
+    "laptop": "missing",
+    "desk": "available",
+    "monitor": "missing",
+    "credit_card": "procedural_icon",
+    "debit_card": "procedural_icon",
+    "money": "procedural",
+    "bank_app": "procedural_ui",
+    "sms": "procedural_ui",
+    "call_screen": "procedural_ui",
+    "atm": "missing",
+    "police_badge": "procedural_icon",
+    "clock": "available",
+    "lamp": "available",
+    "bed": "available"
+  },
+  "ui_screens": [
+    "incoming_call",
+    "in_call",
+    "sms",
+    "bank_transfer",
+    "debit_alerts",
+    "balance",
+    "call_log",
+    "otp"
+  ],
+  "procedural": [
+    "counter",
+    "money_flow",
+    "countdown",
+    "balance_chart",
+    "stack",
+    "authority_ladder",
+    "network_cut",
+    "tunnel",
+    "checklist",
+    "timeline",
+    "crowd"
+  ],
+  "gp_effects": [
+    "rays",
+    "arcs",
+    "ticks",
+    "worry",
+    "ring",
+    "shaft"
+  ],
+  "lighting_moods": [
+    "neutral",
+    "formal",
+    "pressure",
+    "fear",
+    "isolated",
+    "dim",
+    "warm",
+    "bright",
+    "relief"
+  ],
+  "camera_sizes": [
+    "wide",
+    "medium",
+    "close",
+    "ecu",
+    "insert"
+  ],
+  "phases": [
+    "HOOK",
+    "SETUP",
+    "INCITING",
+    "ESCALATION",
+    "COMPLICATION",
+    "REVEAL",
+    "EXPLANATION",
+    "CLIMAX",
+    "PAYOFF"
+  ],
+  "cues": {
+    "note": "Hindi/English text cues used to CORROBORATE (or override) LLM tags. A tag without a textual cue is dropped; a cue overrides a wrong tag.",
+    "ui": {
+      "incoming_call": [
+        "बजा",
+        "रिंग",
+        "incoming call"
+      ],
+      "sms": [
+        "मैसेज",
+        "संदेश",
+        "एसएमएस",
+        "sms"
+      ],
+      "debit_alerts": [
+        "डेबिट मैसेज",
+        "डेबिट अलर्ट",
+        "debit alert"
+      ],
+      "bank_transfer": [
+        "ऐप खोल",
+        "भेजे",
+        "भेज दी",
+        "भेज दीजिए",
+        "transfer"
+      ],
+      "otp": [
+        "ओटीपी",
+        "otp"
+      ]
+    },
+    "ui_limits": {
+      "in_call": 3
+    },
+    "amounts": {
+      "sent": [
+        "भेजे",
+        "भेजा",
+        "भेज दी"
+      ],
+      "lost": [
+        "गायब",
+        "जा चुके",
+        "चले गए"
+      ],
+      "attempted": [
+        "ख़रीदारी",
+        "खरीदारी"
+      ],
+      "threshold": [
+        "मिनट"
+      ]
+    },
+    "psychology": {
+      "authority": [
+        "अधिकार",
+        "अधिकारी",
+        "पुलिस",
+        "सरकार"
+      ],
+      "urgency": [
+        "समय की कमी",
+        "जल्दबाज़ी",
+        "जल्दी मचाए",
+        "तीस मिनट",
+        "मिनट हैं"
+      ],
+      "fear": [
+        "डर",
+        "धमकी",
+        "पुलिस केस"
+      ],
+      "isolation": [
+        "अकेलापन",
+        "किसी को न बता",
+        "किसी को कुछ मत",
+        "अकेली"
+      ],
+      "commitment": [
+        "प्रतिबद्धता",
+        "इतना दे चुकी",
+        "दे चुके होते"
+      ],
+      "shame": [
+        "शर्म"
+      ],
+      "overconfidence": [
+        "भरोसा था",
+        "पूरा भरोसा"
+      ]
+    },
+    "explanation_order_note": "In EXPLANATION segments the mechanism is taken from cues only.",
+    "locations": {
+      "office": [
+        "दफ़्तर",
+        "दफ्तर",
+        "डेस्क",
+        "ऑफिस",
+        "रिपोर्ट"
+      ],
+      "street": [
+        "सड़क",
+        "बाहर निकल"
+      ],
+      "bedroom": [
+        "बिस्तर",
+        "कमरे में"
+      ]
+    },
+    "ui_phases": {
+      "incoming_call": [
+        "INCITING",
+        "ESCALATION"
+      ],
+      "in_call": [
+        "INCITING",
+        "ESCALATION",
+        "COMPLICATION",
+        "CLIMAX"
+      ],
+      "sms": [
+        "INCITING",
+        "ESCALATION",
+        "COMPLICATION",
+        "CLIMAX",
+        "REVEAL"
+      ],
+      "bank_transfer": [
+        "ESCALATION",
+        "COMPLICATION",
+        "CLIMAX"
+      ],
+      "debit_alerts": [
+        "REVEAL",
+        "CLIMAX"
+      ],
+      "otp": [
+        "SETUP",
+        "HOOK",
+        "INCITING",
+        "ESCALATION"
+      ]
+    },
+    "mode": {
+      "note": "paragraph mode from language evidence: explanations generalise in first-person plural ('we/our'); advice addresses the viewer with imperatives; otherwise story",
+      "explanation_tokens": [
+        "हम",
+        "हमारा",
+        "हमारी",
+        "हमारे",
+        "हमें",
+        "हमको",
+        "we",
+        "our",
+        "us"
+      ],
+      "advice_tokens": [
+        "कीजिए",
+        "काटिए",
+        "लीजिए",
+        "बताना",
+        "बताइए",
+        "कीजिये",
+        "समझ",
+        "चाहिए"
+      ],
+      "explanation_min": 2,
+      "advice_min": 2
+    }
+  }
+}

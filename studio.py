@@ -59,6 +59,18 @@ def run_make(topic=None, plan=None, duration=40, plan_only=False, stills=None, b
     subprocess.run([py, "-c", code], cwd=ROOT, check=True, env=dict(os.environ, PYTHONPATH=ROOT))
 
 
+def run_factory(story=None, narration=None, project_plan=None, name=None, plan_only=False, stills=None, window=None, allow_fallbacks=False, domain="money_psychology", qc_only=False):
+    """Story-driven factory: story.md + narration segments JSON -> analysis -> plan -> film + project folder."""
+    py = os.path.join(ROOT, ".venv/bin/python")
+    code = (
+        "import sys; sys.path.insert(0, '.');"
+        "from engine.factory import pipeline;"
+        f"pipeline.run(story={story!r}, narration={narration!r}, project_plan={project_plan!r}, name={name!r}, dom_id={domain!r}, plan_only={plan_only!r}, "
+        f"stills={stills!r}, window={window!r}, allow_fallbacks={allow_fallbacks!r}, qc_only={qc_only!r})"
+    )
+    subprocess.run([py, "-c", code], cwd=ROOT, check=True, env=dict(os.environ, PYTHONPATH=ROOT))
+
+
 def run_contact_sheet():
     subprocess.run([sys.executable, os.path.join(ROOT, "asset_pipeline/contact_sheet.py")], cwd=ROOT, check=True)
 
@@ -76,9 +88,23 @@ def main():
     parser.add_argument("--plan-only", action="store_true", help="With --make: stop after writing plan.json")
     parser.add_argument("--duration", type=int, default=40, help="Target seconds for --make")
     parser.add_argument("--stills", metavar="T,T,..", help="With --make/--from-plan: render only stills at these times")
+    parser.add_argument("--story", metavar="STORY_MD", help="FACTORY: story.md (source of truth)")
+    parser.add_argument("--narration", metavar="SEGMENTS_JSON", help="FACTORY: narration segments JSON (audio = same name without .segments.json)")
+    parser.add_argument("--project-plan", metavar="SHOT_PLAN_JSON", help="FACTORY: deterministic re-render of a saved project/shot_plan.json (no LLM)")
+    parser.add_argument("--name", help="FACTORY: project folder name")
+    parser.add_argument("--domain", default="money_psychology", help="FACTORY: domain pack (domains/<id>)")
+    parser.add_argument("--window", metavar="T0,T1", help="FACTORY: render only this time window (standalone Short candidate)")
+    parser.add_argument("--qc-only", action="store_true", help="FACTORY: re-run QC/reports on an existing render")
+    parser.add_argument("--allow-fallbacks", action="store_true", help="FACTORY: continue even if required assets are missing")
     parser.add_argument("--contact-sheet", action="store_true", help="Regenerate the asset contact sheet from the registry")
     args = parser.parse_args()
 
+    if args.story or args.project_plan:
+        stills = [float(x) for x in args.stills.split(",")] if args.stills else None
+        window = tuple(float(x) for x in args.window.split(",")) if args.window else None
+        run_factory(story=args.story, narration=args.narration, project_plan=args.project_plan, name=args.name, plan_only=args.plan_only,
+                    stills=stills, window=window, allow_fallbacks=args.allow_fallbacks, domain=args.domain, qc_only=args.qc_only)
+        return
     if args.make or args.from_plan or args.brief:
         stills = [float(x) for x in args.stills.split(",")] if args.stills else None
         run_make(topic=args.make, plan=args.from_plan, duration=args.duration, plan_only=args.plan_only, stills=stills, brief=args.brief)

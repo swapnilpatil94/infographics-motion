@@ -248,7 +248,7 @@ def glance(perf, t, target, dur=0.9, amount=0.8):
 def init_arms(perf, rest_a, rest_b):
     for side, r in (("A", rest_a), ("B", rest_b)):
         perf.ch[f"a{side}_x"], perf.ch[f"a{side}_y"] = Channel(r[0]), Channel(r[1])
-    perf.ch["aB_curl"], perf.ch["aB_hold"], perf.ch["aB_prot"] = Channel(0.3), Channel(0.0), Channel(-4.0)
+    perf.ch["aB_curl"], perf.ch["aB_hold"], perf.ch["aB_prot"], perf.ch["aB_ear"] = Channel(0.3), Channel(0.0), Channel(-4.0), Channel(0.0)
 
 
 def _to(ch, t0, t1, v, e="smooth"):

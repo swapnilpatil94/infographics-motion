@@ -48,6 +48,10 @@ def main():
     items["rig_art_layered_v1"] = entry("rig_art_layered_v1", "character", [os.path.join(ROOT, "asset_pipeline/rig_art.py")], "hand-authored (this project)",
                                         "CC0 (original work, dedicated to public domain)", "infographics-animations project",
                                         "ink torso/sleeves/hands/phone/face features drawn in Open Peeps linework", ["torso", "arms", "hands", "phone", "eyes", "brows", "mouth"])
+    fac = [os.path.join(ROOT, "engine/factory", f) for f in ("procedural.py", "ui_screens.py")]
+    items["procedural_ui_v1"] = entry("procedural_ui_v1", "prop", fac, "hand-authored (this project)",
+                                      "CC0 (original work, dedicated to public domain)", "infographics-animations project",
+                                      "procedural financial/psychology graphics + phone UI screens", ["11 procedural graphics", "7 UI screens"])
     reg["assets"] = list(items.values())
     json.dump(reg, open(REG, "w"), indent=2, ensure_ascii=False)
     return len(reg["assets"])

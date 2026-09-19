@@ -11,3 +11,4 @@ scratch_preview/
 # Open Peeps: keep only the SVG atoms the cast builder reads (see assets/licenses/registry.json); drop bundles, PNG templates, duplicates
 assets/character/raw/open_peeps/extracted/Flat Assets/nested_extracted/
 assets/character/raw/open_peeps/extracted/Flat Assets/Templates/
+narration/*.wav
