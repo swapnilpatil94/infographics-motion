@@ -150,3 +150,27 @@ def build(collection_name="World_BedroomNight"):
         },
     }
     return objects, continuity
+
+
+def animate_micro_motion(objects, start_s=0.0, end_s=13.5, fps=24):
+    """Subtle deterministic environment life; deliberately low amplitude."""
+    for name, phase in (("curtain_l", 0.0), ("curtain_r", 1.57)):
+        obj = objects.get(name)
+        if obj is None:
+            continue
+        base = obj.rotation_euler.y
+        duration = max(0.5, end_s-start_s)
+        for i in range(9):
+            t = i / 8.0
+            value = base + math.radians(1.2) * math.sin(t * math.tau * 1.15 + phase)
+            obj.rotation_euler.y = value
+            obj.keyframe_insert(
+                data_path="rotation_euler", index=1,
+                frame=round((start_s + duration*t) * fps) + 1
+            )
+        if obj.animation_data and obj.animation_data.action:
+            for fc in obj.animation_data.action.fcurves:
+                for kp in fc.keyframe_points:
+                    kp.interpolation = "BEZIER"
+                    kp.handle_left_type = "AUTO_CLAMPED"
+                    kp.handle_right_type = "AUTO_CLAMPED"

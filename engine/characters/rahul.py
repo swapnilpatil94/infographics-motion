@@ -37,6 +37,7 @@ import bpy
 import bmesh
 import math
 from mathutils import Vector
+from engine.animation import motion_grammar
 
 CHAR_ID = "rahul"
 
@@ -439,3 +440,20 @@ def keyframe_emotion(face, name, frame):
     brow.keyframe_insert(data_path="rotation_euler", frame=frame)
     brow.keyframe_insert(data_path="location", frame=frame)
     mouth.keyframe_insert(data_path="scale", frame=frame)
+
+
+def keyframe_motion_grammar(arm_obj, face, start_s, end_s, intensity=1.0):
+    """Apply reusable micro-acting without changing the character's identity."""
+    motion_grammar.add_reaction_sequence(
+        arm_obj, face, start_s, end_s, intensity=intensity, fps=24
+    )
+
+
+def keyframe_pose_transition(arm_obj, from_pose, to_pose, start_s, end_s):
+    """Anticipation -> committed pose -> settle, entirely from the named pose API."""
+    start_frame = round(start_s * 24) + 1
+    end_frame = round(end_s * 24) + 1
+    apply_pose(arm_obj, from_pose)
+    keyframe_pose(arm_obj, start_frame)
+    apply_pose(arm_obj, to_pose)
+    keyframe_pose(arm_obj, end_frame)
