@@ -1,0 +1,59 @@
+{
+  "version": "1.0",
+  "policy": "unsupported_shots_must_fail_planning_instead_of_inventing_assets",
+  "families": {
+    "money_behavior": {
+      "tier": "strong_fit",
+      "modes": ["character","environment","prop","infographic"],
+      "core_assets": ["person","phone","laptop","cash","card","bank_app","home","office","graph","numbers"],
+      "specialist_assets": ["specific_bank_brand","specific_financial_institution","historical_currency"]
+    },
+    "technology_internet": {
+      "tier": "strong_fit",
+      "modes": ["character","environment","prop","infographic","network"],
+      "core_assets": ["person","phone","laptop","server","router","chat","browser","network_graph","numbers"],
+      "specialist_assets": ["specific_product_ui","specific_hardware","brand_logo"]
+    },
+    "human_behavior": {
+      "tier": "strong_fit",
+      "modes": ["character","environment","prop","infographic"],
+      "core_assets": ["person","home","office","phone","shopping","clock","graph","text"],
+      "specialist_assets": ["lab_equipment","clinical_environment"]
+    },
+    "history": {
+      "tier": "asset_pack_required",
+      "modes": ["character","environment","prop","map","timeline","infographic"],
+      "core_assets": ["person","map","document","timeline","generic_building"],
+      "specialist_assets": ["period_costume","period_architecture","specific_artifact","specific_vehicle","crowd"]
+    },
+    "mythology": {
+      "tier": "asset_pack_required",
+      "modes": ["character","environment","prop","symbol","infographic"],
+      "core_assets": ["human_figure","temple","forest","mountain","fire","ornament","symbol"],
+      "specialist_assets": ["deity_character","specific_costume","specific_weapon","specific_temple","animal_mount"]
+    },
+    "business_power": {
+      "tier": "strong_fit",
+      "modes": ["character","environment","prop","infographic","network"],
+      "core_assets": ["person","office","phone","laptop","document","money","graph","network_graph"],
+      "specialist_assets": ["company_logo","specific_product","specific_factory","specific_person"]
+    },
+    "science_explainer": {
+      "tier": "diagram_first",
+      "modes": ["infographic","diagram","timeline","map","character"],
+      "core_assets": ["diagram","graph","molecule","cell","planet","timeline","numbers"],
+      "specialist_assets": ["specific_instrument","specific_species","specific_structure"]
+    }
+  },
+  "content_archetypes": [
+    "curiosity_gap",
+    "concrete_stakes",
+    "visualizable_mechanism",
+    "surprising_causal_chain",
+    "numbers_or_scale",
+    "human_conflict",
+    "reveal_and_payoff",
+    "reusable_asset_economics"
+  ],
+  "rule": "The system can generate many topic families, but visual quality depends on the registered asset vocabulary. New families require licensed assets or approved procedural representations."
+}
