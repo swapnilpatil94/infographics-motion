@@ -226,7 +226,7 @@ def stack(data, u, t, seed=1):
     commit()
     for it, yy, h in shown:
         text(c, f"{it['label']}  {inr(it['value'])}", (x0 + w / 2, yy + h / 2 - 4), 44, INK, maxw=440)
-    text(c, inr(sum(i["value"] for i in [s[0] for s in shown])), (W / 2, 420), 120, rgb(TONES["alert"]), min(1, u * 4))
+    text(c, inr(sum(i["value"] for i in [s[0] for s in shown])), (W / 2, 560), 120, rgb(TONES["alert"]), min(1, u * 4))
     if u > 0.8:
         text(c, data.get("exit_label", "अब रुकें कैसे?"), (770, 900), 52, rgb(TONES["alert"]), 1.0, maxw=240)
     return c
@@ -304,7 +304,7 @@ def checklist(data, u, t, seed=1):
     """Ink checklist with ticks drawn on. data: {title, items:[str]}"""
     c = base(seed)
     items = data["items"]
-    text(c, data.get("title", ""), (W / 2, 470), 84, rgb(TONES["calm"]), min(1, u * 6), maxw=900)
+    text(c, data.get("title", ""), (W / 2, 580), 84, rgb(TONES["calm"]), min(1, u * 6), maxw=900)
     d, commit = _draw(c)
     for i, it in enumerate(items):
         k = ease("out", (u * (len(items) + 1) - 0.6 - i) / 0.9)

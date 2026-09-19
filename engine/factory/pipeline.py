@@ -22,6 +22,7 @@ from engine.shorts.layers import W, H
 from engine.shorts.raster import ROOT
 
 FPS = 30
+CAPTION_Y_CARD = 340
 
 
 def _inputs_hash(story, nar):
@@ -219,7 +220,9 @@ def render_project(pj, plan, ar, tl, continuity, out_name="master.mp4", window=N
             for c in caps[max(0, ci - 1):ci + 2]:
                 if c[0] <= t <= c[1]:
                     op = max(0.0, min(1.0, (t - c[0]) / 0.08, (c[1] - t) / 0.08))
-                    arr, bbox = captions.render(c[2], size=68, center_y=1440)
+                    # graphic cards keep their content low: lift the caption above it instead of printing over the graphic
+                    cy = CAPTION_Y_CARD if rn.shots[rn.index_at(t)]["treatment"] == "procedural" else 1440
+                    arr, bbox = captions.render(c[2], size=68, center_y=cy)
                     img = captions.overlay(img, arr, op)
                     text = c[2]
                     break

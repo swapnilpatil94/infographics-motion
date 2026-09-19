@@ -395,9 +395,11 @@ def _compose(dom, shots, segs, chars, story_id):
         style = MOOD_EMOTION_STYLE.get(sh.get("emotion_end") or sh["emotion"], "neutral")
         acts = []
         for a in sh["actions"]:
-            name = a.get("action") or a.get("verb")
-            name = {"pickup_phone": "reach_for_phone"}.get(name, name)
-            acts.append(dict(action=name, verb=name, t=a["t"], dur=a["dur"], emotion=style, intensity=round(min(1.0, sh["importance"] / 5.0), 2)))
+            legacy = a.get("verb") or a.get("action")                # keep the story-level verb: continuity + holding-state logic reads it
+            if legacy == "pickup_phone" and sh["state_before"]["holding_phone"]:
+                continue                                             # continuity: the phone is already in her hand - don't pick it up a second time
+            name = {"pickup_phone": "reach_for_phone"}.get(legacy, legacy)
+            acts.append(dict(action=name, verb=legacy, t=a["t"], dur=a["dur"], emotion=style, intensity=round(min(1.0, sh["importance"] / 5.0), 2)))
         sh["actions"] = acts
         sh["camera"]["intent"] = CG.intent_for(sh["lighting"]["mood"], sh.get("emotion_end") or sh["emotion"], sh["phase"], sh["importance"])
         sh["camera"]["size_locked"] = True
