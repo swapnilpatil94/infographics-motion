@@ -36,6 +36,12 @@ def build(preview=False):
     bpy.context.scene.collection.children.link(master_coll)
 
     world_objects, continuity = bedroom_night.build()
+    bedroom_night.animate_micro_motion(
+        world_objects,
+        start_s=0.0,
+        end_s=shot_plan["shots"][-1]["end_s"],
+        fps=FPS,
+    )
     world_coll = bpy.data.collections["World_BedroomNight"]
     bpy.context.scene.collection.children.unlink(world_coll)
     master_coll.children.link(world_coll)
