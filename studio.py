@@ -68,7 +68,7 @@ def run_factory(story=None, narration=None, project_plan=None, name=None, plan_o
         f"pipeline.run(story={story!r}, narration={narration!r}, project_plan={project_plan!r}, name={name!r}, dom_id={domain!r}, plan_only={plan_only!r}, "
         f"stills={stills!r}, window={window!r}, allow_fallbacks={allow_fallbacks!r}, qc_only={qc_only!r})"
     )
-    subprocess.run([py, "-c", code], cwd=ROOT, check=True, env=dict(os.environ, PYTHONPATH=ROOT))
+    subprocess.run([py, "-c", code], cwd=ROOT, check=True, env=dict(os.environ, PYTHONPATH=ROOT, PYTHONUNBUFFERED="1"))
 
 
 def run_contact_sheet():
@@ -96,9 +96,15 @@ def main():
     parser.add_argument("--window", metavar="T0,T1", help="FACTORY: render only this time window (standalone Short candidate)")
     parser.add_argument("--qc-only", action="store_true", help="FACTORY: re-run QC/reports on an existing render")
     parser.add_argument("--allow-fallbacks", action="store_true", help="FACTORY: continue even if required assets are missing")
+    parser.add_argument("--api-request", metavar="REQUEST_JSON", help='FACTORY API: {"story","narration_segments","style","aspect_ratio"} -> film (what a UI would call)')
     parser.add_argument("--contact-sheet", action="store_true", help="Regenerate the asset contact sheet from the registry")
     args = parser.parse_args()
 
+    if args.api_request:
+        code = ("import sys, json; sys.path.insert(0, '.'); from engine import api;"
+                f"r = api.generate(json.load(open({args.api_request!r}))); print(json.dumps(r, ensure_ascii=False, indent=2))")
+        subprocess.run([os.path.join(ROOT, ".venv/bin/python"), "-c", code], cwd=ROOT, check=True, env=dict(os.environ, PYTHONPATH=ROOT, PYTHONUNBUFFERED="1"))
+        return
     if args.story or args.project_plan:
         stills = [float(x) for x in args.stills.split(",")] if args.stills else None
         window = tuple(float(x) for x in args.window.split(",")) if args.window else None

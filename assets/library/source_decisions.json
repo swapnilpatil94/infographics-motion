@@ -1,0 +1,62 @@
+[
+ {
+  "id": "open_peeps",
+  "license": "CC0-1.0",
+  "decision": "ACCEPT",
+  "reason": "permissive"
+ },
+ {
+  "id": "openmoji",
+  "license": "CC-BY-SA-4.0",
+  "decision": "ACCEPT_WITH_OBLIGATIONS",
+  "reason": "share-alike: derived artwork must be released under the same license"
+ },
+ {
+  "id": "puppet_mode",
+  "license": null,
+  "decision": "QUARANTINE",
+  "reason": "license unknown/unasserted or no license file (README claims are not p"
+ },
+ {
+  "id": "coa_tools2",
+  "license": "GPL-3.0",
+  "decision": "QUARANTINE",
+  "reason": "copyleft CODE must not be vendored into the core; reimplement concepts"
+ },
+ {
+  "id": "tiny_2d_rig_tools",
+  "license": null,
+  "decision": "QUARANTINE",
+  "reason": "license unknown/unasserted or no license file (README claims are not p"
+ },
+ {
+  "id": "proscenio",
+  "license": "NOASSERTION",
+  "decision": "QUARANTINE",
+  "reason": "license unknown/unasserted or no license file (README claims are not p"
+ },
+ {
+  "id": "skeleton_rig",
+  "license": null,
+  "decision": "QUARANTINE",
+  "reason": "license unknown/unasserted or no license file (README claims are not p"
+ },
+ {
+  "id": "svg_character_animator",
+  "license": "MIT",
+  "decision": "ACCEPT",
+  "reason": "permissive"
+ },
+ {
+  "id": "makehuman",
+  "license": "NOASSERTION",
+  "decision": "QUARANTINE",
+  "reason": "license unknown/unasserted or no license file (README claims are not p"
+ },
+ {
+  "id": "mpfb2",
+  "license": "NOASSERTION",
+  "decision": "QUARANTINE",
+  "reason": "license unknown/unasserted or no license file (README claims are not p"
+ }
+]

@@ -62,6 +62,8 @@ LOOK_TARGETS = {
     "ahead": (0.0, 0.0, 0.0),
     "stand": (2.6, 12.0, 5.0),          # toward the nightstand (right of frame)
     "away": (-3.0, -8.0, -4.0),         # glance off to the side, avoiding the thing
+    "camera": (0.0, 0.0, 0.0), "laptop": (-1.5, -2.0, 15.0), "money": (-2.0, -1.0, 19.0), "other_left": (-4.5, -12.0, 0.0), "other_right": (4.5, 12.0, 0.0),
+    "document": (-3.0, -3.0, 20.0), "environment_up": (3.0, 6.0, -10.0), "environment_down": (-2.0, -2.0, 18.0),
 }
 
 
@@ -96,6 +98,7 @@ class Performance:
         tr_x = amp * math.sin(2 * math.pi * 9.3 * t) * 0.9
         tr_y = amp * math.sin(2 * math.pi * 11.7 * t + 1.0) * 0.7
         return dict(
+            mtalk=self.total("mtalk", t),
             gx=self.total("gx", t) + self._saccade(t, 1), gy=self.total("gy", t) + self._saccade(t, 2),
             conv=self.total("conv", t), shrug=self.total("shrug", t),
             roll=self.total("roll", t) + drift_r,
@@ -143,7 +146,8 @@ def emotion(perf, t, to, dur=0.12):
     perf.faces.sort(key=lambda f: f[0])
 
 
-GAZE = {"ceiling": (0.25, -0.9), "window": (0.75, -0.45), "phone": (-0.05, 0.75), "down": (0.0, 0.95), "ahead": (0.0, 0.0),
+GAZE = {"camera": (0.0, 0.0), "laptop": (0.1, 0.85), "money": (0.0, 0.9), "other_left": (-0.95, 0.0), "other_right": (0.95, 0.0), "document": (-0.1, 0.9),
+        "environment_up": (0.3, -0.7), "environment_down": (0.0, 0.8), "ceiling": (0.25, -0.9), "window": (0.75, -0.45), "phone": (-0.05, 0.75), "down": (0.0, 0.95), "ahead": (0.0, 0.0),
         "stand": (0.95, 0.15), "away": (-0.85, -0.2)}
 
 

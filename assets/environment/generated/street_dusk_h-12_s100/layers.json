@@ -1,0 +1,68 @@
+{
+ "order": [
+  "sky",
+  "far_city",
+  "mid_buildings",
+  "lamp_tree",
+  "@char",
+  "parapet_fg"
+ ],
+ "layers": {
+  "sky": {
+   "par": 0.3,
+   "depth": 4.0,
+   "emissive": true,
+   "svg": "assets/environment/generated/street_dusk_h-12_s100/sky.svg",
+   "world": [
+    -160,
+    -160,
+    1400,
+    2240
+   ]
+  },
+  "far_city": {
+   "par": 0.45,
+   "depth": 3.6,
+   "svg": "assets/environment/generated/street_dusk_h-12_s100/far_city.svg",
+   "world": [
+    -160,
+    820,
+    1400,
+    760
+   ]
+  },
+  "mid_buildings": {
+   "par": 0.6,
+   "depth": 3.0,
+   "svg": "assets/environment/generated/street_dusk_h-12_s100/mid_buildings.svg",
+   "world": [
+    -160,
+    420,
+    1400,
+    1160
+   ]
+  },
+  "lamp_tree": {
+   "par": 0.8,
+   "depth": 2.4,
+   "svg": "assets/environment/generated/street_dusk_h-12_s100/lamp_tree.svg",
+   "world": [
+    -160,
+    300,
+    1400,
+    1300
+   ]
+  },
+  "parapet_fg": {
+   "par": 1.08,
+   "depth": 0.9,
+   "svg": "assets/environment/generated/street_dusk_h-12_s100/parapet_fg.svg",
+   "world": [
+    -200,
+    1260,
+    1500,
+    700
+   ]
+  }
+ }
+}

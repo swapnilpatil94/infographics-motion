@@ -1,0 +1,67 @@
+{
+  "order": [
+    "wall",
+    "sign",
+    "windows",
+    "queue",
+    "@char",
+    "counter_fg"
+  ],
+  "layers": {
+    "wall": {
+      "par": 0.6,
+      "depth": 3.2,
+      "svg": "assets/environment/generated/bank_branch_d29555e0/wall.svg",
+      "world": [
+        -160,
+        -160,
+        1400,
+        2240
+      ]
+    },
+    "sign": {
+      "par": 0.62,
+      "depth": 3.1,
+      "svg": "assets/environment/generated/bank_branch_d29555e0/sign.svg",
+      "world": [
+        80,
+        200,
+        700,
+        300
+      ]
+    },
+    "windows": {
+      "par": 0.7,
+      "depth": 2.9,
+      "svg": "assets/environment/generated/bank_branch_d29555e0/windows.svg",
+      "world": [
+        560,
+        420,
+        560,
+        700
+      ]
+    },
+    "queue": {
+      "par": 0.9,
+      "depth": 2.3,
+      "svg": "assets/environment/generated/bank_branch_d29555e0/queue.svg",
+      "world": [
+        -80,
+        900,
+        1240,
+        700
+      ]
+    },
+    "counter_fg": {
+      "par": 1.08,
+      "depth": 0.9,
+      "svg": "assets/environment/generated/bank_branch_d29555e0/counter_fg.svg",
+      "world": [
+        -200,
+        1260,
+        1500,
+        700
+      ]
+    }
+  }
+}

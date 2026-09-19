@@ -45,7 +45,8 @@ def run(mp4, plan, stats, rn, assets, warnings, continuity, log=print):
             p = rn.renderer(i).subject_screen(0.5 * (sh["t0"] + sh["t1"]))
             if p and not (captions.SAFE["left"] <= p[0] <= captions.SAFE["right"] and captions.SAFE["top"] <= p[1] <= captions.SAFE["bottom"]):
                 unsafe_subject.append(dict(shot=sh["id"], at=[round(p[0]), round(p[1])]))
-    sig = [(s["treatment"], s["location"], s["camera"].get("size"), s["camera"].get("move")) for s in shots]
+    # a composition = treatment + location + framing + (which graphic / which screen): a countdown card and a ladder card are different compositions
+    sig = [(s["treatment"], s["location"], s["camera"].get("size"), s["camera"].get("move"), (s.get("procedural") or {}).get("type"), (s.get("ui") or {}).get("screen")) for s in shots]
     rep3 = [shots[i]["id"] for i in range(2, len(sig)) if sig[i] == sig[i - 1] == sig[i - 2]]
     short_ui = [s["id"] for s in shots if s["treatment"] == "insert_ui" and (s["t1"] - s["t0"]) < 1.6]
     checks = {

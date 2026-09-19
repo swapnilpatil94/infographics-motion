@@ -1,0 +1,77 @@
+{
+ "sources": [
+  {
+   "id": "open_peeps",
+   "url": "https://www.openpeeps.com/",
+   "license": "CC0-1.0",
+   "author": "Pablo Stanley",
+   "kind": "asset",
+   "note": "downloaded once via browser (Gumroad PWYW); atoms live in assets/character/raw/open_peeps"
+  },
+  {
+   "id": "openmoji",
+   "repo": "hfg-gmuend/openmoji",
+   "url": "https://openmoji.org/",
+   "author": "OpenMoji contributors (HfG Schwaebisch Gmuend)",
+   "kind": "asset",
+   "attribution_text": "All emojis designed by OpenMoji - the open-source emoji and icon project. License: CC BY-SA 4.0"
+  },
+  {
+   "id": "puppet_mode",
+   "repo": "8bitbyadog/puppet-mode",
+   "kind": "code",
+   "note": "README claims MIT but repo has no LICENSE file: quarantined, study only"
+  },
+  {
+   "id": "coa_tools2",
+   "repo": "Aodaruma/coa_tools2",
+   "kind": "code",
+   "note": "GPL-3.0 add-on: study concepts only, never vendored"
+  },
+  {
+   "id": "tiny_2d_rig_tools",
+   "repo": "NickTiny/Tiny-2D-Rig-Tools",
+   "kind": "code",
+   "note": "no license: concepts only"
+  },
+  {
+   "id": "proscenio",
+   "repo": "firebound/proscenio",
+   "kind": "code",
+   "note": "GPL-3.0-or-later per README: architecture ideas only"
+  },
+  {
+   "id": "skeleton_rig",
+   "repo": "frycz/skeleton-rig",
+   "kind": "code",
+   "note": "no license: concepts only"
+  },
+  {
+   "id": "svg_character_animator",
+   "repo": "molauu/svg-character-animator",
+   "kind": "code",
+   "note": "MIT code (example art is CC BY-NC: never used)"
+  },
+  {
+   "id": "makehuman",
+   "repo": "makehumancommunity/makehuman",
+   "kind": "code",
+   "note": "3D human generator; AGPL code (assets CC0): not a 2D-pipeline fit"
+  },
+  {
+   "id": "mpfb2",
+   "repo": "makehumancommunity/mpfb2",
+   "kind": "code",
+   "note": "Blender add-on for MakeHuman humans: 3D, GPL code"
+  },
+  {
+   "id": "noto_sans_devanagari",
+   "license": "OFL-1.1",
+   "author": "The Noto Project Authors",
+   "kind": "asset",
+   "url": "https://fonts.google.com/noto/specimen/Noto+Sans+Devanagari",
+   "proof_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/notosansdevanagari/OFL.txt",
+   "attribution_text": "Noto Sans Devanagari, Copyright The Noto Project Authors, SIL Open Font License 1.1"
+  }
+ ]
+}

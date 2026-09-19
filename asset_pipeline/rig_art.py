@@ -60,16 +60,42 @@ def seeds(rng, x0, x1, y0, y1, n, rot0=0.0):
     return "".join(out)
 
 
+def pattern_marks(rng, pattern, x0, x1, y0, y1, n):
+    """Cloth pattern inside a rect: seeds (speckled sweater) | stripes | check | plain."""
+    if pattern == "seeds":
+        return seeds(rng, x0, x1, y0, y1, n)
+    if pattern == "stripes":
+        return "".join(f'<line x1="{x0}" y1="{y}" x2="{x1}" y2="{y}" stroke="{INK}" stroke-width="5" opacity="0.55"/>' for y in range(int(y0), int(y1), 46))
+    if pattern == "check":
+        return ("".join(f'<line x1="{x0}" y1="{y}" x2="{x1}" y2="{y}" stroke="{INK}" stroke-width="3.5" opacity="0.4"/>' for y in range(int(y0), int(y1), 56))
+                + "".join(f'<line x1="{x}" y1="{y0}" x2="{x}" y2="{y1}" stroke="{INK}" stroke-width="3.5" opacity="0.4"/>' for x in range(int(x0), int(x1), 56)))
+    return ""
+
+
 # ------------------------------------------------------------------ torso
-def torso(seed=3, fill="#fff", seeds_on=True):
+def torso(seed=3, fill="#fff", seeds_on=True, pattern="seeds", collar="crew", badge=False, epaulettes=False):
     """Chest + shoulders + crew collar (no arms; sleeves are separate parts). Canvas coords."""
     r = random.Random(seed)
     outline = [(470, 712), (405, 738), (330, 776), (268, 830), (232, 900), (236, 990), (262, 1120), (270, 1400),
                (620, 1420), (880, 1400), (884, 1120), (900, 990), (896, 900), (858, 830), (800, 782), (742, 742), (708, 720)]
     body = f'<path d="{_d(outline, True)}" fill="{fill}" stroke="{INK}" stroke-width="{OUT_W}" stroke-linejoin="round"/>'
-    body += seeds(r, 320, 830, 930, 1380, 22) if seeds_on else ""
+    body += pattern_marks(r, pattern if seeds_on else "plain", 300, 850, 900, 1390, 22)
     body += (f'<path d="{_d([(520, 640), (508, 690), (480, 726)])}" fill="none" stroke="{INK}" stroke-width="{OUT_W}" stroke-linecap="round"/>'
              f'<path d="{_d([(690, 662), (716, 700), (744, 728)])}" fill="none" stroke="{INK}" stroke-width="{OUT_W}" stroke-linecap="round"/>')
+    if epaulettes:                                            # uniform shoulder straps + badge
+        for x0 in (300, 720):
+            body += f'<rect x="{x0}" y="815" width="110" height="34" rx="8" fill="#e7d9a8" stroke="{INK}" stroke-width="6" transform="rotate({-18 if x0 < 500 else 18} {x0 + 55} 832)"/>'
+    if badge:
+        body += f'<path d="M700,960 l34,-8 l34,8 v40 q0,26 -34,40 q-34,-14 -34,-40 z" fill="#d9b24a" stroke="{INK}" stroke-width="6"/>'
+    if collar == "polo":
+        body += (f'<path d="M470,716 L520,830 L610,800 L700,830 L752,722" fill="none" stroke="{INK}" stroke-width="{OUT_W}" stroke-linejoin="round"/>'
+                 f'<path d="M520,830 L560,760 M700,830 L660,760" stroke="{INK}" stroke-width="6"/>')
+        return _svg(body)
+    if collar == "kurta":
+        body += (f'<path d="M462,716 Q610,790 752,722" fill="none" stroke="{INK}" stroke-width="{OUT_W}" stroke-linecap="round"/>'
+                 f'<line x1="610" y1="790" x2="610" y2="1010" stroke="{INK}" stroke-width="7"/>'
+                 + "".join(f'<circle cx="610" cy="{y}" r="7" fill="{INK}"/>' for y in (850, 920, 990)))
+        return _svg(body)
     # ribbed crew collar: two arcs + ribs (drawn OVER the neck column of the head, which ends ~y=720)
     collar = [(462, 716), (520, 780), (610, 806), (700, 782), (752, 722)]
     body += f'<path d="{_d(collar)}" fill="none" stroke="{INK}" stroke-width="{OUT_W + 6}" stroke-linecap="round"/>'
@@ -84,12 +110,12 @@ def torso(seed=3, fill="#fff", seeds_on=True):
 
 
 # ------------------------------------------------------------------ sleeves
-def sleeve(pivot, length, width, angle_deg, seed, cuff=False, rest_end_width=None, fill="#fff", seeds_on=True):
+def sleeve(pivot, length, width, angle_deg, seed, cuff=False, rest_end_width=None, fill="#fff", seeds_on=True, pattern="seeds"):
     """A sleeve tube drawn from `pivot` along `angle_deg` for `length`. Pivot = the joint it rotates about."""
     r = random.Random(seed)
     g = (f'<g transform="rotate({angle_deg} {pivot[0]} {pivot[1]})">'
          + capsule_line(pivot, (pivot[0] + length, pivot[1]), width, fill=fill)
-         + (seeds(r, pivot[0] + 26, pivot[0] + length - (60 if cuff else 30), pivot[1] - width / 2 + 20, pivot[1] + width / 2 - 20, max(3, int(length / 78))) if seeds_on else ""))
+         + pattern_marks(r, pattern if seeds_on else "plain", pivot[0] + 26, pivot[0] + length - (60 if cuff else 30), pivot[1] - width / 2 + 20, pivot[1] + width / 2 - 20, max(3, int(length / 78))))
     if cuff:                                            # ribbed cuff band at the wrist end
         cx = pivot[0] + length - 18
         for k in range(4):
@@ -102,7 +128,7 @@ def sleeve(pivot, length, width, angle_deg, seed, cuff=False, rest_end_width=Non
 
 
 # ------------------------------------------------------------------ hand
-def hand(wrist, angle_deg, curl=0.0, spread=0.35, thumb=0.5, grip=False):
+def hand(wrist, angle_deg, curl=0.0, spread=0.35, thumb=0.5, grip=False, skin="#fff"):
     """Inked hand pointing along angle_deg from the wrist. curl 0 (open) .. 1 (fist); thumb 0 (tucked) .. 1 (out)."""
     fingers = []
     base_x, palm_w, palm_h = 8.0, 74.0, 78.0
@@ -117,15 +143,15 @@ def hand(wrist, angle_deg, curl=0.0, spread=0.35, thumb=0.5, grip=False):
         p2 = (p1[0] + seg2 * math.cos(a2), p1[1] + seg2 * math.sin(a2))
         fingers.append(f'<path d="M{p0[0]:.1f},{p0[1]:.1f} L{p1[0]:.1f},{p1[1]:.1f} L{p2[0]:.1f},{p2[1]:.1f}" stroke="{INK}" '
                        f'stroke-width="{21 + 2 * 7}" stroke-linecap="round" stroke-linejoin="round" fill="none"/>')
-    fill_fingers = "".join(f.replace(f'stroke="{INK}"', 'stroke="#fff"').replace(f'stroke-width="{21 + 14}"', 'stroke-width="21"') for f in fingers)
-    palm = (f'<rect x="{base_x}" y="{-palm_h / 2}" width="{palm_w}" height="{palm_h}" rx="24" fill="#fff" stroke="{INK}" stroke-width="{OUT_W}"/>')
+    fill_fingers = "".join(f.replace(f'stroke="{INK}"', f'stroke="{skin}"').replace(f'stroke-width="{21 + 14}"', 'stroke-width="21"') for f in fingers)
+    palm = (f'<rect x="{base_x}" y="{-palm_h / 2}" width="{palm_w}" height="{palm_h}" rx="24" fill="{skin}" stroke="{INK}" stroke-width="{OUT_W}"/>')
     ta = math.radians(-58 + 30 * (1 - thumb))
     t0 = (base_x + 24, -palm_h / 2 + 8)
     t1 = (t0[0] + 38 * math.cos(ta) * (1 - 0.3 * curl), t0[1] + 38 * math.sin(ta))
     t2 = (t1[0] + 30 * math.cos(ta + 0.45 * curl), t1[1] + 30 * math.sin(ta + 0.45 * curl))
     th = (f'<path d="M{t0[0]:.1f},{t0[1]:.1f} L{t1[0]:.1f},{t1[1]:.1f} L{t2[0]:.1f},{t2[1]:.1f}" stroke="{INK}" stroke-width="{22 + 14}" '
           f'stroke-linecap="round" stroke-linejoin="round" fill="none"/>'
-          f'<path d="M{t0[0]:.1f},{t0[1]:.1f} L{t1[0]:.1f},{t1[1]:.1f} L{t2[0]:.1f},{t2[1]:.1f}" stroke="#fff" stroke-width="22" '
+          f'<path d="M{t0[0]:.1f},{t0[1]:.1f} L{t1[0]:.1f},{t1[1]:.1f} L{t2[0]:.1f},{t2[1]:.1f}" stroke="{skin}" stroke-width="22" '
           f'stroke-linecap="round" stroke-linejoin="round" fill="none"/>')
     inner = "".join(fingers) + fill_fingers + palm + th
     return _svg(f'<g transform="translate({wrist[0]} {wrist[1]}) rotate({angle_deg}) scale(1.18)">{inner}</g>')
@@ -167,15 +193,15 @@ def _face_wrap(inner):
             f'<g transform="translate({ox} {oy})">{inner}</g></svg>')
 
 
-def eyes_svg(open_=1.0, gaze=(0.0, 0.0), conv=0.0, lid=0.0):
+def eyes_svg(open_=1.0, gaze=(0.0, 0.0), conv=0.0, lid=0.0, style=(1.0, 1.0)):
     """Two ink eyes. open_ 0..1 (blink), gaze in [-1,1]^2 (shifts the eyes inside the socket), conv = convergence
     (near focus), lid = heavy-lid amount (tired)."""
     out = ""
     for k, (cx, cy) in enumerate((EYE_L, EYE_R)):
         gx = gaze[0] * 8.5 + (conv * 3.2 if k == 0 else -conv * 3.2)
         gy = gaze[1] * 6.0 + conv * 3.0
-        ry = max(2.2, 19.0 * open_ * (1 - 0.42 * lid))
-        rx = 10.8 + (1.5 if open_ < 0.5 else 0)
+        ry = max(2.2, 19.0 * style[1] * open_ * (1 - 0.42 * lid))
+        rx = (10.8 + (1.5 if open_ < 0.5 else 0)) * style[0]
         if open_ > 1.08:                                            # wide eyes: inked eyeball + pupil (as in the Open Peeps 'Hectic' face)
             k = min(1.0, (open_ - 1.08) / 0.2)
             er = 15 + 13 * k
@@ -190,7 +216,7 @@ def eyes_svg(open_=1.0, gaze=(0.0, 0.0), conv=0.0, lid=0.0):
     return _face_wrap(out)
 
 
-def brows_svg(raise_=0.0, tilt=0.0, arch=0.0, asym=0.0):
+def brows_svg(raise_=0.0, tilt=0.0, arch=0.0, asym=0.0, thick=13):
     """Two ink brows. raise_ -1..1 (px*14), tilt -1..1 (+ = inner ends up = worry), arch -1..1, asym = left-right raise difference."""
     out = ""
     for k, (cx, cy) in enumerate((BROW_L, BROW_R)):
@@ -202,7 +228,7 @@ def brows_svg(raise_=0.0, tilt=0.0, arch=0.0, asym=0.0):
         p0, p2 = (cx - dx, y - dy), (cx + dx, y + dy)
         ctrl = (cx, y - 9 * arch - 3)
         out += (f'<path d="M{p0[0]:.1f},{p0[1]:.1f} Q{ctrl[0]:.1f},{ctrl[1]:.1f} {p2[0]:.1f},{p2[1]:.1f}" fill="none" stroke="{INK}" '
-                f'stroke-width="13" stroke-linecap="round"/>')
+                f'stroke-width="{thick}" stroke-linecap="round"/>')
     return _face_wrap(out)
 
 
@@ -231,3 +257,21 @@ def nose_svg(atom_path):
         if nums and abs(min(nums[0::2]) - 138) < 2 and abs(min(nums[1::2]) - 138) < 3:
             return _face_wrap(f'<path d="{part}" fill="{INK}"/>')
     raise ValueError("nose subpath not found")
+
+
+# ------------------------------------------------------------------ head accessories (own art, canvas coords; ride with the head)
+def headset(color="#3a3f4a"):
+    g = (f'<path d="M448,520 Q450,232 615,226 Q782,232 790,520" fill="none" stroke="{INK}" stroke-width="30" stroke-linecap="round"/>'
+         f'<path d="M448,520 Q450,232 615,226 Q782,232 790,520" fill="none" stroke="{color}" stroke-width="14" stroke-linecap="round"/>'
+         f'<rect x="424" y="486" width="46" height="84" rx="20" fill="{color}" stroke="{INK}" stroke-width="8"/>'
+         f'<rect x="770" y="486" width="46" height="84" rx="20" fill="{color}" stroke="{INK}" stroke-width="8"/>'
+         f'<path d="M792,560 Q770,650 690,646" fill="none" stroke="{INK}" stroke-width="12" stroke-linecap="round"/>'
+         f'<ellipse cx="682" cy="646" rx="16" ry="11" fill="{color}" stroke="{INK}" stroke-width="7"/>')
+    return _svg(g)
+
+
+def cap(color="#c9b88a"):
+    g = (f'<path d="M440,340 Q440,196 615,190 Q790,196 796,340 Z" fill="{color}" stroke="{INK}" stroke-width="{OUT_W}" stroke-linejoin="round"/>'
+         f'<path d="M420,344 Q616,400 820,344 Q800,318 616,322 Q440,318 420,344 Z" fill="#7b6f4a" stroke="{INK}" stroke-width="{OUT_W}" stroke-linejoin="round"/>'
+         f'<path d="M596,236 h40 l6,32 q-26,18 -52,0 z" fill="#d9b24a" stroke="{INK}" stroke-width="6"/>')
+    return _svg(g)

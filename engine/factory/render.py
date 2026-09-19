@@ -10,7 +10,12 @@ import random
 
 import numpy as np
 
+from engine.animation import grammar as MG
+from engine.camera import grammar as CG
+from engine.crowd.factory import Crowd
+from engine.environments import factory as EF
 from engine.factory import procedural as PR, verbs
+from engine.props import factory as PF
 from engine.factory.ui_screens import ANCHORS, UIScreen
 from engine.shorts import film as F, gp_bank, performance as P, sets
 from engine.shorts.dust import Dust
@@ -46,6 +51,17 @@ class Ctx:
         self.bank = gp_bank.ensure_bank(log)
         self.vig = None
 
+    def rig_for(self, sh):
+        """Resolve a shot's character to a rig: DNA (v2 plans) or the original 3-person cast (v1 plans)."""
+        ref = sh.get("character_ref")
+        if ref and self.plan.get("characters", {}).get(ref):
+            dna = self.plan["characters"][ref]["dna"]
+            if dna["id"] not in self.rigs:
+                self.log(f"[render] building rig from DNA {dna['id']} ({dna['archetype']})")
+                self.rigs[dna["id"]] = LayeredRig(dna=dna)
+            return self.rigs[dna["id"]]
+        return self.rig(sh["cast"], sh["outfit"])
+
     def rig(self, cast, outfit):
         k = (cast, outfit)
         if k not in self.rigs:
@@ -67,12 +83,34 @@ def _sh_adapter(shot_cam, rig, t0, t1):
     return {"cam": shot_cam, "beat": {"rig": rig}, "t0": t0, "t1": t1}
 
 
+def _draw_semantic(bank, c, g, t, u, fade, cam, rig, S):
+    """Screen anchors for the semantic FX. 'phone'/'head' follow the rig (tracked through the camera); 'top'/'low'/'screen' are frame-relative."""
+    eff, op = g["effect"], g["intensity"] * fade
+    if eff == "scribble":
+        ex, ey = rig.anchor("eyes")
+        x, y, z = S(cam, 1.0, (ex + 250, ey - 330))                 # above/behind the head: it must never cover the face
+        bank.draw(c, "scribble", t, (x, y), min(z, 1.5) * 0.9, opacity=op * 0.75)
+    elif eff == "arrow":
+        px, py = rig.anchor("phone")
+        x, y, z = S(cam, 1.0, (px - 40, py - 120))
+        bank.draw(c, "arrow", t, (x, y), min(z, 1.6) * 1.5, opacity=op)
+    elif eff == "network":
+        bank.draw(c, "network", t, (540, 330), 1.35, opacity=op)
+    elif eff == "smoke":
+        bank.draw(c, "smoke", t, (200, 1500), 1.5, opacity=op * 0.35)
+        bank.draw(c, "smoke", t + 0.4, (880, 1450), 1.3, opacity=op * 0.28)
+    elif eff == "dust":
+        bank.draw(c, "dust", t, (0, 0), 1.0, opacity=op)
+    elif eff == "sweep":
+        bank.draw(c, "sweep", t, (0, 0), 1.0, opacity=0.7 * g["intensity"] * min(1.0, u * 3) * max(0.0, 1.0 - max(0.0, u - 0.5) / 0.5), variant=min(15, int(u * 15)))
+
+
 class PerformanceShot:
     def __init__(self, sh, ctx):
         self.sh, self.ctx = sh, ctx
         st = sh["state_before"]
-        self.rig = ctx.rig(sh["cast"], sh["outfit"])
-        set_id = ctx.plan["sets"][sh["location"]]
+        self.rig = ctx.rig_for(sh)
+        set_id = EF.resolve(sh["environment"]) if sh.get("environment") else ctx.plan["sets"][sh["location"]]
         spec = sets.SETS[set_id]
         amb, tint, expo, vig = MOODS.get(sh["lighting"]["mood"], MOODS["neutral"])
         pr = sh["lighting"]["pressure"]
@@ -88,6 +126,14 @@ class PerformanceShot:
         self.held = self.scene.lights.add(Light("radial", (0.50, 0.88, 1.0), lambda t: self._phone_light(t), reach=(0, 2.3), attach_par=1.0,
                                                 center=(600, 1000), radius=600, power=1.6))
         self.dust = Dust(_seed(sh["id"])) if spec["time"] == "night" else None
+        self.crowd = None
+        if sh.get("crowd"):
+            self.crowd = Crowd(sh["crowd"]["seed"], sh["crowd"]["count"], x_range=(-100, 1180), neck_y=(1010, 1240))
+            order = list(self.scene.order)
+            after = sh["crowd"]["after"] if sh["crowd"]["after"] in order else (order[order.index("@char") - 1] if "@char" in order else order[0])
+            self.crowd.add_to(self.scene, after=after)
+        if sh.get("props"):
+            PF.place(self.scene, sh["environment"]["family"] if sh.get("environment") else set_id, sh["props"], seed=_seed(sh["id"]))
         # ---- acting
         perf = P.Performance(seed=_seed(sh["id"]))
         P.init_arms(perf, REST_A, REST_B)
@@ -106,17 +152,25 @@ class PerformanceShot:
             if st["phone_at_ear"]:
                 perf.ch["aB_ear"].key(t0 - 2.0, 1.0)
         for a in sorted(sh["actions"], key=lambda x: x["t"]):
-            verbs.VERBS[a["verb"]](perf, a["t"], a["dur"])
+            name = a.get("action") or a.get("verb")
+            if "action" in a:
+                MG.perform(perf, name, a["t"], a["dur"], a.get("emotion", "neutral"), a.get("intensity", 0.5), **a.get("params", {}))
+            else:
+                verbs.VERBS[name](perf, a["t"], a["dur"])
         P.auto_blinks(perf, t0, t1, seed=_seed(sh["id"]) + 1)
         held_ui = sh.get("held_ui") or dict(screen="in_call", data=dict(name="बैंक"))
         self.rig.ui = UIScreen(held_ui["screen"], held_ui["data"])
         # ---- camera
         cam = sh["camera"]
-        base = SIZES.get(cam["size"], SIZES["medium"])
-        z0, z1, drift = MOVE.get(cam["move"], MOVE["hold"])
-        mk = lambda tt, u, z: dict(t=tt, target=base["target"], zoom=base["zoom"] * z, offset=(base["offset"][0] + drift * (2 * u - 1), base["offset"][1]),
-                                   aperture=base["ap"], focus=1.6)
-        self.cam = dict(size=sh["id"], shake=cam.get("shake", 0.5), kf=[mk(t0, 0, z0), mk(t1, 1, z1)])
+        if cam.get("intent"):                                        # v2: camera grammar decides HOW from the story's intent
+            g = CG.build(cam, t0, t1, _seed(sh["id"]))
+            self.cam = dict(size=sh["id"], shake=cam.get("shake", g["shake"]) if cam.get("shake") is not None else g["shake"], kf=g["kf"], gain=g["gain"])
+        else:
+            base = SIZES.get(cam["size"], SIZES["medium"])
+            z0, z1, drift = MOVE.get(cam["move"], MOVE["hold"])
+            mk = lambda tt, u, z: dict(t=tt, target=base["target"], zoom=base["zoom"] * z, offset=(base["offset"][0] + drift * (2 * u - 1), base["offset"][1]),
+                                       aperture=base["ap"], focus=1.6)
+            self.cam = dict(size=sh["id"], shake=cam.get("shake", 0.5), kf=[mk(t0, 0, z0), mk(t1, 1, z1)])
         self.adapter = _sh_adapter(self.cam, self.rig, t0, t1)
         self.fx = self._fx()
 
@@ -147,6 +201,8 @@ class PerformanceShot:
                 elif g["effect"] == "ticks":
                     x, y, z = S(cam, 1.0, rig.anchor("eyes"))
                     bank.draw(c, "ticks", t, (x, y), min(z, 1.55), opacity=g["intensity"] * max(0.0, 1 - u))
+                elif g["effect"] in ("scribble", "arrow", "network", "smoke", "dust", "sweep", "underline", "money_flow"):
+                    _draw_semantic(bank, c, g, t, u, fade, cam, rig, S)
                 return c
             out.append(fx)
         return out
@@ -161,6 +217,8 @@ class PerformanceShot:
     def frame(self, t, f):
         sh, rig, scene = self.sh, self.rig, self.scene
         rig.update(self.perf, t)
+        if self.crowd:
+            self.crowd.update(t)
         rig.ui.t = max(0.0, t - sh["t0"])
         rig.update_screen(1.0, 0.0)
         self.held.p["center"] = rig.anchor("phone")
@@ -200,6 +258,20 @@ class InsertShot:
                     cx = 540 - self.ins.sw / 2 + (ax + aw / 2) * sx
                     cy = self.ins.center[1] - self.ins.sh / 2 + (ay + ah / 2) * (self.ins.sh / 800.0)
                     img = bank.draw(img, "ring", t, (cx, cy), max(0.6, aw * sx / 780.0), opacity=g["intensity"] * min(1.0, prog * 3), variant=min(15, int(prog * 15)))
+            if bank is not None and g["effect"] in ("underline", "money_flow", "sweep") and sh["t0"] + g["start"] <= t <= sh["t0"] + g["start"] + g["duration"]:
+                a0 = sh["t0"] + g["start"]
+                uu = (t - a0) / max(g["duration"], 1e-6)
+                fd = min(1.0, (t - a0) / 0.15, (a0 + g["duration"] - t) / 0.3)
+                ax, ay, aw, ah = ANCHORS.get(sh["ui"]["screen"], (60, 320, 320, 110))
+                sx = self.ins.sw / 440.0
+                cx = 540 - self.ins.sw / 2 + (ax + aw / 2) * sx
+                cy = self.ins.center[1] - self.ins.sh / 2 + (ay + ah / 2) * (self.ins.sh / 800.0)
+                if g["effect"] == "underline":
+                    img = bank.draw(img, "underline", t, (cx, cy + ah * self.ins.sh / 800.0 * 0.55), max(0.6, aw * sx / 640.0), opacity=g["intensity"] * fd)
+                elif g["effect"] == "money_flow":
+                    img = bank.draw(img, "money_flow", t, (cx + 250, cy + 200), 1.5, opacity=g["intensity"] * fd)
+                else:
+                    _draw_semantic(bank, img, g, t, uu, fd, None, None, None)
             if g["effect"] == "arcs" and bank is not None and sh["t0"] + g["start"] <= t <= sh["t0"] + g["start"] + g["duration"]:
                 for side in (-1, 1):
                     img = bank.draw(img, "arcs", t, (540 + side * 470, 620), 1.8, opacity=0.8)

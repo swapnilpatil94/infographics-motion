@@ -26,12 +26,12 @@ def premultiply(rgba):
 
 
 class Camera:
-    def __init__(self, cx=W / 2, cy=H / 2, zoom=1.0, focus=1.6, aperture=10.0):
-        self.cx, self.cy, self.zoom, self.focus, self.aperture = cx, cy, zoom, focus, aperture
+    def __init__(self, cx=W / 2, cy=H / 2, zoom=1.0, focus=1.6, aperture=10.0, gain=1.0):
+        self.cx, self.cy, self.zoom, self.focus, self.aperture, self.gain = cx, cy, zoom, focus, aperture, gain     # gain = focal-length feel: >1 wide-angle parallax, <1 telephoto-flat
 
     def view(self, par):
         """(centre_x, centre_y, zoom) as seen by a layer with parallax `par`."""
-        z = 1.0 + (self.zoom - 1.0) * par
+        z = 1.0 + (self.zoom - 1.0) * par * self.gain
         cx = C0[0] + (self.cx - C0[0]) * par
         cy = C0[1] + (self.cy - C0[1]) * par
         return cx, cy, z

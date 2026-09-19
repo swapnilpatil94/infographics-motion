@@ -325,15 +325,57 @@
         "घर"
       ],
       "time": "night"
+    },
+    "bank": {
+      "set": "bank_branch",
+      "aliases": [
+        "बैंक शाखा",
+        "शाखा",
+        "bank branch",
+        "branch"
+      ],
+      "time": "day",
+      "family": "bank_branch"
+    },
+    "call_centre": {
+      "set": "call_centre",
+      "aliases": [
+        "कॉल सेंटर",
+        "call center",
+        "call centre"
+      ],
+      "time": "day",
+      "family": "call_centre"
+    },
+    "living_room": {
+      "set": "indian_living_room",
+      "aliases": [
+        "ड्रॉइंग रूम",
+        "लिविंग रूम",
+        "बैठक",
+        "living room"
+      ],
+      "time": "day",
+      "family": "indian_living_room"
+    },
+    "atm": {
+      "set": "atm_area",
+      "aliases": [
+        "एटीएम",
+        "atm"
+      ],
+      "time": "night",
+      "family": "atm_area"
     }
   },
   "environments_missing": [
-    "bank_branch",
     "police_station",
-    "call_centre",
-    "atm",
-    "living_room",
-    "mall"
+    "cafe",
+    "shop",
+    "hospital",
+    "classroom",
+    "mall",
+    "indian_apartment"
   ],
   "characters": {
     "protagonist_f": {
@@ -603,6 +645,20 @@
       "bedroom": [
         "बिस्तर",
         "कमरे में"
+      ],
+      "bank": [
+        "बैंक शाखा",
+        "शाखा"
+      ],
+      "call_centre": [
+        "कॉल सेंटर"
+      ],
+      "living_room": [
+        "ड्रॉइंग रूम",
+        "लिविंग रूम"
+      ],
+      "atm": [
+        "एटीएम"
       ]
     },
     "ui_phases": {
@@ -664,6 +720,111 @@
       ],
       "explanation_min": 2,
       "advice_min": 2
+    },
+    "props": {
+      "laptop": [
+        "रिपोर्ट",
+        "लैपटॉप",
+        "कंप्यूटर"
+      ],
+      "bank_card": [
+        "कार्ड"
+      ],
+      "bank_document": [
+        "स्टेटमेंट",
+        "खाते का विवरण"
+      ],
+      "cash": [
+        "नकद",
+        "कैश"
+      ],
+      "qr_code": [
+        "क्यूआर",
+        "qr"
+      ],
+      "shopping_bags": [
+        "शॉपिंग",
+        "ख़रीदारी",
+        "खरीदारी"
+      ],
+      "receipt": [
+        "रसीद"
+      ],
+      "mug": [
+        "चाय",
+        "कॉफ़ी",
+        "कॉफी"
+      ],
+      "payment_terminal": [
+        "स्वाइप",
+        "पीओएस"
+      ],
+      "loan_document": [
+        "लोन"
+      ],
+      "emi_document": [
+        "ईएमआई"
+      ]
     }
+  },
+  "character_archetypes": {
+    "protagonist": {
+      "f": "office_worker",
+      "m": "office_worker",
+      "unknown": "office_worker"
+    },
+    "family": {
+      "m_elder": "elderly_man",
+      "f_elder": "elderly_woman",
+      "m": "middle_aged_man",
+      "f": "middle_aged_woman",
+      "unknown": "family_member"
+    },
+    "colleague": "office_worker",
+    "official": "banker",
+    "other": "customer",
+    "antagonist_voice": null,
+    "antagonist_onscreen": "call_centre_agent",
+    "protagonist_young": {
+      "m": "student",
+      "f": "student",
+      "unknown": "student"
+    }
+  },
+  "crowd": {
+    "note": "ambient people behind the protagonist; none when the moment is about isolation",
+    "counts": {
+      "office": [
+        3,
+        6
+      ],
+      "street": [
+        5,
+        10
+      ],
+      "bank": [
+        6,
+        12
+      ],
+      "call_centre": [
+        8,
+        14
+      ],
+      "living_room": [
+        0,
+        0
+      ],
+      "atm": [
+        0,
+        2
+      ]
+    },
+    "no_crowd_moods": [
+      "isolated"
+    ],
+    "focus_crowd_mechanisms": [
+      "social_proof",
+      "fomo"
+    ]
   }
 }

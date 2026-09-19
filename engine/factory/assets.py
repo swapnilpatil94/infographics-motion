@@ -23,8 +23,15 @@ def check(dom, plan_shots, cast_ids, log=print):
     for sh in plan_shots:
         if sh["treatment"] == "performance":
             add("environment", sh["location"], sh["id"])
-            add("cast", sh["cast"], sh["id"])
-            add("outfit", sh["outfit"], sh["id"])
+            if sh.get("character_ref"):
+                add("character_dna", sh["character_ref"], sh["id"])
+            else:
+                add("cast", sh["cast"], sh["id"])
+                add("outfit", sh["outfit"], sh["id"])
+            for pr in sh.get("props", []):
+                add("prop", pr["prop"], sh["id"])
+            if sh.get("crowd"):
+                add("crowd", "ambient_crowd", sh["id"])
         elif sh["treatment"] == "insert_ui":
             add("ui_screen", sh["ui"]["screen"], sh["id"])
         elif sh["treatment"] == "procedural":
@@ -36,7 +43,8 @@ def check(dom, plan_shots, cast_ids, log=print):
         status, how, lic = "available", "library", None
         if kind == "environment":
             e = dom["environments"].get(name)
-            if not e or e["set"] not in sets.SETS:
+            from engine.environments import factory as EF
+            if not e or (e["set"] not in sets.SETS and e["set"] not in EF.available()):        # base sets or a buildable family
                 status, how = "missing", "specialist environment art"
             else:
                 lic = reg.get(f"set_{e['set']}", {}).get("license")
@@ -45,6 +53,16 @@ def check(dom, plan_shots, cast_ids, log=print):
                 status, how = "missing", "on-screen character model"
             else:
                 lic = reg.get("cast_open_peeps_v1", {}).get("license")
+        elif kind == "character_dna":
+            status, how = "available", "character DNA factory"
+            lic = reg.get("cast_open_peeps_v1", {}).get("license")
+        elif kind == "prop":
+            from engine.props import factory as PF
+            status, how = ("available", "prop factory (procedural)") if name in PF.PROPS else ("missing", "prop generator")
+            lic = reg.get("procedural_ui_v1", {}).get("license")
+        elif kind == "crowd":
+            status, how = "available", "crowd factory (DNA sprites)"
+            lic = reg.get("cast_open_peeps_v1", {}).get("license")
         elif kind == "outfit":
             lic = reg.get("rig_art_layered_v1", {}).get("license")
             if name not in dom["outfits"]:

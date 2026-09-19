@@ -7,7 +7,12 @@ touch this stage - it is pure, deterministic and re-runnable (`--from-plan` re-r
 Per shot it decides: purpose, treatment (performance | insert_ui | procedural), what to show, camera (size/move/subject/shake),
 lighting mood, Grease Pencil effects (with timing), transitions, sound cues, and the story state before/after.
 """
+from engine.animation import grammar as MG
+from engine.camera import grammar as CG
+from engine.characters import dna as DNA
+from engine.dsl import variation as VAR
 from engine.factory import procedural as PR, state as S
+from engine.factory.domain import cue_hits
 
 LEAD, TAIL = 0.12, 0.30
 MAX_LEN = dict(performance=8.5, insert_ui=6.0, procedural=9.0)
@@ -53,7 +58,29 @@ def decide(dom, seg, ctx):
     return "performance", ("perf",), {}
 
 
-def build_shots(dom, analysis, segs, log=print):
+def plan_characters(dom, analysis, story_id):
+    """Story characters -> DNA (deterministic in story_id + character id). Off-screen voices get no DNA."""
+    out = {}
+    arche = dom["character_archetypes"]
+    for c in analysis["characters"]:
+        if not c["on_screen"]:
+            continue
+        role, g, age = c["role"], c["gender"], c["age"]
+        key = "m" if g == "m" else "f" if g == "f" else "unknown"
+        if role == "protagonist":
+            a = arche["protagonist_young"][key] if age == "young" and "protagonist_young" in arche else arche["protagonist"][key]
+        elif role == "family":
+            a = arche["family"][(key + "_elder") if age == "elder" and key != "unknown" else key]
+        else:
+            a = arche.get(role) or arche["other"]
+        if not a:
+            continue
+        gender = {"m": "male", "f": "female"}.get(key)
+        out[c["id"]] = dict(name=c["name"], role=role, dna=DNA.make(a, f"{story_id}:{c['id']}", gender=gender), description=c["description"])
+    return out
+
+
+def build_shots(dom, analysis, segs, log=print, story_id="story"):
     warnings = []
     chars = {c["id"]: c for c in analysis["characters"]}
     prot = next((c for c in analysis["characters"] if c["role"] == "protagonist" and c["on_screen"]), None)
@@ -158,7 +185,9 @@ def build_shots(dom, analysis, segs, log=print):
         shots.append(sh)
     # ---- 4. cross-shot design: transitions, GP, sound, variety, pacing
     _design(dom, shots, analysis, warnings)
-    return shots, warnings
+    chars = plan_characters(dom, analysis, story_id)
+    _compose(dom, shots, segs, chars, story_id)
+    return shots, warnings, chars
 
 
 def _ui_data(screen, data, after, analysis, ss):
@@ -228,6 +257,7 @@ def _design(dom, shots, analysis, warnings):
                 sh["gp"].append(dict(effect="ticks", start=0.3, duration=0.75, anchor="eyes", intensity=0.95, relationship="the jolt of realization"))
             if any(a["verb"] in ("pickup_phone", "read_phone") for a in sh["actions"]):
                 sh["gp"].append(dict(effect="rays", start=0.8, duration=min(3.0, sh["t1"] - sh["t0"]), anchor="phone", intensity=0.34, relationship="light from the held screen"))
+        _semantic_fx(dom, sh, i, shots)
         if sh["treatment"] == "insert_ui" and sh["ui"]["screen"] == "incoming_call":
             sh["gp"].append(dict(effect="arcs", start=0.0, duration=1.6, anchor="ui_top", intensity=0.9, relationship="the phone vibrating"))
             sh["sfx"] += [dict(kind="buzz", at=0.0, gain=0.8), dict(kind="ding", at=0.02, gain=0.55), dict(kind="buzz", at=0.9, gain=0.7)]
@@ -299,3 +329,75 @@ def pause_plan(segs, shots):
         if s["tags"]["importance"] >= 5:
             gaps.setdefault(s["id"], 0.5)
     return gaps
+
+
+def _semantic_fx(dom, sh, i, shots):
+    """Grease Pencil by MEANING (not by shot number): each effect names the story relationship it expresses."""
+    add = lambda eff, start, dur, anchor, inten, why: sh["gp"].append(dict(effect=eff, start=round(start, 2), duration=round(dur, 2), anchor=anchor, intensity=inten, relationship=why))
+    d = sh["t1"] - sh["t0"]
+    mood, imp, phase, mech = sh["lighting"]["mood"], sh["importance"], sh["phase"], sh.get("mechanism")
+    if sh["treatment"] == "performance":
+        acts = {a["verb"] for a in sh["actions"]}
+        if mood == "pressure" and imp >= 3:
+            add("scribble", 0.4 * d, min(1.6, 0.5 * d), "head", 0.6, "mounting anxiety: thoughts racing under pressure")
+        if mood == "isolated":
+            add("dust", 0.0, d, "screen", 0.5, "quiet drifting time: being alone with the decision")
+        if mood == "fear" and imp >= 4 and phase in ("REVEAL", "CLIMAX"):
+            add("smoke", 0.2 * d, min(3.0, d), "low", 0.5, "unease rising in the room")
+        if acts & {"pickup_phone"} and phase in ("INCITING", "ESCALATION"):
+            add("arrow", 0.6, 1.2, "phone", 0.85, "attention pulled to the phone")
+        if mech in ("social_proof", "fomo"):
+            add("network", 0.2 * d, min(3.0, 0.7 * d), "top", 0.55, "everyone else is already in")
+    if sh["treatment"] == "insert_ui":
+        scr = sh["ui"]["screen"]
+        if scr == "bank_transfer":
+            add("money_flow", 0.9, 2.0, "ui", 0.8, "the money leaving the account")
+        if scr in ("debit_alerts", "whatsapp_chat", "sms_thread"):
+            add("underline", 0.7, 1.4, "ui", 0.85, "the detail that should have mattered")
+    if i and sh["phase"] != shots[i - 1]["phase"] and sh["transition_in"] in ("dissolve",) and sh["phase"] == "EXPLANATION":
+        add("sweep", 0.0, 0.7, "screen", 0.55, "hand-drawn wipe: the story steps back to explain")
+
+
+MOOD_EMOTION_STYLE = dict(fear="fearful", fearful="fearful", uneasy="nervous", concerned="hesitant", shock="shocked", suspicious="suspicious", calm="relieved", smile="relieved",
+                          happy="relieved", angry="angry", solemn="sad", driven="confident", explaining="confident", serious="neutral", blank="neutral", tired="sad")
+CROWD_AFTER = {"office_day": "plant", "street_dusk": "lamp_tree", "bank_branch": "queue", "call_centre": "cubicles", "indian_living_room": "sofa", "atm_area": "glass"}
+PROP_SLOT_ORDER = {"office_day": ["desk_left", "desk_right", "desk_center"], "street_dusk": ["parapet_left", "parapet_right"], "bank_branch": ["counter_left", "counter_right"],
+                   "call_centre": ["desk_left", "desk_right"], "indian_living_room": ["table_left", "table_right"], "atm_area": ["shelf_left", "shelf_right"], "night_bedroom": ["nightstand"]}
+
+
+def _compose(dom, shots, segs, chars, story_id):
+    """Turn shot plan v1 fields into the full v2 DSL: environments, DNA character refs, props, crowd, semantic actions, camera intents."""
+    by_id = {s["id"]: s for s in segs}
+    hue_for = {}
+    for sh in shots:
+        if sh["treatment"] != "performance":
+            continue
+        base = dom["environments"][sh["location"]]["set"]
+        loc = sh["location"]
+        if loc not in hue_for:                                       # one variation per location per story: continuity within, difference between films
+            hue_for[loc] = VAR.rng(story_id, loc, "hue").choice([-24, -12, 0, 12, 24]) if base in ("office_day", "street_dusk", "night_bedroom") else 0
+        var = {"hue": hue_for[loc]} if base in ("office_day", "street_dusk", "night_bedroom") else {"palette": VAR.seed_int(story_id, loc, "pal") % 3}
+        sh["environment"] = dict(family=base, variation=var, seed=VAR.seed_int(story_id, loc, "env"))
+        sh["character_ref"] = sh["character"]
+        sh["cast"] = sh["outfit"] = None
+        text = " ".join(by_id[i]["text"] for i in sh["segs"])
+        # props: only what the narration mentions, placed on the location's foreground surface
+        slots = list(PROP_SLOT_ORDER.get(base, []))
+        sh["props"] = []
+        for prop in cue_hits(text, dom["cues"]["props"]):
+            if slots:
+                sh["props"].append(dict(prop=prop, at=slots.pop(0), scale=0.8, params={}))
+        # crowd: ambient people, absent when the beat is about isolation, only in looser framings
+        lo, hi = dom["crowd"]["counts"].get({"office": "office", "street": "street", "bank": "bank", "call_centre": "call_centre", "living_room": "living_room", "atm": "atm"}.get(loc, loc), [0, 0])
+        if hi and sh["lighting"]["mood"] not in dom["crowd"]["no_crowd_moods"] and sh["camera"]["size"] in ("wide", "medium") and base in CROWD_AFTER:
+            sh["crowd"] = dict(count=VAR.rng(story_id, loc, "crowd").randint(lo, hi), seed=VAR.seed_int(story_id, loc, "crowdseed"), after=CROWD_AFTER[base])
+        # semantic actions: the story's emotion picks the performance style, importance sets intensity
+        style = MOOD_EMOTION_STYLE.get(sh.get("emotion_end") or sh["emotion"], "neutral")
+        acts = []
+        for a in sh["actions"]:
+            name = a.get("action") or a.get("verb")
+            name = {"pickup_phone": "reach_for_phone"}.get(name, name)
+            acts.append(dict(action=name, verb=name, t=a["t"], dur=a["dur"], emotion=style, intensity=round(min(1.0, sh["importance"] / 5.0), 2)))
+        sh["actions"] = acts
+        sh["camera"]["intent"] = CG.intent_for(sh["lighting"]["mood"], sh.get("emotion_end") or sh["emotion"], sh["phase"], sh["importance"])
+        sh["camera"]["size_locked"] = True

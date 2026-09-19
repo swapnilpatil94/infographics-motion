@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KATHAAYA canonical asset record",
+  "type": "object",
+  "required": ["id", "type", "license", "source", "sha256", "tags", "status"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^[a-z0-9_]+$"},
+    "type": {"enum": ["character", "head", "hair", "face", "eyes", "mouth", "body", "clothing", "hands", "accessory", "facial_hair", "prop", "environment", "environment_part", "fx", "typography", "material", "palette", "icon", "ui_screen", "procedural"]},
+    "style": {"type": "string"},
+    "tags": {"type": "array", "items": {"type": "string"}},
+    "path": {"type": "string"},
+    "generator": {"type": "string", "description": "for procedural/own assets: module.function that produces it"},
+    "source": {"type": "string"}, "source_url": {"type": "string"}, "download_url": {"type": "string"}, "author": {"type": "string"},
+    "license": {"type": "string"}, "commercial_use": {"type": ["boolean", "null"]}, "attribution_required": {"type": "boolean"},
+    "attribution_text": {"type": ["string", "null"]}, "share_alike": {"type": "boolean"}, "modification_allowed": {"type": "boolean"},
+    "proof_url": {"type": "string"}, "sha256": {"type": "string"}, "downloaded_at": {"type": "string"},
+    "status": {"enum": ["REGISTERED", "REGISTERED_WITH_OBLIGATIONS", "QUARANTINED", "REJECTED"]},
+    "status_reason": {"type": "string"}
+  }
+}

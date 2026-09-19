@@ -40,3 +40,48 @@ Add a domain by adding a folder + JSON; the engine reads nothing domain-specific
 ## What is reusable vs. what needs art
 Reusable now: rig + verbs, sets (3), procedural graphics (11), UI screens (7), GP effects (6), director rules, QC. Needs new art per new topic:
 locations (bank branch, police station, call centre, ATM ...), on-screen characters beyond the 3 cast heads, non-phone props.
+
+---
+
+# v2 — the component factories (plan `version: 2`)
+
+The v1 director chose *treatments*; v2 additionally composes every performance shot from seeded, validated components. All of it is
+plain JSON in `shot_plan.json` (the DSL) — `engine/dsl/schema.py::validate_plan` runs before any frame is rendered, and the LLM never emits code.
+
+| Stage | Module | What it does |
+|---|---|---|
+| Character DNA | `engine/characters/dna.py` | archetype × seed → skin, hair, eyes, brows, body, outfit (pattern/collar/badge), accessories. `plan["characters"][id]["dna"]`; rig built by `LayeredRig(dna=…)` |
+| Environments | `engine/environments/{families,factory}.py` | 7 families (office, street, bedroom, bank, call centre, living room, ATM) + hue/palette variation → `EF.resolve(env)` returns a registered set id |
+| Props | `engine/props/factory.py` | 23 ink props, recolourable, screen variation, named slots per set |
+| Crowd | `engine/crowd/factory.py` | seeded DNA people baked to sprites, depth/parallax/sway, per-set insertion slot, absent for `isolated` beats |
+| Motion grammar | `engine/animation/grammar.py` | semantic action (`talk, listen, type, walk, point, reach_for_phone, hesitate, …`) × emotion style × intensity → rig channels |
+| Camera grammar | `engine/camera/grammar.py` | story intent (`fear, realization, investigation, scale, urgency, authority, isolation, intimacy, reveal`) → size/move/keyframes/shake/focal gain |
+| Grease Pencil FX | `engine/shorts/gp_strokes.py`, `engine/render/gp_bank_blender.py` | 14 hand-drawn effects authored in real Blender GPv3; the director picks them by *meaning* (`director._semantic_fx`) and records the `relationship` |
+| Variation | `engine/dsl/variation.py` | every random choice is `f(story_id, shot_id, salt)`; `style.seed` adds a controlled salt |
+| Licensing | `engine/licensing/policy.py`, `assets/licenses.json` | unknown → quarantine, NC/ND → reject, GPL code never enters the core |
+| Asset library | `engine/assets/library.py`, `assets/library/index.json` | schema-validated, sha256-deduped records; resolution order existing → variation → procedural → approved external → generated |
+| Asset acquisition | `tools/assets/{discover,download,verify_license,normalize,register}.py` | live GitHub licence lookup → download → normalise → register (see `assets/sources.json`, `assets/library/source_decisions.json`) |
+
+## API (what a UI calls) — `engine/api.py`
+
+```json
+{"story": "stories/x.md", "narration_segments": "narration/x.wav.segments.json",
+ "style": {"domain": "money_psychology", "seed": "v2", "name": "my_film"}, "aspect_ratio": "9:16"}
+```
+```bash
+python3 studio.py --api-request request.json
+```
+`api.generate(req)` returns `{status, project_dir, master, derivatives, plan, qc}` (or `rejected`/`failed` with `errors`). `api.rerender(plan)` is the no-LLM re-render.
+
+## Adding things
+* **Character archetype**: add to `ARCHETYPES` in `engine/characters/dna.py`, then map story roles to it in `domain.json → character_archetypes`.
+* **Environment family**: add a generator to `engine/environments/families.py::FAMILIES` (+ an entry in `factory.LIGHTS`, a slot list in `engine/props/factory.py::SLOTS`, a crowd `after` layer in `director.CROWD_AFTER`).
+* **Prop**: add a function to `engine/props/factory.py` and list it in `PROPS`; add narration cue words in `domain.json → cues.props`.
+* **GP effect**: add a generator + `SPRITES` entry in `gp_strokes.py` (the bank rebuilds automatically, cached by content hash), a trigger in `director._semantic_fx`, a drawer in `render._draw_semantic`.
+* **Domain pack**: copy `domains/money_psychology/` and change vocab / environments / psychology grammars / cues.
+
+## Known limits (honest)
+* The frame renderer is a 2D layer compositor (numpy/OpenCV). Blender authors the Grease Pencil bank and a native bone-parented-GP + IK rig is proven (`tools/verify_native_gp_rig.py`), but the film is **not** rendered by Blender.
+* Art is portrait-native. `aspect_ratio: "16:9"` produces a labelled **blur-pad derivative** (`engine/compositing/reframe.py`), not a re-staged widescreen composition.
+* Rigs are busts (no walking / full body / sitting); `walk`/`sit`/`stand` degrade to posture + camera.
+* OpenMoji icons (CC BY-SA 4.0, share-alike) are in the library but unused in the film.

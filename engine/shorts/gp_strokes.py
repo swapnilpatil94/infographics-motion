@@ -114,6 +114,133 @@ def ring(progress_frames=1, w=800, h=330, color=(1.0, 0.86, 0.55), seed=11):
     return [dict(pts=pts, color=color, layer="ring", cyclic=False)]
 
 
+def _circle(cx, cy, rad, r, color, layer, rng, n=14, w=3.5, alpha=1.0):
+    pts = []
+    a0 = rng.uniform(0, 6.28)
+    for i in range(n + 2):
+        a = a0 + 2 * math.pi * 1.04 * i / (n + 1)
+        rr = rad * (1 + rng.uniform(-0.05, 0.05))
+        pts.append((cx + math.cos(a) * rr, cy + math.sin(a) * rr * 0.92, w * (0.7 + 0.3 * math.sin(math.pi * i / (n + 1))), alpha))
+    return dict(pts=pts, color=color, layer=layer, cyclic=False)
+
+
+def arrow(variant, color=WARM):
+    """Hand-drawn curved arrow whose TIP is at the sprite centre: 'look here' (attention grammar)."""
+    r = random.Random(6000 + variant)
+    pts = []
+    n = 12
+    for i in range(n):
+        u = i / (n - 1)
+        x = -190 + 190 * u + r.uniform(-2.5, 2.5)
+        y = -170 + 170 * u - 70 * math.sin(math.pi * u) + r.uniform(-2.5, 2.5)
+        pts.append((x, y, 5.0 * (0.55 + 0.45 * math.sin(math.pi * min(1, u * 1.2 + 0.1))), 1.0))
+    out = [dict(pts=pts, color=color, layer="arrow", cyclic=False)]
+    tx, ty = pts[-1][0], pts[-1][1]
+    ang = math.atan2(pts[-1][1] - pts[-3][1], pts[-1][0] - pts[-3][0])
+    for side in (-1, 1):
+        a = ang + math.pi + side * math.radians(28)
+        out.append(_line((tx, ty), (tx + math.cos(a) * 46 + r.uniform(-2, 2), ty + math.sin(a) * 46 + r.uniform(-2, 2)), 5.0, color, "arrow", r, wob=1.5, n=4, r1=0.5))
+    return out
+
+
+def underline(variant, color=WARM, w=620):
+    """Two loose emphasis strokes (the classic double underline)."""
+    r = random.Random(7000 + variant)
+    out = []
+    for k, dy in enumerate((-12, 14)):
+        pts = []
+        for i in range(12):
+            u = i / 11
+            pts.append((-w / 2 + w * (0.02 * k + 0.96 * u) + r.uniform(-3, 3), dy + 6 * math.sin(2.4 * u + k) + r.uniform(-2.5, 2.5), 5.5 * (0.6 + 0.4 * math.sin(math.pi * u)), 0.95))
+        out.append(dict(pts=pts, color=color, layer="underline", cyclic=False))
+    return out
+
+
+def scribble(variant, color=WHITE):
+    """Panic scribble: a tight back-and-forth zigzag loop cluster around the head."""
+    r = random.Random(8000 + variant)
+    out = []
+    for k in range(3):
+        pts = []
+        cx, cy = r.uniform(-30, 30), r.uniform(-20, 20)
+        n = 16
+        for i in range(n):
+            u = i / (n - 1)
+            zig = (1 if i % 2 == 0 else -1)
+            pts.append((cx + zig * (60 + 30 * k) * math.sin(math.pi * u * 0.9 + 0.2) + r.uniform(-6, 6), cy - 110 + 220 * u + r.uniform(-8, 8), 3.4 + r.uniform(-0.6, 0.6), 0.9))
+        out.append(dict(pts=pts, color=color, layer="scribble", cyclic=False))
+    return out
+
+
+def money_flow(variant, color=(1.0, 0.82, 0.38)):
+    """Coins (rings with a bar) streaming down a curved path with speed lines: money leaving."""
+    r = random.Random(9000 + variant)
+    out = []
+    for i in range(6):
+        u = (i + variant * 0.125) % 6 / 6.0
+        x = 90 * math.sin(u * 5.0) + r.uniform(-6, 6)
+        y = -330 + 660 * u
+        rad = 24 * (0.6 + 0.6 * u)
+        out.append(_circle(x, y, rad, 0, color, "money", r, w=4.0, alpha=0.6 + 0.4 * math.sin(math.pi * u)))
+        out.append(_line((x - rad * 0.4, y), (x + rad * 0.4, y), 3.5, color, "money", r, wob=1, n=3, r1=0.8, alpha=0.8))
+        out.append(_line((x, y - 34 - rad), (x, y - 100 - rad * 2), 3.0, color, "money", r, wob=2, n=4, r1=0.1, alpha=0.5))
+    return out
+
+
+def network(variant, color=(0.7, 0.85, 1.0)):
+    """Social-pressure graph: many nodes, thin connections, one node highlighted (everyone is already in)."""
+    r = random.Random(10000 + variant)
+    base = random.Random(10001)                                       # fixed node layout; only the hand wobble varies per take
+    pts = [(-330 + 660 * (i + base.uniform(0.1, 0.9)) / 11 + r.uniform(-4, 4), base.uniform(-170, 170) + r.uniform(-4, 4)) for i in range(11)]
+    out = []
+    for i, a in enumerate(pts):
+        for j in ((i + 1) % 11, (i + 3) % 11):
+            out.append(_line(a, pts[j], 2.2, color, "network", r, wob=2, n=5, alpha=0.7, r1=0.7))
+    for i, (x, y) in enumerate(pts):
+        out.append(_circle(x, y, 13 if i else 20, 0, color if i else WARM, "network", r, n=10, w=3.5 if i else 5.0))
+    return out
+
+
+def smoke(variant, color=(0.85, 0.87, 0.95)):
+    """Slow rising wisps: unease/atmosphere. Boils as loose S-curves."""
+    r = random.Random(11000 + variant)
+    out = []
+    for k in range(4):
+        x0 = -110 + 75 * k + r.uniform(-12, 12)
+        pts = []
+        for i in range(12):
+            u = i / 11
+            pts.append((x0 + 42 * math.sin(3.2 * u + k * 1.3 + variant * 0.4) * (0.4 + u) + r.uniform(-2, 2), 300 - 600 * u, 3.0 + 4.5 * math.sin(math.pi * u), 0.25 + 0.35 * math.sin(math.pi * u)))
+        out.append(dict(pts=pts, color=color, layer="smoke", cyclic=False))
+    return out
+
+
+def dust(variant, w=1080, h=1920, color=(1.0, 0.95, 0.85)):
+    """Floating motes over the whole frame (quiet, lonely, time passing)."""
+    r = random.Random(12000 + variant)
+    out = []
+    for i in range(46):
+        x, y = r.uniform(30, w - 30), r.uniform(60, h - 60)
+        a = r.uniform(0, 6.28)
+        L = r.uniform(4, 13)
+        out.append(dict(pts=[(x, y, r.uniform(1.6, 3.0), 0.7), (x + math.cos(a) * L, y + math.sin(a) * L, r.uniform(1.2, 2.4), 0.4)], color=color, layer="dust", cyclic=False))
+    return out
+
+
+def sweep(w=1080, h=1920, color=(0.9, 0.95, 1.0), seed=13):
+    """Broad diagonal brush strokes that paint ACROSS the frame (Build modifier animates the paint-on): a hand-drawn scene transition."""
+    r = random.Random(seed)
+    out = []
+    for k in range(7):
+        y0 = -80 + k * (h + 160) / 6.0
+        pts = []
+        for i in range(10):
+            u = i / 9
+            pts.append((-60 + (w + 120) * u + r.uniform(-8, 8), y0 + 260 * u * (1 if k % 2 == 0 else -1) + r.uniform(-14, 14), 74 * (0.7 + 0.3 * math.sin(math.pi * u)), 0.55))
+        out.append(dict(pts=pts, color=color, layer="sweep", cyclic=False))
+    return out
+
+
 # name -> (generator, local size (w, h), px per unit, variants, anchor mode, kwargs)
 SPRITES = {
     "rays": dict(gen=rays, size=(560, 560), ppu=2.0, variants=8, anchor="center"),
@@ -122,4 +249,12 @@ SPRITES = {
     "worry": dict(gen=worry, size=(220, 220), ppu=2.0, variants=8, anchor="center"),
     "shaft": dict(gen=shaft_hatch, size=(1040, 960), ppu=1.0, variants=8, anchor="topleft"),
     "ring": dict(gen=lambda v: ring(), size=(920, 440), ppu=1.5, variants=16, anchor="center", build=True),
+    "arrow": dict(gen=arrow, size=(420, 420), ppu=2.0, variants=8, anchor="center"),
+    "underline": dict(gen=underline, size=(720, 120), ppu=2.0, variants=8, anchor="center"),
+    "scribble": dict(gen=scribble, size=(420, 420), ppu=2.0, variants=8, anchor="center"),
+    "money_flow": dict(gen=money_flow, size=(420, 800), ppu=1.5, variants=8, anchor="center"),
+    "network": dict(gen=network, size=(760, 440), ppu=1.5, variants=8, anchor="center"),
+    "smoke": dict(gen=smoke, size=(420, 680), ppu=1.5, variants=8, anchor="center"),
+    "dust": dict(gen=dust, size=(1080, 1920), ppu=0.5, variants=8, anchor="topleft"),
+    "sweep": dict(gen=lambda v: sweep(), size=(1080, 1920), ppu=0.5, variants=16, anchor="topleft", build=True),
 }

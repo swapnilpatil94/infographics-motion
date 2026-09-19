@@ -1,0 +1,67 @@
+{
+  "order": [
+    "wall",
+    "decor",
+    "window",
+    "sofa",
+    "@char",
+    "table_fg"
+  ],
+  "layers": {
+    "wall": {
+      "par": 0.6,
+      "depth": 3.2,
+      "svg": "assets/environment/generated/indian_living_room_d1414edc/wall.svg",
+      "world": [
+        -160,
+        -160,
+        1400,
+        2240
+      ]
+    },
+    "decor": {
+      "par": 0.62,
+      "depth": 3.1,
+      "svg": "assets/environment/generated/indian_living_room_d1414edc/decor.svg",
+      "world": [
+        60,
+        180,
+        760,
+        620
+      ]
+    },
+    "window": {
+      "par": 0.66,
+      "depth": 3.0,
+      "svg": "assets/environment/generated/indian_living_room_d1414edc/window.svg",
+      "world": [
+        660,
+        260,
+        460,
+        800
+      ]
+    },
+    "sofa": {
+      "par": 0.9,
+      "depth": 2.2,
+      "svg": "assets/environment/generated/indian_living_room_d1414edc/sofa.svg",
+      "world": [
+        -120,
+        900,
+        1320,
+        560
+      ]
+    },
+    "table_fg": {
+      "par": 1.08,
+      "depth": 0.9,
+      "svg": "assets/environment/generated/indian_living_room_d1414edc/table_fg.svg",
+      "world": [
+        -200,
+        1260,
+        1500,
+        700
+      ]
+    }
+  }
+}

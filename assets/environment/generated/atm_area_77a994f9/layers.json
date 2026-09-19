@@ -1,0 +1,56 @@
+{
+  "order": [
+    "wall",
+    "atm",
+    "glass",
+    "@char",
+    "shelf_fg"
+  ],
+  "layers": {
+    "wall": {
+      "par": 0.6,
+      "depth": 3.2,
+      "svg": "assets/environment/generated/atm_area_77a994f9/wall.svg",
+      "world": [
+        -160,
+        -160,
+        1400,
+        2240
+      ]
+    },
+    "atm": {
+      "par": 0.8,
+      "depth": 2.4,
+      "svg": "assets/environment/generated/atm_area_77a994f9/atm.svg",
+      "world": [
+        520,
+        240,
+        620,
+        1140
+      ]
+    },
+    "glass": {
+      "par": 0.9,
+      "depth": 2.0,
+      "emissive": false,
+      "svg": "assets/environment/generated/atm_area_77a994f9/glass.svg",
+      "world": [
+        -160,
+        240,
+        700,
+        900
+      ]
+    },
+    "shelf_fg": {
+      "par": 1.08,
+      "depth": 0.9,
+      "svg": "assets/environment/generated/atm_area_77a994f9/shelf_fg.svg",
+      "world": [
+        -200,
+        1260,
+        1500,
+        700
+      ]
+    }
+  }
+}

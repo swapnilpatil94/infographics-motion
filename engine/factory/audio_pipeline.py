@@ -101,12 +101,15 @@ def mix(duration, narration, sfx, mood_track, room_gain=0.5, music_gain=0.32, ou
     bed = underscore(duration, mood_track)
     m.buf[:len(bed)] += bed[:m.n] * music_gain
     v = narration * (0.7 / max(float(np.abs(narration).max()), 1e-6))
-    # sidechain-style duck of the bed under speech: envelope from narration energy
-    env = np.convolve(np.abs(narration), np.ones(int(0.25 * SR)) / int(0.25 * SR), mode="same")
-    duck = 1.0 - 0.55 * np.clip(env / (env.max() + 1e-9) * 3.0, 0, 1)
+    # speech-aware ducking of the bed: cheap block-RMS envelope (50 ms blocks), smoothed, applied to the underscore only
+    blk = int(0.05 * SR)
+    nb = len(narration) // blk
+    rms = np.sqrt((narration[:nb * blk].reshape(nb, blk) ** 2).mean(axis=1))
+    rms = np.convolve(rms, np.ones(8) / 8, mode="same")
+    duck_b = 1.0 - 0.5 * np.clip(rms / (rms.max() + 1e-9) * 4.0, 0, 1)
+    duck = np.repeat(duck_b, blk)
     n = min(len(bed), len(duck), m.n)
-    m.buf[:n] -= bed[:n] * music_gain * (1 - duck[:n]) * 0.0
-    m.buf[:n] += 0.0
+    m.buf[:n] -= bed[:n] * music_gain * (1 - duck[:n])
     m.add(0.0, v, 1.0)
     kinds = {"ding": audio.ding, "buzz": audio.buzz, "heartbeat": audio.heartbeat, "impact": audio.impact, "whoosh": audio.whoosh, "tick": audio.tick}
     for t, kind, g in sfx:

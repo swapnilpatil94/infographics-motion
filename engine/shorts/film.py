@@ -85,7 +85,7 @@ def _camera_kf(film, shot, t):
     amp = cam.get("shake", 0.5) * (1.0 - 0.75 * ease("smooth", (t - shot["t0"]) / max(shot["t1"] - shot["t0"], 1e-6)) if cam.get("settle") else cam.get("shake", 0.5))
     sx = amp * (math.sin(1.9 * t + 0.3) + 0.6 * math.sin(3.7 * t + 1.1))
     sy = amp * (math.sin(1.4 * t + 2.0) + 0.6 * math.sin(4.3 * t + 0.4))
-    return Camera(x + sx, y + sy, z, focus=fc, aperture=ap)
+    return Camera(x + sx, y + sy, z, focus=fc, aperture=ap, gain=cam.get("gain", 1.0))
 
 
 def camera_at(film, shot, t):

@@ -1,0 +1,43 @@
+{
+  "order": [
+    "wall",
+    "cubicles",
+    "@char",
+    "desk_fg"
+  ],
+  "layers": {
+    "wall": {
+      "par": 0.55,
+      "depth": 3.4,
+      "svg": "assets/environment/generated/call_centre_c532268c/wall.svg",
+      "world": [
+        -160,
+        -160,
+        1400,
+        2240
+      ]
+    },
+    "cubicles": {
+      "par": 0.72,
+      "depth": 2.9,
+      "svg": "assets/environment/generated/call_centre_c532268c/cubicles.svg",
+      "world": [
+        -160,
+        520,
+        1400,
+        800
+      ]
+    },
+    "desk_fg": {
+      "par": 1.08,
+      "depth": 0.9,
+      "svg": "assets/environment/generated/call_centre_c532268c/desk_fg.svg",
+      "world": [
+        -200,
+        1260,
+        1500,
+        700
+      ]
+    }
+  }
+}

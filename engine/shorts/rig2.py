@@ -92,19 +92,34 @@ def ik(shoulder, target, l1=L1, l2=L2, below=True):
 
 
 class LayeredRig:
-    def __init__(self, cast_id, outfit=None):
+    def __init__(self, cast_id=None, outfit=None, dna=None):
+        """cast_id/outfit = the original 3-character cast; dna = a CHARACTER DNA (engine.characters.dna) -> any generated character."""
+        from engine.characters import dna as D
+        self.dna = dna
+        skin, self.face_style, self.body = "#ffffff", dict(eyes=(1.0, 1.0), brow=13, mouth=1.0), D.BODY["average"]
         outfit = outfit or dict(fill="#ffffff", seeds=True)
         spec = json.load(open(os.path.join(ROOT, "assets/character/cast/cast.json")))
+        if dna:
+            cast_id = dna["id"]
+            outfit = D.outfit(dna)
+            skin = D.SKIN[dna["skin"]]
+            self.face_style = dict(eyes=D.EYES[dna["eyes"]], brow=D.BROWS[dna["eyebrows"]], mouth=dna["mouth_width"])
+            self.body = D.BODY[dna["body_type"]]
+            self.head_path = D.head_svg_path(dna)
+        else:
+            self.head_path = spec["characters"][cast_id]["head_base"]
         self.cast_id = cast_id
-        self.head_path = spec["characters"][cast_id]["head_base"]
+        self.outfit = outfit
+        pat = outfit.get("pattern", "seeds")
         self.nose_atom = os.path.join(A.__file__.rsplit("/asset_pipeline", 1)[0],
                                       "assets/character/raw/open_peeps/extracted/Flat Assets/Separate Atoms/face/Serious.svg")
         P = REST_PIVOT
-        self.torso = _place("torso", A.torso(fill=outfit["fill"], seeds_on=outfit["seeds"]))
-        self.up = {"A": _place("armA_up", A.sleeve(P, L1, 128, 0, 11, fill=outfit["fill"], seeds_on=outfit["seeds"])), "B": _place("armB_up", A.sleeve(P, L1, 128, 0, 12, fill=outfit["fill"], seeds_on=outfit["seeds"]))}
-        self.fore = {"A": _place("armA_fore", A.sleeve(P, L2 - 8, 112, 0, 13, cuff=True, fill=outfit["fill"], seeds_on=outfit["seeds"])), "B": _place("armB_fore", A.sleeve(P, L2 - 8, 112, 0, 14, cuff=True, fill=outfit["fill"], seeds_on=outfit["seeds"]))}
-        self.handA = _place("handA", A.hand((P[0] + L2 - 8, P[1]), 0, curl=0.3, spread=0.4, thumb=0.4))
-        self.handB = [_place(f"handB_{i}", A.hand((P[0] + L2 - 8, P[1]), 0, curl=c, spread=0.35 * (1 - c), thumb=0.6 - 0.4 * c)) for i, c in enumerate(CURL_STATES)]
+        self.torso = _place("torso", A.torso(fill=outfit["fill"], seeds_on=outfit["seeds"], pattern=pat, collar=outfit.get("collar", "crew"), badge=outfit.get("badge", False), epaulettes=outfit.get("epaulettes", False)))
+        self.up = {"A": _place("armA_up", A.sleeve(P, L1, 128, 0, 11, fill=outfit["fill"], seeds_on=outfit["seeds"], pattern=pat)), "B": _place("armB_up", A.sleeve(P, L1, 128, 0, 12, fill=outfit["fill"], seeds_on=outfit["seeds"], pattern=pat))}
+        self.fore = {"A": _place("armA_fore", A.sleeve(P, L2 - 8, 112, 0, 13, cuff=True, fill=outfit["fill"], seeds_on=outfit["seeds"], pattern=pat)), "B": _place("armB_fore", A.sleeve(P, L2 - 8, 112, 0, 14, cuff=True, fill=outfit["fill"], seeds_on=outfit["seeds"], pattern=pat))}
+        self.handA = _place("handA", A.hand((P[0] + L2 - 8, P[1]), 0, curl=0.3, spread=0.4, thumb=0.4, skin=skin))
+        self.handB = [_place(f"handB_{i}", A.hand((P[0] + L2 - 8, P[1]), 0, curl=c, spread=0.35 * (1 - c), thumb=0.6 - 0.4 * c, skin=skin)) for i, c in enumerate(CURL_STATES)]
+        self.acc = [_place(n, getattr(A, n)()) for n in (dna["extra"] if dna else [])]
         self.phone_body = _place("phone_body", A.phone_body(PHONE_REST))
         self.ui = PhoneScreen()                                  # UI compositor (lock screen + banner)
         x, y, w, h = A.phone_screen_rect(PHONE_REST)
@@ -129,7 +144,7 @@ class LayeredRig:
     @property
     def layers(self):
         return [self.torso, self.up["A"], self.fore["A"], self.handA, self.up["B"], self.fore["B"], *self.handB,
-                self.phone_body, self.phone_screen, self.head, self.nose, self.eyes, self.brows, self.mouth]
+                self.phone_body, self.phone_screen, self.head, self.nose, self.eyes, self.brows, self.mouth, *self.acc]
 
     def use(self, *a, **k):                                      # API parity with CastRig (film calls rig.use)
         return None
@@ -168,24 +183,27 @@ class LayeredRig:
         q = lambda v, st: round(v / st) * st
         # ---- face
         p = self.face_params(s["weights"])
+        p["mopen"] = min(1.0, max(0.0, p["mopen"] + s.get("mtalk", 0.0)))
         gx, gy, conv = s.get("gx", 0.0), s.get("gy", 0.0), s.get("conv", 0.0)
-        eyes = self._feature("eyes", (q(p["open_"], 0.05), q(gx, 0.1), q(gy, 0.1), q(conv, 0.2), q(p["lid"], 0.1)),
-                             lambda: A.eyes_svg(q(p["open_"], 0.05), (q(gx, 0.1), q(gy, 0.1)), q(conv, 0.2), q(p["lid"], 0.1)))
-        brows = self._feature("brows", tuple(q(p[k], 0.08) for k in ("raise_", "tilt", "arch", "asym")),
-                              lambda: A.brows_svg(*(q(p[k], 0.08) for k in ("raise_", "tilt", "arch", "asym"))))
-        mouth = self._feature("mouth", tuple(q(p[k], 0.08) for k in ("smile", "mopen", "width")) + (round(p["shift"]),),
-                              lambda: A.mouth_svg(q(p["smile"], 0.08), q(p["mopen"], 0.08), q(p["width"], 0.05), round(p["shift"])))
+        eyes = self._feature("eyes", (self.cast_id, q(p["open_"], 0.05), q(gx, 0.1), q(gy, 0.1), q(conv, 0.2), q(p["lid"], 0.1)),
+                             lambda: A.eyes_svg(q(p["open_"], 0.05), (q(gx, 0.1), q(gy, 0.1)), q(conv, 0.2), q(p["lid"], 0.1), self.face_style["eyes"]))
+        brows = self._feature("brows", (self.cast_id,) + tuple(q(p[k], 0.08) for k in ("raise_", "tilt", "arch", "asym")),
+                              lambda: A.brows_svg(*(q(p[k], 0.08) for k in ("raise_", "tilt", "arch", "asym")), self.face_style["brow"]))
+        mouth = self._feature("mouth", (self.cast_id,) + tuple(q(p[k], 0.08) for k in ("smile", "mopen", "width")) + (round(p["shift"]),),
+                              lambda: A.mouth_svg(q(p["smile"], 0.08), q(p["mopen"], 0.08), q(p["width"] * self.face_style["mouth"], 0.05), round(p["shift"])))
         self._set_layer(self.eyes, *eyes)
         self._set_layer(self.brows, *brows)
         self._set_layer(self.mouth, *mouth)
         # ---- body / head matrices (same convention as BustRig)
         b = s["breathe"]
         sx, sy = self.seat_w
-        mb = _T(sx + s["bdx"], sy + s["bdy"]) @ _S(1 + b * 0.35, 1 + b) @ _T(-sx, -sy)
+        mb = _T(sx + s["bdx"], sy + s["bdy"]) @ _S((1 + b * 0.35) * self.body["torso_x"], 1 + b) @ _T(-sx, -sy)
         nx, ny = self.neck_w
-        mh = mb @ _T(nx + s["hdx"], ny + s["hdy"]) @ _R(s["roll"]) @ _T(-nx, -ny)
+        mh = mb @ _T(nx + s["hdx"], ny + s["hdy"]) @ _R(s["roll"]) @ _S(self.body["head"] / self.body["torso_x"], self.body["head"]) @ _T(-nx, -ny)
         self.torso.world_xf = mb
         self.head.world_xf = mh
+        for a_ in self.acc:
+            a_.world_xf = mh
         for kind, layer in (("nose", self.nose), ("eyes", self.eyes), ("brows", self.brows), ("mouth", self.mouth)):
             k = FEATURE_TURN[kind]
             layer.world_xf = _T(k * s["hdx"] * 0.6, k * s["hdy"] * 0.4) @ mh

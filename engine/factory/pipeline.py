@@ -15,6 +15,7 @@ import time
 import numpy as np
 from PIL import Image
 
+from engine.dsl import schema as DSL
 from engine.factory import analysis as AN, assets, audio_pipeline as AP, contract, director, domain, project as PJ, qc as FQC, render as R, state
 from engine.shorts import captions, film as F, timelog
 from engine.shorts.layers import W, H
@@ -51,7 +52,7 @@ def _captions(segs):
     return track
 
 
-def build_plan(story_path, narration_path, name=None, dom_id="money_psychology", out_root=None, allow_fallbacks=False, log=print, tl=None):
+def build_plan(story_path, narration_path, name=None, dom_id="money_psychology", out_root=None, allow_fallbacks=False, log=print, tl=None, seed_salt=""):
     tl = tl or timelog.TimeLog()
     dom = domain.load(dom_id)
     with tl.stage("contract"):
@@ -79,7 +80,8 @@ def build_plan(story_path, narration_path, name=None, dom_id="money_psychology",
             st["cached"] = False
     segs = nar["segments"]
     with tl.stage("director"):
-        shots, dwarn = director.build_shots(dom, analysis, segs, log)
+        story_id = PJ.slug(story["title"]) + "_" + hashlib.sha1(story["title"].encode()).hexdigest()[:5] + (f"~{seed_salt}" if seed_salt else "")   # seed = story_id (+ optional style seed) + shot_id
+        shots, dwarn, chars = director.build_shots(dom, analysis, segs, log, story_id)
         gaps = director.pause_plan(segs, shots)
         # the phone on screen shows the most recent UI insert of the same scene
         last_ui = None
@@ -113,12 +115,13 @@ def build_plan(story_path, narration_path, name=None, dom_id="money_psychology",
             sfx.append([round(sh["t0"] + e["at"], 3), e["kind"], e["gain"]])
     moods = [[sh["t0"], sh["t1"], sh["lighting"]["mood"]] for sh in shots]
     covered = sum(1 for s in new_segs if any(sh["t0"] - 0.01 <= s["start"] < sh["t1"] for sh in shots))
-    plan = dict(version=1, domain=dom_id, title=story["title"], fps=FPS, format=dict(w=W, h=H, name="9x16"), duration=round(duration, 3), shots=shots,
+    plan = dict(version=2, story_id=story_id, seed=0, characters=chars, domain=dom_id, title=story["title"], fps=FPS, format=dict(w=W, h=H, name="9x16"), duration=round(duration, 3), shots=shots,
                 segments=[{k: s[k] for k in ("id", "text", "start", "end", "words", "phase", "speaker")} for s in new_segs],
                 captions=_captions(new_segs), sfx=sfx, mood_track=moods, outfits=outfits, sets={k: v["set"] for k, v in dom["environments"].items()},
                 narration_audio=os.path.relpath(wav, pj.dir), pauses=gaps, coverage=dict(segments=len(new_segs), uncovered_segments=len(new_segs) - covered),
                 treatment=analysis["treatment"], warnings=dict(director=dwarn, continuity=continuity, story_quality=analysis["quality_warnings"],
                                                                analysis=analysis["warnings"], contract=c["warnings"]))
+    DSL.validate_plan(plan, dom)                                     # untrusted until validated: fail safely BEFORE render
     _write_views(pj, story, nar, analysis, plan, ar, dom)
     if ar["missing"] and not allow_fallbacks:
         raise SystemExit(f"FAILED before render: {len(ar['missing'])} required asset(s) missing - see {pj.path('project', 'asset_requirements.json')}")
@@ -130,7 +133,7 @@ def _write_views(pj, story, nar, analysis, plan, ar, dom):
     shots = plan["shots"]
     w("project/story.json", dict(title=story["title"], paragraphs=story["paragraphs"], narration=plan["segments"]))
     w("project/story_analysis.json", {k: analysis[k] for k in ("title_en", "logline", "central_question", "topics", "phases", "llm_phases", "paragraph_modes", "paragraph_summaries", "financial_events", "quality_warnings", "warnings")})
-    w("project/characters.json", analysis["characters"])
+    w("project/characters.json", [dict(c, dna=(plan.get("characters", {}).get(c["id"]) or {}).get("dna")) for c in analysis["characters"]])
     w("project/locations.json", [dict(kind=k, set=plan["sets"].get(k), used_in=[s["id"] for s in shots if s.get("location") == k]) for k in dom.env_kinds()])
     w("project/props.json", dict(ui_screens=sorted({s["ui"]["screen"] for s in shots if s["treatment"] == "insert_ui"}), procedural=sorted({s["procedural"]["type"] for s in shots if s["treatment"] == "procedural"})))
     w("project/psychology.json", analysis["psychology"])
@@ -266,7 +269,7 @@ def _finish(pj, plan, ar, tl, continuity, rn, out, stats, log):
 
 
 def run(story=None, narration=None, project_plan=None, name=None, dom_id="money_psychology", out_root=None, stills=None, window=None,
-        allow_fallbacks=False, plan_only=False, qc_only=False, log=print):
+        allow_fallbacks=False, plan_only=False, qc_only=False, log=print, seed_salt="", aspect_ratios=("9:16",)):
     tl = timelog.TimeLog()
     if project_plan:
         plan = json.load(open(project_plan))
@@ -277,9 +280,15 @@ def run(story=None, narration=None, project_plan=None, name=None, dom_id="money_
             ar["missing"] = json.load(open(ar_path))["missing"]
         continuity = plan["warnings"]["continuity"]
     else:
-        pj, plan, ar, tl, continuity, analysis = build_plan(story, narration, name, dom_id, out_root, allow_fallbacks, log, tl)
+        pj, plan, ar, tl, continuity, analysis = build_plan(story, narration, name, dom_id, out_root, allow_fallbacks, log, tl, seed_salt)
     if plan_only:
         log(f"[factory] plan written: {pj.path('project', 'shot_plan.json')}  ({len(plan['shots'])} shots, {plan['duration']:.1f}s)")
         json.dump(tl.report(), open(pj.path("logs", "timing_log_plan.json"), "w"), indent=2)
         return pj, plan
-    return render_project(pj, plan, ar, tl, continuity, window=window, stills=stills, qc_only=qc_only, log=log)
+    res = render_project(pj, plan, ar, tl, continuity, window=window, stills=stills, qc_only=qc_only, log=log)
+    if isinstance(res, tuple) and "16:9" in aspect_ratios and not stills:
+        from engine.compositing import reframe_16x9
+        d = pj.path("final", "master_16x9_blurpad.mp4")
+        reframe_16x9(res[0], d)
+        log(f"[factory] 16:9 blur-pad derivative (NOT a native widescreen composition): {d}")
+    return res
