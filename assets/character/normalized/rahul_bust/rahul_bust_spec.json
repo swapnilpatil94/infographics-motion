@@ -1,0 +1,40 @@
+{
+  "character_id": "rahul",
+  "hair": "Flat Top",
+  "body": "Device",
+  "faces": {
+    "tired": {
+      "atom": "Tired",
+      "svg": "assets/character/normalized/rahul_bust/rahul_head_tired.svg"
+    },
+    "blank": {
+      "atom": "Blank",
+      "svg": "assets/character/normalized/rahul_bust/rahul_head_blank.svg"
+    },
+    "serious": {
+      "atom": "Serious",
+      "svg": "assets/character/normalized/rahul_bust/rahul_head_serious.svg"
+    },
+    "concerned": {
+      "atom": "Concerned",
+      "svg": "assets/character/normalized/rahul_bust/rahul_head_concerned.svg"
+    },
+    "uneasy": {
+      "atom": "Concerned Fear",
+      "svg": "assets/character/normalized/rahul_bust/rahul_head_uneasy.svg"
+    },
+    "shock": {
+      "atom": "Hectic",
+      "svg": "assets/character/normalized/rahul_bust/rahul_head_shock.svg"
+    },
+    "blink": {
+      "atom": "Eyes Closed",
+      "svg": "assets/character/normalized/rahul_bust/rahul_head_blink.svg"
+    },
+    "calm": {
+      "atom": "Calm",
+      "svg": "assets/character/normalized/rahul_bust/rahul_head_calm.svg"
+    }
+  },
+  "body_svg": "assets/character/normalized/rahul_bust/rahul_body.svg"
+}

@@ -1,0 +1,162 @@
+{
+  "wall": {
+    "par": 0.6,
+    "depth": 3.2,
+    "svg": "assets/environment/generated/night_bedroom/wall.svg",
+    "world": [
+      -160,
+      -160,
+      1400,
+      2240
+    ]
+  },
+  "decor": {
+    "par": 0.6,
+    "depth": 3.1,
+    "svg": "assets/environment/generated/night_bedroom/decor.svg",
+    "world": [
+      0,
+      200,
+      700,
+      400
+    ]
+  },
+  "sky": {
+    "par": 0.4,
+    "depth": 3.4,
+    "emissive": true,
+    "svg": "assets/environment/generated/night_bedroom/sky.svg",
+    "world": [
+      690,
+      250,
+      360,
+      560
+    ]
+  },
+  "clouds": {
+    "par": 0.4,
+    "depth": 3.35,
+    "emissive": true,
+    "svg": "assets/environment/generated/night_bedroom/clouds.svg",
+    "world": [
+      690,
+      250,
+      360,
+      560
+    ]
+  },
+  "window": {
+    "par": 0.62,
+    "depth": 3.0,
+    "svg": "assets/environment/generated/night_bedroom/window.svg",
+    "world": [
+      560,
+      190,
+      620,
+      760
+    ]
+  },
+  "curtain_l": {
+    "par": 0.9,
+    "depth": 2.8,
+    "sway": 1,
+    "svg": "assets/environment/generated/night_bedroom/curtain_l.svg",
+    "world": [
+      590,
+      200,
+      590,
+      900
+    ]
+  },
+  "curtain_r": {
+    "par": 0.9,
+    "depth": 2.8,
+    "sway": 1,
+    "svg": "assets/environment/generated/night_bedroom/curtain_r.svg",
+    "world": [
+      590,
+      200,
+      590,
+      900
+    ]
+  },
+  "headboard": {
+    "par": 0.85,
+    "depth": 2.2,
+    "svg": "assets/environment/generated/night_bedroom/headboard.svg",
+    "world": [
+      -20,
+      560,
+      660,
+      900
+    ]
+  },
+  "pillows": {
+    "par": 0.92,
+    "depth": 2.0,
+    "svg": "assets/environment/generated/night_bedroom/pillows.svg",
+    "world": [
+      -120,
+      900,
+      960,
+      420
+    ]
+  },
+  "nightstand": {
+    "par": 0.95,
+    "depth": 2.0,
+    "svg": "assets/environment/generated/night_bedroom/nightstand.svg",
+    "world": [
+      770,
+      900,
+      420,
+      780
+    ]
+  },
+  "stand_phone": {
+    "par": 0.95,
+    "depth": 1.95,
+    "svg": "assets/environment/generated/night_bedroom/stand_phone.svg",
+    "world": [
+      1000,
+      1050,
+      140,
+      170
+    ]
+  },
+  "stand_screen": {
+    "par": 0.95,
+    "depth": 1.94,
+    "emissive": true,
+    "opacity": 0.0,
+    "svg": "assets/environment/generated/night_bedroom/stand_screen.svg",
+    "world": [
+      1000,
+      1050,
+      140,
+      170
+    ]
+  },
+  "blanket_mid": {
+    "par": 1.05,
+    "depth": 1.4,
+    "svg": "assets/environment/generated/night_bedroom/blanket_mid.svg",
+    "world": [
+      -140,
+      1240,
+      1020,
+      720
+    ]
+  },
+  "blanket_fg": {
+    "par": 1.5,
+    "depth": 0.8,
+    "svg": "assets/environment/generated/night_bedroom/blanket_fg.svg",
+    "world": [
+      -200,
+      1560,
+      1500,
+      700
+    ]
+  }
+}

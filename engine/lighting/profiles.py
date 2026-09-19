@@ -37,7 +37,7 @@ def build_night_bedroom_rig(coll, window_obj):
     ambient = _light_obj(
         "Light_RoomAmbient", 'POINT',
         location=(0.0, -0.6, 2.2),
-        energy=55.0, color=(0.35, 0.42, 0.6), coll=coll,
+        energy=26.0, color=(0.30, 0.36, 0.55), coll=coll,
     )
     ambient.data.shadow_soft_size = 1.2
     lights["room_ambient"] = ambient

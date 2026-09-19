@@ -27,21 +27,23 @@ def _material_matte(name, color, roughness=0.5):
     return mat
 
 
-def build(coll, location=(0, 0, 0)):
+def build(coll, location=(0, 0, 0), size=(0.07, 0.008, 0.145)):
     bpy.ops.mesh.primitive_cube_add(size=1.0, location=location)
     body = bpy.context.active_object
     body.name = "Prop_Phone"
-    body.scale = (0.07, 0.008, 0.145)
+    body.scale = size
     body.data.materials.append(_material_matte("Mat_PhoneBody", (0.02, 0.02, 0.025), roughness=0.3))
     for c in list(body.users_collection):
         c.objects.unlink(body)
     coll.objects.link(body)
 
-    bpy.ops.mesh.primitive_plane_add(size=1.0, location=(location[0], location[1] - 0.0045, location[2]))
+    screen_w = size[0] * 0.86
+    screen_h = size[2] * 0.9
+    bpy.ops.mesh.primitive_plane_add(size=1.0, location=(location[0], location[1] - size[1] * 0.55, location[2]))
     screen = bpy.context.active_object
     screen.name = "Prop_PhoneScreen"
     screen.rotation_euler = (1.5708, 0, 0)
-    screen.scale = (0.06, 0.13, 1.0)
+    screen.scale = (screen_w, screen_h, 1.0)
     screen_mat, emit_node = _material_emissive("Mat_PhoneScreen", (0.75, 0.85, 1.0), strength=0.0)
     screen.data.materials.append(screen_mat)
     for c in list(screen.users_collection):

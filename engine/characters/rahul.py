@@ -122,8 +122,9 @@ BODY_ROOTS = {"pelvis", "chest"}
 CLOTH_VERTS = [
     ("waist", (0, 0, 0.0), 0.108, "pelvis"),
     ("spine", (0, 0, 0.17), 0.096, "spine"),
-    ("chest", (0, 0, 0.375), 0.130, "chest"),
-    ("collar", (0, 0, 0.495), 0.075, "chest"),
+    ("chest", (0, 0, 0.375), 0.132, "chest"),
+    ("upper_chest", (0, 0, 0.46), 0.112, "chest"),
+    ("collar", (0, 0, 0.525), 0.088, "chest"),
 
     ("shoulder.R", (0.145, 0, 0.475), 0.062, "upperarm.R"),
     ("sleeve.R", (0.16, -0.09, 0.35), 0.056, "upperarm.R"),
@@ -138,7 +139,7 @@ CLOTH_VERTS = [
     ("short_hem.L", (-0.10, -0.28, 0.02), 0.066, "thigh.L"),
 ]
 CLOTH_EDGES = [
-    ("waist", "spine"), ("spine", "chest"), ("chest", "collar"),
+    ("waist", "spine"), ("spine", "chest"), ("chest", "upper_chest"), ("upper_chest", "collar"),
     ("chest", "shoulder.R"), ("shoulder.R", "sleeve.R"),
     ("chest", "shoulder.L"), ("shoulder.L", "sleeve.L"),
     ("waist", "hip.R"), ("hip.R", "short_hem.R"),
@@ -413,10 +414,10 @@ def keyframe_pose_named(arm_obj, pose_name, frame, breathe_x_delta=0.0):
 
 
 EMOTIONS = {
-    "relaxed": {"brow_rot_x": -3, "brow_z": 0.0, "mouth_scale_y": 0.9},
-    "curious": {"brow_rot_x": -6, "brow_z": 0.006, "mouth_scale_y": 1.0},
-    "uneasy": {"brow_rot_x": 10, "brow_z": -0.004, "mouth_scale_y": 0.6},
-    "realization": {"brow_rot_x": -14, "brow_z": 0.01, "mouth_scale_y": 0.4},
+    "relaxed": {"brow_rot_x": -3, "brow_z": 0.0, "mouth_scale_y": 0.30},
+    "curious": {"brow_rot_x": -6, "brow_z": 0.006, "mouth_scale_y": 0.45},
+    "uneasy": {"brow_rot_x": 10, "brow_z": -0.004, "mouth_scale_y": 0.32},
+    "realization": {"brow_rot_x": -14, "brow_z": 0.01, "mouth_scale_y": 0.22},
 }
 
 

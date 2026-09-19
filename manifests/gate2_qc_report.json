@@ -1,0 +1,24 @@
+{
+  "license_gate": {
+    "pass": true,
+    "registered_count": 12,
+    "quarantined_count": 0,
+    "quarantined_ids": []
+  },
+  "frame_integrity": {
+    "pass": true,
+    "found": 264,
+    "expected": 264,
+    "missing_count": 0,
+    "suspiciously_small_frames": []
+  },
+  "svg_normalization": {
+    "pass": true,
+    "files_normalized": 4,
+    "warnings": []
+  },
+  "known_visual_issues": [
+    "Small striped/hatched rendering artifact near the chin on some expressions (face/Concerned, face/Fear atoms) \u2014 traced to Blender's curve importer not honoring the source SVG's fill-rule=evenodd on a decorative shading sub-path. Cosmetic only; does not affect facial feature legibility. Not fixed in this pass.",
+    "No environment geometry (window/nightstand/phone) is in frame during the close-up hold \u2014 by composition choice for this shot, not a bug, but means the phone itself is only inferred via its light, not seen."
+  ]
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "source_path": "/Users/swapnil/infographics animations/assets/character/normalized/rahul_svg/rahul_curious.svg",
+    "normalized_path": "/Users/swapnil/infographics animations/assets/character/normalized/rahul_svg_clean/rahul_curious.svg",
+    "sha256": "c138df9f4adac5c6b21391376c79e9dd87b2162c4baf0e6493f2e535fbda9420",
+    "warnings": []
+  },
+  {
+    "source_path": "/Users/swapnil/infographics animations/assets/character/normalized/rahul_svg/rahul_realization.svg",
+    "normalized_path": "/Users/swapnil/infographics animations/assets/character/normalized/rahul_svg_clean/rahul_realization.svg",
+    "sha256": "e894f4e1683d386857d20af673f9fe691810351cf733612ce1ecd51d64e0b109",
+    "warnings": []
+  },
+  {
+    "source_path": "/Users/swapnil/infographics animations/assets/character/normalized/rahul_svg/rahul_relaxed.svg",
+    "normalized_path": "/Users/swapnil/infographics animations/assets/character/normalized/rahul_svg_clean/rahul_relaxed.svg",
+    "sha256": "e8f066c339d3d985d6acd541c4adc61f10849306ed73dc8f5ca50b1c090b7d8c",
+    "warnings": []
+  },
+  {
+    "source_path": "/Users/swapnil/infographics animations/assets/character/normalized/rahul_svg/rahul_uneasy.svg",
+    "normalized_path": "/Users/swapnil/infographics animations/assets/character/normalized/rahul_svg_clean/rahul_uneasy.svg",
+    "sha256": "70e583fb962e1624d8dc5a1290b5c59a8081a35f07e7209ff51c284bea87b1e7",
+    "warnings": []
+  }
+]

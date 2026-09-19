@@ -44,18 +44,22 @@ def build(preview=False):
     char_coll = char["collection"]
     bpy.context.scene.collection.children.unlink(char_coll)
     master_coll.children.link(char_coll)
-    char["armature"].location = CHAR_LOCATION
-    rahul.set_pose_sitting_phone(char["armature"])
+    arm = char["armature"]
+    arm.location = CHAR_LOCATION
+    rahul.apply_pose(arm, "base")
 
+    # Bind the phone to hand.R while relaxed (phone resting in the lap,
+    # not yet being looked at) — CHILD_OF is a LIVE constraint, so it keeps
+    # following hand.R correctly through every later pose/keyframe below.
     bpy.context.view_layer.update()
-    hand_matrix_world = char["armature"].matrix_world @ char["armature"].pose.bones["hand.R"].matrix
+    hand_matrix_world = arm.matrix_world @ arm.pose.bones["hand.R"].matrix
     hand_world_pos = hand_matrix_world.translation
     phone_loc = (hand_world_pos.x - 0.01, hand_world_pos.y - 0.06, hand_world_pos.z + 0.06)
-    phone = phone_prop.build(char_coll, location=phone_loc)
+    phone = phone_prop.build(char_coll, location=phone_loc, size=(0.075, 0.009, 0.155))
     phone["body"].rotation_euler = (math.radians(80), 0, math.radians(-15))
     bpy.context.view_layer.update()
     con = phone["body"].constraints.new('CHILD_OF')
-    con.target = char["armature"]
+    con.target = arm
     con.subtarget = "hand.R"
     con.inverse_matrix = hand_matrix_world.inverted()
 
@@ -64,58 +68,110 @@ def build(preview=False):
     room_lights = lighting.build_night_bedroom_rig(light_coll, world_objects["window"])
     phone_glow = lighting.build_phone_glow(light_coll, phone["body"])
 
+    # --- Acting timeline -------------------------------------------------
+    # Named poses (engine.characters.rahul.POSES) carry the story beats:
+    # base (relaxed, alone) -> notice (screen catches his eye) -> phone
+    # (raises it, commits to looking) -> realization (settles/sinks).
+    # Small breathing keyframes ride on top of "base"/"phone"/"realization"
+    # holds so the character never looks like a frozen prop.
+    def t2f(t):
+        return round(t * FPS) + 1
+
+    rahul.keyframe_pose_named(arm, "base", t2f(0.0))
+    bpy.context.view_layer.update()
+    base_head = (arm.matrix_world @ arm.pose.bones["head"].matrix).translation
+    base_chest = (arm.matrix_world @ arm.pose.bones["chest"].matrix).translation
+
+    rahul.keyframe_pose_named(arm, "base", t2f(1.2), breathe_x_delta=1.6)
+    rahul.keyframe_pose_named(arm, "base", t2f(2.3), breathe_x_delta=-1.0)
+
+    rahul.keyframe_pose_named(arm, "notice", t2f(3.55))
+    rahul.keyframe_pose_named(arm, "notice", t2f(3.85))  # brief hesitation hold
+
+    rahul.keyframe_pose_named(arm, "phone", t2f(5.0))
+    bpy.context.view_layer.update()
+    phone_pose_head = (arm.matrix_world @ arm.pose.bones["head"].matrix).translation
+    phone_raised_loc = tuple((arm.matrix_world @ arm.pose.bones["hand.R"].matrix).translation)
+
+    rahul.keyframe_pose_named(arm, "phone", t2f(6.2), breathe_x_delta=1.2)
+    rahul.keyframe_pose_named(arm, "phone", t2f(8.6), breathe_x_delta=-0.8)
+
+    rahul.keyframe_pose_named(arm, "realization", t2f(10.0))
+    bpy.context.view_layer.update()
+    realization_head = (arm.matrix_world @ arm.pose.bones["head"].matrix).translation
+
+    rahul.keyframe_pose_named(arm, "realization", t2f(12.2), breathe_x_delta=1.0)
+
     ignite_shot = next(s for s in shot_plan["shots"] if s.get("phone_screen_ignite_at_s") is not None)
-    ignite_frame = round(ignite_shot["phone_screen_ignite_at_s"] * FPS) + 1
+    ignite_frame = t2f(ignite_shot["phone_screen_ignite_at_s"])
     lighting.keyframe_energy(phone_glow, [
-        (1, 0.0), (ignite_frame - 1, 0.0), (ignite_frame + 6, 3.5),
+        (1, 0.0), (ignite_frame - 1, 0.0), (ignite_frame + 5, 4.0),
     ])
     phone_prop.keyframe_screen(phone, [
-        (1, 0.0), (ignite_frame - 1, 0.0), (ignite_frame + 6, 4.0),
+        (1, 0.0), (ignite_frame - 1, 0.0), (ignite_frame + 5, 4.5),
     ])
 
     for shot in shot_plan["shots"]:
-        frame = round(shot["start_s"] * FPS) + 1
+        frame = t2f(shot["start_s"])
         emotion = shot["characters"][0]["emotion"]
         rahul.keyframe_emotion(char["face"], emotion, frame)
 
-    head_pos = (char["armature"].matrix_world @ char["armature"].pose.bones["head"].matrix).translation
-    chest_pos = (char["armature"].matrix_world @ char["armature"].pose.bones["chest"].matrix).translation
-    head_target = (head_pos.x, head_pos.y, head_pos.z + 0.09)
-    chest_target = (chest_pos.x, chest_pos.y, chest_pos.z)
+    base_target = (base_head.x, base_head.y, base_head.z + 0.06)
+    chest_target = (base_chest.x, base_chest.y, base_chest.z)
+    phone_target = (phone_pose_head.x, phone_pose_head.y, phone_pose_head.z + 0.08)
+    realization_target = (realization_head.x, realization_head.y, realization_head.z + 0.07)
 
     cam, target, focus = camera_shots.build_camera(master_coll)
+    char_x, char_y = CHAR_LOCATION[0], CHAR_LOCATION[1]
     cam_shots = [
         {
-            "start_s": 0.0, "end_s": 3.0,
-            "cam_location": (0.5, -3.3, 1.3),
-            "target_location": (0.5, -1.1, 0.9),
-            "focus_location": (0.5, -1.1, 0.9),
-            "lens_mm": 24,
+            # 3/4 angle, not dead-on-axis: reads the sitting silhouette
+            # along its length instead of foreshortening the legs, and is
+            # simply a more deliberate establishing composition.
+            "start_s": 0.0, "end_s": 3.2,
+            "cam_location": (char_x + 1.35, char_y - 2.75, 1.35),
+            "target_location": base_target,
+            "focus_location": base_target,
+            "lens_mm": 28,
         },
         {
-            "start_s": 3.0, "end_s": 5.5,
-            "cam_location": (0.5, -2.7, 1.2),
+            "start_s": 3.2, "end_s": 5.0,
+            "cam_location": (char_x + 1.05, char_y - 2.15, 1.2),
             "target_location": chest_target,
             "focus_location": chest_target,
-            "lens_mm": 28,
-            "cam_location_end": (0.5, -1.9, 1.05),
-            "target_location_end": head_target,
-            "focus_location_end": head_target,
+            "lens_mm": 32,
+            "cam_location_end": (char_x + 0.75, char_y - 1.55, 1.05),
+            "target_location_end": base_target,
+            "focus_location_end": base_target,
         },
         {
-            "start_s": 5.5, "end_s": 8.5,
-            "cam_location": (0.3, -1.95, 0.88),
-            "target_location": phone_loc,
-            "focus_location": phone_loc,
-            "lens_mm": 50,
+            # Phone-forward composition: camera low and close to the raised
+            # hand so the lit screen reads as a foreground shape, face soft
+            # behind it — the phone becomes the subject, not a prop.
+            "start_s": 5.0, "end_s": 7.4,
+            "cam_location": (phone_raised_loc[0] + 0.42, phone_raised_loc[1] - 0.30, phone_raised_loc[2] - 0.10),
+            "target_location": phone_raised_loc,
+            "focus_location": phone_raised_loc,
+            "lens_mm": 60,
         },
         {
-            "start_s": 8.5, "end_s": 11.5,
-            "cam_location": (0.35, -2.35, 1.2),
-            "target_location": head_target,
-            "focus_location": head_target,
-            "lens_mm": 55,
-            "cam_location_end": (0.4, -2.0, 1.15),
+            "start_s": 7.4, "end_s": 10.0,
+            "cam_location": (char_x + 0.55, char_y - 1.85, 1.18),
+            "target_location": phone_target,
+            "focus_location": phone_target,
+            "lens_mm": 75,
+        },
+        {
+            # Pull back out to a medium-wide — the release after four
+            # shots of pushing in, and the visual "isolation reveal".
+            "start_s": 10.0, "end_s": 13.5,
+            "cam_location": (char_x + 0.55, char_y - 1.9, 1.15),
+            "target_location": realization_target,
+            "focus_location": realization_target,
+            "lens_mm": 60,
+            "cam_location_end": (char_x + 1.5, char_y - 3.3, 1.5),
+            "target_location_end": (realization_target[0], realization_target[1] + 0.15, realization_target[2] - 0.05),
+            "focus_location_end": (realization_target[0], realization_target[1] + 0.15, realization_target[2] - 0.05),
         },
     ]
     camera_shots.animate_camera(cam, target, focus, cam_shots)

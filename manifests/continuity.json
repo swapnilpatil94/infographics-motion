@@ -143,6 +143,142 @@
         1.0,
         1.0
       ]
+    },
+    "window_glass": {
+      "location": [
+        -1.75,
+        1.2000000476837158,
+        1.5800000429153442
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "dimensions": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "curtain_l": {
+      "location": [
+        -1.7400000095367432,
+        0.6200000047683716,
+        1.5499999523162842
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "dimensions": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "curtain_r": {
+      "location": [
+        -1.7400000095367432,
+        1.7799999713897705,
+        1.5499999523162842
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "dimensions": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "pillow": {
+      "location": [
+        0.8999999761581421,
+        0.15000000596046448,
+        0.6100000143051147
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "dimensions": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "blanket": {
+      "location": [
+        0.8999999761581421,
+        -1.350000023841858,
+        0.6000000238418579
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "dimensions": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "wall_frame": {
+      "location": [
+        0.8999999761581421,
+        2.069999933242798,
+        1.600000023841858
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "dimensions": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "lamp_base": {
+      "location": [
+        -0.11999999731779099,
+        -0.05000000074505806,
+        0.574999988079071
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "dimensions": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "lamp_shade": {
+      "location": [
+        -0.11999999731779099,
+        -0.05000000074505806,
+        0.699999988079071
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "dimensions": [
+        1.0,
+        1.0,
+        1.0
+      ]
     }
   },
   "screen_direction_notes": "Window is on -X wall; character sits/lies on bed facing +X/-Y toward nightstand+phone. Camera stays on the -Y/-X side of the 180-degree line drawn between character and phone for Gate 1.",

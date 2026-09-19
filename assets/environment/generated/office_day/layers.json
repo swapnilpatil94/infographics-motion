@@ -1,0 +1,92 @@
+{
+  "order": [
+    "wall",
+    "decor",
+    "sky",
+    "window",
+    "blinds",
+    "plant",
+    "@char",
+    "desk_fg"
+  ],
+  "layers": {
+    "wall": {
+      "par": 0.6,
+      "depth": 3.2,
+      "svg": "assets/environment/generated/office_day/wall.svg",
+      "world": [
+        -160,
+        -160,
+        1400,
+        2240
+      ]
+    },
+    "decor": {
+      "par": 0.6,
+      "depth": 3.1,
+      "svg": "assets/environment/generated/office_day/decor.svg",
+      "world": [
+        60,
+        200,
+        620,
+        460
+      ]
+    },
+    "sky": {
+      "par": 0.4,
+      "depth": 3.4,
+      "emissive": true,
+      "svg": "assets/environment/generated/office_day/sky.svg",
+      "world": [
+        690,
+        210,
+        420,
+        640
+      ]
+    },
+    "window": {
+      "par": 0.62,
+      "depth": 3.0,
+      "svg": "assets/environment/generated/office_day/window.svg",
+      "world": [
+        660,
+        180,
+        480,
+        720
+      ]
+    },
+    "blinds": {
+      "par": 0.66,
+      "depth": 2.9,
+      "svg": "assets/environment/generated/office_day/blinds.svg",
+      "world": [
+        700,
+        220,
+        400,
+        130
+      ]
+    },
+    "plant": {
+      "par": 0.95,
+      "depth": 2.2,
+      "svg": "assets/environment/generated/office_day/plant.svg",
+      "world": [
+        780,
+        1000,
+        420,
+        620
+      ]
+    },
+    "desk_fg": {
+      "par": 1.08,
+      "depth": 0.9,
+      "svg": "assets/environment/generated/office_day/desk_fg.svg",
+      "world": [
+        -200,
+        1260,
+        1500,
+        700
+      ]
+    }
+  }
+}

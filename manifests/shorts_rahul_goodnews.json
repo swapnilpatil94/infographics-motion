@@ -1,0 +1,286 @@
+{
+  "version": 2,
+  "title": "rahul_good_news",
+  "format": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30
+  },
+  "seed": 11,
+  "character": {
+    "rig_spec": "assets/character/normalized/rahul_bust/rahul_bust_spec.json"
+  },
+  "narration": {
+    "voice": "Lekha",
+    "rate": 150,
+    "preroll": 1.0,
+    "gap": 0.42,
+    "tail": 1.15,
+    "segments": [
+      {
+        "id": "s1",
+        "text": "उस रात राहुल को बिल्कुल अंदाज़ा नहीं था"
+      },
+      {
+        "id": "s2",
+        "text": "कि उसके फोन पर आया वो छोटा सा मैसेज"
+      },
+      {
+        "id": "s3",
+        "text": "वो मैसेज उसकी सबसे अच्छी खबर थी।"
+      }
+    ]
+  },
+  "captions": [
+    {
+      "seg": "s1",
+      "chunks": [
+        "उस रात राहुल को",
+        "बिल्कुल अंदाज़ा नहीं था"
+      ]
+    },
+    {
+      "seg": "s2",
+      "chunks": [
+        "कि उसके फोन पर आया",
+        "वो छोटा सा मैसेज"
+      ]
+    },
+    {
+      "seg": "s3",
+      "chunks": [
+        "वो मैसेज उसकी",
+        "सबसे अच्छी खबर थी।"
+      ]
+    }
+  ],
+  "performance": [
+    {
+      "t": "0",
+      "do": "emotion",
+      "to": "tired",
+      "dur": 0
+    },
+    {
+      "t": "0.05",
+      "do": "look",
+      "target": "ceiling",
+      "dur": 0.01,
+      "amount": 0.8
+    },
+    {
+      "t": "s1.start+1.5",
+      "do": "look",
+      "target": "window",
+      "dur": 1.0,
+      "amount": 0.9,
+      "ease": "smooth"
+    },
+    {
+      "t": "s2.start-0.2",
+      "do": "look",
+      "target": "ahead",
+      "dur": 0.9,
+      "amount": 1.0,
+      "ease": "smooth"
+    },
+    {
+      "t": "s2.start+1.12",
+      "do": "startle",
+      "amount": 0.9
+    },
+    {
+      "t": "s2.start+1.14",
+      "do": "emotion",
+      "to": "blank",
+      "dur": 0.07
+    },
+    {
+      "t": "s2.start+1.2",
+      "do": "blink"
+    },
+    {
+      "t": "s2.start+1.3",
+      "do": "look",
+      "target": "phone",
+      "dur": 0.55
+    },
+    {
+      "t": "s2.end-0.35",
+      "do": "emotion",
+      "to": "serious",
+      "dur": 0.07
+    },
+    {
+      "t": "s3.start+0.15",
+      "do": "lean",
+      "dur": 1.0,
+      "amount": 1.0
+    },
+    {
+      "t": "s3.start+0.3",
+      "do": "emotion",
+      "to": "serious",
+      "dur": 0.07
+    },
+    {
+      "t": "s3.start+0.62",
+      "do": "emotion",
+      "to": "blank",
+      "dur": 0.07
+    },
+    {
+      "t": "s3.start+1.02",
+      "do": "emotion",
+      "to": "calm",
+      "dur": 0.07
+    },
+    {
+      "t": "s3.start+1.02",
+      "do": "startle",
+      "amount": 0.4
+    },
+    {
+      "t": "s3.start+1.1",
+      "do": "look",
+      "target": "down",
+      "dur": 0.5,
+      "amount": 0.5
+    }
+  ],
+  "events": [
+    {
+      "t": "s2.start+1.1",
+      "do": "notification"
+    },
+    {
+      "t": "s2.end-0.2",
+      "do": "drone",
+      "until": "s3.start+1.02"
+    }
+  ],
+  "coverage": [
+    {
+      "id": "A_wide",
+      "from": "0",
+      "to": "s2.start-0.3",
+      "camera": {
+        "from": {
+          "target": "room",
+          "zoom": 1.0
+        },
+        "to": {
+          "target": "room",
+          "zoom": 1.08,
+          "offset": [
+            0,
+            30
+          ]
+        },
+        "ease": "smooth",
+        "aperture": 7
+      }
+    },
+    {
+      "id": "B_medium",
+      "from": "s2.start-0.3",
+      "to": "s2.start+1.73",
+      "camera": {
+        "from": {
+          "target": "chest",
+          "zoom": 1.75,
+          "offset": [
+            10,
+            -150
+          ]
+        },
+        "to": {
+          "target": "chest",
+          "zoom": 1.9,
+          "offset": [
+            10,
+            -150
+          ]
+        },
+        "ease": "smooth",
+        "aperture": 14
+      }
+    },
+    {
+      "id": "C_phone_insert",
+      "from": "s2.start+1.73",
+      "to": "s2.end-0.35",
+      "insert": "phone_screen",
+      "camera": {
+        "from": {
+          "target": "chest",
+          "zoom": 1.75,
+          "offset": [
+            10,
+            -150
+          ]
+        },
+        "to": {
+          "target": "chest",
+          "zoom": 1.75,
+          "offset": [
+            10,
+            -150
+          ]
+        },
+        "ease": "smooth",
+        "aperture": 14
+      }
+    },
+    {
+      "id": "D_close",
+      "from": "s2.end-0.35",
+      "to": "s3.start+1.02",
+      "camera": {
+        "from": {
+          "target": "head",
+          "zoom": 2.0,
+          "offset": [
+            0,
+            95
+          ]
+        },
+        "to": {
+          "target": "head",
+          "zoom": 2.2,
+          "offset": [
+            0,
+            95
+          ]
+        },
+        "ease": "smooth",
+        "aperture": 22
+      }
+    },
+    {
+      "id": "E_ecu",
+      "from": "s3.start+1.02",
+      "to": "end",
+      "camera": {
+        "from": {
+          "target": "eyes",
+          "zoom": 3.05,
+          "offset": [
+            0,
+            25
+          ]
+        },
+        "to": {
+          "target": "eyes",
+          "zoom": 3.35,
+          "offset": [
+            0,
+            25
+          ]
+        },
+        "ease": "out",
+        "aperture": 28
+      }
+    }
+  ]
+}

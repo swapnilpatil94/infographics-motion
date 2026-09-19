@@ -1,0 +1,72 @@
+{
+  "version": "1.0",
+  "story_id": "gate3_rahul_notification",
+  "narration": "उस रात राहुल को बिल्कुल अंदाज़ा नहीं था कि उसके फोन पर आया वो छोटा सा मैसेज उसकी ज़िंदगी बदलने वाला था।",
+  "environment": "bedroom_night_svg",
+  "characters": {
+    "rahul": {
+      "rig_spec": "assets/character/normalized/rahul_rig/rahul_rig_spec.json"
+    }
+  },
+  "props": {
+    "phone": {"asset": "prop_phone"}
+  },
+  "shots": [
+    {
+      "shot_id": "A",
+      "start_s": 0.0,
+      "end_s": 2.6,
+      "intent": "alone_at_night",
+      "characters": [{"id": "rahul", "action": "idle", "emotion": "relaxed"}],
+      "camera": {"shot_type": "wide_3q", "movement": "static_hold"},
+      "phone_screen": "off"
+    },
+    {
+      "shot_id": "B",
+      "start_s": 2.6,
+      "end_s": 3.6,
+      "intent": "notification_arrives",
+      "characters": [{"id": "rahul", "action": "idle", "emotion": "relaxed"}],
+      "camera": {"shot_type": "wide_3q", "movement": "static_hold"},
+      "phone_screen": "ignite",
+      "sound_cues": [{"cue": "notification_ding", "at_s": 2.65}]
+    },
+    {
+      "shot_id": "C",
+      "start_s": 3.6,
+      "end_s": 5.0,
+      "intent": "notices_it",
+      "characters": [{"id": "rahul", "action": "look_at_phone", "emotion": "notice"}],
+      "camera": {"shot_type": "medium_push", "movement": "slow_push", "target": "rahul_head"},
+      "phone_screen": "on"
+    },
+    {
+      "shot_id": "D",
+      "start_s": 5.0,
+      "end_s": 6.4,
+      "intent": "curiosity",
+      "characters": [{"id": "rahul", "action": "look_at_phone", "emotion": "curious"}],
+      "camera": {"shot_type": "medium_close", "movement": "static_hold", "target": "rahul_head"},
+      "phone_screen": "on"
+    },
+    {
+      "shot_id": "E",
+      "start_s": 6.4,
+      "end_s": 8.0,
+      "intent": "unease",
+      "characters": [{"id": "rahul", "action": "look_at_phone", "emotion": "uneasy"}],
+      "camera": {"shot_type": "closeup", "movement": "static_hold", "target": "rahul_head"},
+      "phone_screen": "on"
+    },
+    {
+      "shot_id": "F",
+      "start_s": 8.0,
+      "end_s": 9.6,
+      "intent": "realization",
+      "characters": [{"id": "rahul", "action": "look_at_phone", "emotion": "realization"}],
+      "camera": {"shot_type": "closeup", "movement": "static_hold", "target": "rahul_head"},
+      "phone_screen": "on"
+    }
+  ],
+  "grease_pencil": ["window_light_rays", "dust_motes"]
+}

@@ -8,7 +8,13 @@ ensure_dirs()
 build(preview=True)
 scene = bpy.context.scene
 
-for label, frame in [("s01_wide", 12), ("s02_push", round(4.5 * FPS)), ("s03_notif", round(6.0 * FPS)), ("s04_reaction", round(9.5 * FPS))]:
+for label, frame in [
+    ("s01_wide", round(1.8 * FPS)),
+    ("s02_notice", round(4.4 * FPS)),
+    ("s03_phone", round(6.2 * FPS)),
+    ("s04_unease", round(8.8 * FPS)),
+    ("s05_pullback", round(12.8 * FPS)),
+]:
     scene.frame_set(frame)
     scene.render.filepath = os.path.join(PREVIEWS_DIR, f"gate1_still_{label}.png")
     bpy.ops.render.render(write_still=True)

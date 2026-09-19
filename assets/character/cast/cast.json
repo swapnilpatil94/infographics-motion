@@ -1,0 +1,93 @@
+{
+  "bodies": {
+    "device": "assets/character/cast/body_device.svg",
+    "coffee": "assets/character/cast/body_coffee.svg",
+    "explaining": "assets/character/cast/body_explaining.svg",
+    "laptop": "assets/character/cast/body_laptop.svg",
+    "paper": "assets/character/cast/body_paper.svg",
+    "pointing": "assets/character/cast/body_pointing.svg",
+    "crossed": "assets/character/cast/body_crossed.svg",
+    "shrug": "assets/character/cast/body_shrug.svg",
+    "gaming": "assets/character/cast/body_gaming.svg",
+    "neutral": "assets/character/cast/body_neutral.svg",
+    "hoodie": "assets/character/cast/body_hoodie.svg",
+    "hug": "assets/character/cast/body_hug.svg"
+  },
+  "characters": {
+    "rahul": {
+      "desc": "young man, short flat-top hair",
+      "heads": {
+        "calm": "assets/character/cast/rahul_head_calm.svg",
+        "smile": "assets/character/cast/rahul_head_smile.svg",
+        "happy": "assets/character/cast/rahul_head_happy.svg",
+        "tired": "assets/character/cast/rahul_head_tired.svg",
+        "blank": "assets/character/cast/rahul_head_blank.svg",
+        "serious": "assets/character/cast/rahul_head_serious.svg",
+        "concerned": "assets/character/cast/rahul_head_concerned.svg",
+        "uneasy": "assets/character/cast/rahul_head_uneasy.svg",
+        "shock": "assets/character/cast/rahul_head_shock.svg",
+        "fear": "assets/character/cast/rahul_head_fear.svg",
+        "awe": "assets/character/cast/rahul_head_awe.svg",
+        "angry": "assets/character/cast/rahul_head_angry.svg",
+        "suspicious": "assets/character/cast/rahul_head_suspicious.svg",
+        "contempt": "assets/character/cast/rahul_head_contempt.svg",
+        "driven": "assets/character/cast/rahul_head_driven.svg",
+        "explaining": "assets/character/cast/rahul_head_explaining.svg",
+        "solemn": "assets/character/cast/rahul_head_solemn.svg",
+        "cheeky": "assets/character/cast/rahul_head_cheeky.svg",
+        "blink": "assets/character/cast/rahul_head_blink.svg"
+      },
+      "head_base": "assets/character/cast/rahul_head_base.svg"
+    },
+    "priya": {
+      "desc": "young woman, long hair",
+      "heads": {
+        "calm": "assets/character/cast/priya_head_calm.svg",
+        "smile": "assets/character/cast/priya_head_smile.svg",
+        "happy": "assets/character/cast/priya_head_happy.svg",
+        "tired": "assets/character/cast/priya_head_tired.svg",
+        "blank": "assets/character/cast/priya_head_blank.svg",
+        "serious": "assets/character/cast/priya_head_serious.svg",
+        "concerned": "assets/character/cast/priya_head_concerned.svg",
+        "uneasy": "assets/character/cast/priya_head_uneasy.svg",
+        "shock": "assets/character/cast/priya_head_shock.svg",
+        "fear": "assets/character/cast/priya_head_fear.svg",
+        "awe": "assets/character/cast/priya_head_awe.svg",
+        "angry": "assets/character/cast/priya_head_angry.svg",
+        "suspicious": "assets/character/cast/priya_head_suspicious.svg",
+        "contempt": "assets/character/cast/priya_head_contempt.svg",
+        "driven": "assets/character/cast/priya_head_driven.svg",
+        "explaining": "assets/character/cast/priya_head_explaining.svg",
+        "solemn": "assets/character/cast/priya_head_solemn.svg",
+        "cheeky": "assets/character/cast/priya_head_cheeky.svg",
+        "blink": "assets/character/cast/priya_head_blink.svg"
+      },
+      "head_base": "assets/character/cast/priya_head_base.svg"
+    },
+    "uncle": {
+      "desc": "middle-aged man, grey hair, moustache, glasses",
+      "heads": {
+        "calm": "assets/character/cast/uncle_head_calm.svg",
+        "smile": "assets/character/cast/uncle_head_smile.svg",
+        "happy": "assets/character/cast/uncle_head_happy.svg",
+        "tired": "assets/character/cast/uncle_head_tired.svg",
+        "blank": "assets/character/cast/uncle_head_blank.svg",
+        "serious": "assets/character/cast/uncle_head_serious.svg",
+        "concerned": "assets/character/cast/uncle_head_concerned.svg",
+        "uneasy": "assets/character/cast/uncle_head_uneasy.svg",
+        "shock": "assets/character/cast/uncle_head_shock.svg",
+        "fear": "assets/character/cast/uncle_head_fear.svg",
+        "awe": "assets/character/cast/uncle_head_awe.svg",
+        "angry": "assets/character/cast/uncle_head_angry.svg",
+        "suspicious": "assets/character/cast/uncle_head_suspicious.svg",
+        "contempt": "assets/character/cast/uncle_head_contempt.svg",
+        "driven": "assets/character/cast/uncle_head_driven.svg",
+        "explaining": "assets/character/cast/uncle_head_explaining.svg",
+        "solemn": "assets/character/cast/uncle_head_solemn.svg",
+        "cheeky": "assets/character/cast/uncle_head_cheeky.svg",
+        "blink": "assets/character/cast/uncle_head_blink.svg"
+      },
+      "head_base": "assets/character/cast/uncle_head_base.svg"
+    }
+  }
+}

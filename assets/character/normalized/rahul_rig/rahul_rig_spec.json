@@ -1,0 +1,27 @@
+{
+  "character_id": "rahul",
+  "base_svg": "assets/character/raw/open_peeps/extracted/Flat Assets/Separate Atoms/a person/sitting.svg",
+  "hair_atom": "assets/character/raw/open_peeps/extracted/Flat Assets/Separate Atoms/head/Flat Top.svg",
+  "granularity": {
+    "body_pose": "rigid \u2014 one inseparable silhouette per pose atom, no per-limb bones",
+    "head": "rigid \u2014 rotatable independently of the body (turn/tilt), not deformable",
+    "face": "rigid per expression \u2014 eyes/eyebrows/mouth are not independently addressable"
+  },
+  "parts": {
+    "body_pose": {
+      "variants": {
+        "default": "assets/character/normalized/rahul_rig/rahul_body.svg"
+      }
+    },
+    "face": {
+      "variants": {
+        "relaxed": "assets/character/normalized/rahul_rig/rahul_head_relaxed.svg",
+        "notice": "assets/character/normalized/rahul_rig/rahul_head_notice.svg",
+        "curious": "assets/character/normalized/rahul_rig/rahul_head_curious.svg",
+        "uneasy": "assets/character/normalized/rahul_rig/rahul_head_uneasy.svg",
+        "realization": "assets/character/normalized/rahul_rig/rahul_head_realization.svg",
+        "blink": "assets/character/normalized/rahul_rig/rahul_head_blink.svg"
+      }
+    }
+  }
+}

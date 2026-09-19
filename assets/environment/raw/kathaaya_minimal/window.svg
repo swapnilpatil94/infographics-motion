@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="320px" height="420px" viewBox="0 0 320 420" version="1.1" xmlns="http://www.w3.org/2000/svg">
+<title>environment/window</title>
+<g id="environment/window">
+  <rect x="10" y="10" width="300" height="400" rx="6" fill="#dfe6f2" />
+  <path d="M160,10 L160,410 M10,210 L310,210" stroke="#0d0c0b" stroke-width="4" />
+  <rect x="10" y="10" width="300" height="400" rx="6" fill="none" stroke="#0d0c0b" stroke-width="6" stroke-linejoin="round" />
+</g>
+</svg>
