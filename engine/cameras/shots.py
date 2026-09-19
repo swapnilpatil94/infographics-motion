@@ -61,3 +61,20 @@ def animate_camera(cam, target, focus, shots):
             focus.location = shot.get("focus_location_end", shot["focus_location"])
             focus.keyframe_insert(data_path="location", frame=end_frame)
 
+    # Cinematic easing: camera and focus should accelerate/decelerate into
+    # shots instead of moving linearly between hard keyframes.
+    for obj in (cam, target, focus):
+        if not obj.animation_data or not obj.animation_data.action:
+            continue
+        for fc in obj.animation_data.action.fcurves:
+            for kp in fc.keyframe_points:
+                kp.interpolation = "BEZIER"
+                kp.handle_left_type = "AUTO_CLAMPED"
+                kp.handle_right_type = "AUTO_CLAMPED"
+    if cam.data.animation_data and cam.data.animation_data.action:
+        for fc in cam.data.animation_data.action.fcurves:
+            for kp in fc.keyframe_points:
+                kp.interpolation = "BEZIER"
+                kp.handle_left_type = "AUTO_CLAMPED"
+                kp.handle_right_type = "AUTO_CLAMPED"
+
