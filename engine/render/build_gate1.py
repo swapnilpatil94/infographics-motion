@@ -73,10 +73,44 @@ def build(preview=False):
         (1, 0.0), (ignite_frame - 1, 0.0), (ignite_frame + 6, 4.0),
     ])
 
+    pose_by_shot = {
+        "S01": "base",
+        "S02": "notice",
+        "S03": "phone",
+        "S04": "phone",
+        "S05": "realization",
+    }
+    previous_pose = "base"
     for shot in shot_plan["shots"]:
-        frame = round(shot["start_s"] * FPS) + 1
+        start_s = shot["start_s"]
+        end_s = shot["end_s"]
+        frame = round(start_s * FPS) + 1
         emotion = shot["characters"][0]["emotion"]
+        pose_name = pose_by_shot.get(shot["shot_id"], previous_pose)
+
+        # Character acting is now a temporal sequence, not a single pose swap.
+        # The short anticipation window makes the change readable while the
+        # micro-acting layer supplies breathing/blink/glance/settle.
+        transition_start = max(0.0, start_s - 0.20)
+        transition_end = min(end_s, start_s + 0.28)
+        rahul.keyframe_pose_transition(
+            char["armature"], previous_pose, pose_name,
+            transition_start, transition_end
+        )
         rahul.keyframe_emotion(char["face"], emotion, frame)
+        if shot["shot_id"] != "S01":
+            rahul.keyframe_motion_grammar(
+                char["armature"], char["face"],
+                start_s, end_s,
+                intensity=0.65 if shot["shot_id"] in ("S02", "S03") else 0.8
+            )
+        else:
+            from engine.animation import motion_grammar
+            motion_grammar.add_breathing(
+                char["armature"], start_s, end_s,
+                amplitude_deg=0.45, cycles=1.25, fps=FPS
+            )
+        previous_pose = pose_name
 
     head_pos = (char["armature"].matrix_world @ char["armature"].pose.bones["head"].matrix).translation
     chest_pos = (char["armature"].matrix_world @ char["armature"].pose.bones["chest"].matrix).translation
