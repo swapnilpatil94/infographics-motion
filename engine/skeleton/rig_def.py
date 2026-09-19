@@ -23,8 +23,8 @@ AGE_K = {"young": 0.97, "adult": 1.0, "elder": 0.94}
 REST = dict(arm=7.0, elbow=11.0, wrist=8.0, thigh=3.0, knee=-7.0)
 
 
-VIEWS = ("profile", "three_quarter", "front")
-VIEW_LAT = dict(profile=(0.0, 0.0, 0.0), three_quarter=(0.24, 0.10, 0.10), front=(0.50, 0.26, 0.35))   # (shoulder, hip) lateral offset as a fraction of torso width; face shift
+VIEWS = ("profile", "three_quarter", "front", "back")
+VIEW_LAT = dict(profile=(0.0, 0.0, 0.0), three_quarter=(0.24, 0.10, 0.10), front=(0.50, 0.26, 0.35), back=(0.50, 0.26, 0.0))   # (shoulder, hip) lateral offset as a fraction of torso width; face shift
 
 
 def _derive(P, view="profile"):
@@ -151,7 +151,7 @@ IK = [("IK_HAND_L", "ARM_L", "FOREARM_L", "HAND_L", (-11.0, 150.0)), ("IK_HAND_R
 
 # draw order back -> front. (part, bone, layer_group). Face feature meshes sit between skull and hair.
 PART_ORDER = ["upperarm_L", "forearm_L", "hand_L", "thigh_L", "shin_L", "foot_L", "neck", "pelvis", "backpack", "thigh_R", "shin_R", "foot_R", "skirt", "torso",
-              "skull", "nose", "@face", "hair", "upperarm_R", "forearm_R", "hand_R", "bag", "phone", "fingers"]
+              "skull", "nose", "@face", "hair", "upperarm_R", "forearm_R", "bag", "phone", "hand_R", "fingers"]
 PART_BONE = dict(upperarm_L="ARM_L", forearm_L="FOREARM_L", hand_L="HAND_L", thigh_L="THIGH_L", shin_L="SHIN_L", foot_L="FOOT_L", neck="NECK", pelvis="PELVIS",
                  thigh_R="THIGH_R", shin_R="SHIN_R", foot_R="FOOT_R", torso="CHEST", skull="HEAD", nose="HEAD", hair="HAIR", upperarm_R="ARM_R",
                  forearm_R="FOREARM_R", hand_R="HAND_R", backpack="CHEST", skirt="PELVIS", bag="CHEST")

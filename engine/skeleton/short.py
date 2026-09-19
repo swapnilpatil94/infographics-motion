@@ -65,7 +65,7 @@ class Actor:
                 if ids is not None:
                     m = {}
                     for i, name in enumerate(PA2.HAND_POSES):
-                        m[i] = poses.index(name) if name in poses else poses.index({"grab": "closed", "fist": "closed", "hold_phone": "closed", "hold_card": "gesture", "hold_money": "gesture", "point": "gesture", "palm_up": "open"}.get(name, "open"))
+                        m[i] = poses.index(name) if name in poses else poses.index({"grab": "closed", "fist": "closed", "hold_phone": "closed", "hold_card": "gesture", "hold_money": "gesture", "point": "gesture", "palm_up": "open", "pinch": "gesture", "hold_pen": "point", "hold_cup": "closed", "type": "relaxed", "touch_screen": "point", "push": "open", "pull": "closed", "wave": "open", "palm_down": "relaxed"}.get(name, "open"))
                     out[f"hand_{side}_pose"] = [float(m[int(round(v))]) for v in ids]
         return out
 
@@ -480,7 +480,7 @@ class SkeletonShot:
         self.scene.camera = cam
         ph = self.layers.get("phone_free")
         if ph is not None:
-            ph.visible = t < film.t_grab
+            ph.visible = t < film.t_grab or t >= film.t_place
         film.ctx.post.exposure = self.exposure
         img = self.scene.render(t, f, 1.0, insert=None, dust=self.dust, fx=self.fx)
         return film.ctx.extra_vignette(img, self.vig) if hasattr(film.ctx, "extra_vignette") else img
@@ -496,6 +496,7 @@ class SkeletonFilm(FR.Renderer):
         actor_layer.film = self
         self.set_id = EF.resolve(plan["environment"])
         self.t_grab = min([e[0] for e in actors["A"].perf.events if e[1] == "phone_grab"] or [1e9])
+        self.t_place = min([e[0] for e in actors["A"].perf.events if e[1] == "phone_place"] or [1e9])
         self.hall_t = plan.get("hall_on", 1e9)
 
     def rim_params(self, t):
@@ -691,8 +692,11 @@ def render_film(plan, out_dir, log=print, skip_blender=False, samples=10, stills
     FQC.contact_sheet(film, plan, os.path.join(out_dir, "contact_sheet.png"), cols=5, w=240)
     json.dump(plan, open(os.path.join(out_dir, "plan.json"), "w"), ensure_ascii=False, indent=1)
     if qc == "auto":
-        qc = "v2" if plan.get("version", 1) >= 2 else "v1"
-    if qc == "v2":
+        qc = "v3" if plan.get("version", 1) >= 3 else ("v2" if plan.get("version", 1) >= 2 else "v1")
+    if qc == "v3":
+        from engine.skeleton import qc_v3
+        qc = qc_v3.run(plan, actors, cam, rep, film, out_mp4, stats, frames_dir, log)
+    elif qc == "v2":
         from engine.skeleton import qc_v2
         qc = qc_v2.run(plan, actors, cam, rep, film, out_mp4, stats, frames_dir, log)
     elif qc == "v1":

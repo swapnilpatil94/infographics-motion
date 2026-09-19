@@ -1,5 +1,5 @@
 source page: https://opengameart.org/content/puppet-base-rigged
-fetched: 2026-09-19T18:38:06.874585+00:00
+fetched: 2026-09-19T20:03:23.035826+00:00
 matched licence text:
   - cc0.png' alt='' title=''>
   - CC0

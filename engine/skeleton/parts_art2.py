@@ -7,6 +7,7 @@ Heads, hair, nose and the ink style: Open Peeps (CC0). Everything else is own-wo
 """
 import hashlib
 import json
+import re
 import math
 import os
 import random
@@ -23,8 +24,9 @@ GEN = os.path.join(ROOT, "assets/character/skeleton/generated_v2")
 INK = "#000000"
 OW = 6.0
 M = 44.0
-HAND_POSES = ["open", "closed", "point", "grab", "hold_phone", "hold_card", "hold_money", "gesture", "palm_up", "fist"]
-BASIC_POSES = ["open", "closed", "gesture"]
+from engine.skeleton import hands3 as H3   # noqa: E402
+HAND_POSES = list(H3.POSES)                                                          # 20 poses per hand (v3); the first ten keep their v2 ids
+BASIC_POSES = list(H3.BASIC)
 PROP_HELD = {"hold_phone": "phone", "hold_card": "card", "hold_money": "money"}
 
 TOP_STYLE = {
@@ -177,7 +179,10 @@ def neck(k):
 
 def torso(k):
     """Profile: side-on shirt with forward chest bulge. Three-quarter / front: wider, symmetric shirt block. All tops share the outline builder; details come from TOP_STYLE."""
-    P, ts = k.P, k.ts
+    P, ts = k.P, dict(k.ts)
+    back = k.view == "back"
+    if back:                                                                       # seen from behind: no placket, buttons, pocket, zip, collar opening
+        ts.update(collar="band", buttons=False, placket=False, pocket=False, zip=False, kangaroo=False, opening=False)
     kk, Lt = P["k"], P["torso"]
     tw = P["torso_w"] * (ts["baggy"] ** 0.6)
     if k.view == "profile":
@@ -407,6 +412,8 @@ def head_layers(k):
     svg = open(os.path.join(ROOT, D1.head_svg_path(v1)), encoding="utf-8").read()
     skin_hex = d2["skin"]["hex"]
     skull = svg.replace('fill="#000000"', 'fill="none"')
+    if k.view == "back":                                                          # the back of the head is hair-coloured all over
+        skull = re.sub(r'fill="(#[0-9a-fA-F]{6})"', lambda m: 'fill="none"' if m.group(1).lower() == "#000000" else f'fill="{d2["hair"]["color"]}"', svg)   # every non-ink fill (skin, white) -> hair
     hair = svg.replace(f'fill="{skin_hex}"', 'fill="none"').replace('fill="#000000"', f'fill="{d2["hair"]["color"]}"')
     ear = ""
     if "earrings" in k.acc:
@@ -431,7 +438,7 @@ def nose(k):
 
 
 # ------------------------------------------------------------------------------------------------------------------ bake
-ART_VERSION = "art-v2.5"                                                             # bump whenever any part art changes (bake cache key)
+ART_VERSION = "art-v3.4"                                                             # bump whenever any part art changes (bake cache key)
 
 
 def _key(d2, view, hand_set):
@@ -472,14 +479,22 @@ def bake2(d2, view="profile", hand_set="full"):
     if "bag" in k.acc:
         save("bag", bag(k))
     poses = HAND_POSES if hand_set == "full" else BASIC_POSES
+    anchors = {}
     for pose in poses:
-        art = hand_pose(k, pose, "R")
         for side in ("L", "R"):
-            save(f"hand_{side}_{pose}", art)
+            mirror = (side == "L" and view != "profile")                              # profile: both thumbs face forward; 3/4 and front: true left/right hands
+            if pose in H3.HARVEST:
+                im, pv, an = H3.harvested_png(k, pose, mirror, TEX)
+                name = f"hand_{side}_{pose}"
+                im.save(os.path.join(d, name + ".png"))
+                parts[name] = dict(png=os.path.relpath(os.path.join(d, name + ".png"), ROOT), pivot=[float(pv[0]), float(pv[1])], size=[im.width, im.height], res=TEX)
+            else:
+                svg, pv, an = H3.hand_svg(k, pose, mirror)
+                save(f"hand_{side}_{pose}", (svg, pv))
+            anchors[pose] = an
     save("phone", PA.phone(P, None, dict(bottom=k.bot_c)))
     save("card", prop_card(k))
     save("money", prop_money(k))
-    save("fingers", fingers_overlay(k, "hold_phone"))
     skull, hair = head_layers(k)
     hz = TEX * P["hs"]
     save("skull", (skull, R.NECK_PIVOT_CANVAS), zoom=hz)
@@ -488,13 +503,14 @@ def bake2(d2, view="profile", hand_set="full"):
     save("nose", (nose(k), (R.NECK_PIVOT_CANVAS[0] - reg[0], R.NECK_PIVOT_CANVAS[1] - reg[1])), zoom=hz)
     et, bt, mt = dna2.EYE_TYPES[d2["eyes"]], dna2.BROW_TYPES[d2["eyebrows"]], dna2.MOUTH_TYPES[d2["mouth"]]
     man = dict(version=2, id=key, dir=os.path.relpath(d, ROOT), view=view, P=P, parts=parts, dna_id=d2["id"], skin=d2["skin"]["hex"], hand_poses=poses,
+               hand_anchors={p_: {kk: (list(vv) if isinstance(vv, tuple) else vv) for kk, vv in a_.items()} for p_, a_ in anchors.items()},
                face_style=dict(ex=et[0], ey=et[1], tilt=et[2], lash=et[3], brow=bt[0], arch=bt[1], mouth=mt[0], lip=mt[1]),
                wardrobe=dict(d2["wardrobe"]), fb=dict(height_scale=d2["body"]["height"]))
     json.dump(man, open(man_path, "w"), indent=1)
     return man
 
 
-REQUIRED_PARTS = ["upperarm_L", "forearm_L", "thigh_L", "shin_L", "foot_L", "upperarm_R", "forearm_R", "thigh_R", "shin_R", "foot_R", "pelvis", "torso", "neck", "skull", "hair", "nose", "phone", "card", "money", "fingers"]
+REQUIRED_PARTS = ["upperarm_L", "forearm_L", "thigh_L", "shin_L", "foot_L", "upperarm_R", "forearm_R", "thigh_R", "shin_R", "foot_R", "pelvis", "torso", "neck", "skull", "hair", "nose", "phone", "card", "money"]
 
 
 def verify(man):

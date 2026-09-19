@@ -1,0 +1,9 @@
+source page: https://opengameart.org/content/free-cc0-modular-animated-vector-characters-2d
+fetched: 2026-09-19T20:03:47.984889+00:00
+matched licence text:
+  - cc0-modular-animated-vector-characters-2d" />
+  - cc0-modular-animated-vector-characters-2d" />
+  - CC0 Modular Animated Vector Characters 2D" />
+  - cc0_vector_2d_game_characters.gif" />
+  - CC0 Modular Animated Vector Characters 2D" />
+  - CC0 Modular Animated Vector Characters 2D | OpenGameArt.org

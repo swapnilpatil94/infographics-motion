@@ -1,5 +1,5 @@
 source page: https://www.blendernation.com/2019/02/13/free-download-mike-fully-rigged-character-cc-0/
-fetched: 2026-09-19T18:38:10.976051+00:00
+fetched: 2026-09-19T20:03:28.309654+00:00
 matched licence text:
   - CC-0) - BlenderNation
   - cc-0/ >

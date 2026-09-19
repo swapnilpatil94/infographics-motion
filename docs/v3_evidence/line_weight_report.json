@@ -1,0 +1,141 @@
+{
+ "parts": {
+  "hand_R_hold_phone": {
+   "values": [
+    3.6,
+    3.6,
+    3.6,
+    3.6,
+    4.0,
+    4.0
+   ],
+   "median": 3.6
+  },
+  "hand_R_open": {
+   "values": [
+    4.0,
+    4.0,
+    4.0,
+    4.0,
+    4.0,
+    4.0
+   ],
+   "median": 4.0
+  },
+  "hand_R_fist": {
+   "values": [
+    4.2,
+    4.2,
+    4.0,
+    4.0,
+    4.0,
+    4.0
+   ],
+   "median": 4.0
+  },
+  "hand_R_point": {
+   "values": [
+    4.0,
+    4.0,
+    4.0,
+    4.0,
+    4.0,
+    4.0
+   ],
+   "median": 4.0
+  },
+  "hand_L_relaxed": {
+   "values": [
+    4.2,
+    4.0,
+    4.0,
+    4.0,
+    4.0,
+    4.0
+   ],
+   "median": 4.0
+  },
+  "forearm_R": {
+   "values": [
+    6.0,
+    6.0,
+    6.0,
+    6.0,
+    6.0,
+    6.0
+   ],
+   "median": 6.0
+  },
+  "upperarm_R": {
+   "values": [
+    6.0,
+    6.0,
+    6.0,
+    6.0,
+    6.0,
+    6.0
+   ],
+   "median": 6.0
+  },
+  "thigh_R": {
+   "values": [
+    6.0,
+    6.0,
+    6.0,
+    6.0,
+    6.0,
+    6.0
+   ],
+   "median": 6.0
+  },
+  "shin_R": {
+   "values": [
+    6.0,
+    6.0,
+    6.0,
+    6.0,
+    6.0,
+    6.0
+   ],
+   "median": 6.0
+  },
+  "torso": {
+   "values": [
+    6.0,
+    6.0,
+    6.0,
+    6.0,
+    6.0,
+    6.0
+   ],
+   "median": 6.0
+  },
+  "neck": {
+   "values": [
+    6.0,
+    6.0,
+    6.0,
+    6.0,
+    6.0,
+    6.0
+   ],
+   "median": 6.0
+  },
+  "pelvis": {
+   "values": [
+    6.0,
+    6.0,
+    6.0,
+    6.0,
+    6.0,
+    6.0
+   ],
+   "median": 6.0
+  }
+ },
+ "big_target_px": 6.0,
+ "small_target_px": 4.0,
+ "big_ok": true,
+ "hands_ok": true,
+ "hands_vs_limbs_ratio": 0.67
+}

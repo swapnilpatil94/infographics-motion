@@ -1,0 +1,269 @@
+{
+ "cases": [
+  {
+   "character": 0,
+   "case": "front",
+   "components": 1,
+   "area": 40440,
+   "bbox": [
+    153,
+    528
+   ],
+   "fill_ratio": 0.501
+  },
+  {
+   "character": 0,
+   "case": "3q",
+   "components": 1,
+   "area": 35934,
+   "bbox": [
+    141,
+    526
+   ],
+   "fill_ratio": 0.485
+  },
+  {
+   "character": 0,
+   "case": "side",
+   "components": 1,
+   "area": 35777,
+   "bbox": [
+    143,
+    526
+   ],
+   "fill_ratio": 0.476
+  },
+  {
+   "character": 0,
+   "case": "back",
+   "components": 1,
+   "area": 40766,
+   "bbox": [
+    152,
+    526
+   ],
+   "fill_ratio": 0.51
+  },
+  {
+   "character": 0,
+   "case": "walking",
+   "components": 1,
+   "area": 41380,
+   "bbox": [
+    159,
+    522
+   ],
+   "fill_ratio": 0.499
+  },
+  {
+   "character": 0,
+   "case": "sitting",
+   "components": 1,
+   "area": 33697,
+   "bbox": [
+    234,
+    419
+   ],
+   "fill_ratio": 0.344
+  },
+  {
+   "character": 0,
+   "case": "reaching",
+   "components": 1,
+   "area": 35900,
+   "bbox": [
+    225,
+    526
+   ],
+   "fill_ratio": 0.303
+  },
+  {
+   "character": 0,
+   "case": "holding phone",
+   "components": 1,
+   "area": 36328,
+   "bbox": [
+    152,
+    526
+   ],
+   "fill_ratio": 0.454
+  },
+  {
+   "character": 1,
+   "case": "front",
+   "components": 1,
+   "area": 35472,
+   "bbox": [
+    141,
+    495
+   ],
+   "fill_ratio": 0.508
+  },
+  {
+   "character": 1,
+   "case": "3q",
+   "components": 1,
+   "area": 31043,
+   "bbox": [
+    128,
+    493
+   ],
+   "fill_ratio": 0.492
+  },
+  {
+   "character": 1,
+   "case": "side",
+   "components": 1,
+   "area": 31218,
+   "bbox": [
+    138,
+    493
+   ],
+   "fill_ratio": 0.459
+  },
+  {
+   "character": 1,
+   "case": "back",
+   "components": 1,
+   "area": 35957,
+   "bbox": [
+    142,
+    493
+   ],
+   "fill_ratio": 0.514
+  },
+  {
+   "character": 1,
+   "case": "walking",
+   "components": 1,
+   "area": 38080,
+   "bbox": [
+    169,
+    489
+   ],
+   "fill_ratio": 0.461
+  },
+  {
+   "character": 1,
+   "case": "sitting",
+   "components": 1,
+   "area": 31250,
+   "bbox": [
+    233,
+    398
+   ],
+   "fill_ratio": 0.337
+  },
+  {
+   "character": 1,
+   "case": "reaching",
+   "components": 1,
+   "area": 30763,
+   "bbox": [
+    130,
+    492
+   ],
+   "fill_ratio": 0.481
+  },
+  {
+   "character": 1,
+   "case": "holding phone",
+   "components": 1,
+   "area": 33858,
+   "bbox": [
+    155,
+    493
+   ],
+   "fill_ratio": 0.443
+  },
+  {
+   "character": 2,
+   "case": "front",
+   "components": 1,
+   "area": 50883,
+   "bbox": [
+    181,
+    533
+   ],
+   "fill_ratio": 0.527
+  },
+  {
+   "character": 2,
+   "case": "3q",
+   "components": 1,
+   "area": 41151,
+   "bbox": [
+    142,
+    531
+   ],
+   "fill_ratio": 0.546
+  },
+  {
+   "character": 2,
+   "case": "side",
+   "components": 1,
+   "area": 37590,
+   "bbox": [
+    133,
+    531
+   ],
+   "fill_ratio": 0.532
+  },
+  {
+   "character": 2,
+   "case": "back",
+   "components": 1,
+   "area": 51502,
+   "bbox": [
+    181,
+    531
+   ],
+   "fill_ratio": 0.536
+  },
+  {
+   "character": 2,
+   "case": "walking",
+   "components": 1,
+   "area": 46331,
+   "bbox": [
+    151,
+    531
+   ],
+   "fill_ratio": 0.578
+  },
+  {
+   "character": 2,
+   "case": "sitting",
+   "components": 1,
+   "area": 35591,
+   "bbox": [
+    236,
+    416
+   ],
+   "fill_ratio": 0.363
+  },
+  {
+   "character": 2,
+   "case": "reaching",
+   "components": 1,
+   "area": 40593,
+   "bbox": [
+    224,
+    531
+   ],
+   "fill_ratio": 0.341
+  },
+  {
+   "character": 2,
+   "case": "holding phone",
+   "components": 1,
+   "area": 41747,
+   "bbox": [
+    162,
+    531
+   ],
+   "fill_ratio": 0.485
+  }
+ ],
+ "all_single_connected_body": true
+}

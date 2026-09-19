@@ -51,7 +51,7 @@ class RigTests(unittest.TestCase):
         self.assertEqual({c[0] for c in R.IK}, {"IK_HAND_L", "IK_HAND_R", "IK_FOOT_L", "IK_FOOT_R"})
 
     def test_views_offset_limbs_laterally(self):
-        P0, P1, P2 = (R.proportions_v2(d2(3), v) for v in R.VIEWS)
+        P0, P1, P2 = (R.proportions_v2(d2(3), v) for v in R.VIEWS[:3])
         self.assertEqual(P0["lat_s"], 0.0)
         self.assertGreater(P1["lat_s"], 5)
         self.assertGreater(P2["lat_s"], P1["lat_s"])
@@ -115,8 +115,10 @@ class MotionCoverageTests(unittest.TestCase):
         for e in ("neutral", "curious", "confused", "worried", "fear", "surprise", "realization", "relief", "sadness", "anger", "determination"):
             self.assertIn(e, M.EMO, e)
 
-    def test_hand_pose_set_is_the_ten_required(self):
-        self.assertEqual(set(PA2.HAND_POSES), {"open", "closed", "point", "grab", "hold_phone", "hold_card", "hold_money", "gesture", "palm_up", "fist"})
+    def test_hand_pose_library_has_the_twenty_required_poses(self):
+        need = {"open", "relaxed", "fist", "point", "pinch", "grab", "hold_phone", "hold_card", "hold_money", "hold_pen", "hold_cup", "type", "touch_screen", "push", "pull", "wave", "palm_up", "palm_down", "gesture", "closed"}
+        self.assertEqual(set(PA2.HAND_POSES), need)
+        self.assertEqual(len(PA2.HAND_POSES), 20)
 
     def test_no_frozen_character_during_required_actions(self):
         for act, kw in (("idle", {}), ("walk", dict(speed=200)), ("reach", dict(target="PHONE")), ("gesture", {}), ("read_phone", {}), ("talk", {}), ("breathe", {})):
@@ -133,14 +135,23 @@ class MotionCoverageTests(unittest.TestCase):
                 best = max(best, run)
             self.assertLess(best, 8, f"{act}: frozen for {best} consecutive frames (>0.25 s)")
 
-    def test_hand_target_accuracy_at_contact(self):
+    def test_phone_grip_contact_is_exact(self):
+        """the wrist solved for the PHONE grip puts the phone (as the real hand drawing holds it) on the target: no floating hand, no near miss"""
+        from engine.skeleton import hands3 as H3
         p = perf()
-        end = M.perform(p, "reach", 0.3, 1.2, "confident", 0.6, target="PHONE")
-        P = p.P
-        tx, ty = p.target_rig("PHONE", 1.5)
-        tgt = (tx - 18 * P["k"], ty + 36 * P["k"])
-        got = (p.v("hand_R_x", end), p.v("hand_R_y", end))
-        self.assertLess(math.dist(got, tgt), 3.0)
+        end = M.perform(p, "reach", 0.3, 1.2, "confident", 0.6, target="PHONE", grip="grab")
+        ev = [e for e in p.events if e[1] == "phone_contact"]
+        self.assertTrue(ev)
+        C = ev[0][2]["centre"]
+        wrist = (p.v("hand_R_x", end), p.v("hand_R_y", end))
+        rot = p.v("hand_R_rot", end)
+        sh = p.shoulder(end)
+        _, _, a1, a2 = R.two_bone(sh, wrist, p.P["upper_arm"], p.P["forearm"], -1)
+        H = math.radians(a2 + R.REST["wrist"] + rot)
+        lx, ly, th = H3.phone_anchor(p.P)
+        centre = (wrist[0] + lx * math.cos(H) + ly * math.sin(H), wrist[1] + lx * math.sin(H) - ly * math.cos(H))
+        self.assertLess(math.dist(centre, C), 2.5)
+        self.assertAlmostEqual((a2 + R.REST["wrist"] + rot) - th, -90.0, delta=1.0)                # the phone lies flat at contact
 
     def test_eye_target_accuracy_bearing_and_saturation(self):
         p = perf()
@@ -243,8 +254,8 @@ class CharacterFactoryTests(unittest.TestCase):
         m = [PA2.bake2(d, v, "basic") for v in R.VIEWS]
         self.assertEqual({x["dna_id"] for x in m}, {d["id"]})
         self.assertEqual({x["view"] for x in m}, set(R.VIEWS))
-        self.assertEqual(len({x["id"] for x in m}), 3)
-        skull = {hashlib.sha1(open(os.path.join(ROOT, x["parts"]["skull"]["png"]), "rb").read()).hexdigest() for x in m}
+        self.assertEqual(len({x["id"] for x in m}), len(R.VIEWS))
+        skull = {hashlib.sha1(open(os.path.join(ROOT, x["parts"]["skull"]["png"]), "rb").read()).hexdigest() for x in m if x["view"] != "back"}
         self.assertEqual(len(skull), 1)                                              # the same head, not a new person
 
     def test_no_missing_body_part_and_missing_asset_detection(self):

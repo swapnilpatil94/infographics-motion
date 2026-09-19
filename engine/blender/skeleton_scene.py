@@ -197,6 +197,12 @@ def build_char(spec, idx):
         add_textured_part(c, pname, i)
     add_face(c, order.index("@face"))
     add_phone(c, order.index("phone"))
+    if man.get("view") == "back":                                                          # seen from behind: no face features, no nose
+        for ob in c.face.values():
+            ob.scale = (0.0001, 0.0001, 0.0001)
+        if "nose" in c.parts:
+            c.parts["nose"].scale = (0.0001, 0.0001, 0.0001)
+    c.all_objs = list(c.parts.values()) + list(c.face.values()) + [ob for _, ob in c.handposes["L"]] + [ob for _, ob in c.handposes["R"]]
     return c
 
 
@@ -252,8 +258,8 @@ def add_textured_part(c, pname, order_i, extra=None, bone_override=None):
     uvs = [(0, 1), (1, 1), (1, 0), (0, 0)]
     verts = []
     for (x, y) in corners:
-        rx = x * math.cos(a) + y * math.sin(a)                 # forward (clockwise) rotation by a about the pivot
-        ry = -x * math.sin(a) + y * math.cos(a)
+        rx = x * math.cos(a) - y * math.sin(a)                 # rest orientation: a hanging limb tilted FORWARD by a (counter-clockwise, y up) - matches the bone's rest direction
+        ry = x * math.sin(a) + y * math.cos(a)                 # (v2 rotated the art the other way: parts sat 2a off their bones, e.g. the forearm 36 deg)
         verts.append(to3((jx + rx, jy + ry), c.facing, 0.0))
     # stage-local -> object at stage origin => vertices are stage-local
     ob = _obj_from_mesh(pname + "_" + c.spec["id"], verts, [(0, 1, 2, 3)], uvs)
@@ -313,13 +319,14 @@ def add_face(c, order_i):
         e = R.head_point(P, R.FACE[ek])
         sg = -1 if side == "L" else 1
         t = tilt * sg
-        wide = _rot(ellipse(e[0], e[1], eye_rx * 2.4, eye_ry * 1.55), e[0], e[1], t)
-        small = _rot(ellipse(e[0], e[1], eye_rx * 0.4, eye_ry * 0.32), e[0], e[1], t)
-        c.face["eyewhite_" + side] = flat_mesh(c, "eyewhite_" + side, small, "#ffffff", "EYE_" + side, order_i, shape_keys={"wide": wide})
-        c.face["eyering_" + side] = flat_mesh(c, "eyering_" + side, _rot(ellipse(e[0], e[1], eye_rx * 0.45, eye_ry * 0.36), e[0], e[1], t), ink, "EYE_" + side, order_i,
-                                              shape_keys={"wide": _rot(ellipse(e[0], e[1], eye_rx * 2.75, eye_ry * 1.78), e[0], e[1], t)})
+        big = st.get("editorial", True)                                            # v3: a visible sclera at rest (a bigger, readable eye) instead of a bare dot
+        wide = _rot(ellipse(e[0], e[1], eye_rx * (2.75 if big else 2.4), eye_ry * (1.92 if big else 1.55)), e[0], e[1], t)
+        small = _rot(ellipse(e[0], e[1], eye_rx * (2.15 if big else 0.4), eye_ry * (1.42 if big else 0.32)), e[0], e[1], t)
+        c.face["eyewhite_" + side] = flat_mesh(c, "eyewhite_" + side, small, "#fbfaf6", "EYE_" + side, order_i, shape_keys={"wide": wide})
+        c.face["eyering_" + side] = flat_mesh(c, "eyering_" + side, _rot(ellipse(e[0], e[1], eye_rx * (2.42 if big else 0.45), eye_ry * (1.62 if big else 0.36)), e[0], e[1], t), ink, "EYE_" + side, order_i,
+                                              shape_keys={"wide": _rot(ellipse(e[0], e[1], eye_rx * (3.05 if big else 2.75), eye_ry * (2.14 if big else 1.78)), e[0], e[1], t)})
         c.face["eyering_" + side].location.y += 0.0014
-        c.face["pupil_" + side] = flat_mesh(c, "pupil_" + side, _rot(ellipse(e[0], e[1], eye_rx, eye_ry), e[0], e[1], t), ink, "EYE_" + side, order_i)
+        c.face["pupil_" + side] = flat_mesh(c, "pupil_" + side, _rot(ellipse(e[0], e[1], eye_rx * (0.98 if big else 1.0), eye_ry * (0.96 if big else 1.0)), e[0], e[1], t), ink, "EYE_" + side, order_i)
         c.face["pupil_" + side].location.y -= 0.0012
         if st.get("lash"):                                                         # lash flick at the outer top corner
             lx = e[0] + eye_rx * 0.7
@@ -334,20 +341,20 @@ def add_face(c, order_i):
         c.face["brow_" + side] = flat_mesh(c, "brow_" + side, strip, ink, "BROW_" + side, order_i)
     m = R.head_point(P, R.FACE["mouth"])
     mw = 31 * hs * st.get("mouth", 1.0)
-    th = st.get("lip", 4.5) * hs
+    th = st.get("lip", 4.5) * 1.4 * hs
 
     def lip(smile, worried=0.0, n=9):
         top, bot = [], []
         for i in range(n):
             u = i / (n - 1)
             x = m[0] + (u - 0.5) * 2 * mw
-            y = m[1] + smile * (-15.0 * hs) * (1 - (2 * u - 1) ** 2) + smile * (10.0 * hs) * ((2 * u - 1) ** 2)
-            y += worried * (9.0 * hs * (1 - (2 * u - 1) ** 2) - 12.0 * hs * ((2 * u - 1) ** 2)) * -1
+            y = m[1] + smile * (-24.0 * hs) * (1 - (2 * u - 1) ** 2) + smile * (16.0 * hs) * ((2 * u - 1) ** 2)
+            y += worried * (14.0 * hs * (1 - (2 * u - 1) ** 2) - 18.0 * hs * ((2 * u - 1) ** 2)) * -1
             top.append((x, y + th))
             bot.append((x, y - th))
         return top + bot[::-1]
     c.face["mouth_line"] = flat_mesh(c, "mouth_line", lip(0.0), ink, "MOUTH", order_i, shape_keys={"smile": lip(1.0), "frown": lip(-1.0), "worried": lip(-0.5, 1.0)})
-    cav = lambda rxf, ryv: ellipse(m[0], m[1], mw * rxf, ryv * hs)
+    cav = lambda rxf, ryv: ellipse(m[0], m[1], mw * rxf, ryv * hs * 1.35)
     c.face["mouth_cavity"] = flat_mesh(c, "mouth_cavity", cav(0.8, 24.0), "#2a0f14", "MOUTH", order_i, shape_keys={n: cav(*v) for n, v in VISEMES.items()})
     c.face["mouth_cavity"].location.y += 0.0009
     c.face["mouth_line"].location.y -= 0.0009
@@ -362,14 +369,30 @@ def add_phone(c, order_i):
     p = c.man["parts"]["phone"]
     hand_bone = "HAND_R"
     a = math.radians(R.REST["arm"] + R.REST["elbow"] + R.REST["wrist"])
-    off = (P["hand"] * 0.62, 6.0)                                 # phone centre relative to the wrist along/perp the hand axis
+    off = (P["hand"] * 0.62, 6.0)                                 # phone centre relative to the wrist along/perp the hand axis (v2 fallback)
     ax, ay = math.sin(a), -math.cos(a)                            # hand axis (pointing down-forward)
     px_, py_ = J["wrist"][0] + ax * off[0] + ay * off[1] * -1, J["wrist"][1] + ay * off[0] + ax * off[1]
-    ob = add_textured_part_at(c, "phone", order_i, (px_, py_), 0.0, hand_bone)
+    rot_extra = 0.0
+    pp = (c.man.get("hand_anchors", {}).get("hold_phone", {}) or {}).get("prop_phone")
+    if pp:                                                        # v3: the phone sits where the real hand drawing holds it
+        lx, ly, th = pp
+        fx, fy = math.cos(a), math.sin(a)                         # perpendicular (forward-ish)
+        px_, py_ = J["wrist"][0] + fx * lx + ax * ly, J["wrist"][1] + fy * lx + ay * ly
+        rot_extra = th
+    ob = add_textured_part_at(c, "phone", order_i, (px_, py_), (math.degrees(a) - rot_extra) if pp else 0.0, hand_bone)
     c.parts["phone"] = ob
+    if pp:                                                        # perspective flatten: a phone lying on the table is a thin slab seen from the side; it turns face-on as it is lifted
+        vs = [Vector(v.co) for v in ob.data.vertices]
+        ctr = sum(vs, Vector((0, 0, 0))) / 4.0
+        wd = (vs[1] - vs[0]).normalized()
+        ob.shape_key_add(name="Basis")
+        fk = ob.shape_key_add(name="flat")
+        for v, w in zip(fk.data, vs):
+            v.co = w - wd * ((w - ctr).dot(wd) * 0.86)
+        c.phone_flat = fk
     for extra in ("card", "money"):                                          # other held props share the grip point
         if extra in c.man["parts"]:
-            c.parts[extra] = add_textured_part_at(c, extra, order_i, (px_ + 8 * ax, py_ + 8 * ay), rest_angle_deg("hand_R") - 90.0, hand_bone)
+            c.parts[extra] = add_textured_part_at(c, extra, order_i, (px_ + 8 * ax, py_ + 8 * ay), rest_angle_deg("hand_R") + 90.0, hand_bone)
     if "fingers" in c.man["parts"]:
         f = add_textured_part_at(c, "fingers", order_i + 1, (J["wrist"][0] + ax * P["hand"] * 0.78, J["wrist"][1] + ay * P["hand"] * 0.78), rest_angle_deg("hand_R"), hand_bone)
         c.parts["fingers"] = f
@@ -384,8 +407,8 @@ def add_textured_part_at(c, pname, order_i, joint_xy, angle_deg, bone):
     corners = [(-px / res, py / res), ((w - px) / res, py / res), ((w - px) / res, -(h - py) / res), (-px / res, -(h - py) / res)]
     verts = []
     for (x, y) in corners:
-        rx = x * math.cos(a) + y * math.sin(a)
-        ry = -x * math.sin(a) + y * math.cos(a)
+        rx = x * math.cos(a) - y * math.sin(a)                 # angle_deg is COUNTER-CLOCKWISE (y up), the same convention as add_textured_part
+        ry = x * math.sin(a) + y * math.cos(a)
         verts.append(to3((joint_xy[0] + rx, joint_xy[1] + ry), c.facing))
     ob = _obj_from_mesh(pname + "_" + c.spec["id"], verts, [(0, 1, 2, 3)], [(0, 1), (1, 1), (1, 0), (0, 0)])
     ob.location = (c.arm.location.x, c.obj_y - 0.004 * order_i, c.arm.location.z)
@@ -425,6 +448,11 @@ def key_pose(c, f, fi):
     g = lambda n, d=0.0: setc(ch, n, fi, d)
     for b in pb:
         b.rotation_mode = "XYZ"
+    if "char_vis" in ch:                                                                    # a view-set that becomes visible again must get its normal scale back
+        skip = set(c.face.values()) | ({c.parts["nose"]} if "nose" in c.parts else set()) if c.man.get("view") == "back" else set()
+        for ob in c.all_objs:
+            if ob not in skip:
+                ob.scale = (1.0, 1.0, 1.0)
     pb["ROOT"].location = local_vec(c, "ROOT", g("root_x"), g("root_y"))
     pb["PELVIS"].location = local_vec(c, "PELVIS", g("pelvis_dx"), g("pelvis_dy"))
     for bn, chn in (("SPINE", "spine_rot"), ("CHEST", "chest_rot"), ("NECK", "neck_rot"), ("HEAD", "head_rot"), ("HAIR", "hair_rot")):
@@ -505,6 +533,12 @@ def key_pose(c, f, fi):
             continue
         v = 1.0 if g(cn) > 0.5 else 0.0
         c.parts[pn].scale = (v, v, v) if v else (0.0001, 0.0001, 0.0001)
+    if getattr(c, "phone_flat", None) is not None:
+        c.phone_flat.value = max(0.0, min(1.0, g("phone_flat")))
+    hidden = "char_vis" in ch and g("char_vis", 1.0) < 0.5                                   # replacement-drawing turns: only one view-set of a character is drawn at a time
+    if hidden:
+        for ob in c.all_objs:
+            ob.scale = (0.0001, 0.0001, 0.0001)
     # keyframes
     for b in pb:
         for path in ("location", "rotation_euler", "scale"):
@@ -518,6 +552,11 @@ def key_pose(c, f, fi):
     for pn in ("phone", "card", "money", "fingers"):
         if pn in c.parts:
             c.parts[pn].keyframe_insert("scale", frame=f)
+    if getattr(c, "phone_flat", None) is not None:
+        c.phone_flat.keyframe_insert("value", frame=f)
+    if "char_vis" in ch:
+        for ob in c.all_objs:
+            ob.keyframe_insert("scale", frame=f)
     for side in ("L", "R"):
         for pose, ob in c.handposes[side]:
             ob.keyframe_insert("scale", frame=f)

@@ -15,6 +15,7 @@ from engine.animation.grammar import _style
 from engine.shorts.performance import ease
 from engine.skeleton import motion as M
 from engine.skeleton.parts_art2 import HAND_POSES
+from engine.skeleton import hands3 as H3, rig_def as _R
 
 POSE_ID = {n: i for i, n in enumerate(HAND_POSES)}
 VISEME_OPEN = dict(A=0.62, E=0.32, I=0.22, O=0.55, U=0.36, shocked=1.0)
@@ -40,6 +41,36 @@ def _eye_world(perf, t):
     return (base[0] + P["head"] * 0.30 * (1.0 if P["view"] != "front" else 0.3), base[1] + P["head"] * 0.62)
 
 
+
+# ---------------------------------------------------------------------------------------------------------------- prop grips (v3)
+def _phone_wrist(perf, C, phone_abs_ccw, t):
+    """Where must the WRIST be (and how must the hand turn) so that the phone held by the hold_phone hand drawing has its centre at C with the given absolute tilt
+    (deg counter-clockwise from vertical, y up)? -> (wrist_xy, hand_rot_deg). The hand drawing fixes the phone's place in the hand frame (hands3.phone_anchor)."""
+    lx, ly, th = H3.phone_anchor(perf.P)
+    H = phone_abs_ccw + th                                                    # absolute hand angle (ccw from straight down)
+    hr = math.radians(H)
+    off = (lx * math.cos(hr) + ly * math.sin(hr), lx * math.sin(hr) - ly * math.cos(hr))
+    wrist = (C[0] - off[0], C[1] - off[1])
+    sh = perf.shoulder(t)
+    _, _, a1, a2 = _R.two_bone(sh, wrist, perf.P["upper_arm"], perf.P["forearm"], -1)
+    return wrist, H - a2 - _R.REST["wrist"]
+
+
+def _rekey(perf, name, t, v, e="smooth"):
+    """set a key at t REPLACING any existing key at the same instant (a duplicate would be ignored by Channel evaluation: the first one wins)"""
+    ch = perf.ch[name]
+    ch.keys = [k for k in ch.keys if abs(k[0] - t) > 1e-6]
+    ch.key(t, v, e)
+
+
+def _is_phone(target):
+    if isinstance(target, str) and target.split(".")[0] == "PHONE":
+        from engine.skeleton import props3
+        props3.parse(target)                                                       # validates the grip name (KeyError on an unknown grip)
+        return True
+    return False
+
+
 def gaze_toward(perf, t, dur, target, e="out_back", head=True, log=True):
     """TARGET-BASED gaze: eyes (and head) orient toward the target's bearing. Returns (gx, gy) applied."""
     P = perf.P
@@ -59,8 +90,13 @@ def gaze_toward(perf, t, dur, target, e="out_back", head=True, log=True):
         if dx < 0:                                           # target behind: look back over the shoulder
             gx, pitch = -1.0, pitch * 0.4 - 4.0
     d = min(dur, 0.5)
-    perf.to("gaze_x", t, t + d * 0.7, gx, e)
-    perf.to("gaze_y", t, t + d * 0.7, gy, e)
+    gx0, gy0 = perf.v("gaze_x", t), perf.v("gaze_y", t)
+    for nm, a0, a1 in (("gaze_x", gx0, gx), ("gaze_y", gy0, gy)):                     # anticipation (a tiny counter-move) -> fast saccade with overshoot -> settle
+        ch = perf.ch[nm]
+        ch.key(t, a0, "linear")
+        ch.key(t + 0.05, a0 - (a1 - a0) * 0.08, "smooth")
+        ch.key(t + 0.05 + 0.09, a1 + (a1 - a0) * 0.10, "out")
+        ch.key(t + 0.05 + 0.09 + 0.16, a1, "smooth")
     if head:
         perf.to("head_rot", t + 0.07, t + d + 0.1, pitch, "smooth")
         perf.to("neck_rot", t + 0.07, t + d + 0.12, pitch * 0.35, "smooth")
@@ -125,7 +161,9 @@ def a_walk(perf, t, dur, st, speed=None, end_x=None, stride_scale=1.0, hold_R=Fa
     ramp = min(0.4, dur * 0.3)
     x_start = perf.v("root_x", t)
     lift = 42.0 * P["k"] * st["amp"]
-    bob = 11.0 * P["k"] * st["amp"]
+    bob = 22.0 * P["k"] * max(st["amp"], 0.7)                                        # the pelvis drops at contact so the leading leg can reach (and it is what a body does)
+    hip_v = P["hip_y"] - P["foot_h"]
+    a = min(a, 0.97 * math.sqrt(max(leg * leg - (hip_v - 0.5 * bob) ** 2, 1.0)))              # stride limited by what the leg can span with the pelvis at its lowest
     base_h = perf.v("pelvis_dy", t)
     fL0 = (perf.v("foot_L_x", t), perf.v("foot_L_y", t))
     fR0 = (perf.v("foot_R_x", t), perf.v("foot_R_y", t))
@@ -146,6 +184,25 @@ def a_walk(perf, t, dur, st, speed=None, end_x=None, stride_scale=1.0, hold_R=Fa
     scale = 1.0
     if end_x is not None and abs(path[-1] - x_start) > 1e-3:
         scale = (end_x - x_start) / (path[-1] - x_start)
+    Ls = min(Ls, 0.6 * math.sqrt(leg / 416.0) * max(v * scale, 1.0))                                                 # a step never takes longer than ~0.6 s: slow walks get SHORT steps, not giant slow ones
+    a = min(0.6 * Ls, 0.97 * math.sqrt(max(leg * leg - (P["hip_y"] - P["foot_h"] - 0.5 * bob) ** 2, 1.0)))
+    T = 2 * Ls / max(v * scale, 1.0)                                                       # cadence follows the EFFECTIVE speed (the path may be scaled to arrive exactly at end_x)
+    scale_w = 1.0
+
+    def x_at(uu_):                                                                    # root x at walk time uu_ (extrapolated with the final speed beyond the walk)
+        i_ = max(0.0, uu_) * 30.0
+        if i_ >= n:
+            return x_start + (path[n] - x_start) * scale
+        lo = int(i_)
+        fr = i_ - lo
+        return x_start + ((path[lo] * (1 - fr) + path[min(lo + 1, n)] * fr) - x_start) * scale
+
+    def plant(k, side, cyc):
+        """world x where foot k touches down at the start of stance cycle `cyc`: `a` ahead of the pelvis at that instant."""
+        u_c = max(0.0, (cyc - 0.5 * k) * T)
+        wc = prof[min(n, int(round(min(u_c, dur) * 30)))]                                # small steps while starting / stopping, full steps at cruising speed
+        return x_at(u_c) + a * wc * scale_w + stand_off[side]
+
     keys = {k: [] for k in ("root_x", "pelvis_dy", "pelvis_dx", "spine_rot", "head_rot", "neck_rot", "hair_rot", "foot_L_x", "foot_L_y", "foot_R_x", "foot_R_y", "foot_L_rot", "foot_R_rot",
                             "hand_L_x", "hand_L_y", "hand_R_x", "hand_R_y", "chest_rot")}
     for i in range(n + 1):
@@ -156,7 +213,7 @@ def a_walk(perf, t, dur, st, speed=None, end_x=None, stride_scale=1.0, hold_R=Fa
         ph = (u / T) if T > 0 else 0.0
         sfoot = math.sin(2 * math.pi * ph)
         keys["root_x"].append((tt, x))
-        keys["pelvis_dy"].append((tt, base_h - bob * w * (1 - math.cos(4 * math.pi * ph)) * 0.5))                       # lowest at contact, highest at passing
+        keys["pelvis_dy"].append((tt, base_h - bob * w * (1 + math.cos(4 * math.pi * ph)) * 0.5))                       # lowest at contact (double support), highest at passing
         keys["pelvis_dx"].append((tt, 5.0 * P["k"] * w * math.sin(2 * math.pi * ph + 0.6)))                          # weight shift over the stance leg
         keys["spine_rot"].append((tt, 3.0 * st["lean"] * w + 2.4 * w * sfoot))
         keys["chest_rot"].append((tt, -2.4 * w * sfoot))                                                              # torso counter-rotation
@@ -166,20 +223,22 @@ def a_walk(perf, t, dur, st, speed=None, end_x=None, stride_scale=1.0, hold_R=Fa
         wb = ease("smooth", min(1.0, u / max(ramp, 1e-3), (dur - u) / max(ramp, 1e-3))) if ramp > 0 else 1.0
         for k, side in enumerate(("L", "R")):
             phk = (ph + 0.5 * k) % 1.0
-            if phk < 0.6:
-                rel = a - 2 * a * (phk / 0.6)
+            cyc = int(math.floor(ph + 0.5 * k))
+            if phk < 0.6:                                                        # STANCE: the foot is PLANTED at the contact position (no slide by construction)
+                walk_x = plant(k, side, cyc)
                 fy = P["foot_h"]
+                if phk > 0.42:                                                   # push-off: the heel rises while the toe stays on the ground
+                    fy += 16.0 * P["k"] * ((phk - 0.42) / 0.18) ** 1.4
                 rot = (9.0 * (1 - phk / 0.15) if phk < 0.15 else 0.0) - (24.0 * ((phk - 0.45) / 0.15) if phk > 0.45 else 0.0)
-            else:
+            else:                                                                # SWING: from this plant to the next one, lifting over the ground
                 uu = (phk - 0.6) / 0.4
-                rel = -a + 2 * a * ease("smooth", uu)
-                fy = P["foot_h"] + lift * math.sin(math.pi * uu) ** 0.8
+                walk_x = plant(k, side, cyc) + (plant(k, side, cyc + 1) - plant(k, side, cyc)) * ease("smooth", uu)
+                fy = P["foot_h"] + 16.0 * P["k"] * (1 - uu) ** 2 + lift * math.sin(math.pi * uu) ** 0.8                  # continuous with the push-off heel height, lands flat
                 rot = -24.0 * (1 - uu) + 9.0 * uu
-            walk_x = x + rel + stand_off[side] * 0.4
             f0 = fL0 if side == "L" else fR0
             sx = x + stand_off[side]
             keys[f"foot_{side}_x"].append((tt, (1 - wb) * (f0[0] if u < dur / 2 else sx) + wb * walk_x))
-            keys[f"foot_{side}_y"].append((tt, (1 - wb) * P["foot_h"] + wb * fy))
+            keys[f"foot_{side}_y"].append((tt, (1 - wb) * P["foot_h"] + wb * fy + 0.5 * lift * math.sin(math.pi * wb) * (1.0 if wb < 0.999 else 0.0)))   # the first / last step lifts the foot
             keys[f"foot_{side}_rot"].append((tt, rot * wb))
         for k, side in enumerate(("L", "R")):
             holding = hold_R if side == "R" else hold_L
@@ -221,11 +280,19 @@ def a_walk_to(perf, t, dur, st, target="DOOR", stop_before=120.0, speed=None, **
 
 
 def a_reach(perf, t, dur, st, target=None, hand="R", grip=None, **kw):
-    """anticipation (0.16 s pull-back + lean back) -> reach (eyes first, torso commits, overshoot) -> contact (slow-in, 0.12 s hold) -> grip pose. Returns the contact time."""
+    """anticipation (0.16 s pull-back + lean back) -> reach (eyes first, torso commits, overshoot) -> contact (slow-in, 0.12 s hold) -> grip pose. Returns the contact time.
+    A phone target (`PHONE` or `PHONE.right_hand_grip`) is reached so that the real hand drawing closes ON the phone: wrist and wrist angle are solved from the hand's grip anchor."""
     P = perf.P
-    tgt = perf.target_rig(target, t + dur) if target is not None else (perf.hip(t)[0] + 240, P["hip_y"] * 0.7)
-    if target is not None and isinstance(target, str) and target in ("PHONE", "CARD", "MONEY"):
-        tgt = (tgt[0] - 18 * P["k"], tgt[1] + 36 * P["k"])                               # wrist target so the fingers close on the object
+    contact_rot = None
+    if _is_phone(target):
+        C = perf.target_rig(target.split(".")[0], t + dur)
+        tgt, contact_rot = _phone_wrist(perf, C, kw.get("phone_abs", -90.0), t + dur)
+        grip_focus = C
+    else:
+        tgt = perf.target_rig(target, t + dur) if target is not None else (perf.hip(t)[0] + 240, P["hip_y"] * 0.7)
+        if target is not None and isinstance(target, str) and target in ("CARD", "MONEY"):
+            tgt = (tgt[0] - 18 * P["k"], tgt[1] + 36 * P["k"])                               # wrist target so the fingers close on the object
+        grip_focus = None
     d = dur / st["speed"]
     arrive = t + d
     sh = perf.shoulder(t)
@@ -237,7 +304,7 @@ def a_reach(perf, t, dur, st, target=None, hand="R", grip=None, **kw):
         tgt = (sh[0] + (tgt[0] - sh[0]) * f, sh[1] + (tgt[1] - sh[1]) * f)
         dist = reach_len * 0.98
     lean = max(0.0, min(26.0, (dist - reach_len * 0.7) / 6.0)) * st["amp"]
-    gaze_toward(perf, t, 0.35, dict(rig=(tgt[0] + 18 * P["k"], tgt[1] - 36 * P["k"])) if target in ("PHONE", "CARD", "MONEY") else dict(rig=tgt))
+    gaze_toward(perf, t, 0.35, dict(rig=grip_focus) if grip_focus is not None else (dict(rig=(tgt[0] + 18 * P["k"], tgt[1] - 36 * P["k"])) if target in ("CARD", "MONEY") else dict(rig=tgt)))
     start = (perf.v(f"hand_{hand}_x", t), perf.v(f"hand_{hand}_y", t))
     ant = 0.16
     set_pose(perf, t, hand, "open")
@@ -253,9 +320,19 @@ def a_reach(perf, t, dur, st, target=None, hand="R", grip=None, **kw):
         M._tremble(perf, t1, t1 + 0.3 * st["hesitate"] * 1.4, st["tremble"] * 2.2, (f"hand_{hand}_x", f"hand_{hand}_y"))
     else:
         hand_to(perf, hand, t + ant, arrive, tgt, "out_back")
-    perf.to(f"hand_{hand}_rot", t, arrive, -10.0, "smooth")
+    perf.to(f"hand_{hand}_rot", t, arrive, contact_rot if contact_rot is not None else -10.0, "smooth")
+    if contact_rot is not None:                                                          # refine with the shoulder as it actually is at contact (the lean is keyed by now)
+        tgt2, rot2 = _phone_wrist(perf, C, kw.get("phone_abs", -90.0), arrive)
+        sh2 = perf.shoulder(arrive)
+        d2 = math.hypot(tgt2[0] - sh2[0], tgt2[1] - sh2[1])
+        if d2 > reach_len * 0.98:                                                        # still out of the arm's envelope after the refinement: stay reachable
+            f2 = reach_len * 0.98 / d2
+            tgt2 = (sh2[0] + (tgt2[0] - sh2[0]) * f2, sh2[1] + (tgt2[1] - sh2[1]) * f2)
+        for nm, v in ((f"hand_{hand}_x", tgt2[0]), (f"hand_{hand}_y", tgt2[1]), (f"hand_{hand}_rot", rot2)):
+            _rekey(perf, nm, arrive, v)
+        perf.events.append((arrive, "phone_contact", dict(centre=[round(C[0], 2), round(C[1], 2)], hand=hand, phone_abs=kw.get("phone_abs", -90.0))))
     if grip:
-        set_pose(perf, arrive - 0.03, hand, grip)
+        set_pose(perf, arrive - 0.03, hand, "hold_phone" if (contact_rot is not None and grip == "grab") else grip)
     perf.events.append((arrive, "contact", dict(target=str(target), hand=hand)))
     return arrive
 
@@ -268,13 +345,17 @@ def hand_to(perf, side, t0, t1, target, e="smooth"):
 def a_grab(perf, t, dur, st, hand="R", prop="phone", **kw):
     """Close the fingers over the object: grip pose, prop attaches to the hand, screen glow (phone). Emits the pick-up event."""
     pose = {"phone": "hold_phone", "card": "hold_card", "money": "hold_money"}.get(prop, "grab")
-    set_pose(perf, t, hand, "grab")
-    set_pose(perf, t + 0.08, hand, pose)
+    set_pose(perf, t, hand, pose)
     for nm in ("phone_vis", "card_vis", "money_vis"):
         perf.ch[nm].key(t - 0.001, perf.ch[nm](t), "linear")
         perf.ch[nm].key(t, 1.0 if nm == prop + "_vis" else 0.0, "linear")
     perf.ch["fingers_vis"].key(t - 0.001, 0.0, "linear")
     perf.ch["fingers_vis"].key(t + 0.06, 1.0, "linear")
+    if kw.get("from_table") and prop == "phone":                                   # lifted off the table: starts as a thin slab seen from the side, turns face-on in ~0.9 s
+        perf.ch["phone_flat"].key(t - 0.001, 0.0, "linear")
+        perf.ch["phone_flat"].key(t, 1.0, "linear")
+        perf.ch["phone_flat"].key(t + 0.45, 1.0, "linear")
+        perf.ch["phone_flat"].key(t + 0.95, 0.0, "smooth")
     if prop == "phone":
         perf.to("phone_glow", t, t + 0.4, 1.0, "out")
     perf.events.append((t, "phone_grab" if prop == "phone" else f"{prop}_grab", dict(hand=hand)))
@@ -290,7 +371,7 @@ def a_hold(perf, t, dur, st, hand="R", **kw):
 def a_release(perf, t, dur, st, hand="R", prop="phone", **kw):
     """Open the hand, the prop leaves it (visibility off; the scene places the free prop via the event)."""
     set_pose(perf, t, hand, "open")
-    set_pose(perf, t + 0.45, hand, "closed")
+    set_pose(perf, t + 0.45, hand, "relaxed")
     perf.ch[prop + "_vis"].key(t - 0.001, perf.ch[prop + "_vis"](t), "linear")
     perf.ch[prop + "_vis"].key(t + 0.05, 0.0, "linear")
     perf.ch["fingers_vis"].key(t - 0.001, perf.ch["fingers_vis"](t), "linear")
@@ -303,16 +384,14 @@ def a_release(perf, t, dur, st, hand="R", prop="phone", **kw):
 
 
 def a_hold_phone(perf, t, dur, st, pos="chest", hand="R", **kw):
-    """Phone to chest / face / ear: forearm lifts, wrist tilts the screen toward the eyes, head adjusts, eyes focus on the screen."""
+    """Phone to chest / face / ear: the wrist and wrist angle are solved so the phone (as held by the hand drawing) sits where a person actually holds it; the forearm lifts, the head
+    adjusts, the eyes focus on the screen."""
     P = perf.P
     sh = perf.shoulder(t)
     d = dur / st["speed"]
-    if pos == "ear":
-        tgt, rot = (sh[0] + 38 * P["k"], sh[1] + 58 * P["k"]), -78.0
-    elif pos == "face":
-        tgt, rot = (sh[0] + 150 * P["k"], sh[1] - 20 * P["k"]), -25.0
-    else:
-        tgt, rot = (sh[0] + 130 * P["k"], sh[1] - 175 * P["k"]), -38.0
+    k = P["k"]
+    C, tilt = {"ear": ((sh[0] + 30 * k, sh[1] + 122 * k), 6.0), "face": ((sh[0] + 92 * k, sh[1] + 30 * k), -14.0)}.get(pos, ((sh[0] + 92 * k, sh[1] - 70 * k), -20.0))
+    tgt, rot = _phone_wrist(perf, C, tilt, t + d)
     set_pose(perf, t, hand, "hold_phone")
     hand_to(perf, hand, t, t + d, tgt, "smooth")
     perf.to(f"hand_{hand}_rot", t, t + d, rot, "smooth")
@@ -494,17 +573,49 @@ def a_speak(perf, t, dur, st, words=None, **kw):
     return last
 
 
+def a_place(perf, t, dur, st, target="PHONE", hand="R", prop="phone", **kw):
+    """Put the phone back on the table: the wrist carries it to the surface, it turns flat (perspective) as it lowers, the fingers open, the prop leaves the hand (the free prop reappears)."""
+    C = perf.target_rig(target, t + dur)
+    tgt, rot = _phone_wrist(perf, C, -90.0, t + dur)
+    hand_to(perf, hand, t, t + dur, tgt, "smooth")
+    perf.to(f"hand_{hand}_rot", t, t + dur, rot, "smooth")
+    perf.ch["phone_flat"].key(t + dur * 0.35, perf.ch["phone_flat"](t + dur * 0.35), "linear")
+    perf.ch["phone_flat"].key(t + dur, 1.0, "smooth")
+    gaze_toward(perf, t, 0.35, dict(rig=C))
+    arrive = t + dur
+    set_pose(perf, arrive + 0.05, hand, "open")
+    perf.ch[prop + "_vis"].key(arrive + 0.14, perf.ch[prop + "_vis"](arrive), "linear")
+    perf.ch[prop + "_vis"].key(arrive + 0.15, 0.0, "linear")
+    perf.events.append((arrive + 0.15, prop + "_place", dict(hand=hand)))
+    set_pose(perf, arrive + 0.5, hand, "relaxed")
+    hand_to(perf, hand, arrive + 0.25, arrive + 0.9, M._arm_rest(perf, hand, arrive + 0.9), "smooth")
+    perf.to(f"hand_{hand}_rot", arrive + 0.25, arrive + 0.9, 0.0, "smooth")
+    return arrive + 0.9
+
+
 def a_hand_over(perf, t, dur, st, point="HANDOVER", hand="R", prop="phone", **kw):
-    """Give an object: eyes to the receiver, arm extends to the meeting point (target id), the hand holds until the receiver has it, then releases."""
-    arrive = a_reach(perf, t, dur, st, target=dict(rig=perf.target_rig(point, t + dur)), hand=hand)
+    """Give an object: eyes to the receiver, the arm carries the object to the meeting point (the phone stays upright so both hands agree on its tilt), holds until the receiver has it."""
+    C = perf.target_rig(point, t + dur)
+    if prop == "phone":
+        tgt, rot = _phone_wrist(perf, C, 0.0, t + dur)
+        arrive = a_reach(perf, t, dur, st, target=dict(rig=tgt), hand=hand)
+        _rekey(perf, f"hand_{hand}_rot", arrive, rot)
+    else:
+        arrive = a_reach(perf, t, dur, st, target=dict(rig=C), hand=hand)
     set_pose(perf, arrive, hand, {"phone": "hold_phone", "card": "hold_card", "money": "hold_money"}[prop])
     perf.events.append((arrive, "handover_give", dict(prop=prop, hand=hand, point=str(point))))
     return arrive
 
 
 def a_receive(perf, t, dur, st, point="HANDOVER", hand="R", prop="phone", **kw):
-    """Take an object: hand opens toward the meeting point, closes on the prop (prop attaches at contact), brings it to the eyes."""
-    arrive = a_reach(perf, t, dur, st, target=dict(rig=perf.target_rig(point, t + dur)), hand=hand)
+    """Take an object: the hand opens toward the meeting point, closes on the prop (the prop attaches at contact), brings it to the eyes."""
+    C = perf.target_rig(point, t + dur)
+    if prop == "phone":
+        tgt, rot = _phone_wrist(perf, C, 0.0, t + dur)
+        arrive = a_reach(perf, t, dur, st, target=dict(rig=tgt), hand=hand)
+        _rekey(perf, f"hand_{hand}_rot", arrive, rot)
+    else:
+        arrive = a_reach(perf, t, dur, st, target=dict(rig=C), hand=hand)
     a_grab(perf, arrive + 0.05, 0.1, st, hand=hand, prop=prop)
     perf.events.append((arrive + 0.05, "handover_take", dict(prop=prop, hand=hand)))
     return arrive + 0.1
@@ -544,13 +655,132 @@ def _relax_wrap(orig, mode):
     return f
 
 
+# ---------------------------------------------------------------------------------------------------------------- acting sequences (v3)
+def _still(perf, names, t0, t1):
+    """Hold `names` perfectly still over [t0, t1]: intermediate keys (idle breathing, sway) are removed first, otherwise the hold would be overridden."""
+    for nm in names:
+        ch = perf.ch[nm]
+        v = ch(t0)
+        ch.keys = [k for k in ch.keys if not (t0 < k[0] < t1)]
+        ch.key(t0, v, "linear")
+        ch.key(t1, v, "linear")
+
+
+def _breath(perf, t0, t1, hz, amp):
+    """explicit breathing on the chest/shoulders so the rate can change with the emotion (fear: fast and shallow, realization: held)"""
+    nm = "chest_rot"
+    base = perf.ch[nm](t0)
+    perf.ch[nm].keys = [k for k in perf.ch[nm].keys if not (t0 < k[0] < t1)]
+    n = int((t1 - t0) * 30)
+    for i in range(0, n + 1, 2):
+        tt = t0 + i / 30.0
+        perf.ch[nm].key(tt, base + amp * math.sin(2 * math.pi * hz * (tt - t0)), "linear")
+
+
+def a_realization(perf, t, dur, st, target="PHONE", **kw):
+    """REALIZATION as a sequence: the look holds, everything stops (breathing held), the pupils shift, the brows rise BEFORE the eyes widen, the head stops and rocks back a hair, the mouth
+    comes open on an 'O', the torso stays frozen, then a slow exhale as it sinks in."""
+    dur = max(dur, 1.3)
+    _still(perf, ("hand_L_x", "hand_L_y", "hand_R_x", "hand_R_y", "spine_rot", "pelvis_dx", "shrug"), t, t + dur * 0.62)
+    _breath(perf, t, t + dur * 0.5, 0.0, 0.0)                                            # breathing reduced to a hold
+    perf.no_blink.append((t, t + dur * 0.6))
+    perf.to("gaze_y", t + 0.22, t + 0.34, perf.v("gaze_y", t) + 0.35, "out")            # pupils shift
+    perf.to("gaze_x", t + 0.24, t + 0.36, perf.v("gaze_x", t) - 0.25, "out")
+    perf.to("brow_raise", t + 0.32, t + 0.55, 0.95, "out")                                # brows first
+    perf.to("brow_tilt", t + 0.32, t + 0.6, 0.4, "smooth")
+    perf.to("wide", t + 0.5, t + 0.68, 0.9, "out")                                        # then the eyes
+    perf.to("head_rot", t + 0.45, t + 0.62, perf.v("head_rot", t) - 4.0, "out")           # the head stops and recoils slightly
+    perf.to("mouth_smile", t + 0.6, t + 0.85, -0.1, "smooth")
+    for nm in ("vis_A", "vis_E", "vis_I", "vis_U"):
+        perf.to(nm, t + 0.6, t + 0.7, 0.0, "linear")
+    perf.to("vis_O", t + 0.62, t + 0.85, 0.75, "out")
+    perf.to("mouth_open", t + 0.62, t + 0.85, 0.35, "out")
+    t2 = t + dur * 0.62
+    perf.to("shrug", t2, t2 + 0.5, 0.0, "smooth")
+    _breath(perf, t2, t + dur, 0.35, 1.6)                                                 # the slow exhale
+    perf.to("vis_O", t2, t2 + 0.5, 0.0, "smooth")
+    perf.to("mouth_open", t2, t2 + 0.5, 0.08, "smooth")
+    perf.to("head_rot", t2, t + dur, perf.v("head_rot", t) + 3.0, "smooth")
+    perf.events.append((t, "acting", dict(kind="realization", steps=["look", "hold", "pupils", "brows", "eyes", "head_stop", "mouth", "exhale"])))
+    return t + dur
+
+
+def a_fear(perf, t, dur, st, body=True, **kw):
+    """FEAR as a sequence: micro recoil -> shoulders rise -> head retracts -> eyes widen -> breathing quickens and stays shallow; the hands tremble."""
+    dur = max(dur, 1.2)
+    P = perf.P
+    if body:
+        perf.to("spine_rot", t, t + 0.07, perf.v("spine_rot", t) - 4.0, "out")            # micro recoil
+        perf.to("pelvis_dx", t, t + 0.09, perf.v("pelvis_dx", t) - 5.0 * P["k"], "out")
+    perf.to("shrug", t + 0.08, t + 0.32, 0.9, "out")                                       # shoulders rise
+    perf.to("neck_rot", t + 0.12, t + 0.4, -5.0, "smooth")                                 # head retracts
+    perf.to("head_rot", t + 0.12, t + 0.4, perf.v("head_rot", t) - 5.0, "smooth")
+    perf.to("wide", t + 0.2, t + 0.36, 0.9, "out")                                         # eyes widen
+    perf.to("brow_raise", t + 0.18, t + 0.4, 0.85, "out")
+    perf.to("brow_tilt", t + 0.18, t + 0.4, 0.9, "smooth")
+    perf.to("mouth_smile", t + 0.3, t + 0.6, -0.6, "smooth")
+    perf.to("mouth_worried", t + 0.3, t + 0.6, 0.8, "smooth")
+    perf.to("vis_E", t + 0.3, t + 0.55, 0.55, "out")                                       # lips parted, corners pulled back
+    perf.to("mouth_open", t + 0.3, t + 0.55, 0.42, "out")
+    _breath(perf, t + 0.3, t + dur, 1.7, 1.5)                                              # fast, shallow
+    if body:                                                                               # (while the body is busy standing up the hands must stay under the stand's control)
+        M._tremble(perf, t + 0.4, t + dur, max(st["tremble"], 0.3), ("hand_R_x", "hand_R_y"), hz=10.0)
+        M._tremble(perf, t + 0.4, t + dur, max(st["tremble"], 0.3), ("hand_L_x", "hand_L_y"), hz=12.0)
+    perf.no_blink.append((t + 0.1, t + 0.7))
+    perf.events.append((t, "acting", dict(kind="fear", steps=["recoil", "shoulders", "head_retract", "eyes", "breathing"])))
+    return t + dur
+
+
+def a_confusion(perf, t, dur, st, **kw):
+    """CONFUSION as a sequence: head tilt -> the eyes go left, then right -> brows compress -> a small pause -> a slight shrug."""
+    dur = max(dur, 1.1)
+    perf.to("head_rot", t, t + 0.35, perf.v("head_rot", t) + 8.0, "smooth")               # head tilt
+    perf.to("neck_rot", t, t + 0.35, 3.0, "smooth")
+    perf.to("gaze_x", t + 0.1, t + 0.2, -0.4, "out")                                        # eyes shift
+    perf.to("gaze_x", t + 0.42, t + 0.52, 0.45, "out")
+    perf.to("brow_raise", t + 0.2, t + 0.5, 0.35, "smooth")                                 # brow compression: one brow down, one up
+    perf.to("brow_asym", t + 0.2, t + 0.5, 0.7, "smooth")
+    perf.to("brow_tilt", t + 0.2, t + 0.5, -0.3, "smooth")
+    perf.to("mouth_smile", t + 0.3, t + 0.6, -0.25, "smooth")
+    _still(perf, ("head_rot", "gaze_x", "gaze_y"), t + 0.6, t + 0.95)                       # small pause
+    perf.to("shrug", t + 0.95, t + 1.2, 0.5, "smooth")
+    perf.to("shrug", t + 1.2, t + dur, 0.0, "smooth")
+    perf.events.append((t, "acting", dict(kind="confusion", steps=["tilt", "eyes", "brows", "pause", "shrug"])))
+    return t + dur
+
+
+def a_notice(perf, t, dur, st, target="PERSON_D", **kw):
+    """NOTICE something/someone: the eyes lead, the brows lift, the body checks (a half-beat stop), the head follows, a blink resets, then the gaze settles on the target."""
+    _still(perf, ("spine_rot", "pelvis_dx"), t, t + 0.4)
+    perf.to("brow_raise", t, t + 0.15, 0.55, "out")
+    perf.to("wide", t, t + 0.15, 0.4, "out")
+    gaze_toward(perf, t + 0.02, 0.5, target, head=False)
+    gaze_toward(perf, t + 0.16, 0.6, target, head=True)
+    perf.ch["blink"].key(t + 0.5, 0.0, "linear"), perf.ch["blink"].key(t + 0.55, 1.0, "linear"), perf.ch["blink"].key(t + 0.68, 0.0, "out")
+    perf.to("brow_raise", t + 0.5, t + dur, 0.2, "smooth")
+    perf.to("wide", t + 0.5, t + dur, 0.1, "smooth")
+    perf.events.append((t, "acting", dict(kind="notice", target=str(target))))
+    return t + dur
+
+
+def a_eye_contact(perf, t, dur, st, target="PERSON_D", **kw):
+    """EYE CONTACT: both eyes and head settle on the other person and HOLD; micro-saccades keep the eyes alive; the blink rate drops."""
+    gaze_toward(perf, t, min(0.5, dur), target)
+    for i in range(int(dur / 0.55)):
+        tt = t + 0.5 + i * 0.55
+        perf.ch["gaze_x"].key(tt, perf.ch["gaze_x"](tt) + 0.03 * (1 if i % 2 else -1), "linear")
+    perf.no_blink.append((t + 0.3, t + dur))
+    perf.events.append((t, "eye_contact", dict(target=str(target))))
+    return t + dur
+
+
 def register():
     A = M.ACTIONS
     A["sit"], A["stand"] = _relax_wrap(M.a_sit, "sit"), _relax_wrap(M.a_stand, "stand")
     A.update({"idle": a_idle, "breathe": a_breathe, "walk": a_walk, "walk_to": a_walk_to, "reach": a_reach, "reach_for_phone": lambda p, t, d, st, **k: a_reach(p, t, d, st, **k),
               "grab": a_grab, "pickup_phone": a_grab, "hold": a_hold, "release": a_release, "hold_phone": a_hold_phone, "read_phone": a_read_phone, "type": a_type, "call": a_call,
               "hesitate": a_hesitate, "freeze": a_freeze, "flinch": a_flinch, "relief": a_relief, "anger": a_anger, "point": a_point, "gesture": a_gesture, "speak": a_speak,
-              "hand_over": a_hand_over, "receive": a_receive, "look_at": a_look_at, "look_at_phone": lambda p, t, d, st, **k: a_look_at(p, t, d, st, target="PHONE", **{x: y for x, y in k.items() if x != "target"}),
+              "hand_over": a_hand_over, "receive": a_receive, "place": a_place, "realization": a_realization, "fear": a_fear, "confusion": a_confusion, "notice": a_notice, "eye_contact": a_eye_contact, "look_at": a_look_at, "look_at_phone": lambda p, t, d, st, **k: a_look_at(p, t, d, st, target="PHONE", **{x: y for x, y in k.items() if x != "target"}),
               "hand_pose": lambda p, t, d, st, side="R", pose="open", **k: (set_pose(p, t, side, pose), t + d)[1]})
     for nm in ("worried", "sadness", "determination", "neutral", "curious"):
         A["emotion_" + nm] = a_emotion_named(nm)

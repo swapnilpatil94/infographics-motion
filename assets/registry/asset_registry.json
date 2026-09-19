@@ -1,6 +1,6 @@
 {
  "schema": "kathaya.asset_registry/2",
- "generated": "2026-09-19T18:38:24.527884+00:00",
+ "generated": "2026-09-19T20:03:49.864011+00:00",
  "assets": [
   {
    "asset_id": "kenney_platformer_characters_v1",
@@ -414,7 +414,7 @@
    "author": "MakeHuman Community targets/assets",
    "license": "CC0-1.0",
    "sha256": "aba05c81090d492734c65b350572743b6e6b045e3f465ef11e19a7eb962e973c",
-   "downloaded_at": "2026-09-19T18:38:01.392278+00:00",
+   "downloaded_at": "2026-09-19T20:03:17.311036+00:00",
    "local_path": "assets/raw/blender_audit/mpfb_out/mpfb_rigify.blend",
    "license_proof": "assets/raw/blender_audit/LICENSE_PROOF_mpfb2_output.txt",
    "status": "DOWNLOADED_TESTED",
@@ -636,6 +636,48 @@
    "share_alike": false,
    "policy_decision": "QUARANTINE",
    "policy_reason": "license unknown/unasserted or no license file (README claims are not proof)"
+  },
+  {
+   "asset_id": "rgs_cc0_modular_animated_vector_characters",
+   "source": "OpenGameArt (RGS_Dev)",
+   "name": "Free CC0 Modular Animated Vector Characters 2D",
+   "source_url": "https://opengameart.org/content/free-cc0-modular-animated-vector-characters-2d",
+   "download_url": "https://opengameart.org/sites/default/files/free_2d_animated_vector_game_character_sprites.zip",
+   "author": "rgsdev",
+   "license": "CC0-1.0",
+   "sha256": "b44bac3ee8d4be48b034677a3a40db402e2fc3787c416c7acd18d797d798d1d5",
+   "downloaded_at": "2026-09-19T19:22:27.786972+00:00",
+   "local_path": "assets/raw/rgs/free_2d_animated_vector_game_character_sprites.zip",
+   "license_proof": "assets/raw/blender_audit/LICENSE_PROOF_rgs_modular.txt",
+   "status": "DOWNLOADED_EVALUATED",
+   "usage": "EVALUATED, NOT USED: 3 monster/creature heads, 3 hairs, 7 glossy eyes, 8 mouths, 1 body/hand/foot as 2048 px white-tinted game sprites with baked cel shading and thick black rims - a game-monster style that does not match the flat editorial ink of the Open Peeps heads, and single hand/foot sprites cannot give a 20-pose hand library. Kept as a style reference for the eye highlight idea only.",
+   "commercial_use": true,
+   "modification_allowed": true,
+   "attribution_required": false,
+   "share_alike": false,
+   "policy_decision": "ACCEPT",
+   "policy_reason": "permissive"
+  },
+  {
+   "asset_id": "openpeeps_device_hand_harvest_v1",
+   "source": "derived from Open Peeps (Pablo Stanley) 'Device' body atom",
+   "name": "hold_phone hand drawing (harvested)",
+   "source_url": "https://www.openpeeps.com/",
+   "download_url": "derived locally: tools/assets/harvest_openpeeps.py Separate Atoms/body/Device.svg crop (430,270,720,500)",
+   "author": "Pablo Stanley",
+   "license": "CC0-1.0",
+   "sha256": "a4384bbf0e6f946ed90ac64047aaab4fd3450c002f0fdfc4c29cf67cafed05b2",
+   "downloaded_at": "2026-09-19T20:03:17.311036+00:00",
+   "local_path": "assets/character/harvest/openpeeps_device_hand.fill.npy",
+   "license_proof": "assets/raw/open_peeps/LICENSE_PROOF.txt",
+   "status": "USED",
+   "usage": "USED: the real hand drawing for the hold_phone pose (fill + ink masks, recoloured to the DNA skin tone). Harvest attempts on the Explaining / Coffee / Macbook / Gaming / Killer atoms produced open contours (the atoms' hand outlines are not closed), so only the Device hand is production quality; see docs/CHARACTER_ART_LOCK.md.",
+   "commercial_use": true,
+   "modification_allowed": true,
+   "attribution_required": false,
+   "share_alike": false,
+   "policy_decision": "ACCEPT",
+   "policy_reason": "permissive"
   }
  ]
 }

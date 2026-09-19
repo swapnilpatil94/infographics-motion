@@ -108,6 +108,19 @@ def entries():
                         download_url="n/a (generated: tools/assets/mpfb_build.py)", author="MakeHuman Community targets/assets", license=CC0, sha256=A.sha256(os.path.join(RAW, "mpfb_out/mpfb_rigify.blend")), downloaded_at=now,
                         local_path=rel("mpfb_out/mpfb_rigify.blend"), license_proof=proof("mpfb2_output", "https://static.makehumancommunity.org/about/license.html", r"CC0[^<]{0,100}"), status="DOWNLOADED_TESTED",
                         usage="C: 3D human foundation candidate (parametric proportions via macro details, 5 rig options incl. Rigify 1090 bones). Driven by our semantic channels: 0.02 % of hip height IK error. Not yet the production path."))
+    # ---- ASSET + ACTING QUALITY LOCK (character art sources)
+    rgs = os.path.join(A.ROOT, "assets/raw/rgs/free_2d_animated_vector_game_character_sprites.zip")
+    out.append(A.record(asset_id="rgs_cc0_modular_animated_vector_characters", source="OpenGameArt (RGS_Dev)", name="Free CC0 Modular Animated Vector Characters 2D", source_url="https://opengameart.org/content/free-cc0-modular-animated-vector-characters-2d",
+                        download_url="https://opengameart.org/sites/default/files/free_2d_animated_vector_game_character_sprites.zip", author="rgsdev", license=CC0, sha256=A.sha256(rgs),
+                        downloaded_at=datetime.datetime.fromtimestamp(os.path.getmtime(rgs), datetime.timezone.utc).isoformat(), local_path=os.path.relpath(rgs, A.ROOT),
+                        license_proof=proof("rgs_modular", "https://opengameart.org/content/free-cc0-modular-animated-vector-characters-2d", r"CC0[^<]{0,60}"), status="DOWNLOADED_EVALUATED",
+                        usage="EVALUATED, NOT USED: 3 monster/creature heads, 3 hairs, 7 glossy eyes, 8 mouths, 1 body/hand/foot as 2048 px white-tinted game sprites with baked cel shading and thick black rims - a game-monster style that "
+                              "does not match the flat editorial ink of the Open Peeps heads, and single hand/foot sprites cannot give a 20-pose hand library. Kept as a style reference for the eye highlight idea only."))
+    out.append(A.record(asset_id="openpeeps_device_hand_harvest_v1", source="derived from Open Peeps (Pablo Stanley) 'Device' body atom", name="hold_phone hand drawing (harvested)", source_url="https://www.openpeeps.com/",
+                        download_url="derived locally: tools/assets/harvest_openpeeps.py Separate Atoms/body/Device.svg crop (430,270,720,500)", author="Pablo Stanley", license=CC0, sha256=A.sha256(os.path.join(A.ROOT, "assets/character/harvest/openpeeps_device_hand.fill.npy")),
+                        downloaded_at=now, local_path="assets/character/harvest/openpeeps_device_hand.fill.npy", license_proof="assets/raw/open_peeps/LICENSE_PROOF.txt", status="USED",
+                        usage="USED: the real hand drawing for the hold_phone pose (fill + ink masks, recoloured to the DNA skin tone). Harvest attempts on the Explaining / Coffee / Macbook / Gaming / Killer atoms produced open contours (the atoms' hand outlines are not "
+                              "closed), so only the Device hand is production quality; see docs/CHARACTER_ART_LOCK.md."))
     # ---- blocked / unverified
     out.append(blocked("blendswap_stickman_basic_rig_30507", "BLOCKED_LOGIN", "Blend Swap requires signing in to download; account creation/sign-in is not something the agent does. CC0 per the page (author EMOPRODUCTION, 560 KB, Blender 3.0x). User can drop the .blend into assets/raw/blender_audit/ to have it audited.",
                        source="Blend Swap", name="Stickman Characters with Basic rig and Freestyle", source_url="https://blendswap.com/blend/30507", download_url="https://blendswap.com/blend/30507/download", author="EMOPRODUCTION", license=CC0,

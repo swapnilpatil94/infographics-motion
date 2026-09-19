@@ -29,3 +29,6 @@ assets/environment/generated/
 narration/**/*.wav
 narration/skeleton/vv_raw.vibevoice-out/
 narration/skeleton/vvb/
+
+assets/raw/rgs/*
+!assets/raw/rgs/*.txt

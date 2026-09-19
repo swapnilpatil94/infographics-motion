@@ -12,9 +12,10 @@ import subprocess
 import time
 
 from engine.shorts.raster import ROOT
-from engine.skeleton import pace, parts_art2 as PA2, short, short_director_v2 as SD2
+from engine.skeleton import pace, parts_art2 as PA2, short, short_director_v2 as SD2, short_director_v3 as SD3
 
 OUT = os.path.join(ROOT, "output/shorts/skeleton_factory_v2")
+OUT3 = os.path.join(ROOT, "output/shorts/skeleton_factory_v3")
 BEATS = os.path.join(ROOT, "narration/skeleton_v2/beats.json")
 
 
@@ -35,15 +36,15 @@ def voice(log=print):
     return raw, seg
 
 
-def make(out_dir=None, tempo=1.08, seed=11, log=print, samples=10):
-    out_dir = out_dir or OUT
+def make(out_dir=None, tempo=1.08, seed=11, log=print, samples=10, director="v2"):
+    out_dir = out_dir or (OUT3 if director == "v3" else OUT)
     os.makedirs(os.path.join(out_dir, "narration"), exist_ok=True)
     t0 = time.time()
     raw, seg = voice(log)
     pw, pj = os.path.join(out_dir, "narration/paced.wav"), os.path.join(out_dir, "narration/paced.json")
     d = pace.build(raw, seg, _beats(), pw, pj, tempo=tempo)
     nar = dict(segments=[dict(id=s["beat_id"], text=s["text"], start=s["start_seconds"], end=s["end_seconds"], words=s["words"]) for s in d["segments"]], audio=os.path.relpath(pw, ROOT), tts="chatterbox", tempo=tempo)
-    plan = SD2.build_plan(nar, seed=seed, tts="chatterbox")
+    plan = (SD3 if director == "v3" else SD2).build_plan(nar, seed=seed, tts="chatterbox")
     plan["narration"]["pacing"] = {k: d[k] for k in ("raw_duration", "raw_words_per_s", "paced_words_per_s", "gap_cap", "beat_gap", "tempo")}
     t_plan = time.time() - t0
     t1 = time.time()

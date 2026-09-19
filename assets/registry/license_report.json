@@ -1,12 +1,13 @@
 {
  "policy_source": "engine/licensing/policy.py",
  "summary": {
-  "ACCEPT": 13,
+  "ACCEPT": 15,
   "ACCEPT_WITH_OBLIGATIONS": 5,
   "QUARANTINE": 12
  },
  "usable_in_films": [
-  "open_peeps_flat_v1"
+  "open_peeps_flat_v1",
+  "openpeeps_device_hand_harvest_v1"
  ],
  "evaluated_downloaded": [
   "kenney_platformer_characters_v1",
@@ -21,7 +22,8 @@
   "blenderstudio_gp_brush_pack_v2",
   "artell_mike_rig_v1",
   "blender_human_base_meshes_v1_4_1",
-  "mpfb2_generated_humans_cc0"
+  "mpfb2_generated_humans_cc0",
+  "rgs_cc0_modular_animated_vector_characters"
  ],
  "external_tools": [
   "mpfb2_extension_2_0_17"

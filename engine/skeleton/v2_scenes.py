@@ -49,7 +49,7 @@ def interaction_plan():
     A_(action="buzz", t=1.0, dur=1.0, intensity=0.9)
     A_(action="look_at", t=1.3, dur=1.2, target="PHONE", track=True, emotion="curious", intensity=0.6)
     A_(action="reach", t=2.6, dur=1.2, target="PHONE", emotion="hesitant", intensity=0.7, grip="hold_phone")
-    A_(action="grab", t=3.85, dur=0.1, prop="phone")
+    A_(action="grab", t=3.85, dur=0.1, prop="phone", from_table=True)
     A_(action="hold_phone", t=4.05, dur=0.8, pos="chest", emotion="hesitant", intensity=0.6)
     A_(action="read_phone", t=4.6, dur=2.0, emotion="nervous", intensity=0.6)
     B_(action="walk_to", t=5.2, dur=2.3, target="B_STOP", stop_before=0.0, speed=230.0, stride_scale=0.7, emotion="hesitant", intensity=0.5)
@@ -79,6 +79,22 @@ def interaction_plan():
     p = _base("multi_character_interaction", 24.0, dict(family="study_room", variation=dict(palette=1), seed=3), chars, shots, targets, lamp_on=20.7, hall_on=4.8)
     p["overlays"] = [dict(t0=0.0, t1=24.0, x=14, y=14, size=26, w=1050, text="Person A · Person B · Phone · Table · Chair · semantic targets: PHONE / PERSON_x / HANDOVER / B_STOP / A_HAND")]
     return p
+
+
+def contact_plan():
+    """hand <-> phone contact test: a man at a table; reach, approach, contact, grip, lift, read, put it back. Camera close on the hand and phone."""
+    A = dna2.make("con:A", "young_man", {"wardrobe.top": "sweater", "wardrobe.bottom": "jeans", "wardrobe.shoes": "sneakers", "wardrobe.palette": "sage", "wardrobe.accessories": [], "glasses": "* None"})
+    chars = {"A": dict(name="A", dna=A, facing=1, origin=[300.0, BW.FLOOR_Y], view="three_quarter", hand_set="full", start="sit")}
+    targets = dict(PHONE=list(SR.PHONE_POS), TABLE=[730.0, SR.TABLE_TOP], CHAIR=[300.0, 1230.0], LAMP=[700.0, 940.0], nightstand_phone=list(SR.PHONE_POS))
+    cam = lambda t, s, m, **k: dict(target=t, size=s, move=m, **k)
+    shots = _shots([(0.0, 3.4, cam("A.reach", "two_reach", "push"), dict(purpose="reach and approach")), (3.4, 6.4, cam("A.phone", "close", "hold"), dict(purpose="contact, grip, lift")),
+                    (6.4, 9.6, cam("A.phone", "close", "push"), dict(purpose="read")), (9.6, 12.6, cam("A.reach", "two_reach", "hold"), dict(purpose="put back, release"))], dict(mood="dim", moon=0.9, phone=1.0, hall=0.0))
+    acts = [dict(char="A", action="idle", t=0.0, dur=12.6), dict(char="A", action="look_at", t=0.2, dur=1.0, target="PHONE", track=True, emotion="curious", intensity=0.5),
+            dict(char="A", action="reach", t=1.0, dur=2.6, target="PHONE", emotion="calm", intensity=0.5, grip="grab"), dict(char="A", action="grab", t=3.62, dur=0.1, prop="phone", from_table=True),
+            dict(char="A", action="hold_phone", t=3.9, dur=1.4, pos="chest", emotion="calm", intensity=0.5), dict(char="A", action="read_phone", t=5.6, dur=3.6, emotion="calm", intensity=0.5),
+            dict(char="A", action="place", t=9.3, dur=1.6, target="PHONE")]
+    _attach(shots, acts)
+    return _base("hand_phone_contact", 12.6, dict(family="study_room", variation=dict(palette=1), seed=3), chars, shots, targets, lamp_on=99.0, hall_on=99.0)
 
 
 def parallax_plan():
@@ -118,7 +134,7 @@ def lighting_plan():
 
 
 def run(kind, log=print, samples=8):
-    plan = dict(interaction=interaction_plan, parallax=parallax_plan, lighting=lighting_plan)[kind]()
+    plan = dict(interaction=interaction_plan, parallax=parallax_plan, lighting=lighting_plan, contact=contact_plan)[kind]()
     name = plan["name"]
     out_dir = os.path.join(OUT, "work_" + name)
     os.makedirs(out_dir, exist_ok=True)

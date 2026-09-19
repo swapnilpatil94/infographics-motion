@@ -21,7 +21,7 @@ def cast(story_id):
     D = dna2.make(f"{story_id}:D", "middle_aged_woman", {"wardrobe.top": "kurta", "wardrobe.bottom": "salwar", "wardrobe.shoes": "sandals", "wardrobe.palette": "terracotta", "wardrobe.pattern": "plain",
                                                          "wardrobe.accessories": ["earrings"], "age": 47, "hair.style": "Bun 2", "hair.length": "long", "posture": "upright", "personality": "calm", "eyes": "almond", "eyebrows": "arched"})
     return {"A": dict(name="अर्जुन", role="protagonist", dna=A, facing=1, origin=[380.0, BW.FLOOR_Y], view="three_quarter", hand_set="full", start="sit"),
-            "D": dict(name="माँ", role="family", dna=D, facing=-1, origin=[1335.0, BW.FLOOR_Y], view="three_quarter", hand_set="full", start="stand")}
+            "D": dict(name="माँ", role="family", dna=D, facing=-1, origin=[1440.0, BW.FLOOR_Y], view="three_quarter", hand_set="full", start="stand")}
 
 
 def _w(seg, needle, default):
@@ -31,7 +31,7 @@ def _w(seg, needle, default):
     return default
 
 
-def build_plan(nar, seed=11, tts=None, name="skeleton_factory_v2"):
+def build_plan(nar, seed=11, tts=None, name="skeleton_factory_v3"):
     segs = {s["id"]: s for s in nar["segments"]}
     missing = [b for b in BEATS if b not in segs]
     if missing:
@@ -77,20 +77,25 @@ def build_plan(nar, seed=11, tts=None, name="skeleton_factory_v2"):
     A(action="realization", t=t0 + 0.05, dur=t1 - t0 - 0.05, emotion="shocked", intensity=0.8)
     # S09 he stands
     t0, t1 = T["S09"]
-    A(action="face", t=t0, dur=0.3, name="fear")
+    A(action="fear", t=t0, dur=1.0, emotion="fearful", intensity=0.7, body=False)
     A(action="stand", t=t0 + 0.08, dur=min(1.3, max(1.0, t1 - t0 - 0.1)), emotion="fearful", intensity=0.7)
     # S10 he walks across the room
     t0, t1 = T["S10"]
     A(action="walk_to", t=t0 + 0.05, dur=t1 - t0 - 0.1, target="A_STOP", stop_before=0.0, speed=170.0, stride_scale=0.5, hold_R=True, emotion="nervous", intensity=0.7)
-    # S11 the mother enters
+    # S11 the mother ENTERS: comes in from off-screen, notices him on the way (eyes first, then head, a half-beat stop), he hears/sees the door and notices her, EYE CONTACT, she settles at a
+    # believable distance (personal space) and stops. Nothing 'appears': she walks the whole way.
     t0, t1 = T["S11"]
-    D(action="walk_to", t=t0 - 0.2, dur=max(1.4, t1 - t0 + 0.2), target="D_STOP", stop_before=0.0, speed=230.0, stride_scale=0.7, emotion="hesitant", intensity=0.5)
-    D(action="face", t=t0 + 0.2, dur=0.4, name="concerned")
-    A(action="head_turn", t=t0 + 0.3, dur=0.5, direction=1, emotion="shocked", intensity=0.5)
-    # S12 he looks at her, she looks at him
+    D(action="walk_to", t=t0 - 1.1, dur=max(2.4, t1 - t0 + 1.2), target="D_STOP", stop_before=0.0, speed=205.0, stride_scale=0.7, emotion="hesitant", intensity=0.5)
+    D(action="face", t=t0 + 0.3, dur=0.4, name="concerned")
+    D(action="notice", t=t0 + 0.35, dur=0.7, target="PERSON_A", emotion="hesitant", intensity=0.5)
+    A(action="notice", t=t0 + 0.2, dur=0.7, target="DOOR", emotion="shocked", intensity=0.5)
+    A(action="eye_contact", t=t0 + 0.95, dur=max(1.0, t1 - t0 - 0.85), target="PERSON_D")
+    D(action="eye_contact", t=t0 + 1.1, dur=max(1.0, t1 - t0 - 0.9), target="PERSON_A")
+    # S12 he looks at her, she looks at him (eye contact holds), the concern lands
     t0, t1 = T["S12"]
-    A(action="look_at", t=t0 + 0.05, dur=t1 - t0 - 0.05, target="PERSON_D", track=True, emotion="nervous", intensity=0.5)
-    D(action="look_at", t=t0 + 0.15, dur=t1 - t0 - 0.15, target="PERSON_A", track=True, emotion="hesitant", intensity=0.5)
+    A(action="eye_contact", t=t0 + 0.02, dur=t1 - t0 - 0.02, target="PERSON_D", emotion="nervous", intensity=0.5)
+    D(action="eye_contact", t=t0 + 0.05, dur=t1 - t0 - 0.05, target="PERSON_A", emotion="hesitant", intensity=0.5)
+    D(action="confusion", t=t0 + 0.4, dur=1.1, emotion="hesitant", intensity=0.5)
     # S13 she looks at the phone
     t0, t1 = T["S13"]
     D(action="look_at", t=t0 + 0.05, dur=t1 - t0 - 0.05, target="PHONE", track=True, emotion="suspicious", intensity=0.6)
@@ -101,11 +106,11 @@ def build_plan(nar, seed=11, tts=None, name="skeleton_factory_v2"):
     t_meet = round(t0 + max(0.8, (t1 - t0) * 0.55), 3)
     A(action="hand_over", t=t0 + 0.05, dur=t_meet - t0 - 0.05, target="PERSON_D", point="HANDOVER", prop="phone", emotion="hesitant", intensity=0.6)
     D(action="receive", t=t0 + 0.15, dur=t_meet - t0 - 0.1, point="HANDOVER", prop="phone", emotion="hesitant", intensity=0.5)
-    A(action="release", t=t_meet + 0.12, dur=0.5, prop="phone")
-    D(action="hold_phone", t=t_meet + 0.35, dur=max(0.4, t1 - t_meet - 0.35), pos="chest", emotion="hesitant", intensity=0.5)
+    A(action="release", t=t_meet + 0.55, dur=0.5, prop="phone")                                  # only AFTER her hand has closed on it (the hand-over is slowed by the hesitant style)
+    D(action="hold_phone", t=t_meet + 0.65, dur=max(0.4, t1 - t_meet - 0.65), pos="chest", emotion="hesitant", intensity=0.5)
     # S15 she reacts
     t0, t1 = T["S15"]
-    D(action="flinch", t=t0 + 0.05, dur=0.6, emotion="fearful", intensity=0.6)
+    D(action="fear", t=t0 + 0.05, dur=1.2, emotion="fearful", intensity=0.6)
     D(action="read_phone", t=t0 + 0.5, dur=max(0.6, t1 - t0 - 0.5), emotion="nervous", intensity=0.5)
     D(action="face", t=t0 + 0.3, dur=0.4, name="worried")
     A(action="look_at", t=t0 + 0.1, dur=t1 - t0 - 0.1, target="PERSON_D", track=True)
@@ -173,8 +178,8 @@ def build_plan(nar, seed=11, tts=None, name="skeleton_factory_v2"):
         sfx.append(dict(t=round(cuts[i] - 0.06, 3), kind="whoosh", gain=0.2))
     mood = [(0.0, T["S04"][0], "dim"), (T["S04"][0], T["S11"][0], "fear"), (T["S11"][0], T["S18"][0], "dim"), (T["S18"][0], T["S20"][0], "fear"), (T["S20"][0], dur, "relief")]
     targets = dict(PHONE=list(BW.PHONE_POS), DOOR=[960.0, 1000.0], NIGHTSTAND=[670.0, 1180.0], BED=[200.0, 1230.0], LAMP=[600.0, 1110.0], WINDOW=[865.0, 560.0],
-                   A_STOP=[800.0, BW.FLOOR_Y], D_STOP=[1030.0, BW.FLOOR_Y], HANDOVER=list(HANDOVER), SCREEN=[540.0, 900.0], MONEY=[540.0, 900.0], nightstand_phone=list(BW.PHONE_POS))
-    return dict(kind="skeleton_short", version=2, title=TITLE, story_id=story_id, seed=seed, fps=FPS, format=dict(w=1080, h=1920, name="9x16"), duration=dur, name=name,
+                   A_STOP=[780.0, BW.FLOOR_Y], D_STOP=[1050.0, BW.FLOOR_Y], HANDOVER=list(HANDOVER), SCREEN=[540.0, 900.0], MONEY=[540.0, 900.0], nightstand_phone=list(BW.PHONE_POS))
+    return dict(kind="skeleton_short", version=3, title=TITLE, story_id=story_id, seed=seed, fps=FPS, format=dict(w=1080, h=1920, name="9x16"), duration=dur, name=name,
                 environment=dict(family="bedroom_wide", variation=dict(palette=VAR.seed_int(story_id, "env", "pal") % 3), seed=VAR.seed_int(story_id, "env", "seed") % 1000),
                 characters=cast(story_id), cast_in_short=["A", "D"], narration=dict(segments=nar["segments"], audio=nar.get("audio"), tts=tts or nar.get("tts", "unknown"), tempo=nar.get("tempo", 1.0)),
                 targets=targets, shots=shots, sfx=sfx, mood_track=mood, title_card=dict(t0=round(dur - 1.9, 3), t1=dur, text=TITLE), lamp_on=round(T["S20"][0] + 0.3, 3), hall_on=round(T["S11"][0] - 0.5, 3),

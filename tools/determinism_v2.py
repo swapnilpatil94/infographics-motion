@@ -75,7 +75,7 @@ def main(args):
     for r in runs.values():
         r.pop("_video_frame_md5")
     res = dict(runs=runs, comparisons=cmp)
-    json.dump(res, open(os.path.join(ROOT, "output/tests/determinism_v2.json"), "w"), indent=1)
+    json.dump(res, open(os.path.join(ROOT, "output/tests", os.environ.get("DET_OUT", "determinism_v2.json")), "w"), indent=1)
     print(json.dumps(res, indent=1))
 
 
