@@ -1,0 +1,284 @@
+{
+ "id": "200bb4e836df",
+ "dir": "assets/character/skeleton/generated/200bb4e836df",
+ "P": {
+  "head": 154.66759999999996,
+  "neck": 26.293491999999993,
+  "torso": 221.17466799999997,
+  "upper_arm": 136.107488,
+  "forearm": 123.73407999999998,
+  "hand": 49.49363199999999,
+  "thigh": 190.24114799999995,
+  "shin": 182.50776799999997,
+  "foot_h": 32.48019599999999,
+  "foot_len": 98.98726399999998,
+  "torso_w": 120.32,
+  "limb": 49.68,
+  "k": 0.7733379999999999,
+  "hip_y": 405.22911199999993,
+  "shoulder_y": 626.4037799999999,
+  "shoulder_joint_y": 600.1102879999999,
+  "neck_top_y": 652.6972719999999,
+  "hs": 0.37449782082324445,
+  "height": 807.3648719999999,
+  "stride_max": 231.10432791999995
+ },
+ "fb": {
+  "bottom": "#6a4b5a",
+  "shoes": "#e6e6ea",
+  "hair_color": "#8f8f95",
+  "short_sleeve": false,
+  "long_top": true,
+  "height_scale": 0.866
+ },
+ "parts": {
+  "upperarm_L": {
+   "png": "assets/character/skeleton/generated/200bb4e836df/upperarm_L.png",
+   "pivot": [
+    64.0,
+    64.0
+   ],
+   "size": [
+    128,
+    388
+   ],
+   "res": 2.0
+  },
+  "forearm_L": {
+   "png": "assets/character/skeleton/generated/200bb4e836df/forearm_L.png",
+   "pivot": [
+    56.0,
+    56.0
+   ],
+   "size": [
+    112,
+    346
+   ],
+   "res": 2.0
+  },
+  "hand_L": {
+   "png": "assets/character/skeleton/generated/200bb4e836df/hand_L.png",
+   "pivot": [
+    55.62880000000001,
+    15.0
+   ],
+   "size": [
+    140,
+    121
+   ],
+   "res": 2.0
+  },
+  "thigh_L": {
+   "png": "assets/character/skeleton/generated/200bb4e836df/thigh_L.png",
+   "pivot": [
+    76.0,
+    76.0
+   ],
+   "size": [
+    152,
+    514
+   ],
+   "res": 2.0
+  },
+  "shin_L": {
+   "png": "assets/character/skeleton/generated/200bb4e836df/shin_L.png",
+   "pivot": [
+    58.0,
+    58.0
+   ],
+   "size": [
+    116,
+    466
+   ],
+   "res": 2.0
+  },
+  "foot_L": {
+   "png": "assets/character/skeleton/generated/200bb4e836df/foot_L.png",
+   "pivot": [
+    68.58698399999997,
+    19.0
+   ],
+   "size": [
+    230,
+    103
+   ],
+   "res": 2.0
+  },
+  "upperarm_R": {
+   "png": "assets/character/skeleton/generated/200bb4e836df/upperarm_R.png",
+   "pivot": [
+    64.0,
+    64.0
+   ],
+   "size": [
+    128,
+    388
+   ],
+   "res": 2.0
+  },
+  "forearm_R": {
+   "png": "assets/character/skeleton/generated/200bb4e836df/forearm_R.png",
+   "pivot": [
+    56.0,
+    56.0
+   ],
+   "size": [
+    112,
+    346
+   ],
+   "res": 2.0
+  },
+  "hand_R": {
+   "png": "assets/character/skeleton/generated/200bb4e836df/hand_R.png",
+   "pivot": [
+    55.62880000000001,
+    15.0
+   ],
+   "size": [
+    140,
+    121
+   ],
+   "res": 2.0
+  },
+  "thigh_R": {
+   "png": "assets/character/skeleton/generated/200bb4e836df/thigh_R.png",
+   "pivot": [
+    76.0,
+    76.0
+   ],
+   "size": [
+    152,
+    514
+   ],
+   "res": 2.0
+  },
+  "shin_R": {
+   "png": "assets/character/skeleton/generated/200bb4e836df/shin_R.png",
+   "pivot": [
+    58.0,
+    58.0
+   ],
+   "size": [
+    116,
+    466
+   ],
+   "res": 2.0
+  },
+  "foot_R": {
+   "png": "assets/character/skeleton/generated/200bb4e836df/foot_R.png",
+   "pivot": [
+    68.58698399999997,
+    19.0
+   ],
+   "size": [
+    230,
+    103
+   ],
+   "res": 2.0
+  },
+  "pelvis": {
+   "png": "assets/character/skeleton/generated/200bb4e836df/pelvis.png",
+   "pivot": [
+    125.32,
+    122.053744
+   ],
+   "size": [
+    251,
+    216
+   ],
+   "res": 2.0
+  },
+  "torso": {
+   "png": "assets/character/skeleton/generated/200bb4e836df/torso.png",
+   "pivot": [
+    137.32,
+    479.349336
+   ],
+   "size": [
+    296,
+    616
+   ],
+   "res": 2.0
+  },
+  "neck": {
+   "png": "assets/character/skeleton/generated/200bb4e836df/neck.png",
+   "pivot": [
+    46.0,
+    151.17396799999997
+   ],
+   "size": [
+    92,
+    194
+   ],
+   "res": 2.0
+  },
+  "phone": {
+   "png": "assets/character/skeleton/generated/200bb4e836df/phone.png",
+   "pivot": [
+    53.946956,
+    97.25388399999997
+   ],
+   "size": [
+    108,
+    195
+   ],
+   "res": 2.0
+  },
+  "fingers": {
+   "png": "assets/character/skeleton/generated/200bb4e836df/fingers.png",
+   "pivot": [
+    67.62880000000001,
+    12.0
+   ],
+   "size": [
+    156,
+    120
+   ],
+   "res": 2.0
+  },
+  "skull": {
+   "png": "assets/character/skeleton/generated/200bb4e836df/skull.png",
+   "pivot": [
+    198.3853326876512,
+    351.59214527845023
+   ],
+   "size": [
+    344,
+    381
+   ],
+   "res": 2.0
+  },
+  "hair": {
+   "png": "assets/character/skeleton/generated/200bb4e836df/hair.png",
+   "pivot": [
+    198.3853326876512,
+    351.59214527845023
+   ],
+   "size": [
+    357,
+    381
+   ],
+   "res": 2.0
+  },
+  "nose": {
+   "png": "assets/character/skeleton/generated/200bb4e836df/nose.png",
+   "pivot": [
+    -45.642618886198576,
+    112.42358353510889
+   ],
+   "size": [
+    40,
+    36
+   ],
+   "res": 2.0
+  }
+ },
+ "dna_id": "dna_009ee5639b",
+ "skin": "#e2b487",
+ "face_style": {
+  "ex": 0.85,
+  "ey": 0.9,
+  "brow": 13,
+  "mouth": 1.06
+ }
+}

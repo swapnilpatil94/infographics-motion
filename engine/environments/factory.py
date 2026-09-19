@@ -18,6 +18,7 @@ from engine.shorts.raster import ROOT
 GEN = os.path.join(ROOT, "assets/environment/generated")
 
 LIGHTS = {   # family -> (ambient, bloom, time, mood, description, good_for, light builder)
+    "bedroom_wide": ((0.20, 0.22, 0.34), 0.42, "night", "quiet, private, night-time", "Wide Indian bedroom for full-body characters: bed edge at seat height, nightstand, window, doorway, foreground plant/curtain", "full-body acting, sitting/standing/walking, phone calls at night, family entering a room"),
     "bank_branch": ((0.66, 0.66, 0.64), 0.28, "day", "formal, official, orderly", "Bank branch: teller windows, queue posts, signage, counter in front", "bank visits, official processes, queues, loans, KYC, fraud reports"),
     "call_centre": ((0.60, 0.62, 0.68), 0.32, "day", "busy, impersonal, pressured", "Call centre floor: rows of glowing cubicles, headset desk in front", "support calls, scam call centres, customer service, sales pressure"),
     "indian_living_room": ((0.64, 0.58, 0.50), 0.35, "day", "warm, familial, domestic", "Indian living room: sofa, framed pictures, ceiling fan, curtained window", "family conversations, home life, evenings, TV, festivals"),

@@ -158,6 +158,15 @@ def room_tone(dur, seed=2):
     return (brown * 0.06 + hum * 0.05).astype(np.float32)
 
 
+def footstep():
+    n = int(SR * 0.16)
+    tt = np.arange(n) / SR
+    rng = np.random.default_rng(4)
+    thud = np.sin(2 * np.pi * (95 - 45 * tt / 0.16) * tt) * np.exp(-tt / 0.045) * 0.16
+    scuff = _filt(rng.standard_normal(n), "band", 500, 2500) * np.exp(-tt / 0.02) * 0.03
+    return (thud + scuff).astype(np.float32)
+
+
 def tick():
     n = int(SR * 0.05)
     tt = np.arange(n) / SR

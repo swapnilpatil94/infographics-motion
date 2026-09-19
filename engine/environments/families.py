@@ -172,4 +172,5 @@ def atm_area(v, seed):
     return L, ["wall", "atm", "glass", "@char", "shelf_fg"]
 
 
-FAMILIES = {"bank_branch": bank_branch, "call_centre": call_centre, "indian_living_room": indian_living_room, "atm_area": atm_area}
+from engine.environments.bedroom_wide import bedroom_wide          # noqa: E402  (full-body stage)
+FAMILIES = {"bedroom_wide": bedroom_wide, "bank_branch": bank_branch, "call_centre": call_centre, "indian_living_room": indian_living_room, "atm_area": atm_area}

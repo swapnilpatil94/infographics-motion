@@ -71,6 +71,14 @@ def run_factory(story=None, narration=None, project_plan=None, name=None, plan_o
     subprocess.run([py, "-c", code], cwd=ROOT, check=True, env=dict(os.environ, PYTHONPATH=ROOT, PYTHONUNBUFFERED="1"))
 
 
+def _is_skeleton_plan(path):
+    try:
+        import json
+        return json.load(open(path)).get("kind") == "skeleton_short"
+    except Exception:
+        return False
+
+
 def run_contact_sheet():
     subprocess.run([sys.executable, os.path.join(ROOT, "asset_pipeline/contact_sheet.py")], cwd=ROOT, check=True)
 
@@ -97,9 +105,22 @@ def main():
     parser.add_argument("--qc-only", action="store_true", help="FACTORY: re-run QC/reports on an existing render")
     parser.add_argument("--allow-fallbacks", action="store_true", help="FACTORY: continue even if required assets are missing")
     parser.add_argument("--api-request", metavar="REQUEST_JSON", help='FACTORY API: {"story","narration_segments","style","aspect_ratio"} -> film (what a UI would call)')
+    parser.add_argument("--skeleton-short", action="store_true", help="SKELETON PROOF: build + render the full-body 2D skeleton short (narration -> plan -> Blender rig -> film)")
+    parser.add_argument("--tts", default="chatterbox", choices=["chatterbox", "vibevoice"], help="With --skeleton-short: narration engine used to (re)generate the voice")
+    parser.add_argument("--tempo", type=float, default=1.16, help="With --skeleton-short: pacing speed-up (1.0 = natural)")
     parser.add_argument("--contact-sheet", action="store_true", help="Regenerate the asset contact sheet from the registry")
     args = parser.parse_args()
 
+    if args.from_plan and _is_skeleton_plan(args.from_plan):
+        code = ("import sys, json; sys.path.insert(0, '.'); from engine.skeleton import build;"
+                f"build.from_plan({args.from_plan!r})")
+        subprocess.run([os.path.join(ROOT, ".venv/bin/python"), "-c", code], cwd=ROOT, check=True, env=dict(os.environ, PYTHONPATH=ROOT, PYTHONUNBUFFERED="1"))
+        return
+    if args.skeleton_short:
+        code = ("import sys; sys.path.insert(0, '.'); from engine.skeleton import build;"
+                f"build.make(tts={args.tts!r}, tempo={args.tempo})")
+        subprocess.run([os.path.join(ROOT, ".venv/bin/python"), "-c", code], cwd=ROOT, check=True, env=dict(os.environ, PYTHONPATH=ROOT, PYTHONUNBUFFERED="1"))
+        return
     if args.api_request:
         code = ("import sys, json; sys.path.insert(0, '.'); from engine import api;"
                 f"r = api.generate(json.load(open({args.api_request!r}))); print(json.dumps(r, ensure_ascii=False, indent=2))")

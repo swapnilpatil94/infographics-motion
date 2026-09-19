@@ -13,3 +13,4 @@ assets/character/raw/open_peeps/extracted/Flat Assets/nested_extracted/
 assets/character/raw/open_peeps/extracted/Flat Assets/Templates/
 narration/*.wav
 assets/character/raw/open_peeps/extracted/__MACOSX/
+.vendor_tf/

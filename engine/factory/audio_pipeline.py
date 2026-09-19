@@ -111,7 +111,7 @@ def mix(duration, narration, sfx, mood_track, room_gain=0.5, music_gain=0.32, ou
     n = min(len(bed), len(duck), m.n)
     m.buf[:n] -= bed[:n] * music_gain * (1 - duck[:n])
     m.add(0.0, v, 1.0)
-    kinds = {"ding": audio.ding, "buzz": audio.buzz, "heartbeat": audio.heartbeat, "impact": audio.impact, "whoosh": audio.whoosh, "tick": audio.tick}
+    kinds = {"ding": audio.ding, "buzz": audio.buzz, "heartbeat": audio.heartbeat, "impact": audio.impact, "whoosh": audio.whoosh, "tick": audio.tick, "footstep": audio.footstep}
     for t, kind, g in sfx:
         if g > 0 and kind in kinds and 0 <= t < duration:
             m.add(t, kinds[kind](), g * 0.5)
