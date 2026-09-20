@@ -9,6 +9,7 @@ import hashlib
 import json
 import math
 import os
+import shutil
 import subprocess
 import time
 
@@ -17,7 +18,7 @@ import numpy as np
 from PIL import Image
 
 from engine.dsl import variation as VAR
-from engine.environments import factory as EF
+from engine.environments import factory as EF, locations as _LOCATIONS  # noqa: F401  (registers the semantic story locations)
 from engine.factory import audio_pipeline as AP, render as FR
 from engine.shorts import captions, sets
 from engine.shorts.dust import Dust
@@ -54,6 +55,7 @@ class Actor:
         self.perf = M.Performance(self.P, seed=VAR.seed_int(plan["story_id"], cid, "perf") % 1000, world=dict(seat_h=BW.FLOOR_Y - BW.SEAT_Y), facing=self.facing, origin=self.origin,
                                   personality=pers)
         self.channels = None
+        self.perf.anchors = self.man.get("hand_anchors")
 
     def job_channels(self):
         """Channels as the Blender script wants them: canonical hand-pose ids -> indices into THIS character's pose set."""
@@ -120,11 +122,23 @@ def _resolve(actor, act, plan):
     return kw
 
 
+def targets_at(plan, t):
+    """the target registry in force at time t: stories that change location carry one registry per scene (`plan['target_scenes']` = [{t0, t1, targets}])"""
+    for sc in plan.get("target_scenes", ()):
+        if sc["t0"] <= t < sc["t1"]:
+            return sc["targets"]
+    return plan.get("targets", {})
+
+
+def on_screen(actor, t, lo=-220.0, hi=1290.0):
+    """a character is 'in the set' when its root is inside the set's world extent (a parked character waits far outside it)"""
+    return lo < actor.rig_to_world(actor.perf.v("root_x", t), 0.0)[0] < hi
+
+
 def make_resolver(plan, actors):
     """The scene's SPATIAL-TARGET registry: semantic id -> world (x, y) at time t (PERSON_x, PHONE, HANDOVER, DOOR, TABLE, CHAIR, BED, NIGHTSTAND, LAMP, MONEY, SCREEN, custom ids)."""
-    tg = plan.get("targets", {})
-
     def resolve(tid, t):
+        tg = targets_at(plan, t)
         if isinstance(tid, str) and tid.startswith("PERSON_"):
             return actors[tid[7:]].anchor("head", t)
         if tid == "PHONE":
@@ -212,6 +226,9 @@ def build_actors(plan, log=print):
     for a in actors.values():
         M.auto_blinks(a.perf, 0.0, plan["duration"], VAR.seed_int(plan["story_id"], a.id, "blink") % 1000)
         a.channels = M.sample(a.perf, plan["fps"], 0.0, plan["duration"])
+        if plan.get("version", 1) >= 4:                                                    # production films: follow-through (hair spring, neck lag, breathing) on the sampled channels
+            from engine.skeleton import motion_polish as MP
+            a.polish = MP.polish(a.channels, plan["fps"], VAR.seed_int(plan["story_id"], a.id, "polish") % 100)
         a.reach_clamped_frames = _clamp_reach(a, plan["fps"])
     return actors
 
@@ -220,20 +237,30 @@ def build_actors(plan, log=print):
 def _target(plan, actors, spec, t):
     if spec == "stage":
         return (540.0, 1010.0)
-    if spec == "A+D":
-        pts = [actors[c].anchor("chest", t) for c in ("A", "D") if c in actors and (c == "A" or abs(actors[c].perf.v("root_x", t)) > 20)]
+    if "+" in spec:                                                                    # 'A+D', 'A+X1': a two-shot of the protagonist and the named partner (skipped while the partner is parked)
+        ids = spec.split("+")
+        pts = [actors[c].anchor("chest", t) for c in ids if c in actors and (c == ids[0] or on_screen(actors[c], t))]
         if len(pts) == 1:
             pts.append((pts[0][0] + 130, pts[0][1]))
         return (sum(p[0] for p in pts) / len(pts), sum(p[1] for p in pts) / len(pts))
     if spec == "A.reach":
         c = actors["A"].anchor("chest", t)
-        ph = plan["targets"]["nightstand_phone"]
+        ph = targets_at(plan, t).get("PHONE") or plan["targets"]["nightstand_phone"]
         return ((c[0] + ph[0]) / 2, (c[1] + ph[1]) / 2)
     cid, part = spec.split(".")
     if part == "full":
         h, hip = actors[cid].anchor("head", t), actors[cid].anchor("hip", t)
         return ((h[0] + hip[0]) / 2 + 40, 1500 - 480)
     return actors[cid].anchor(part, t)
+
+
+def _fit_two(plan, actors, c, t, mv):
+    ids = c["target"].split("+")
+    xs = [actors[k].anchor("chest", t)[0] for k in ids if k in actors and (k == ids[0] or on_screen(actors[k], t))]
+    if len(xs) < 2:
+        return 9.0
+    slack = 300.0 if mv == "reveal" else 220.0 if mv == "truck" else 60.0
+    return W / (abs(xs[0] - xs[1]) + 2 * 250.0 + slack)
 
 
 def build_camera(plan, actors):
@@ -265,6 +292,8 @@ def build_camera(plan, actors):
                 a1 = _target(plan, actors, c["target"], sh["t1"] - 0.05)
                 tx, ty = a0[0] + (a1[0] - a0[0]) * e, a0[1] + (a1[1] - a0[1]) * e
             z = z0 * c.get("zoom_mul", 1.0)
+            if "+" in c["target"] and c["target"] != "A.reach" and not c["target"].startswith("stage"):
+                z = min(z, _fit_two(plan, actors, c, t, mv))                          # both people of a two-shot always inside the frame (with the move's own offset)
             z0 = z
             tx, ty = tx + c.get("dx", 0.0), ty + c.get("dy", 0.0)                    # critic fixes: framing nudges
             g = 1.0
@@ -329,11 +358,53 @@ def render_actors(plan, actors, cam, workdir, log=print, samples=10, only_frames
     for cid, a in actors.items():
         chars.append(dict(id=cid, manifest=os.path.join(ROOT, a.man["dir"], "parts.json"), facing=a.facing, origin=list(a.origin), channels=a.job_channels()))
     zoom_eff = [view_zoom(cam["zoom"][i], cam["gain"][i]) for i in range(n)]
-    job = dict(width=W, height=H, fps=plan["fps"], start=0, end=n - 1, out=out, prefix="a", samples=samples, characters=chars, gaze_mode=plan.get("gaze_mode", "pupil"),
-               camera=dict(cx=[round(float(x), 3) for x in cam["cx"]], cy=[round(float(x), 3) for x in cam["cy"]], zoom=[round(float(x), 4) for x in zoom_eff]),
-               render_frames=fr, probe_frames=fr[::max(1, len(fr) // 40)], save_blend=os.path.join(workdir, "skeleton_scene.blend"))
+    camj = dict(cx=[round(float(x), 3) for x in cam["cx"]], cy=[round(float(x), 3) for x in cam["cy"]], zoom=[round(float(x), 4) for x in zoom_eff])
+    keys = _frame_keys(plan, chars, camj, fr, samples)                             # content address of every frame: same characters + channels + camera + quality -> same pixels
+    cache = os.path.join(ROOT, "output/cache/actor_frames")
+    os.makedirs(cache, exist_ok=True)
+    have = {f for f in fr if os.path.exists(os.path.join(cache, keys[f] + ".png"))}
+    todo = [f for f in fr if f not in have]
+    job = dict(width=W, height=H, fps=plan["fps"], start=0, end=n - 1, out=out, prefix="a", samples=samples, characters=chars, gaze_mode=plan.get("gaze_mode", "pupil"), camera=camj,
+               render_frames=todo or fr[:1], probe_frames=fr[::max(1, len(fr) // 40)], save_blend=os.path.join(workdir, "skeleton_scene.blend"))
     rep = blender_job.run(job, workdir, log)
+    for f in todo:                                                                 # freshly rendered frames enter the cache
+        src = os.path.join(out, f"a{f:05d}.png")
+        if os.path.exists(src):
+            shutil.copyfile(src, os.path.join(cache, keys[f] + ".png"))
+    for f in have:
+        dst = os.path.join(out, f"a{f:05d}.png")
+        if os.path.lexists(dst):
+            os.remove(dst)
+        shutil.copyfile(os.path.join(cache, keys[f] + ".png"), dst)
+    rep["frame_cache"] = dict(frames=len(fr), reused=len(have), rendered=len(todo))
+    log(f"[cache] actor frames: {len(have)} reused, {len(todo)} rendered")
     return out, rep
+
+
+def _frame_keys(plan, chars, camj, frames, samples):
+    """sha1 per frame over everything that can change that frame's pixels"""
+    import hashlib as hl
+    from engine.skeleton import parts_art2 as _PA
+    base = hl.sha1(json.dumps([_PA.ART_VERSION, samples, plan.get("gaze_mode", "pupil"), plan["fps"], W, H], sort_keys=True).encode())
+    per = []
+    for c in chars:
+        h = hl.sha1(open(c["manifest"], "rb").read())
+        h.update(json.dumps([c["facing"], c["origin"]]).encode())
+        names = sorted(c["channels"])
+        arr = np.array([c["channels"][k] for k in names], np.float64).T          # (frames, channels)
+        wx = c["origin"][0] + c["facing"] * np.array(c["channels"]["root_x"], np.float64)
+        per.append((h.digest(), arr, (wx > -320.0) & (wx < 1400.0)))              # an actor parked far off the set contributes nothing to a frame's pixels (so editing him re-renders nothing where he is absent)
+    cam = np.array([camj["cx"], camj["cy"], camj["zoom"]], np.float64).T
+    keys = {}
+    for f in frames:
+        h = base.copy()
+        for d, arr, vis in per:
+            if vis[f]:
+                h.update(d)
+                h.update(arr[f].tobytes())
+        h.update(cam[f].tobytes())
+        keys[f] = h.hexdigest()[:24]
+    return keys
 
 
 class ActorLayer:
@@ -410,7 +481,7 @@ class SkeletonShot:
     def __init__(self, sh, film):
         self.sh, self.film = sh, film
         plan = film.plan
-        set_id = film.set_id
+        set_id = film.set_for(sh)                                                    # per-shot environment (story locations change between shots)
         spec = sets.SETS[set_id]
         self.layers = sets.layers_for(set_id)
         self.scene = Scene(ActorRig(film.actor_layer, film.shadow_layer), room=self.layers, order=sets.order_for(set_id), ambient=(0.20, 0.22, 0.34), bloom_strength=0.5, post=film.ctx.post)
@@ -422,9 +493,13 @@ class SkeletonShot:
         A, Dm = film.actors["A"], film.actors.get("D")
         L = self.scene.lights
         moon = lt.get("moon", 1.0)
-        L.add(Light("shaft", (0.28, 0.32, 0.56), lambda t: 0.9 * moon, reach=(0.0, 3.4), attach_par=0.85, poly=[(700, 330), (1040, 330), (760, 1500), (100, 1500)],
-                    axis=[(870, 340), (420, 1500)], feather=50, fade_end=0.25))
-        L.add(Light("radial", (0.10, 0.11, 0.22), 1.0, reach=(0, 3.4), attach_par=0.7, center=(760, 700), radius=1500, power=1.5))
+        tod = lt.get("time", "night")
+        if tod == "night":                                                          # moonlight shaft + cool fill exist ONLY at night (a day scene never gets moon light)
+            L.add(Light("shaft", (0.28, 0.32, 0.56), lambda t: 0.9 * moon, reach=(0.0, 3.4), attach_par=0.85, poly=[(700, 330), (1040, 330), (760, 1500), (100, 1500)],
+                        axis=[(870, 340), (420, 1500)], feather=50, fade_end=0.25))
+            L.add(Light("radial", (0.10, 0.11, 0.22), 1.0, reach=(0, 3.4), attach_par=0.7, center=(760, 700), radius=1500, power=1.5))
+        elif tod == "dusk":
+            L.add(Light("radial", (0.30, 0.16, 0.10), 1.0, reach=(0, 3.4), attach_par=0.7, center=(800, 700), radius=1500, power=1.5))
         phone_gain = lt.get("phone", 1.0)
         self.phone_light = L.add(Light("radial", (0.50, 0.88, 1.0), lambda t: self._phone_level(t) * phone_gain, reach=(0, 2.6), attach_par=1.0, center=tuple(plan.get("targets", {}).get("PHONE", BW.PHONE_POS)), radius=560, power=1.6))
         if lt.get("sun"):                                                           # daylight through the window (lighting test / day scenes)
@@ -439,7 +514,8 @@ class SkeletonShot:
         if lt.get("hall"):
             L.add(Light("radial", (0.95, 0.72, 0.42), lambda t: film.hall_level(t) * lt["hall"], reach=(0, 3.0), attach_par=0.9, center=(960, 1100), radius=760, power=1.5))
         if lt.get("lamp") or plan.get("lamp_on") is not None:
-            L.add(Light("radial", (1.0, 0.72, 0.36), lambda t: film.lamp_level(t), reach=(0, 3.0), attach_par=0.96, center=tuple(plan.get("targets", {}).get("LAMP", (600, 1110))), radius=820, power=1.4))
+            lamp_fn = (lambda t, v=lt["lamp"]: v) if lt.get("lamp_const") else (lambda t: film.lamp_level(t))
+            L.add(Light("radial", (1.0, 0.72, 0.36), lamp_fn, reach=(0, 3.0), attach_par=0.96, center=tuple(plan.get("targets", {}).get("LAMP", (600, 1110))), radius=820, power=1.4))
         self.dust = Dust(VAR.seed_int(plan["story_id"], sh["id"], "dust") % 1000)
         for i, mk in enumerate(plan.get("debug_markers", [])):                      # parallax test: a coloured bar pinned to each layer's own parallax factor
             bar = np.zeros((1900, 26, 4), np.uint8)
@@ -548,15 +624,24 @@ class SkeletonFilm(FR.Renderer):
         self.actors, self.cam, self.actor_layer = actors, cam, actor_layer
         self.shadow_layer = ShadowLayer(actors, plan["fps"], BW.FLOOR_Y) if plan.get("version", 1) >= 2 else None
         actor_layer.film = self
-        self.set_id = EF.resolve(plan["environment"])
+        self._sets = {}
+        self.set_id = self.set_for(plan["shots"][0])
         self.t_grab = min([e[0] for e in actors["A"].perf.events if e[1] == "phone_grab"] or [1e9])
         self.t_place = min([e[0] for e in actors["A"].perf.events if e[1] == "phone_place"] or [1e9])
         self.hall_t = plan.get("hall_on", 1e9)
 
+    def set_for(self, sh):
+        env = sh.get("environment") or self.plan["environment"]
+        k = json.dumps(env, sort_keys=True)
+        if k not in self._sets:
+            self._sets[k] = EF.resolve(env)
+        return self._sets[k]
+
     def rim_params(self, t):
         """[(direction (dx, dy), colour, strength)] of the lights that currently rim the actors."""
         lt = self.plan.get("rim", {})
-        out = [((0.55, -0.83), (0.55, 0.70, 1.0), lt.get("moon", 0.5))]
+        tod = self.shots[self.index_at(t)]["lighting"].get("time", "night")
+        out = [((0.55, -0.83), (0.55, 0.70, 1.0), lt.get("moon", 0.5))] if tod == "night" else [((0.6, -0.8), (1.0, 0.92, 0.75), 0.22 if tod == "day" else 0.35)]
         h = self.hall_level(t)
         if h > 0.02:
             out.append(((0.95, -0.15), (1.0, 0.78, 0.5), 0.45 * h))
@@ -743,7 +828,15 @@ def render_film(plan, out_dir, log=print, skip_blender=False, samples=10, stills
         narr = AP.read_audio(audio_path)
     else:
         narr = np.zeros(int(plan["duration"] * AP.SR), np.float32)
-    wav = AP.mix(plan["duration"], narr, sfx_list(plan, actors), [tuple(m) for m in plan["mood_track"]], out_dir=work)
+    arep = None
+    if plan.get("version", 1) >= 4:                                                    # production plans: the Audio Director (ambience per scene, music per mood, foley from the actions, ducking, master limiter)
+        from engine.skeleton import audio_director as AUD
+        perf_ev = [(round(e[0] + 0.05 + k * e[2]["T"] / 2, 3), "footstep", 0.7 if cid == "A" else 0.55) for cid, a in actors.items() for e in a.perf.events if e[1] == "walk" for k in range(int(max(0.0, (e[2]["t1"] - 0.1 - e[0])) / (e[2]["T"] / 2)))]
+        perf_ev += [(round(e[0], 3), "tick", 0.7) for a in actors.values() for e in a.perf.events if e[1] == "phone_grab"]
+        wav, arep = AUD.mix(plan, narr, work, perf_ev, audio_path)
+        json.dump(arep, open(os.path.join(out_dir, "audio_report.json"), "w"), indent=1, default=list)
+    else:
+        wav = AP.mix(plan["duration"], narr, sfx_list(plan, actors), [tuple(m) for m in plan["mood_track"]], out_dir=work)
     stages["audio"] = round(time.time() - t, 1)
     # ---- frames -> ffmpeg
     fps = plan["fps"]
@@ -788,8 +881,11 @@ def render_film(plan, out_dir, log=print, skip_blender=False, samples=10, stills
     FQC.contact_sheet(film, plan, os.path.join(out_dir, "contact_sheet.png"), cols=5, w=240)
     json.dump(plan, open(os.path.join(out_dir, "plan.json"), "w"), ensure_ascii=False, indent=1)
     if qc == "auto":
-        qc = "v3" if plan.get("version", 1) >= 3 else ("v2" if plan.get("version", 1) >= 2 else "v1")
-    if qc == "v3":
+        qc = "v4" if plan.get("version", 1) >= 4 else "v3" if plan.get("version", 1) >= 3 else ("v2" if plan.get("version", 1) >= 2 else "v1")
+    if qc == "v4":
+        from engine.skeleton import qc_v4
+        qc = qc_v4.run(plan, actors, cam, rep, film, out_mp4, stats, frames_dir, log, audio=arep)
+    elif qc == "v3":
         from engine.skeleton import qc_v3
         qc = qc_v3.run(plan, actors, cam, rep, film, out_mp4, stats, frames_dir, log)
     elif qc == "v2":

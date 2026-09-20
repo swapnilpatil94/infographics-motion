@@ -1,0 +1,182 @@
+[
+ {
+  "location": "bedroom",
+  "family": "bedroom_wide",
+  "time": "night",
+  "start": "stand"
+ },
+ {
+  "location": "bedroom",
+  "family": "bedroom_wide",
+  "time": "night",
+  "start": "sit"
+ },
+ {
+  "location": "bedroom",
+  "family": "bedroom_wide",
+  "time": "day",
+  "start": "stand"
+ },
+ {
+  "location": "bedroom",
+  "family": "bedroom_wide",
+  "time": "day",
+  "start": "sit"
+ },
+ {
+  "location": "study",
+  "family": "study",
+  "time": "night",
+  "start": "stand"
+ },
+ {
+  "location": "study",
+  "family": "study",
+  "time": "night",
+  "start": "sit"
+ },
+ {
+  "location": "study",
+  "family": "study",
+  "time": "day",
+  "start": "stand"
+ },
+ {
+  "location": "study",
+  "family": "study",
+  "time": "day",
+  "start": "sit"
+ },
+ {
+  "location": "living_room",
+  "family": "living_room",
+  "time": "day",
+  "start": "stand"
+ },
+ {
+  "location": "living_room",
+  "family": "living_room",
+  "time": "night",
+  "start": "stand"
+ },
+ {
+  "location": "office",
+  "family": "office",
+  "time": "day",
+  "start": "stand"
+ },
+ {
+  "location": "office",
+  "family": "office",
+  "time": "day",
+  "start": "sit"
+ },
+ {
+  "location": "classroom",
+  "family": "classroom",
+  "time": "day",
+  "start": "stand"
+ },
+ {
+  "location": "classroom",
+  "family": "classroom",
+  "time": "day",
+  "start": "sit"
+ },
+ {
+  "location": "cafe",
+  "family": "cafe",
+  "time": "day",
+  "start": "stand"
+ },
+ {
+  "location": "cafe",
+  "family": "cafe",
+  "time": "day",
+  "start": "sit"
+ },
+ {
+  "location": "cafe",
+  "family": "cafe",
+  "time": "night",
+  "start": "stand"
+ },
+ {
+  "location": "cafe",
+  "family": "cafe",
+  "time": "night",
+  "start": "sit"
+ },
+ {
+  "location": "bank",
+  "family": "bank_counter",
+  "time": "day",
+  "start": "stand"
+ },
+ {
+  "location": "shop",
+  "family": "shop",
+  "time": "day",
+  "start": "stand"
+ },
+ {
+  "location": "shop",
+  "family": "shop",
+  "time": "night",
+  "start": "stand"
+ },
+ {
+  "location": "police",
+  "family": "police",
+  "time": "day",
+  "start": "stand"
+ },
+ {
+  "location": "police",
+  "family": "police",
+  "time": "night",
+  "start": "stand"
+ },
+ {
+  "location": "atm",
+  "family": "atm",
+  "time": "night",
+  "start": "stand"
+ },
+ {
+  "location": "atm",
+  "family": "atm",
+  "time": "day",
+  "start": "stand"
+ },
+ {
+  "location": "call_center",
+  "family": "call_center",
+  "time": "day",
+  "start": "stand"
+ },
+ {
+  "location": "call_center",
+  "family": "call_center",
+  "time": "night",
+  "start": "stand"
+ },
+ {
+  "location": "street",
+  "family": "street",
+  "time": "day",
+  "start": "stand"
+ },
+ {
+  "location": "street",
+  "family": "street",
+  "time": "dusk",
+  "start": "stand"
+ },
+ {
+  "location": "street",
+  "family": "street",
+  "time": "night",
+  "start": "stand"
+ }
+]

@@ -50,11 +50,18 @@ def bedroom_wide(v, seed):
     L.append(("decor", a, dict(par=0.62, depth=3.1)))
     # ---- window sky (emissive) + frame with curtains
     a = Ink(660, 300, 420, 560, seed + 3)
-    a.raw('<defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1c2a55"/><stop offset="1" stop-color="#40507e"/></linearGradient></defs>')
+    day = v.get("time", "night") == "day"                                       # the window shows the sky of the scene's time of day (a day scene never gets a moon)
+    a.raw(f'<defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{"#6fb1e6" if day else "#1c2a55"}"/><stop offset="1" stop-color="{"#cfe7f8" if day else "#40507e"}"/></linearGradient></defs>')
     a.raw('<rect x="700" y="340" width="330" height="470" fill="url(#sg)"/>')
-    a.ellipse(940, 430, 36, 36, fill="#f4f1dc", sw=0, wobble=0)
-    for _ in range(14):
-        a.ellipse(r.uniform(715, 1015), r.uniform(355, 640), 2.4, 2.4, fill="#fff", sw=0, wobble=0)
+    if day:
+        a.ellipse(950, 440, 44, 44, fill="#fff3b0", sw=0, wobble=0)               # sun
+        for cx_, cy_, w_ in ((790, 470, 70), (900, 580, 90), (760, 690, 60)):
+            a.ellipse(cx_, cy_, w_, w_ * 0.36, fill="#ffffff", sw=0, wobble=0)
+            a.ellipse(cx_ + w_ * 0.5, cy_ + 6, w_ * 0.7, w_ * 0.3, fill="#ffffff", sw=0, wobble=0)
+    else:
+        a.ellipse(940, 430, 36, 36, fill="#f4f1dc", sw=0, wobble=0)
+        for _ in range(14):
+            a.ellipse(r.uniform(715, 1015), r.uniform(355, 640), 2.4, 2.4, fill="#fff", sw=0, wobble=0)
     L.append(("sky", a, dict(par=0.66, depth=3.0, emissive=True)))
     a = Ink(640, 280, 470, 620, seed + 4)
     a.rect(696, 336, 338, 478, fill="none", sw=9)

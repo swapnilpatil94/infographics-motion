@@ -77,9 +77,11 @@ def _rel(perf, t, hand, rel):
     return (sh[0] + perf.so["s" + hand] + rel[0] * A, sh[1] + rel[1] * A)
 
 
-def perform(perf, anchors, prop, t0, hand="R", mirror=False, stand_rest=True):
+def perform(perf, anchors, prop, t0, hand="R", mirror=False, stand_rest=True, scale=1.0):
     """Key one full interaction cycle of `prop` with one hand. Returns [dict(phase, t, target, hand_angle, contact_err_px, reachable, pose)] (times = phase START)."""
     d = PROPS[prop]
+    DURS = {k: v * scale for k, v in DUR.items()}
+    vis = perf.ch.get(prop.lower() + "_vis") if prop in ("CARD", "MONEY", "DOCUMENT", "CUP", "BAG", "PHONE") else None
     recs = []
     t = t0
     side = hand
@@ -100,38 +102,44 @@ def perform(perf, anchors, prop, t0, hand="R", mirror=False, stand_rest=True):
     MV.set_pose(perf, t, side, open_pose)
     pre = (contact[0] - 0.05 * (perf.P["upper_arm"] + perf.P["forearm"]), contact[1] + 0.12 * (perf.P["upper_arm"] + perf.P["forearm"]))
     w, rot, err, ok = solve(pre, d["H"], pose=open_pose, anchor="grip")
-    go(t, t + DUR["REACH"], w, rot)
+    go(t, t + DURS["REACH"], w, rot)
     recs.append(dict(phase="REACH", t=t, target=pre, contact_err_px=round(err, 2), reachable=ok, pose=open_pose, H=d["H"]))
-    t += DUR["REACH"]
+    t += DURS["REACH"]
     # CONTACT: the anchor of the GRIP pose on the contact point
     w, rot, err, ok = solve(contact, d["H"])
-    go(t, t + DUR["CONTACT"], w, rot, "smooth")
+    go(t, t + DURS["CONTACT"], w, rot, "smooth")
     recs.append(dict(phase="CONTACT", t=t, target=contact, contact_err_px=round(err, 2), reachable=ok, pose=d["pose"], H=d["H"]))
-    t += DUR["CONTACT"]
+    t += DURS["CONTACT"]
     # GRAB: pose swap at the contact instant
     MV.set_pose(perf, t, side, d["pose"])
-    M.hand_to(perf, side, t, t + DUR["GRAB"], w, "linear")
+    if vis is not None:                                                            # the prop art attaches to the hand at the grab and leaves it at the release
+        vis.key(t - 0.001, vis(t), "linear")
+        vis.key(t, 1.0, "linear")
+    M.hand_to(perf, side, t, t + DURS["GRAB"], w, "linear")
     recs.append(dict(phase="GRAB", t=t, target=contact, contact_err_px=round(err, 2), reachable=ok, pose=d["pose"], H=d["H"]))
-    t += DUR["GRAB"]
+    t += DURS["GRAB"]
     # HOLD: carry to the hold position (a fixed prop - laptop, keyboard, ATM - stays: hold == contact)
     w, rot, err, ok = solve(hold, d["H"])
-    go(t, t + DUR["HOLD"], w, rot)
+    go(t, t + DURS["HOLD"], w, rot)
     recs.append(dict(phase="HOLD", t=t, target=hold, contact_err_px=round(err, 2), reachable=ok, pose=d["pose"], H=d["H"]))
-    t += DUR["HOLD"]
+    t += DURS["HOLD"]
     # USE: prop-specific target (+ a small oscillation for typing / keypad taps)
     H_use = d["H"] + (-25.0 if prop == "CUP" else 15.0 if prop in ("DOOR", "BAG") else 0.0)
     w, rot, err, ok = solve(use, H_use)
-    go(t, t + DUR["USE"], w, rot)
+    go(t, t + DURS["USE"], w, rot)
     if prop in ("LAPTOP", "KEYBOARD", "ATM"):
         for j in range(4):
             tt = t + 0.1 + j * 0.16
             M.hand_to(perf, side, tt, tt + 0.08, (w[0] + (4 if j % 2 else -4), w[1] - 6), "linear")
     recs.append(dict(phase="USE", t=t, target=use, contact_err_px=round(err, 2), reachable=ok, pose=d["pose"], H=H_use))
-    t += DUR["USE"]
+    t += DURS["USE"]
     # RELEASE: open, withdraw to the relaxed arm
     MV.set_pose(perf, t, side, open_pose)
+    if vis is not None:
+        vis.key(t - 0.001, vis(t), "linear")
+        vis.key(t + 0.05, 0.0, "linear")
     MV.set_pose(perf, t + 0.4, side, "relaxed")
-    go(t + 0.1, t + DUR["RELEASE"], M._arm_rest(perf, side, t + DUR["RELEASE"]), 0.0)
+    go(t + 0.1, t + DURS["RELEASE"], M._arm_rest(perf, side, t + DURS["RELEASE"]), 0.0)
     recs.append(dict(phase="RELEASE", t=t, target=None, contact_err_px=0.0, reachable=True, pose=open_pose, H=None))
     return recs
 

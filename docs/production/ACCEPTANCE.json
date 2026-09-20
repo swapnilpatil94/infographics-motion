@@ -1,0 +1,544 @@
+{
+ "started": "2026-09-20 15:50:19",
+ "stories": {
+  "A": {
+   "story": "a_whatsapp_investment",
+   "description": "fake WhatsApp investment group",
+   "film": "output/production/a_whatsapp_investment/final.mp4",
+   "passed": true,
+   "gates": "30/30",
+   "failed_gates": [],
+   "duration_s": 45.471,
+   "shots": 19,
+   "scenes": [
+    [
+     "bedroom",
+     "night"
+    ],
+    [
+     "cafe",
+     "day"
+    ]
+   ],
+   "cast": [
+    {
+     "id": "A",
+     "role": "protagonist",
+     "hair": "Gray Short"
+    },
+    {
+     "id": "D",
+     "role": "friend",
+     "hair": "Short 4"
+    }
+   ],
+   "acts": [
+    "ESTABLISH",
+    "PHONE_ALERT",
+    "LOOK_AT_PHONE",
+    "EYES_CHANGE",
+    "REACH_PHONE",
+    "TAKE_PHONE",
+    "READ_MESSAGE",
+    "INSERT_SCREEN",
+    "OBSERVE",
+    "SUSPECT",
+    "MEET",
+    "CONVERSE",
+    "OTHER_LOOKS_AT_PHONE",
+    "GIVE_OBJECT",
+    "OTHER_REACTS",
+    "VISUALIZE_FLOW",
+    "BOTH_REALIZE",
+    "CLOSE_UP",
+    "RESOLVE"
+   ],
+   "qc_rounds": [
+    {
+     "round": 0,
+     "passed": true,
+     "failed": [],
+     "frame_cache": {
+      "frames": 1182,
+      "reused": 0,
+      "rendered": 1182
+     },
+     "fixes_applied": []
+    }
+   ],
+   "seconds": 590.3,
+   "audio": {
+    "duration": 45.471,
+    "expected": 45.471,
+    "peak": 0.8951,
+    "clipped_samples": 0,
+    "speech_to_bed_db": 18.45,
+    "narration_active_pct": 93.0,
+    "silent_half_seconds": 0,
+    "rms_db": -14.9,
+    "cache_hit": true,
+    "layers": {
+     "narration": true,
+     "ambience_scenes": [
+      [
+       "bedroom",
+       "night"
+      ],
+      [
+       "cafe",
+       "day"
+      ]
+     ],
+     "music_moods": [
+      "isolated",
+      "warm",
+      "dim",
+      "warm",
+      "dim",
+      "warm",
+      "fear",
+      "dim",
+      "isolated",
+      "dim",
+      "isolated",
+      "dim",
+      "fear",
+      "dim",
+      "relief"
+     ],
+     "foley_events": 37
+    }
+   },
+   "frame_cache": {
+    "frames": 1182,
+    "reused": 0,
+    "rendered": 1182
+   }
+  },
+  "B": {
+   "story": "b_lottery_fee",
+   "description": "lottery / prize processing fee",
+   "film": "output/production/b_lottery_fee/final.mp4",
+   "passed": true,
+   "gates": "31/31",
+   "failed_gates": [],
+   "duration_s": 49.623,
+   "shots": 19,
+   "scenes": [
+    [
+     "living_room",
+     "day"
+    ],
+    [
+     "bank",
+     "day"
+    ]
+   ],
+   "cast": [
+    {
+     "id": "A",
+     "role": "protagonist",
+     "hair": "Short 4"
+    },
+    {
+     "id": "D",
+     "role": "bank_employee",
+     "hair": "Medium Straight"
+    }
+   ],
+   "acts": [
+    "ESTABLISH",
+    "PHONE_ALERT",
+    "LOOK_AT_PHONE",
+    "EYES_CHANGE",
+    "TAKE_PHONE",
+    "READ_MESSAGE",
+    "INSERT_SCREEN",
+    "OBSERVE",
+    "STAND_UP",
+    "ARRIVE",
+    "MEET",
+    "GIVE_OBJECT",
+    "READ_DOCUMENT",
+    "OTHER_REACTS",
+    "SUSPECT",
+    "REALIZE",
+    "VISUALIZE_FLOW",
+    "CLOSE_UP",
+    "RESOLVE"
+   ],
+   "qc_rounds": [
+    {
+     "round": 0,
+     "passed": true,
+     "failed": [],
+     "frame_cache": {
+      "frames": 1272,
+      "reused": 1254,
+      "rendered": 18
+     },
+     "fixes_applied": []
+    }
+   ],
+   "seconds": 433.9,
+   "audio": {
+    "duration": 49.623,
+    "expected": 49.623,
+    "peak": 0.8952,
+    "clipped_samples": 0,
+    "speech_to_bed_db": 18.14,
+    "narration_active_pct": 91.6,
+    "silent_half_seconds": 0,
+    "rms_db": -15.13,
+    "cache_hit": true,
+    "layers": {
+     "narration": true,
+     "ambience_scenes": [
+      [
+       "living_room",
+       "day"
+      ],
+      [
+       "bank",
+       "day"
+      ]
+     ],
+     "music_moods": [
+      "dim",
+      "warm",
+      "dim",
+      "warm",
+      "dim",
+      "fear",
+      "dim",
+      "relief"
+     ],
+     "foley_events": 44
+    }
+   },
+   "frame_cache": {
+    "frames": 1272,
+    "reused": 1254,
+    "rendered": 18
+   }
+  },
+  "C": {
+   "story": "c_atm_helper",
+   "description": "ATM 'helper' card swap (new story)",
+   "film": "output/production/c_atm_helper/final.mp4",
+   "passed": true,
+   "gates": "31/31",
+   "failed_gates": [],
+   "duration_s": 53.371,
+   "shots": 21,
+   "scenes": [
+    [
+     "street",
+     "day"
+    ],
+    [
+     "atm",
+     "day"
+    ],
+    [
+     "bank",
+     "day"
+    ]
+   ],
+   "cast": [
+    {
+     "id": "A",
+     "role": "protagonist",
+     "hair": "Bun 2"
+    },
+    {
+     "id": "D",
+     "role": "stranger",
+     "hair": "Short 3"
+    },
+    {
+     "id": "X1",
+     "role": "bank_employee",
+     "hair": "Long Afro"
+    },
+    {
+     "id": "X3",
+     "role": "crowd",
+     "hair": "Short 4"
+    },
+    {
+     "id": "X4",
+     "role": "crowd",
+     "hair": "Short 2"
+    }
+   ],
+   "acts": [
+    "ARRIVE",
+    "CROWD_WATCH",
+    "OBSERVE",
+    "ARRIVE",
+    "USE_ATM",
+    "PERSON_ENTERS",
+    "CONVERSE",
+    "GIVE_OBJECT",
+    "CONVERSE",
+    "RECEIVE_OBJECT",
+    "PHONE_ALERT",
+    "TAKE_PHONE",
+    "READ_MESSAGE",
+    "REALIZE",
+    "ARRIVE",
+    "MEET",
+    "RECEIVE_OBJECT",
+    "READ_DOCUMENT",
+    "CONVERSE",
+    "CLOSE_UP",
+    "RESOLVE"
+   ],
+   "qc_rounds": [
+    {
+     "round": 0,
+     "passed": true,
+     "failed": [],
+     "frame_cache": {
+      "frames": 1601,
+      "reused": 1601,
+      "rendered": 0
+     },
+     "fixes_applied": []
+    }
+   ],
+   "seconds": 560.9,
+   "audio": {
+    "duration": 53.371,
+    "expected": 53.371,
+    "peak": 0.8955,
+    "clipped_samples": 0,
+    "speech_to_bed_db": 18.33,
+    "narration_active_pct": 93.7,
+    "silent_half_seconds": 0,
+    "rms_db": -14.94,
+    "cache_hit": true,
+    "layers": {
+     "narration": true,
+     "ambience_scenes": [
+      [
+       "street",
+       "day"
+      ],
+      [
+       "atm",
+       "day"
+      ],
+      [
+       "bank",
+       "day"
+      ]
+     ],
+     "music_moods": [
+      "dim",
+      "fear",
+      "dim",
+      "fear",
+      "dim",
+      "relief"
+     ],
+     "foley_events": 88
+    }
+   },
+   "frame_cache": {
+    "frames": 1601,
+    "reused": 1601,
+    "rendered": 0
+   }
+  },
+  "materially_different": {
+   "distinct_act_sequences": true,
+   "distinct_scene_sets": true,
+   "act_overlap_A_B": 0.65,
+   "shot_counts": [
+    19,
+    19,
+    21
+   ]
+  }
+ },
+ "determinism": {
+  "no_llm_no_parser": true,
+  "sampled_frames": 2004,
+  "identical_frames": 2004,
+  "pixel_identical": true,
+  "qc_passed": true,
+  "rerender_seconds": 361.8,
+  "frame_cache": {
+   "frames": 1182,
+   "reused": 1182,
+   "rendered": 0
+  },
+  "plan_sha": "075830d9c7d0"
+ },
+ "caching": {
+  "camera": {
+   "frames_total": 1182,
+   "frames_changed": 90,
+   "all_inside_that_shot": true,
+   "shot": "S07",
+   "shot_frames": 90
+  },
+  "character": {
+   "character": "D (skin changed)",
+   "frames_changed": 594,
+   "frames_total": 1182,
+   "frames_where_D_is_on_set": 594,
+   "changed_only_where_D_is_visible": true,
+   "first_changed_t": 22.93
+  },
+  "audio": {
+   "video_frames_changed": 0,
+   "hash_before": "04ce2bedad803e15",
+   "hash_after": "07ca75a1dfea2986",
+   "mix_rehash": true
+  },
+  "story": {
+   "deterministic_same_input_same_plan": true,
+   "plan_seconds": 0.001
+  }
+ },
+ "failure_modes": {
+  "cases": [
+   {
+    "case": "unsupported_places_no_money_theme",
+    "raised": true,
+    "type": "StoryNotSupported",
+    "reason": "no money / scam / psychology cue anywhere in the script (this factory tells money-psychology stories); places with no stage: ['मंदिर', 'अस्पताल'] (supported: ['"
+   },
+   {
+    "case": "too_few_segments",
+    "raised": true,
+    "type": "StoryNotSupported",
+    "reason": "3 narration segments: a Short needs 8-40; no money / scam / psychology cue anywhere in the script (this factory tells money-psychology stories); places with no "
+   },
+   {
+    "case": "invalid_narration_json",
+    "raised": true,
+    "type": "NarrationInvalid",
+    "reason": "segment 0 lacks 'start'; segment 0 lacks 'end'; segment 1 lacks 'start'; segment 1 lacks 'end'; segment 2 lacks 'start'; segment 2 lacks 'end'"
+   },
+   {
+    "case": "unknown_location",
+    "raised": true,
+    "type": "LocationUnsupported",
+    "reason": "unknown location 'moon_base' (supported: ['bedroom', 'study', 'living_room', 'office', 'classroom', 'cafe', 'bank', 'shop', 'police', 'atm', 'call_center', 'str"
+   }
+  ],
+  "all_fail_clearly": true
+ },
+ "matrix": {
+  "scenarios": 16,
+  "distinct_protagonists": 16,
+  "distinct_partners": 14,
+  "meaningful_situations": 142,
+  "locations": [
+   "atm",
+   "bank",
+   "bedroom",
+   "cafe",
+   "call_center",
+   "classroom",
+   "living_room",
+   "office",
+   "police",
+   "shop",
+   "street",
+   "study"
+  ],
+  "times": [
+   "day",
+   "dusk",
+   "night"
+  ],
+  "props": [
+   "card",
+   "document",
+   "laptop",
+   "money",
+   "phone"
+  ],
+  "emotions": [
+   "confusion",
+   "fear",
+   "hope",
+   "neutral",
+   "realization",
+   "relief",
+   "suspicion"
+  ],
+  "acts": [
+   "ARRIVE",
+   "BOTH_REALIZE",
+   "CLOSE_UP",
+   "CONVERSE",
+   "COUNT_MONEY",
+   "CROWD_WATCH",
+   "ESTABLISH",
+   "EYE_CONTACT",
+   "GIVE_OBJECT",
+   "HAND_OVER",
+   "LOOK_AT_PHONE",
+   "MEET",
+   "OBSERVE",
+   "OTHER_LOOKS_AT_PHONE",
+   "OTHER_REACTS",
+   "PERSON_ENTERS",
+   "PHONE_ALERT",
+   "PHONE_CALL",
+   "REACH_PHONE",
+   "READ_DOCUMENT",
+   "READ_MESSAGE",
+   "REALIZE",
+   "RECEIVE_OBJECT",
+   "RESOLVE",
+   "RUN_AWAY",
+   "SIT_DOWN",
+   "STAND_UP",
+   "SUSPECT",
+   "TAKE_PHONE",
+   "TYPE_LAPTOP",
+   "USE_ATM",
+   "WALK_ACROSS"
+  ],
+  "single_person_scenarios": 4,
+  "two_person_scenarios": 11,
+  "crowd_scenarios": 1,
+  "prop_contacts": 42,
+  "prop_contacts_bad": 0,
+  "unreachable_events": 0,
+  "snaps": 0,
+  "ghost_actor_scenes": 0,
+  "geometry_bad_shots": 0
+ },
+ "regression_original_film": {
+  "film": "output/production/regression_v3/final.mp4",
+  "passed": true,
+  "gates": "52/52",
+  "failed": [],
+  "seconds": 545.6
+ },
+ "unit_tests": {
+  "ran": 189,
+  "failures": 0,
+  "errors": 0,
+  "passed": true
+ },
+ "verdict": {
+  "stories": true,
+  "determinism": true,
+  "caching": true,
+  "failure_modes": true,
+  "matrix": true,
+  "regression": true,
+  "unit_tests": true,
+  "ACCEPTED": true
+ },
+ "total_seconds": 2646.0
+}

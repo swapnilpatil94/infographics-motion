@@ -403,6 +403,11 @@ def add_phone(c, order_i):
     for extra in ("card", "money"):                                          # other held props share the grip point
         if extra in c.man["parts"]:
             c.parts[extra] = add_textured_part_at(c, extra, order_i, (px_ + 8 * ax, py_ + 8 * ay), rest_angle_deg("hand_R") + 90.0, hand_bone)
+    for extra, pose, ang in (("document", "pinch", 90.0), ("cup", "hold_cup", 90.0), ("bag_hand", "grab", 90.0)):     # v4 in-hand props: art placed on the GRIP anchor of the pose that holds it
+        if extra in c.man["parts"]:
+            an = (c.man.get("hand_anchors", {}).get(pose, {}) or {}).get("grip") or (0.0, P["hand"] * 0.6)
+            gx, gy = J["wrist"][0] + math.cos(a) * an[0] + ax * an[1], J["wrist"][1] + math.sin(a) * an[0] + ay * an[1]
+            c.parts[extra] = add_textured_part_at(c, extra, order_i, (gx, gy), rest_angle_deg("hand_R") + ang, hand_bone)
     if "fingers" in c.man["parts"]:
         f = add_textured_part_at(c, "fingers", order_i + 1, (J["wrist"][0] + ax * P["hand"] * 0.78, J["wrist"][1] + ay * P["hand"] * 0.78), rest_angle_deg("hand_R"), hand_bone)
         c.parts["fingers"] = f
@@ -543,7 +548,7 @@ def key_pose(c, f, fi):
             v = 1.0 if j == idx else 0.0001
             ob.scale = (v, v, v)
     # visibility of held phone / gripping fingers (scale to 0 = not drawn)
-    for pn, cn in (("phone", "phone_vis"), ("card", "card_vis"), ("money", "money_vis"), ("fingers", "fingers_vis")):
+    for pn, cn in (("phone", "phone_vis"), ("card", "card_vis"), ("money", "money_vis"), ("document", "document_vis"), ("cup", "cup_vis"), ("bag_hand", "bag_vis"), ("fingers", "fingers_vis")):
         if pn not in c.parts:
             continue
         v = 1.0 if g(cn) > 0.5 else 0.0
@@ -576,7 +581,7 @@ def key_pose(c, f, fi):
     if GAZE_MODE == "pupil":
         for side in ("L", "R"):
             c.face["pupil_" + side].keyframe_insert("location", frame=f)
-    for pn in ("phone", "card", "money", "fingers"):
+    for pn in ("phone", "card", "money", "document", "cup", "bag_hand", "fingers"):
         if pn in c.parts:
             c.parts[pn].keyframe_insert("scale", frame=f)
     if c.faceatoms and "face_atom_id" in ch:

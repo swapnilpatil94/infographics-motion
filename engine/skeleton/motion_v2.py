@@ -345,11 +345,14 @@ def hand_to(perf, side, t0, t1, target, e="smooth"):
     perf.to(f"hand_{side}_y", t0, t1, target[1], e)
 
 
+HELD_VIS = ("phone_vis", "card_vis", "money_vis", "document_vis", "cup_vis", "bag_vis")
+
+
 def a_grab(perf, t, dur, st, hand="R", prop="phone", **kw):
     """Close the fingers over the object: grip pose, prop attaches to the hand, screen glow (phone). Emits the pick-up event."""
-    pose = {"phone": "hold_phone", "card": "hold_card", "money": "hold_money"}.get(prop, "grab")
+    pose = {"phone": "hold_phone", "card": "hold_card", "money": "hold_money", "document": "pinch", "cup": "hold_cup", "bag": "grab"}.get(prop, "grab")
     set_pose(perf, t, hand, pose)
-    for nm in ("phone_vis", "card_vis", "money_vis"):
+    for nm in HELD_VIS:
         perf.ch[nm].key(t - 0.001, perf.ch[nm](t), "linear")
         perf.ch[nm].key(t, 1.0 if nm == prop + "_vis" else 0.0, "linear")
     perf.ch["fingers_vis"].key(t - 0.001, 0.0, "linear")
@@ -447,7 +450,7 @@ def a_call(perf, t, dur, st, **kw):
     while tt < t + dur:
         seg = r.uniform(0.6, 1.4)
         if r.random() < 0.5:
-            a_talk(perf, tt, seg, st)
+            M.a_talk(perf, tt, seg, st)
         else:
             perf.to("head_rot", tt, tt + 0.3, 3.0, "smooth")
         tt += seg
@@ -605,7 +608,7 @@ def a_hand_over(perf, t, dur, st, point="HANDOVER", hand="R", prop="phone", **kw
         _rekey(perf, f"hand_{hand}_rot", arrive, rot)
     else:
         arrive = a_reach(perf, t, dur, st, target=dict(rig=C), hand=hand)
-    set_pose(perf, arrive, hand, {"phone": "hold_phone", "card": "hold_card", "money": "hold_money"}[prop])
+    set_pose(perf, arrive, hand, {"phone": "hold_phone", "card": "hold_card", "money": "hold_money", "document": "pinch", "cup": "hold_cup", "bag": "grab"}[prop])
     perf.events.append((arrive, "handover_give", dict(prop=prop, hand=hand, point=str(point))))
     return arrive
 
@@ -637,7 +640,7 @@ def _relax_wrap(orig, mode):
         end = orig(perf, t, dur, st, **kw)
         P = perf.P
         for side in ("L", "R"):
-            if side == "R" and (perf.ch["phone_vis"](t) > 0.5 or perf.ch["card_vis"](t) > 0.5 or perf.ch["money_vis"](t) > 0.5):
+            if side == "R" and any(perf.ch[nm](t) > 0.5 for nm in HELD_VIS):
                 continue
             if mode == "stand" and side == "R":
                 continue                                         # the v1 stand pushes off the knee with the near hand, then rests it
@@ -777,6 +780,42 @@ def a_eye_contact(perf, t, dur, st, target="PERSON_D", **kw):
     return t + dur
 
 
+def a_teleport(perf, t, dur, st, x=0.0, pose="stand", **kw):
+    """Hard-cut re-blocking: the body is at world x in the rest `pose` ('stand' | 'sit') from time t on (every body channel is held one frame earlier, then keyed at the new place); held props are put away."""
+    names = ("root_x", "root_y", "pelvis_dx", "pelvis_dy", "spine_rot", "chest_rot", "neck_rot", "head_rot", "hair_rot", "shrug", "foot_L_x", "foot_L_y", "foot_R_x", "foot_R_y", "foot_L_rot", "foot_R_rot",
+             "hand_L_x", "hand_L_y", "hand_R_x", "hand_R_y", "hand_L_rot", "hand_R_rot") + HELD_VIS + ("fingers_vis", "phone_glow", "phone_flat")
+    for nm in names:
+        ch = perf.ch[nm]
+        ch.key(t - 0.001, ch(t - 0.001), "linear")
+    xr = perf.to_rig((x, perf.origin[1]))[0]
+    for nm in HELD_VIS + ("fingers_vis", "phone_glow", "phone_flat"):
+        perf.ch[nm].key(t, 0.0, "linear")
+    if pose == "sit":
+        M.pose_sit(perf, t, seat=perf.world["seat_h"], x=xr)
+    else:
+        M.pose_stand(perf, t, xr)
+    for side in ("L", "R"):
+        set_pose(perf, t, side, "relaxed")
+    for nm in ("spine_rot", "chest_rot", "neck_rot", "head_rot"):
+        perf.ch[nm].key(t, 4.0 if (pose == "sit" and nm == "spine_rot") else 0.0, "linear")
+    perf.events.append((t, "teleport", dict(x=x, pose=pose)))
+    return t
+
+
+def a_prop_cycle(perf, t, dur, st, prop="CUP", hand="R", both=False, **kw):
+    """One full interaction cycle with `prop` (props4 primitive) stretched to `dur` seconds: REACH -> CONTACT -> GRAB -> HOLD -> USE -> RELEASE. Needs the character's hand anchors (perf.anchors)."""
+    from engine.skeleton import props4 as P4
+    if getattr(perf, "anchors", None) is None:                                     # a bare Performance (no baked hand set): nothing to solve the grip against - say so, do not fake a contact
+        perf.events.append((t, "prop_cycle_unavailable", dict(prop=prop, reason="no baked hand anchors")))
+        return t + dur
+    scale = max(dur, 1.0) / sum(P4.DUR.values())
+    recs = P4.perform(perf, perf.anchors, prop, t, hand, mirror=(hand == "L"), scale=scale)
+    if both:
+        P4.perform(perf, perf.anchors, prop, t, "L" if hand == "R" else "R", mirror=(hand == "R"), scale=scale)
+    perf.events.append((t, "prop_cycle", dict(prop=prop, hand=hand, recs=[dict(phase=r["phase"], t=r["t"], err=r["contact_err_px"], ok=bool(r["reachable"])) for r in recs])))
+    return t + dur
+
+
 def a_face_atom(perf, t, dur, st, name="fear", **kw):
     """REPLACEMENT FACE DRAWING: swap the procedural face for the Open Peeps face atom of emotion `name` for `dur` seconds (a peak-expression frame; gaze is baked into the drawing while it is up).
     Needs the character baked with parts_art2.bake_face_atoms. Step keys (the id is an integer, never interpolated)."""
@@ -872,7 +911,7 @@ def register():
               "grab": a_grab, "pickup_phone": a_grab, "hold": a_hold, "release": a_release, "hold_phone": a_hold_phone, "read_phone": a_read_phone, "type": a_type, "call": a_call,
               "hesitate": a_hesitate, "freeze": a_freeze, "flinch": a_flinch, "relief": a_relief, "anger": a_anger, "point": a_point, "gesture": a_gesture, "speak": a_speak,
               "hand_over": a_hand_over, "receive": a_receive, "place": a_place, "realization": a_realization, "fear": a_fear, "confusion": a_confusion, "notice": a_notice, "eye_contact": a_eye_contact, "look_at": a_look_at, "look_at_phone": lambda p, t, d, st, **k: a_look_at(p, t, d, st, target="PHONE", **{x: y for x, y in k.items() if x != "target"}),
-              "hand_pose": lambda p, t, d, st, side="R", pose="open", **k: (set_pose(p, t, side, pose), t + d)[1], "face_atom": a_face_atom, "run": a_run})
+              "hand_pose": lambda p, t, d, st, side="R", pose="open", **k: (set_pose(p, t, side, pose), t + d)[1], "face_atom": a_face_atom, "run": a_run, "teleport": a_teleport, "prop_cycle": a_prop_cycle})
     for nm in ("worried", "sadness", "determination", "neutral", "curious"):
         A["emotion_" + nm] = a_emotion_named(nm)
 

@@ -383,6 +383,42 @@ def prop_money(k):
     return _svg(W_, H_, body), (M + 55, M + 35)
 
 
+def prop_document(k):
+    """an A4 form: paper with a folded corner, header bar, printed lines and a stamp (ink language of the rest of the art)"""
+    W_, H_ = 2 * M + 112, 2 * M + 150
+    x0, y0, w, h = M, M, 104, 142
+    body = (f'<path d="M{x0},{y0} L{x0 + w - 26},{y0} L{x0 + w},{y0 + 26} L{x0 + w},{y0 + h} L{x0},{y0 + h} Z" fill="#f6f2e6" stroke="{INK}" stroke-width="5" stroke-linejoin="round"/>'
+            f'<path d="M{x0 + w - 26},{y0} L{x0 + w - 26},{y0 + 26} L{x0 + w},{y0 + 26}" fill="#e4dcc6" stroke="{INK}" stroke-width="4" stroke-linejoin="round"/>'
+            f'<rect x="{x0 + 12}" y="{y0 + 14}" width="52" height="12" rx="3" fill="{k.accent}" stroke="{INK}" stroke-width="2.4"/>'
+            + "".join(f'<path d="M{x0 + 12},{y0 + 44 + i * 15} L{x0 + w - 14 - (i % 3) * 14},{y0 + 44 + i * 15}" stroke="#6f6f7a" stroke-width="4" stroke-linecap="round"/>' for i in range(6))
+            + f'<circle cx="{x0 + w - 32}" cy="{y0 + h - 30}" r="15" fill="none" stroke="#b03a3a" stroke-width="3.4"/><path d="M{x0 + w - 42},{y0 + h - 30} L{x0 + w - 22},{y0 + h - 30}" stroke="#b03a3a" stroke-width="3"/>')
+    return _svg(W_, H_, body), (M + 52, M + 72)
+
+
+def prop_cup(k):
+    """a chai cup: tapered body, handle, dark tea surface, steam"""
+    W_, H_ = 2 * M + 96, 2 * M + 110
+    x0, y0 = M + 14, M + 32
+    body = (f'<path d="M{x0 + 60},{y0 + 8} C{x0 + 96},{y0 + 4} {x0 + 96},{y0 + 46} {x0 + 58},{y0 + 44}" fill="none" stroke="{INK}" stroke-width="9" stroke-linecap="round"/>'
+            f'<path d="M{x0},{y0} L{x0 + 60},{y0} L{x0 + 52},{y0 + 62} C{x0 + 50},{y0 + 72} {x0 + 10},{y0 + 72} {x0 + 8},{y0 + 62} Z" fill="#f2ede0" stroke="{INK}" stroke-width="5.5" stroke-linejoin="round"/>'
+            f'<ellipse cx="{x0 + 30}" cy="{y0 + 2}" rx="30" ry="7" fill="#7a4a2a" stroke="{INK}" stroke-width="4"/>'
+            f'<path d="M{x0 + 6},{y0 + 30} L{x0 + 54},{y0 + 30}" stroke="{k.accent}" stroke-width="8"/>'
+            f'<path d="M{x0 + 16},{y0 - 8} C{x0 + 6},{y0 - 20} {x0 + 26},{y0 - 26} {x0 + 16},{y0 - 40}" fill="none" stroke="#9a9aa6" stroke-width="4" stroke-linecap="round" opacity="0.8"/>'
+            f'<path d="M{x0 + 38},{y0 - 8} C{x0 + 28},{y0 - 20} {x0 + 48},{y0 - 26} {x0 + 38},{y0 - 40}" fill="none" stroke="#9a9aa6" stroke-width="4" stroke-linecap="round" opacity="0.8"/>')
+    return _svg(W_, H_, body), (M + 44, M + 66)
+
+
+def prop_bag_hand(k):
+    """a handbag carried by its handle: body, clasp, stitched seam, handle arch"""
+    W_, H_ = 2 * M + 150, 2 * M + 130
+    x0, y0, w, h = M + 10, M + 44, 130, 78
+    body = (f'<path d="M{x0 + 30},{y0} C{x0 + 30},{y0 - 46} {x0 + w - 30},{y0 - 46} {x0 + w - 30},{y0}" fill="none" stroke="{INK}" stroke-width="9" stroke-linecap="round"/>'
+            f'<path d="M{x0},{y0 + 12} Q{x0},{y0} {x0 + 12},{y0} L{x0 + w - 12},{y0} Q{x0 + w},{y0} {x0 + w},{y0 + 12} L{x0 + w - 8},{y0 + h - 10} Q{x0 + w - 10},{y0 + h} {x0 + w - 22},{y0 + h} L{x0 + 22},{y0 + h} Q{x0 + 10},{y0 + h} {x0 + 8},{y0 + h - 10} Z" fill="{shade(k.accent, 0.95)}" stroke="{INK}" stroke-width="5.5" stroke-linejoin="round"/>'
+            f'<path d="M{x0 + 6},{y0 + 26} L{x0 + w - 6},{y0 + 26}" stroke="{INK}" stroke-width="3" stroke-dasharray="6 5"/>'
+            f'<rect x="{x0 + w / 2 - 10}" y="{y0 + 18}" width="20" height="18" rx="4" fill="#e8c860" stroke="{INK}" stroke-width="3.4"/>')
+    return _svg(W_, H_, body), (M + 75, M + 100)
+
+
 def bag(k):
     P = k.P
     kk = P["k"]
@@ -438,7 +474,7 @@ def nose(k):
 
 
 # ------------------------------------------------------------------------------------------------------------------ bake
-ART_VERSION = "art-v3.4"                                                             # bump whenever any part art changes (bake cache key)
+ART_VERSION = "art-v3.6"                                                             # bump whenever any part art changes (bake cache key)
 
 
 def _key(d2, view, hand_set):
@@ -495,6 +531,9 @@ def bake2(d2, view="profile", hand_set="full"):
     save("phone", PA.phone(P, None, dict(bottom=k.bot_c)))
     save("card", prop_card(k))
     save("money", prop_money(k))
+    save("document", prop_document(k))
+    save("cup", prop_cup(k), zoom=TEX * 1.7)
+    save("bag_hand", prop_bag_hand(k))
     skull, hair = head_layers(k)
     hz = TEX * P["hs"]
     save("skull", (skull, R.NECK_PIVOT_CANVAS), zoom=hz)

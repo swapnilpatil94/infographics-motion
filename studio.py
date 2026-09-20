@@ -105,6 +105,9 @@ def main():
     parser.add_argument("--qc-only", action="store_true", help="FACTORY: re-run QC/reports on an existing render")
     parser.add_argument("--allow-fallbacks", action="store_true", help="FACTORY: continue even if required assets are missing")
     parser.add_argument("--api-request", metavar="REQUEST_JSON", help='FACTORY API: {"story","narration_segments","style","aspect_ratio"} -> film (what a UI would call)')
+    parser.add_argument("--production", metavar="STORY_MD", help="PRODUCTION: story.md + --narration-json SEGMENTS_JSON -> finished cinematic Short (parse -> plan -> render -> audio -> QC + auto-fix)")
+    parser.add_argument("--narration-json", metavar="SEGMENTS_JSON", help="With --production: narration segments JSON (id,text,start,end[,words] + audio path)")
+    parser.add_argument("--production-acceptance", action="store_true", help="ONE command: 3 different stories end to end + determinism + caching + failure modes + 24-situation matrix + original-film regression + unit tests")
     parser.add_argument("--skeleton-short", action="store_true", help="SKELETON PROOF: build + render the full-body 2D skeleton short (narration -> plan -> Blender rig -> film)")
     parser.add_argument("--skeleton-short-v2", action="store_true", help="FACTORY V2: render the 'एक गलत कॉल' Short (CharacterDNA v2, 3/4 views, hand poses, gaze targets, hand-over, lighting)")
     parser.add_argument("--skeleton-short-v3", action="store_true", help="CHARACTER ART + ACTING LOCK: the V3 Short (hand library, prop grips, acted entrance, sequences)")
@@ -124,6 +127,16 @@ def main():
                 f"build.from_plan({args.from_plan!r})")
         subprocess.run([os.path.join(ROOT, ".venv/bin/python"), "-c", code], cwd=ROOT, check=True, env=dict(os.environ, PYTHONPATH=ROOT, PYTHONUNBUFFERED="1"))
         return
+    if args.production_acceptance:
+        sys.exit(subprocess.run([os.path.join(ROOT, ".venv/bin/python"), "-u", "-m", "engine.skeleton.acceptance"], cwd=ROOT, env=dict(os.environ, PYTHONPATH=ROOT, PYTHONUNBUFFERED="1")).returncode)
+    if args.production:
+        if not args.narration_json:
+            parser.error("--production needs --narration-json")
+        code = ("import sys; sys.path.insert(0, '.'); from engine.skeleton import production as P, story_semantics as SS, narration_io as NI;"
+                "\ntry:\n"
+                f"    r = P.make({args.production!r}, {args.narration_json!r}, out_dir={args.out_dir!r}, critique_rounds={args.critique_rounds}); print('FILM', r['mp4'], 'QC passed:', r['qc']['passed'])\n"
+                "except (SS.StoryNotSupported, NI.NarrationInvalid) as e:\n    print('REJECTED:', e); sys.exit(2)")
+        sys.exit(subprocess.run([os.path.join(ROOT, ".venv/bin/python"), "-c", code], cwd=ROOT, env=dict(os.environ, PYTHONPATH=ROOT, PYTHONUNBUFFERED="1")).returncode)
     if args.skeleton_topic:
         code = ("import sys, json; sys.path.insert(0, '.'); from engine.skeleton import topic_build as TB;"
                 f"st = json.load(open({args.story_json!r})) if {args.story_json!r} else None;"

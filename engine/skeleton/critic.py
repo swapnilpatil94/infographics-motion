@@ -32,6 +32,17 @@ FACE_LUMA_MIN = 0.38
 FRAME_LUMA_MIN = 0.16
 TEXT_CONTRAST_MIN = 0.60
 SAMPLES_U = (0.08, 0.5, 0.92)
+SIZE_ORDER = ["close", "medium", "two_reach", "two", "full", "reveal", "wide"]
+
+
+def size_fallback(sh, kinds):
+    """no camera position satisfies the constraints at this shot size: a wider size (clipping) or a tighter one (face too small) does"""
+    cur = sh["camera"]["size"]
+    if cur in SIZE_ORDER and any(k.endswith("clipped_x") or k.endswith("out_y") for k in kinds):
+        return dict(size=SIZE_ORDER[min(SIZE_ORDER.index(cur) + 1, len(SIZE_ORDER) - 1)], dx=0.0, dy=0.0)
+    if cur in SIZE_ORDER and "face_too_small" in kinds:
+        return dict(size=SIZE_ORDER[max(SIZE_ORDER.index(cur) - 1, 0)], dx=0.0, dy=0.0)
+    return None
 SET_X = (-150.0, 1230.0)                              # world x extent of the set's wall/floor layers (bedroom_wide / study_room): a frame edge beyond it shows the black void
 OLLAMA = "http://localhost:11434/api/chat"
 VLM = "qwen3.5:9b"
@@ -43,15 +54,16 @@ def _screen(cam, f, wx, wy, zoom_mul=1.0, dx=0.0, dy=0.0):
     return (wx - float(cam["cx"][f]) - dx) * z0 + C0[0], (wy - float(cam["cy"][f]) - dy) * z0 + C0[1], z0
 
 
-def _d_visible(actors, t):
-    D = actors.get("D")
-    return D is not None and abs(D.perf.v("root_x", t)) > 20
+def _d_visible(actors, t, cid="D"):
+    D = actors.get(cid)
+    return D is not None and short.on_screen(D, t)
 
 
 def subjects(sh, actors, t):
     tgt = (sh.get("camera") or {}).get("target", "stage")
-    if tgt == "A+D":
-        return ["A"] + (["D"] if _d_visible(actors, t) else [])
+    if "+" in tgt:
+        ids = tgt.split("+")
+        return [ids[0]] + [c for c in ids[1:] if _d_visible(actors, t, c)]
     if "." in tgt:
         return [tgt.split(".")[0]]
     return ["A"]
@@ -154,7 +166,7 @@ def measure_geometry(plan, actors, cam):
         uniq = {}
         for p in probs:
             uniq.setdefault(p["kind"], p)
-        rep.append(dict(shot=sh["id"], beat=sh["beats"][0], act=sh.get("act"), size=sh["camera"]["size"], target=sh["camera"]["target"], ok=not uniq, problems=list(uniq.values()), head_px=met,
+        rep.append(dict(shot=sh["id"], beat=sh.get("key", sh["beats"][0]), act=sh.get("act"), size=sh["camera"]["size"], target=sh["camera"]["target"], ok=not uniq, problems=list(uniq.values()), head_px=met,
                         warnings=list({w["kind"]: w for w in warns}.values())))
     return rep
 
@@ -268,7 +280,7 @@ def fix_rhythm(plan, findings, fixes):
     for x in findings:
         if x["kind"] == "repeated_framing":
             sh = next(s for s in plan["shots"] if s["id"] == x["shot"])
-            beat = sh["beats"][0]
+            beat = sh.get("key", sh["beats"][0])
             cur = sh["camera"]["move"]
             new = cyc[(cyc.index(cur) + 2) % len(cyc)] if cur in cyc else "push"
             fixes.setdefault(beat, {}).setdefault("camera", {})["move"] = new
@@ -320,7 +332,7 @@ def _run_vlm(plan, stills):
     return out
 
 
-def improve(plan, story, nar, out_dir, rounds=3, log=print, samples=10, seed=11, use_vlm=True):
+def improve(plan, story, nar, out_dir, rounds=3, log=print, samples=10, seed=11, use_vlm=True, builder=None):
     """Critique -> fix -> re-render loop. Returns dict(plan, fixes, summary)."""
     from engine.skeleton import auto_director as AD
     cdir = os.path.join(out_dir, "critique")
@@ -330,7 +342,7 @@ def improve(plan, story, nar, out_dir, rounds=3, log=print, samples=10, seed=11,
     vlm_ok = use_vlm and vlm_available()
     log(f"[critic] rounds<={rounds}  VLM={'on (' + VLM + ')' if vlm_ok else 'off'}")
     for r in range(rounds + 1):
-        plan = AD.build_plan(story, nar, seed=seed, tts=nar["tts"], name=story["slug"], fixes=fixes)
+        plan = (builder or AD.build_plan)(story, nar, seed=seed, tts=nar["tts"], name=story["slug"], fixes=fixes)
         times = _stills_times(plan)
         rd = os.path.join(cdir, f"round_{r}")
         R = short.render_stills(plan, rd, times, log, samples=samples)
@@ -365,10 +377,13 @@ def improve(plan, story, nar, out_dir, rounds=3, log=print, samples=10, seed=11,
                 _merge(fixes, g["beat"], "camera", sol)
                 rec["applied"].append(dict(shot=g["shot"], beat=g["beat"], problems=[p["kind"] for p in g["problems"]], fix=dict(camera=sol)))
             else:
-                rec["applied"].append(dict(shot=g["shot"], beat=g["beat"], problems=[p["kind"] for p in g["problems"]], fix=None, note="no camera satisfies every constraint (needs a different shot size)"))
+                new = size_fallback(sh, [p["kind"] for p in g["problems"]])
+                if new:
+                    _merge(fixes, g["beat"], "camera", new)
+                rec["applied"].append(dict(shot=g["shot"], beat=g["beat"], problems=[p["kind"] for p in g["problems"]], fix=dict(camera=new) if new else None, note="no camera satisfies every constraint: shot size changed" if new else "no camera satisfies every constraint"))
         for p in pix:
             sh = next(s for s in plan["shots"] if s["id"] == p["shot"])
-            beat = sh["beats"][0]
+            beat = sh.get("key", sh["beats"][0])
             if "face_too_dark" in p["flags"] or "frame_too_dark" in p["flags"]:
                 lt = fixes.get(beat, {}).get("lighting", {})
                 new = dict(fill=round(min(2.4, lt.get("fill", 0.0) + 0.7), 2), exposure_mul=round(min(1.6, lt.get("exposure_mul", 1.0) * 1.15), 3))

@@ -70,6 +70,9 @@ def _perf(out_dir, t_plan, t_assets, t_total):
 def from_plan(path, log=print, samples=10):
     plan = json.load(open(path, encoding="utf-8"))
     out_dir = os.path.dirname(os.path.abspath(path))
+    if plan.get("version", 1) >= 4:                                     # production plans: same deterministic path, no LLM
+        from engine.skeleton import production
+        return production.from_plan(path, out_dir, samples, log)
     t = time.time()
     res = short.render_film(plan, out_dir, log, samples=samples)
     _perf(out_dir, 0.0, 0.0, time.time() - t)
