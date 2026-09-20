@@ -108,6 +108,11 @@ def main():
     parser.add_argument("--skeleton-short", action="store_true", help="SKELETON PROOF: build + render the full-body 2D skeleton short (narration -> plan -> Blender rig -> film)")
     parser.add_argument("--skeleton-short-v2", action="store_true", help="FACTORY V2: render the 'एक गलत कॉल' Short (CharacterDNA v2, 3/4 views, hand poses, gaze targets, hand-over, lighting)")
     parser.add_argument("--skeleton-short-v3", action="store_true", help="CHARACTER ART + ACTING LOCK: the V3 Short (hand library, prop grips, acted entrance, sequences)")
+    parser.add_argument("--skeleton-topic", metavar="TOPIC", help="TOPIC -> FILM: the system writes the story, voices it, directs it, CRITIQUES the preview stills and fixes the flaws, then renders the Short")
+    parser.add_argument("--story-json", metavar="STORY_JSON", help="With --skeleton-topic: reuse a saved story.json (deterministic re-run: no LLM)")
+    parser.add_argument("--critique-rounds", type=int, default=3, help="With --skeleton-topic: max critique->fix->re-render rounds")
+    parser.add_argument("--no-llm", action="store_true", help="With --skeleton-topic: deterministic domain packs only")
+    parser.add_argument("--draft", action="store_true", help="With --skeleton-topic: estimated narration timing (no TTS) - fast preview")
     parser.add_argument("--out-dir", default=None, help="With --skeleton-short-v2: output folder (default output/shorts/skeleton_factory_v2)")
     parser.add_argument("--tts", default="chatterbox", choices=["chatterbox", "vibevoice"], help="With --skeleton-short: narration engine used to (re)generate the voice")
     parser.add_argument("--tempo", type=float, default=1.16, help="With --skeleton-short: pacing speed-up (1.0 = natural)")
@@ -117,6 +122,12 @@ def main():
     if args.from_plan and _is_skeleton_plan(args.from_plan):
         code = ("import sys, json; sys.path.insert(0, '.'); from engine.skeleton import build;"
                 f"build.from_plan({args.from_plan!r})")
+        subprocess.run([os.path.join(ROOT, ".venv/bin/python"), "-c", code], cwd=ROOT, check=True, env=dict(os.environ, PYTHONPATH=ROOT, PYTHONUNBUFFERED="1"))
+        return
+    if args.skeleton_topic:
+        code = ("import sys, json; sys.path.insert(0, '.'); from engine.skeleton import topic_build as TB;"
+                f"st = json.load(open({args.story_json!r})) if {args.story_json!r} else None;"
+                f"TB.make({args.skeleton_topic!r}, out_dir={args.out_dir!r}, use_llm={not args.no_llm}, rounds={args.critique_rounds}, draft={args.draft}, story=st)")
         subprocess.run([os.path.join(ROOT, ".venv/bin/python"), "-c", code], cwd=ROOT, check=True, env=dict(os.environ, PYTHONPATH=ROOT, PYTHONUNBUFFERED="1"))
         return
     if args.skeleton_short_v3 or args.skeleton_short_v2:

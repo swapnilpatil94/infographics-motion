@@ -274,6 +274,9 @@ def a_walk_to(perf, t, dur, st, target="DOOR", stop_before=120.0, speed=None, **
     dist = abs(end_x - perf.v("root_x", t))
     spd = speed or 210.0 * perf.P["k"]
     d = max(1.0, dist / (spd * 0.82))
+    if kw.get("fill"):                                                               # the walk takes exactly the time the story gives it (a beat 'across the room' is not a 1-second shuffle)
+        d = max(1.0, dur)
+        spd = max(60.0, dist / (0.82 * d))
     a_walk(perf, t, d, st, speed=spd, end_x=end_x, **{k: v for k, v in kw.items() if k in ("stride_scale", "hold_R", "hold_L", "speed_scale")})
     perf.events.append((t, "walk_to", dict(target=str(target), end_x=end_x, dur=d)))
     return t + d

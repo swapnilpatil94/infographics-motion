@@ -26,12 +26,17 @@ def run(plan, actors, cam, rep, film, mp4, stats, frames_dir, log=print):
     base = qc_v2.run(plan, actors, cam, rep, film, mp4, stats, frames_dir, log)
     checks, ev = dict(base["checks"]), dict(base["evidence"])
     fps = plan["fps"]
+    acts = set(plan.get("acts") or [])                    # topic films: a gate about an act that the story does not contain is 'not applicable' (recorded, not silently passed)
+    has = (lambda *names: (not acts) or bool(acts & set(names)))
+    na = []
     # ---- hand-over: with real grips the WRISTS are a hand-length apart by design; what must coincide is the PHONE (centre implied by each hand's grip anchor)
     key = "hand_over_(both_hands_meet_within_30px;_phone_changes_owner)"
     give = [e for e in actors["A"].perf.events if e[1] == "handover_give"]
     take = [e for e in actors["D"].perf.events if e[1] == "handover_take"]
     ok_h, err_h = False, None
-    if give and take:
+    if not has("HAND_OVER"):
+        na.append("hand_over")
+    elif give and take:
         def centre(a, t, hand):
             perf = a.perf
             wrist = (perf.v(f"hand_{hand}_x", t), perf.v(f"hand_{hand}_y", t))
@@ -45,7 +50,8 @@ def run(plan, actors, cam, rep, film, mp4, stats, frames_dir, log=print):
         own = ev["hand_over"]["ownership"]
         ok_h = err_h <= 8.0 and own["a_phone_after"] < 0.5 and own["d_phone_after"] > 0.5 and abs(tt - tg) < 1.6
     checks.pop(key, None)
-    checks["hand_over_(phone_centres_coincide_<=8px;_phone_changes_owner)"] = ok_h
+    if has("HAND_OVER"):
+        checks["hand_over_(phone_centres_coincide_<=8px;_phone_changes_owner)"] = ok_h
     ev["hand_over_phone_centre_error_px"] = None if err_h is None else round(err_h, 2)
     # ---- the phone never vanishes between the giver's hand and the receiver's hand
     gaps = 0
@@ -54,13 +60,17 @@ def run(plan, actors, cam, rep, film, mp4, stats, frames_dir, log=print):
         for f in range(max(0, f0), min(f1, len(actors["A"].channels["phone_vis"]))):
             if actors["A"].channels["phone_vis"][f] < 0.5 and actors["D"].channels["phone_vis"][f] < 0.5:
                 gaps += 1
-    checks["phone_never_disappears_during_hand-over"] = bool(give and take) and gaps == 0
+    if has("HAND_OVER"):
+        checks["phone_never_disappears_during_hand-over"] = bool(give and take) and gaps == 0
     ev["hand_over_phone_gap_frames"] = gaps
     # ---- hands: real library, exact grips
     from engine.skeleton import parts_art2 as PA2
     checks["hand_library_(>=20_poses_per_hand)"] = len(PA2.HAND_POSES) >= 20
     errs = [_phone_centre_error(a, e) for a in actors.values() for e in a.perf.events if e[1] == "phone_contact"]
-    checks["phone_grip_contact_(hand_closes_on_the_phone_<=3px)"] = bool(errs) and max(errs) <= 3.0
+    if has("PICK_UP", "REACH_PHONE"):
+        checks["phone_grip_contact_(hand_closes_on_the_phone_<=3px)"] = bool(errs) and max(errs) <= 3.0
+    else:
+        na.append("phone_grip_contact")
     ev["phone_contact_error_px"] = [round(e, 2) for e in errs]
     # ---- feet: planted stance, no teleporting
     slide, jump = [], 0.0
@@ -82,7 +92,9 @@ def run(plan, actors, cam, rep, film, mp4, stats, frames_dir, log=print):
                 if run_:
                     runs.append(run_)
                 slide += [max(r) - min(r) for r in runs if len(r) >= 4]
-    checks["planted_feet_(flat-foot_slide_<=8px)"] = (max(slide) <= 8.0) if slide else False
+    walks_expected = has("WALK_ACROSS", "PERSON_ENTERS")
+    if walks_expected:
+        checks["planted_feet_(flat-foot_slide_<=8px)"] = (max(slide) <= 8.0) if slide else False
     checks["no_teleporting_feet_(<=60px_per_frame_=_human_swing_peak)"] = jump <= 60.0
     ev["flat_foot_slide_px_max"] = round(max(slide), 2) if slide else None
     ev["foot_step_px_per_frame_max"] = round(jump, 2)
@@ -92,8 +104,10 @@ def run(plan, actors, cam, rep, film, mp4, stats, frames_dir, log=print):
     dist = max((abs(e[2]["x1"] - e[2]["x0"]) for e in walks), default=0.0)
     notice = [e for e in D.perf.events if e[1] == "acting" and e[2].get("kind") == "notice"] if D else []
     ec = {cid: [e for e in a.perf.events if e[1] == "eye_contact"] for cid, a in actors.items()}
-    checks["mother_enters_(starts_off-screen,_walks_>=300px,_notices_him)"] = bool(D) and D.origin[0] >= 1350 and dist >= 300 and len(notice) >= 1
-    checks["eye_contact_both_ways"] = all(len(v) >= 1 for v in ec.values())
+    if has("PERSON_ENTERS"):
+        checks["mother_enters_(starts_off-screen,_walks_>=300px,_notices_him)"] = bool(D) and D.origin[0] >= 1350 and dist >= 300 and len(notice) >= 1
+    if has("PERSON_ENTERS", "EYE_CONTACT"):
+        checks["eye_contact_both_ways"] = all(len(v) >= 1 for v in ec.values())
     ev["entrance"] = dict(start_x=D.origin[0] if D else None, walk_px=round(dist), notice_events=len(notice), eye_contact={k: len(v) for k, v in ec.items()})
     # ---- acting is a SEQUENCE, not a static swap
     kinds = {}
@@ -101,7 +115,9 @@ def run(plan, actors, cam, rep, film, mp4, stats, frames_dir, log=print):
         for e in a.perf.events:
             if e[1] == "acting":
                 kinds[e[2]["kind"]] = max(kinds.get(e[2]["kind"], 0), len(e[2].get("steps", [])))
-    checks["acting_sequences_(realization,fear,confusion_with_>=5_steps)"] = all(kinds.get(k, 0) >= 5 for k in ("realization", "fear", "confusion"))
+    need = [k for k, acts_ in (("realization", ("REALIZE", "BOTH_REALIZE")), ("fear", ("STAND_UP", "OTHER_REACTS")), ("confusion", ("EYE_CONTACT",))) if has(*acts_)]
+    checks["acting_sequences_(realization,fear,confusion_with_>=5_steps)"] = all(kinds.get(k, 0) >= 5 for k in need)
+    ev["not_applicable_gates"] = na
     ev["acting_sequences"] = kinds
     # ---- no unreadable overlap: torsos never intersect
     xa = actors["A"].origin[0] + actors["A"].facing * np.array(actors["A"].channels["root_x"])

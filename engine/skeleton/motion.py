@@ -124,12 +124,15 @@ def _hand_side(kw):
     return kw.get("hand", "R")
 
 
+REST_REACH = 0.95
+
+
 def _arm_rest(perf, side, t):
     """Where a relaxed hand hangs (absolute), following the body."""
     sh = perf.shoulder(t)
-    a = math.radians(9 if side == "R" else 5)
-    r = (perf.P["upper_arm"] + perf.P["forearm"]) * 0.93
-    return (sh[0] + r * math.sin(a), sh[1] - r * math.cos(a))
+    a = math.radians(6 if side == "R" else -3)                      # arms hang by the sides (v3.5: the old +9/+5 deg forward lean + 0.93 reach put both hands clasped in front of the pelvis)
+    r = (perf.P["upper_arm"] + perf.P["forearm"]) * REST_REACH
+    return (sh[0] + perf.so["s" + side] + r * math.sin(a), sh[1] - r * math.cos(a))          # the near/far shoulder sit at different x in a 3/4 view
 
 
 def hand_to(perf, side, t0, t1, target, e="smooth"):
@@ -260,6 +263,16 @@ def a_stand(perf, t, dur, st, **kw):
     perf.to("spine_rot", t + d * 0.45, t + d, 0.0, "smooth")
     perf.to("head_rot", t, t + d * 0.4, -12.0, "smooth")
     perf.to("head_rot", t + d * 0.5, t + d, 0.0, "smooth")
+    if perf.v("phone_vis", t) > 0.5:                                  # v3.5: a phone in the hand travels WITH the body (it used to lag behind the rising shoulder and the arm went taut)
+        sh0 = perf.shoulder(t)
+        off = (perf.v("hand_R_x", t) - sh0[0], perf.v("hand_R_y", t) - sh0[1])
+        tt_prev = t
+        for i in range(1, 7):
+            tt = t + d * i / 6.0
+            s_ = perf.shoulder(tt)
+            hand_to(perf, "R", tt_prev, tt, (s_[0] + off[0], s_[1] + off[1]), "smooth")
+            tt_prev = tt
+        return t + d
     # hands push off the knees while rising
     sh = perf.shoulder(t)
     for side in ("R",):
@@ -629,11 +642,11 @@ def pose_stand(perf, t=-1.0, x=0.0):
     perf.ch["pelvis_dy"].key(t, -9.0 * P["k"], "linear")
     for side, off in (("L", -16.0), ("R", 24.0)):
         perf.ch[f"foot_{side}_x"].key(t, x + off * P["k"] + perf.so["h" + side], "linear")
-    perf.ch["hand_L_x"].key(t, x + 22 * P["k"] + perf.so["sL"], "linear")
-    perf.ch["hand_R_x"].key(t, x + 26 * P["k"] + perf.so["sR"], "linear")
-    for side in ("L", "R"):
+    reach = (P["upper_arm"] + P["forearm"]) * REST_REACH
+    for side, a in (("L", -3.0), ("R", 6.0)):
         sh_y = P["shoulder_joint_y"] - 9.0 * P["k"]
-        perf.ch[f"hand_{side}_y"].key(t, sh_y - (P["upper_arm"] + P["forearm"]) * 0.93, "linear")
+        perf.ch[f"hand_{side}_x"].key(t, x + reach * math.sin(math.radians(a)) + perf.so["s" + side], "linear")
+        perf.ch[f"hand_{side}_y"].key(t, sh_y - reach * math.cos(math.radians(a)), "linear")
 
 
 def pose_sit(perf, t=-1.0, seat=None, x=0.0):
@@ -646,7 +659,7 @@ def pose_sit(perf, t=-1.0, seat=None, x=0.0):
     perf.ch["foot_L_x"].key(t, x + knee_x - 22 * P["k"] + perf.so["hL"], "linear")
     perf.ch["foot_R_x"].key(t, x + knee_x + 14 * P["k"] + perf.so["hR"], "linear")
     perf.ch["spine_rot"].key(t, 4.0, "linear")
-    for side, dx in (("L", 0.12), ("R", 0.2)):
+    for side, dx in (("L", 0.06), ("R", 0.11)):                    # v3.5: hands rest nearer the lap, so the reach to the nightstand is a real movement for every body size
         perf.ch[f"hand_{side}_x"].key(t, x + knee_x * dx, "linear")
         perf.ch[f"hand_{side}_y"].key(t, sit_hip + 45 * P["k"], "linear")
 

@@ -146,6 +146,22 @@ def _posture(a):
         a.perf.ch["head_rot"].key(-1.0, pz["head"], "linear")
 
 
+def _clamp_reach(a, fps):
+    """A hand target can never be farther from the shoulder than the straight arm: clamp the sampled hand channels to 0.995 x arm length (Blender's IK otherwise leaves a few px of error while the body
+    rises / leans, e.g. holding a phone during a stand-up). Body sizes vary, so this is a guard for every character, not a tweak for one."""
+    reach = 0.995 * (a.P["upper_arm"] + a.P["forearm"])
+    n = len(a.channels["root_x"])
+    for side in ("L", "R"):
+        hx, hy = a.channels[f"hand_{side}_x"], a.channels[f"hand_{side}_y"]
+        for f in range(n):
+            sx, sy = a.perf.shoulder(f / fps)
+            sx += a.perf.so["s" + side]
+            dx, dy = hx[f] - sx, hy[f] - sy
+            d = math.hypot(dx, dy)
+            if d > reach:
+                hx[f], hy[f] = sx + dx * reach / d, sy + dy * reach / d
+
+
 def build_actors(plan, log=print):
     actors = {}
     for cid in plan["cast_in_short"]:
@@ -223,7 +239,9 @@ def build_camera(plan, actors):
                 a0 = _target(plan, actors, c["target"], sh["t0"] + 0.05)
                 a1 = _target(plan, actors, c["target"], sh["t1"] - 0.05)
                 tx, ty = a0[0] + (a1[0] - a0[0]) * e, a0[1] + (a1[1] - a0[1]) * e
-            z = z0
+            z = z0 * c.get("zoom_mul", 1.0)
+            z0 = z
+            tx, ty = tx + c.get("dx", 0.0), ty + c.get("dy", 0.0)                    # critic fixes: framing nudges
             g = 1.0
             if mv == "push":
                 z = z0 * (1.0 + 0.13 * e)
@@ -270,7 +288,7 @@ def view_zoom(zoom, gain):
 
 
 # ------------------------------------------------------------------------------------------------------------------ Blender
-def render_actors(plan, actors, cam, workdir, log=print, samples=10):
+def render_actors(plan, actors, cam, workdir, log=print, samples=10, only_frames=None):
     """One Blender job for all characters; only the frames of skeleton shots are rendered. Returns (frames_dir, report)."""
     n = int(round(plan["duration"] * plan["fps"]))
     fr = []
@@ -278,6 +296,8 @@ def render_actors(plan, actors, cam, workdir, log=print, samples=10):
         if sh["treatment"] == "skeleton":
             fr += range(int(round(sh["t0"] * plan["fps"])), min(n, int(round(sh["t1"] * plan["fps"]))) + 1)
     fr = sorted(set(f for f in fr if f < n))
+    if only_frames is not None:                                                    # critic previews: render just these frames
+        fr = sorted(set(int(f) for f in only_frames if 0 <= int(f) < n))
     out = os.path.join(workdir, "actor_frames")
     os.makedirs(out, exist_ok=True)
     chars = []
@@ -371,7 +391,7 @@ class SkeletonShot:
         self.scene = Scene(ActorRig(film.actor_layer, film.shadow_layer), room=self.layers, order=sets.order_for(set_id), ambient=(0.20, 0.22, 0.34), bloom_strength=0.5, post=film.ctx.post)
         lt = sh["lighting"]
         mood = FR.MOODS.get(lt.get("mood", "dim"), FR.MOODS["dim"])
-        self.exposure, self.vig = mood[2], mood[3]
+        self.exposure, self.vig = mood[2] * lt.get("exposure_mul", 1.0), mood[3]                     # exposure_mul / fill: critic fixes (dark shots)
         amb = np.array(lt.get("ambient", (0.20, 0.22, 0.34)), np.float32) * np.array(mood[1], np.float32) * mood[0]
         self.scene.lights.ambient = amb
         A, Dm = film.actors["A"], film.actors.get("D")
@@ -387,6 +407,10 @@ class SkeletonShot:
         self.face_light = None
         if film.plan.get("version", 1) >= 2:                                        # the phone screen lights the face: a tight cool radial that only reaches the actor layer
             self.face_light = L.add(Light("radial", (0.45, 0.82, 1.0), lambda t: self._face_level(t) * phone_gain, reach=(1.5, 1.7), attach_par=1.0, center=(540, 900), radius=250, power=1.3))
+        self.fill_lights = {}
+        if lt.get("fill") and film.plan.get("version", 1) >= 2:                      # soft cool fill on each face (critic fix for a face that is too dark to read)
+            for cid in film.actors:
+                self.fill_lights[cid] = L.add(Light("radial", (0.62, 0.72, 1.0), lambda t, c=cid: self._fill_level(c, t), reach=(1.5, 1.7), attach_par=1.0, center=(540, 900), radius=320, power=1.3))
         if lt.get("hall"):
             L.add(Light("radial", (0.95, 0.72, 0.42), lambda t: film.hall_level(t) * lt["hall"], reach=(0, 3.0), attach_par=0.9, center=(960, 1100), radius=760, power=1.5))
         if lt.get("lamp") or plan.get("lamp_on") is not None:
@@ -411,6 +435,11 @@ class SkeletonShot:
                 self.face_light.p["center"] = (ex + A.facing * 26, ey + 30)
                 return 0.5 * g
         return 0.0
+
+    def _fill_level(self, cid, t):
+        ex, ey = self.film.actors[cid].anchor("eyes", t)
+        self.fill_lights[cid].p["center"] = (ex, ey + 30)
+        return 0.45 * float(self.sh["lighting"].get("fill", 0.0))
 
     def _phone_level(self, t):
         for A in self.film.actors.values():
@@ -564,14 +593,14 @@ def sfx_list(plan, actors):
 
 
 # ------------------------------------------------------------------------------------------------------------------ top level
-def build_everything(plan, workdir, log=print, samples=10, skip_blender=False):
+def build_everything(plan, workdir, log=print, samples=10, skip_blender=False, only_frames=None):
     t0 = time.time()
     actors = build_actors(plan, log)
     cam = build_camera(plan, actors)
     if skip_blender and os.path.isdir(os.path.join(workdir, "actor_frames")):
         frames_dir, rep = os.path.join(workdir, "actor_frames"), json.load(open(os.path.join(workdir, "actor_frames", "report.json")))
     else:
-        frames_dir, rep = render_actors(plan, actors, cam, workdir, log, samples)
+        frames_dir, rep = render_actors(plan, actors, cam, workdir, log, samples, only_frames)
     return actors, cam, frames_dir, rep, time.time() - t0
 
 
@@ -618,6 +647,47 @@ def _title_card(img, plan, t):
     return captions.overlay(img, arr, a)
 
 
+def caption_at(plan, film, tt, caps):
+    """The caption drawn at time tt -> (arr, bbox, text, opacity) or None (same rule as the film loop)."""
+    if plan.get("title_card") and tt >= plan["title_card"]["t0"]:
+        return None
+    shot_i = film.index_at(tt)
+    for c in caps:
+        if c[0] <= tt <= c[1]:
+            op = max(0.0, min(1.0, (tt - c[0]) / 0.08, (c[1] - tt) / 0.08))
+            ptype = plan["shots"][shot_i].get("procedural", {}).get("type")
+            from engine.factory import pipeline as FP
+            cy = FP.CAPTION_Y_CARD if (plan["shots"][shot_i]["treatment"] == "procedural" and ptype != "money_flow") else 1440
+            arr, bbox = captions.render(c[2], size=68, center_y=cy)
+            return arr, bbox, c[2], op
+    return None
+
+
+def render_stills(plan, out_dir, times, log=print, samples=10, with_captions=True):
+    """Preview stills at `times` (s) as the viewer would see them (title card + captions on). Only those frames are rasterised by Blender.
+    -> dict(paths=[...], meta=[{t, shot, caption_bbox, caption}], actors, cam, film)."""
+    from engine.factory import pipeline as FP
+    os.makedirs(out_dir, exist_ok=True)
+    work = os.path.join(out_dir, "work_preview")
+    os.makedirs(work, exist_ok=True)
+    only = [int(round(tt * plan["fps"])) for tt in times]
+    actors, cam, frames_dir, rep, _ = build_everything(plan, work, log, samples, False, only)
+    film = SkeletonFilm(plan, actors, cam, ActorLayer(frames_dir, plan["fps"]), log)
+    caps = FP._captions([dict(s, start=s["start"] if "start" in s else s["start_seconds"], end=s["end"] if "end" in s else s["end_seconds"]) for s in plan["narration"]["segments"]])
+    paths, meta = [], []
+    for tt in times:
+        f = int(round(tt * plan["fps"]))
+        img = _title_card(film.frame_at(tt, f), plan, tt)
+        cb = caption_at(plan, film, tt, caps) if with_captions else None
+        if cb:
+            img = captions.overlay(img, cb[0], cb[3])
+        p = os.path.join(out_dir, f"still_{tt:07.2f}.png")
+        Image.fromarray((np.clip(img, 0, 1) * 255).astype(np.uint8)).save(p)
+        paths.append(p)
+        meta.append(dict(t=tt, f=f, shot=plan["shots"][film.index_at(tt)]["id"], caption_bbox=list(cb[1]) if cb else None, caption=cb[2] if cb else None))
+    return dict(paths=paths, meta=meta, actors=actors, cam=cam, film=film)
+
+
 def render_film(plan, out_dir, log=print, skip_blender=False, samples=10, stills=None, qc="auto", final_name="final.mp4"):
     """plan (dict) -> out_dir/{final.mp4, contact_sheet.png, plan.json, manifest.json, qc_report.json}. Deterministic: same plan -> same frames."""
     from engine.factory import pipeline as FP, qc as FQC
@@ -628,7 +698,8 @@ def render_film(plan, out_dir, log=print, skip_blender=False, samples=10, stills
     os.makedirs(work, exist_ok=True)
     stages = {}
     t = time.time()
-    actors, cam, frames_dir, rep, _ = build_everything(plan, work, log, samples, skip_blender)
+    only = [int(round(tt * plan["fps"])) for tt in stills] if stills else None
+    actors, cam, frames_dir, rep, _ = build_everything(plan, work, log, samples, skip_blender, only)
     stages["rig+motion+blender"] = round(time.time() - t, 1)
     film = SkeletonFilm(plan, actors, cam, ActorLayer(frames_dir, plan["fps"]), log)
     if stills:

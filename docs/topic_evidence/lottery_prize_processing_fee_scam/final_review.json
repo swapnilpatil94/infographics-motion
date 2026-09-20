@@ -1,0 +1,378 @@
+{
+ "frames": [
+  {
+   "shot": "S01",
+   "t": 1.52,
+   "frame_luma": 0.229,
+   "vlm": {
+    "subject_fully_visible": true,
+    "face_readable": true,
+    "too_dark": false,
+    "text_legible": true,
+    "cluttered": false,
+    "issues": [],
+    "score": 9
+   }
+  },
+  {
+   "shot": "S02",
+   "t": 3.63,
+   "frame_luma": 0.264,
+   "vlm": {
+    "subject_fully_visible": true,
+    "face_readable": true,
+    "too_dark": false,
+    "text_legible": true,
+    "cluttered": false,
+    "issues": [],
+    "score": 10
+   }
+  },
+  {
+   "shot": "S03",
+   "t": 5.49,
+   "frame_luma": 0.242,
+   "vlm": {
+    "subject_fully_visible": true,
+    "face_readable": false,
+    "too_dark": true,
+    "text_legible": true,
+    "cluttered": false,
+    "issues": [
+     "Face is not clearly visible due to low lighting",
+     "Overall scene darkness reduces visual clarity"
+    ],
+    "score": 5
+   }
+  },
+  {
+   "shot": "S04",
+   "t": 7.7,
+   "frame_luma": 0.324,
+   "vlm": {
+    "subject_fully_visible": true,
+    "face_readable": true,
+    "too_dark": false,
+    "text_legible": false,
+    "cluttered": false,
+    "issues": [
+     "Hindi text overlay obscures part of the character’s torso and reduces visual clarity.",
+     "Background lacks sufficient detail to enhance mood or context."
+    ],
+    "score": 7
+   }
+  },
+  {
+   "shot": "S05",
+   "t": 9.78,
+   "frame_luma": 0.287,
+   "vlm": {
+    "subject_fully_visible": true,
+    "face_readable": true,
+    "too_dark": false,
+    "text_legible": true,
+    "cluttered": false,
+    "issues": [
+     "character's hand is not clearly reaching for a phone",
+     "no visible phone in frame to match intent"
+    ],
+    "score": 7
+   }
+  },
+  {
+   "shot": "S06",
+   "t": 11.26,
+   "frame_luma": 0.299,
+   "vlm": {
+    "subject_fully_visible": true,
+    "face_readable": true,
+    "too_dark": false,
+    "text_legible": true,
+    "cluttered": false,
+    "issues": [],
+    "score": 10
+   }
+  },
+  {
+   "shot": "S07",
+   "t": 12.76,
+   "frame_luma": 0.235,
+   "vlm": {
+    "subject_fully_visible": true,
+    "face_readable": true,
+    "too_dark": false,
+    "text_legible": true,
+    "cluttered": false,
+    "issues": [],
+    "score": 10
+   }
+  },
+  {
+   "shot": "S08",
+   "t": 14.36,
+   "frame_luma": 0.271,
+   "vlm": {
+    "subject_fully_visible": true,
+    "face_readable": true,
+    "too_dark": false,
+    "text_legible": false,
+    "cluttered": false,
+    "issues": [
+     "Hindi caption text is present and not legible to non-Hindi speakers",
+     "Phone screen content is indistinct"
+    ],
+    "score": 8
+   }
+  },
+  {
+   "shot": "S09",
+   "t": 16.07,
+   "frame_luma": 0.215,
+   "vlm": {
+    "subject_fully_visible": true,
+    "face_readable": true,
+    "too_dark": false,
+    "text_legible": true,
+    "cluttered": false,
+    "issues": [],
+    "score": 10
+   }
+  },
+  {
+   "shot": "S10",
+   "t": 18.01,
+   "frame_luma": 0.225,
+   "vlm": {
+    "subject_fully_visible": true,
+    "face_readable": true,
+    "too_dark": false,
+    "text_legible": true,
+    "cluttered": false,
+    "issues": [],
+    "score": 10
+   }
+  },
+  {
+   "shot": "S11",
+   "t": 20.09,
+   "frame_luma": 0.221,
+   "vlm": {
+    "subject_fully_visible": true,
+    "face_readable": false,
+    "too_dark": true,
+    "text_legible": false,
+    "cluttered": false,
+    "issues": [
+     "faces are too small and dimly lit to read expressions",
+     "phone screen text is illegible due to low contrast",
+     "caption text at bottom is partially obscured by plant foreground"
+    ],
+    "score": 4
+   }
+  },
+  {
+   "shot": "S12",
+   "t": 22.05,
+   "frame_luma": 0.236,
+   "vlm": {
+    "subject_fully_visible": true,
+    "face_readable": false,
+    "too_dark": true,
+    "text_legible": true,
+    "cluttered": false,
+    "issues": [
+     "faces are too small to read expressions",
+     "overall scene is underexposed/dimly lit"
+    ],
+    "score": 5
+   }
+  },
+  {
+   "shot": "S13",
+   "t": 24.35,
+   "frame_luma": 0.218,
+   "vlm": {
+    "subject_fully_visible": true,
+    "face_readable": false,
+    "too_dark": true,
+    "text_legible": true,
+    "cluttered": false,
+    "issues": [
+     "overall scene is too dark for clear facial expression reading",
+     "phone screen text not legible due to low contrast and blur"
+    ],
+    "score": 5
+   }
+  },
+  {
+   "shot": "S14",
+   "t": 26.71,
+   "frame_luma": 0.285,
+   "vlm": {
+    "subject_fully_visible": true,
+    "face_readable": true,
+    "too_dark": false,
+    "text_legible": true,
+    "cluttered": false,
+    "issues": [],
+    "score": 10
+   }
+  },
+  {
+   "shot": "S15",
+   "t": 28.5,
+   "frame_luma": 0.26,
+   "vlm": {
+    "subject_fully_visible": true,
+    "face_readable": true,
+    "too_dark": false,
+    "text_legible": true,
+    "cluttered": false,
+    "issues": [
+     "background window elements distract from focus",
+     "character's arm partially obscures torso"
+    ],
+    "score": 8
+   }
+  },
+  {
+   "shot": "S16",
+   "t": 30.99,
+   "frame_luma": 0.455,
+   "vlm": {
+    "subject_fully_visible": false,
+    "face_readable": false,
+    "too_dark": true,
+    "text_legible": true,
+    "cluttered": false,
+    "issues": [
+     "frame is too dark",
+     "no character visible"
+    ],
+    "score": 2
+   }
+  },
+  {
+   "shot": "S17",
+   "t": 34.18,
+   "frame_luma": 0.608,
+   "vlm": {
+    "subject_fully_visible": false,
+    "face_readable": false,
+    "too_dark": true,
+    "text_legible": true,
+    "cluttered": false,
+    "issues": [
+     "No character face visible",
+     "Overall dim lighting reduces clarity"
+    ],
+    "score": 5
+   }
+  },
+  {
+   "shot": "S18",
+   "t": 37.04,
+   "frame_luma": 0.279,
+   "vlm": {
+    "subject_fully_visible": true,
+    "face_readable": true,
+    "too_dark": false,
+    "text_legible": true,
+    "cluttered": false,
+    "issues": [],
+    "score": 10
+   }
+  },
+  {
+   "shot": "S19",
+   "t": 39.7,
+   "frame_luma": 0.304,
+   "vlm": {
+    "subject_fully_visible": true,
+    "face_readable": true,
+    "too_dark": false,
+    "text_legible": true,
+    "cluttered": false,
+    "issues": [],
+    "score": 10
+   }
+  },
+  {
+   "shot": "S20",
+   "t": 43.76,
+   "frame_luma": 0.324,
+   "vlm": {
+    "subject_fully_visible": true,
+    "face_readable": false,
+    "too_dark": true,
+    "text_legible": true,
+    "cluttered": false,
+    "issues": [
+     "faces are too small and dimly lit to read expressions",
+     "overall scene is underexposed with low contrast"
+    ],
+    "score": 4
+   }
+  }
+ ],
+ "vlm_mean_score": 7.45,
+ "low_scoring": [
+  {
+   "shot": "S03",
+   "score": 5,
+   "issues": [
+    "Face is not clearly visible due to low lighting",
+    "Overall scene darkness reduces visual clarity"
+   ]
+  },
+  {
+   "shot": "S11",
+   "score": 4,
+   "issues": [
+    "faces are too small and dimly lit to read expressions",
+    "phone screen text is illegible due to low contrast",
+    "caption text at bottom is partially obscured by plant foreground"
+   ]
+  },
+  {
+   "shot": "S12",
+   "score": 5,
+   "issues": [
+    "faces are too small to read expressions",
+    "overall scene is underexposed/dimly lit"
+   ]
+  },
+  {
+   "shot": "S13",
+   "score": 5,
+   "issues": [
+    "overall scene is too dark for clear facial expression reading",
+    "phone screen text not legible due to low contrast and blur"
+   ]
+  },
+  {
+   "shot": "S16",
+   "score": 2,
+   "issues": [
+    "frame is too dark",
+    "no character visible"
+   ]
+  },
+  {
+   "shot": "S17",
+   "score": 5,
+   "issues": [
+    "No character face visible",
+    "Overall dim lighting reduces clarity"
+   ]
+  },
+  {
+   "shot": "S20",
+   "score": 4,
+   "issues": [
+    "faces are too small and dimly lit to read expressions",
+    "overall scene is underexposed with low contrast"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,2509 @@
+{
+ "kind": "skeleton_short",
+ "version": 3,
+ "title": "जो इनाम माँगा ही नहीं",
+ "story_id": "lottery_d357f",
+ "seed": 11,
+ "fps": 30,
+ "format": {
+  "w": 1080,
+  "h": 1920,
+  "name": "9x16"
+ },
+ "duration": 45.747,
+ "name": "lottery_prize_processing_fee_scam",
+ "environment": {
+  "family": "bedroom_wide",
+  "variation": {
+   "palette": 0
+  },
+  "seed": 753
+ },
+ "characters": {
+  "A": {
+   "name": "राहुल",
+   "role": "protagonist",
+   "dna": {
+    "schema": "kathaya.character_dna/2",
+    "seed": "lottery_d357f:A",
+    "role": "young_man",
+    "age": 22,
+    "age_group": "young",
+    "gender_presentation": "masculine",
+    "body": {
+     "height": 0.948,
+     "width": 1.196,
+     "shoulder": 1.207,
+     "head_size": 1.045,
+     "neck": 0.82,
+     "leg_ratio": 1.018,
+     "build": "broad"
+    },
+    "skin": {
+     "id": "skin_07",
+     "hex": "#7f4f33"
+    },
+    "hair": {
+     "style": "Short 4",
+     "length": "short",
+     "color": "#5a3a22"
+    },
+    "facial_hair": "* None",
+    "eyebrows": "normal",
+    "eyes": "round",
+    "nose": 1.062,
+    "mouth": "wide",
+    "wardrobe": {
+     "top": "hoodie",
+     "bottom": "trousers",
+     "shoes": "slippers",
+     "accessories": [],
+     "palette": "ink_blue",
+     "pattern": "plain",
+     "top_color": "#5f7fae",
+     "bottom_color": "#2f3b55",
+     "shoe_color": "#23262f",
+     "accent": "#c8a96a"
+    },
+    "posture": "slouched",
+    "personality": "anxious",
+    "glasses": "* None",
+    "silhouette": "stocky",
+    "palette": {
+     "name": "ink_blue",
+     "top": "#5f7fae",
+     "bottom": "#2f3b55",
+     "shoes": "#23262f",
+     "accent": "#c8a96a",
+     "skin": "#7f4f33"
+    },
+    "id": "cdna_52bbfecc34"
+   },
+   "facing": 1,
+   "origin": [
+    380.0,
+    1500
+   ],
+   "view": "three_quarter",
+   "hand_set": "full",
+   "start": "sit"
+  },
+  "D": {
+   "name": "माँ",
+   "role": "mother",
+   "dna": {
+    "schema": "kathaya.character_dna/2",
+    "seed": "lottery_d357f:D",
+    "role": "middle_aged_woman",
+    "age": 47,
+    "age_group": "adult",
+    "gender_presentation": "feminine",
+    "body": {
+     "height": 0.949,
+     "width": 1.227,
+     "shoulder": 0.956,
+     "head_size": 1.097,
+     "neck": 1.02,
+     "leg_ratio": 1.014,
+     "build": "heavy"
+    },
+    "skin": {
+     "id": "skin_05",
+     "hex": "#bb8256"
+    },
+    "hair": {
+     "style": "Bun 2",
+     "length": "long",
+     "color": "#3a2416"
+    },
+    "facial_hair": "* None",
+    "eyebrows": "arched",
+    "eyes": "almond",
+    "nose": 0.896,
+    "mouth": "full",
+    "wardrobe": {
+     "top": "kurta",
+     "bottom": "salwar",
+     "shoes": "sandals",
+     "accessories": [
+      "earrings"
+     ],
+     "palette": "terracotta",
+     "pattern": "plain",
+     "top_color": "#c98466",
+     "bottom_color": "#4a4d5a",
+     "shoe_color": "#2b2a2e",
+     "accent": "#e4d2b0"
+    },
+    "posture": "upright",
+    "personality": "calm",
+    "glasses": "* None",
+    "silhouette": "stocky",
+    "palette": {
+     "name": "sage",
+     "top": "#8fae9c",
+     "bottom": "#4c5b56",
+     "shoes": "#3b3f47",
+     "accent": "#d9c9a3",
+     "skin": "#bb8256"
+    },
+    "id": "cdna_e9d090e6f7"
+   },
+   "facing": -1,
+   "origin": [
+    1440.0,
+    1500
+   ],
+   "view": "three_quarter",
+   "hand_set": "full",
+   "start": "stand"
+  }
+ },
+ "cast_in_short": [
+  "A",
+  "D"
+ ],
+ "narration": {
+  "segments": [
+   {
+    "id": "n01",
+    "text": "रात के ग्यारह बजे। कमरे में अकेला राहुल।",
+    "start": 0.25925925925925924,
+    "end": 2.4157323423196435,
+    "words": [
+     {
+      "word": "रात",
+      "start": 0.25925925925925924,
+      "end": 0.4824074074074074
+     },
+     {
+      "word": "के",
+      "start": 0.5379629629629629,
+      "end": 0.6129629629629629
+     },
+     {
+      "word": "ग्यारह",
+      "start": 0.687037037037037,
+      "end": 0.9287037037037037
+     },
+     {
+      "word": "बजे।",
+      "start": 0.9842592592592592,
+      "end": 1.2444444444444442
+     },
+     {
+      "word": "कमरे",
+      "start": 1.3740656756529772,
+      "end": 1.597213823801125
+     },
+     {
+      "word": "में",
+      "start": 1.6536953052826069,
+      "end": 1.7277693793566806
+     },
+     {
+      "word": "अकेला",
+      "start": 1.7462878978751992,
+      "end": 2.0620286386159403
+     },
+     {
+      "word": "राहुल।",
+      "start": 2.13702863861594,
+      "end": 2.4157323423196435
+     }
+    ]
+   },
+   {
+    "id": "n02",
+    "text": "तभी फ़ोन पर मैसेज चमका।",
+    "start": 2.6564835810867553,
+    "end": 4.239821113630638,
+    "words": [
+     {
+      "word": "तभी",
+      "start": 2.6564835810867553,
+      "end": 2.917594692197867
+     },
+     {
+      "word": "फ़ोन",
+      "start": 2.936113210716385,
+      "end": 3.2342613588645333
+     },
+     {
+      "word": "पर",
+      "start": 3.34629839590157,
+      "end": 3.4768539514571257
+     },
+     {
+      "word": "मैसेज",
+      "start": 3.5509280255312,
+      "end": 3.830557655160829
+     },
+     {
+      "word": "चमका।",
+      "start": 3.9601914840010077,
+      "end": 4.239821113630638
+     }
+    ]
+   },
+   {
+    "id": "n03",
+    "text": "राहुल ने स्क्रीन की तरफ़ देखा।",
+    "start": 4.480557655160829,
+    "end": 6.125002099605274,
+    "words": [
+     {
+      "word": "राहुल",
+      "start": 4.480557655160829,
+      "end": 4.836113210716385
+     },
+     {
+      "word": "ने",
+      "start": 4.910187284790458,
+      "end": 4.985187284790459
+     },
+     {
+      "word": "स्क्रीन",
+      "start": 5.060187284790459,
+      "end": 5.359261358864532
+     },
+     {
+      "word": "की",
+      "start": 5.452779877383051,
+      "end": 5.5083354329386065
+     },
+     {
+      "word": "तरफ़",
+      "start": 5.601853951457126,
+      "end": 5.8259280255312
+     },
+     {
+      "word": "देखा।",
+      "start": 5.882409507012681,
+      "end": 6.125002099605274
+     }
+    ]
+   },
+   {
+    "id": "n04",
+    "text": "अनजान भेजने वाला। आँखें सिकुड़ गईं।",
+    "start": 6.3657512387671105,
+    "end": 8.545382968002015,
+    "words": [
+     {
+      "word": "अनजान",
+      "start": 6.3657512387671105,
+      "end": 6.813899386915258
+     },
+     {
+      "word": "भेजने",
+      "start": 6.906491979507851,
+      "end": 7.242603090618962
+     },
+     {
+      "word": "वाला।",
+      "start": 7.298158646174517,
+      "end": 7.596306794322666
+     },
+     {
+      "word": "आँखें",
+      "start": 7.725938523557571,
+      "end": 8.024086671705717
+     },
+     {
+      "word": "सिकुड़",
+      "start": 8.116679264298313,
+      "end": 8.377790375409424
+     },
+     {
+      "word": "गईं।",
+      "start": 8.434271856890904,
+      "end": 8.545382968002015
+     }
+    ]
+   },
+   {
+    "id": "n05",
+    "text": "उसने काँपता हाथ बढ़ाया।",
+    "start": 8.786134206769127,
+    "end": 10.395393466028384,
+    "words": [
+     {
+      "word": "उसने",
+      "start": 8.786134206769127,
+      "end": 9.086134206769126
+     },
+     {
+      "word": "काँपता",
+      "start": 9.215776434030401,
+      "end": 9.628739396993362
+     },
+     {
+      "word": "हाथ",
+      "start": 9.758356428991346,
+      "end": 9.983356428991348
+     },
+     {
+      "word": "बढ़ाया।",
+      "start": 10.076874947509866,
+      "end": 10.395393466028384
+     }
+    ]
+   },
+   {
+    "id": "n06",
+    "text": "और फ़ोन उठा लिया।",
+    "start": 10.636138405979674,
+    "end": 11.635212480053747,
+    "words": [
+     {
+      "word": "और",
+      "start": 10.636138405979674,
+      "end": 10.768545813387082
+     },
+     {
+      "word": "फ़ोन",
+      "start": 10.787064331905599,
+      "end": 11.16391618375745
+     },
+     {
+      "word": "उठा",
+      "start": 11.201879146720415,
+      "end": 11.40928655412782
+     },
+     {
+      "word": "लिया।",
+      "start": 11.465768035609305,
+      "end": 11.635212480053747
+     }
+    ]
+   },
+   {
+    "id": "n07",
+    "text": "मैसेज: अजीब संदेश आया",
+    "start": 11.875955320399761,
+    "end": 13.306504577139494,
+    "words": [
+     {
+      "word": "मैसेज:",
+      "start": 11.875955320399761,
+      "end": 12.322251616696057
+     },
+     {
+      "word": "अजीब",
+      "start": 12.45187704711514,
+      "end": 12.675025195263288
+     },
+     {
+      "word": "संदेश",
+      "start": 12.804652725287642,
+      "end": 13.120393466028384
+     },
+     {
+      "word": "आया",
+      "start": 13.213911984546902,
+      "end": 13.306504577139494
+     }
+    ]
+   },
+   {
+    "id": "n08",
+    "text": "चेहरे का रंग उड़ गया।",
+    "start": 13.547241118669687,
+    "end": 14.865776434030396,
+    "words": [
+     {
+      "word": "चेहरे",
+      "start": 13.547241118669687,
+      "end": 13.84446334089191
+     },
+     {
+      "word": "का",
+      "start": 13.955574452003018,
+      "end": 14.086130007558575
+     },
+     {
+      "word": "रंग",
+      "start": 14.2157764340304,
+      "end": 14.382443100697065
+     },
+     {
+      "word": "उड़",
+      "start": 14.457443100697065,
+      "end": 14.605591248845213
+     },
+     {
+      "word": "गया।",
+      "start": 14.698183841437807,
+      "end": 14.865776434030396
+     }
+    ]
+   },
+   {
+    "id": "n09",
+    "text": "वो घबराकर उठ खड़ा हुआ।",
+    "start": 15.10651297556059,
+    "end": 16.666698160745774,
+    "words": [
+     {
+      "word": "वो",
+      "start": 15.10651297556059,
+      "end": 15.292624086671701
+     },
+     {
+      "word": "घबराकर",
+      "start": 15.385216679264294,
+      "end": 15.96114260519022
+     },
+     {
+      "word": "उठ",
+      "start": 16.07225371630133,
+      "end": 16.18336482741244
+     },
+     {
+      "word": "खड़ा",
+      "start": 16.275957420005035,
+      "end": 16.480587049634664
+     },
+     {
+      "word": "हुआ।",
+      "start": 16.517624086671702,
+      "end": 16.666698160745774
+     }
+    ]
+   },
+   {
+    "id": "n10",
+    "text": "बेचैन क़दम, कमरे के आर-पार।",
+    "start": 16.907428403460145,
+    "end": 18.70095322079449,
+    "words": [
+     {
+      "word": "बेचैन",
+      "start": 16.907428403460145,
+      "end": 17.262058033089776
+     },
+     {
+      "word": "क़दम,",
+      "start": 17.355576551608294,
+      "end": 17.63613210716385
+     },
+     {
+      "word": "कमरे",
+      "start": 17.765768035609305,
+      "end": 18.04632359116486
+     },
+     {
+      "word": "के",
+      "start": 18.13984210968338,
+      "end": 18.19632359116486
+     },
+     {
+      "word": "आर-पार।",
+      "start": 18.27039766523893,
+      "end": 18.70095322079449
+     }
+    ]
+   },
+   {
+    "id": "n11",
+    "text": "तभी दरवाज़ा खुला। माँ अंदर आईं।",
+    "start": 18.94169396153523,
+    "end": 20.815782732846227,
+    "words": [
+     {
+      "word": "तभी",
+      "start": 18.94169396153523,
+      "end": 19.201879146720415
+     },
+     {
+      "word": "दरवाज़ा",
+      "start": 19.294471739313007,
+      "end": 19.702805072646342
+     },
+     {
+      "word": "खुला।",
+      "start": 19.795397665238934,
+      "end": 20.000027294868566
+     },
+     {
+      "word": "माँ",
+      "start": 20.129671621735113,
+      "end": 20.296338288401785
+     },
+     {
+      "word": "अंदर",
+      "start": 20.388930880994373,
+      "end": 20.667634584698078
+     },
+     {
+      "word": "आईं।",
+      "start": 20.723190140253635,
+      "end": 20.815782732846227
+     }
+    ]
+   },
+   {
+    "id": "n12",
+    "text": "राहुल ने माँ की तरफ़ देखा।",
+    "start": 21.05652137398169,
+    "end": 22.672262114722432,
+    "words": [
+     {
+      "word": "राहुल",
+      "start": 21.05652137398169,
+      "end": 21.353743596203913
+     },
+     {
+      "word": "ने",
+      "start": 21.427817670277985,
+      "end": 21.539854707315026
+     },
+     {
+      "word": "माँ",
+      "start": 21.650965818426133,
+      "end": 21.8176324850928
+     },
+     {
+      "word": "की",
+      "start": 21.92966952212984,
+      "end": 21.985225077685392
+     },
+     {
+      "word": "तरफ़",
+      "start": 22.077817670277987,
+      "end": 22.35652137398169
+     },
+     {
+      "word": "देखा।",
+      "start": 22.412076929537246,
+      "end": 22.672262114722432
+     }
+    ]
+   },
+   {
+    "id": "n13",
+    "text": "माँ की नज़र उसके हाथ के फ़ोन पर पड़ी।",
+    "start": 22.912992357436803,
+    "end": 25.270414462081128,
+    "words": [
+     {
+      "word": "माँ",
+      "start": 22.912992357436803,
+      "end": 23.13614050558495
+     },
+     {
+      "word": "की",
+      "start": 23.24725161669606,
+      "end": 23.32225161669606
+     },
+     {
+      "word": "नज़र",
+      "start": 23.377807172251618,
+      "end": 23.693547912992358
+     },
+     {
+      "word": "उसके",
+      "start": 23.823192239858905,
+      "end": 24.06393298059965
+     },
+     {
+      "word": "हाथ",
+      "start": 24.193562610229275,
+      "end": 24.434303350970016
+     },
+     {
+      "word": "के",
+      "start": 24.50837742504409,
+      "end": 24.583377425044088
+     },
+     {
+      "word": "फ़ोन",
+      "start": 24.694488536155202,
+      "end": 24.861155202821866
+     },
+     {
+      "word": "पर",
+      "start": 24.936155202821865,
+      "end": 25.04726631393298
+     },
+     {
+      "word": "पड़ी।",
+      "start": 25.121340388007052,
+      "end": 25.270414462081128
+     }
+    ]
+   },
+   {
+    "id": "n14",
+    "text": "उसने चुपचाप फ़ोन माँ को थमा दिया।",
+    "start": 25.511148904006042,
+    "end": 27.462994457042072,
+    "words": [
+     {
+      "word": "उसने",
+      "start": 25.511148904006042,
+      "end": 25.771334089191228
+     },
+     {
+      "word": "चुपचाप",
+      "start": 25.864852607709743,
+      "end": 26.21763038548752
+     },
+     {
+      "word": "फ़ोन",
+      "start": 26.34725371630133,
+      "end": 26.551883345930964
+     },
+     {
+      "word": "माँ",
+      "start": 26.625957420005037,
+      "end": 26.775031494079112
+     },
+     {
+      "word": "को",
+      "start": 26.8676240866717,
+      "end": 26.941698160745776
+     },
+     {
+      "word": "थमा",
+      "start": 27.035216679264295,
+      "end": 27.258364827412443
+     },
+     {
+      "word": "दिया।",
+      "start": 27.313920382968,
+      "end": 27.462994457042072
+     }
+    ]
+   },
+   {
+    "id": "n15",
+    "text": "माँ का चेहरा बदल गया।",
+    "start": 27.703745695809186,
+    "end": 28.9898568069203,
+    "words": [
+     {
+      "word": "माँ",
+      "start": 27.703745695809186,
+      "end": 27.87133828840178
+     },
+     {
+      "word": "का",
+      "start": 27.9648568069203,
+      "end": 28.03893088099437
+     },
+     {
+      "word": "चेहरा",
+      "start": 28.150967918031405,
+      "end": 28.430597547661037
+     },
+     {
+      "word": "बदल",
+      "start": 28.52411606617956,
+      "end": 28.766708658772146
+     },
+     {
+      "word": "गया।",
+      "start": 28.840782732846225,
+      "end": 28.9898568069203
+     }
+    ]
+   },
+   {
+    "id": "n16",
+    "text": "स्क्रीन पर लिखा था: इनाम पाने के लिए फ़ीस भेजिए",
+    "start": 29.230599647266317,
+    "end": 32.124113966574285,
+    "words": [
+     {
+      "word": "स्क्रीन",
+      "start": 29.230599647266317,
+      "end": 29.546340388007057
+     },
+     {
+      "word": "पर",
+      "start": 29.657451499118167,
+      "end": 29.76856261022928
+     },
+     {
+      "word": "लिखा",
+      "start": 29.842636684303354,
+      "end": 30.12134038800706
+     },
+     {
+      "word": "था:",
+      "start": 30.213932980599647,
+      "end": 30.343562610229277
+     },
+     {
+      "word": "इनाम",
+      "start": 30.47318804064836,
+      "end": 30.750965818426142
+     },
+     {
+      "word": "पाने",
+      "start": 30.862076929537253,
+      "end": 31.122262114722435
+     },
+     {
+      "word": "के",
+      "start": 31.196336188796508,
+      "end": 31.251891744352065
+     },
+     {
+      "word": "लिए",
+      "start": 31.307447299907622,
+      "end": 31.437076929537252
+     },
+     {
+      "word": "फ़ीस",
+      "start": 31.549113966574286,
+      "end": 31.77133618879651
+     },
+     {
+      "word": "भेजिए",
+      "start": 31.863928781389102,
+      "end": 32.124113966574285
+     }
+    ]
+   },
+   {
+    "id": "n17",
+    "text": "पाँच लाख रुपये, तीन खाते... एक पूरा जाल।",
+    "start": 32.364869404551946,
+    "end": 35.35561434450324,
+    "words": [
+     {
+      "word": "पाँच",
+      "start": 32.364869404551946,
+      "end": 32.77412866381121
+     },
+     {
+      "word": "लाख",
+      "start": 32.88523977492232,
+      "end": 33.1454249601075
+     },
+     {
+      "word": "रुपये,",
+      "start": 33.20098051566306,
+      "end": 33.591721256403794
+     },
+     {
+      "word": "तीन",
+      "start": 33.721361384059804,
+      "end": 33.96302805072647
+     },
+     {
+      "word": "खाते...",
+      "start": 34.05562064331906,
+      "end": 34.446361384059806
+     },
+     {
+      "word": "एक",
+      "start": 34.57598471487361,
+      "end": 34.65005878894768
+     },
+     {
+      "word": "पूरा",
+      "start": 34.779688418577315,
+      "end": 35.039873603762494
+     },
+     {
+      "word": "जाल।",
+      "start": 35.133392122281016,
+      "end": 35.35561434450324
+     }
+    ]
+   },
+   {
+    "id": "n18",
+    "text": "दोनों समझ गए, इनाम नहीं, ये ठगी है।",
+    "start": 35.596350886033434,
+    "end": 37.95561854371378,
+    "words": [
+     {
+      "word": "दोनों",
+      "start": 35.596350886033434,
+      "end": 35.913017552700104
+     },
+     {
+      "word": "समझ",
+      "start": 36.00561014529269,
+      "end": 36.30283236751492
+     },
+     {
+      "word": "गए,",
+      "start": 36.35838792307047,
+      "end": 36.525980515663065
+     },
+     {
+      "word": "इनाम",
+      "start": 36.655622742924336,
+      "end": 36.95284496514656
+     },
+     {
+      "word": "नहीं,",
+      "start": 37.00840052070211,
+      "end": 37.250067187368785
+     },
+     {
+      "word": "ये",
+      "start": 37.37969261778786,
+      "end": 37.473211136306375
+     },
+     {
+      "word": "ठगी",
+      "start": 37.56580372889897,
+      "end": 37.84450743260267
+     },
+     {
+      "word": "है।",
+      "start": 37.91858150667675,
+      "end": 37.95561854371378
+     }
+    ]
+   },
+   {
+    "id": "n19",
+    "text": "जो इनाम माँगा नहीं, उसकी फ़ीस कभी मत भरिए।",
+    "start": 38.19635508524398,
+    "end": 40.665793230872595,
+    "words": [
+     {
+      "word": "जो",
+      "start": 38.19635508524398,
+      "end": 38.32691064079954
+     },
+     {
+      "word": "इनाम",
+      "start": 38.34542915931805,
+      "end": 38.62320693709584
+     },
+     {
+      "word": "माँगा",
+      "start": 38.69820693709583,
+      "end": 38.95746619635509
+     },
+     {
+      "word": "नहीं,",
+      "start": 39.013947677836576,
+      "end": 39.273206937095836
+     },
+     {
+      "word": "उसकी",
+      "start": 39.402830267909636,
+      "end": 39.6444969345763
+     },
+     {
+      "word": "फ़ीस",
+      "start": 39.75560804568741,
+      "end": 39.960237675317046
+     },
+     {
+      "word": "कभी",
+      "start": 40.034311749391115,
+      "end": 40.2194969345763
+     },
+     {
+      "word": "मत",
+      "start": 40.2944969345763,
+      "end": 40.40560804568741
+     },
+     {
+      "word": "भरिए।",
+      "start": 40.47968211976149,
+      "end": 40.665793230872595
+     }
+    ]
+   },
+   {
+    "id": "n20",
+    "text": "पर इस बार, दोनों ने रुककर सोचा।",
+    "start": 40.90654656924499,
+    "end": 42.7472810111699,
+    "words": [
+     {
+      "word": "पर",
+      "start": 40.90654656924499,
+      "end": 41.01858360628202
+     },
+     {
+      "word": "इस",
+      "start": 41.03710212480054,
+      "end": 41.16673175443017
+     },
+     {
+      "word": "बार,",
+      "start": 41.24173175443017,
+      "end": 41.520435458133875
+     },
+     {
+      "word": "दोनों",
+      "start": 41.65005878894768,
+      "end": 41.92876249265139
+     },
+     {
+      "word": "ने",
+      "start": 41.984318048206944,
+      "end": 42.05931804820694
+     },
+     {
+      "word": "रुककर",
+      "start": 42.1148736037625,
+      "end": 42.375058788947676
+     },
+     {
+      "word": "सोचा।",
+      "start": 42.48709582598472,
+      "end": 42.7472810111699
+     }
+    ]
+   }
+  ],
+  "audio": "output/shorts/topic/lottery_prize_processing_fee_scam/narration/paced.wav",
+  "tts": "chatterbox",
+  "tempo": 1.08,
+  "pacing": {
+   "raw_duration": 49.41410430839002,
+   "raw_words_per_s": 2.57,
+   "paced_words_per_s": 2.94,
+   "gap_cap": 0.14,
+   "beat_gap": 0.1,
+   "tempo": 1.08
+  }
+ },
+ "targets": {
+  "PHONE": [
+   670.0,
+   1166.0
+  ],
+  "DOOR": [
+   960.0,
+   1000.0
+  ],
+  "NIGHTSTAND": [
+   670.0,
+   1180.0
+  ],
+  "BED": [
+   200.0,
+   1230.0
+  ],
+  "LAMP": [
+   600.0,
+   1110.0
+  ],
+  "WINDOW": [
+   865.0,
+   560.0
+  ],
+  "A_STOP": [
+   830.0,
+   1500
+  ],
+  "D_STOP": [
+   1070.0,
+   1500
+  ],
+  "HANDOVER": [
+   905.0,
+   860.0
+  ],
+  "SCREEN": [
+   540.0,
+   900.0
+  ],
+  "MONEY": [
+   540.0,
+   900.0
+  ],
+  "nightstand_phone": [
+   670.0,
+   1166.0
+  ]
+ },
+ "shots": [
+  {
+   "id": "S01",
+   "treatment": "skeleton",
+   "t0": 0.0,
+   "t1": 2.536,
+   "beats": [
+    "n01"
+   ],
+   "segs": [
+    "n01"
+   ],
+   "purpose": "Wide establishing: the protagonist alone in the room at night",
+   "act": "ESTABLISH",
+   "gp": [],
+   "transition_in": "fade",
+   "sfx": [],
+   "phase": "-",
+   "location": "bedroom",
+   "lighting": {
+    "mood": "dim",
+    "moon": 1.0,
+    "phone": 1.0,
+    "fill": 2.1,
+    "exposure_mul": 1.52
+   },
+   "camera": {
+    "target": "stage",
+    "size": "wide",
+    "move": "push"
+   },
+   "fixes": {
+    "lighting": {
+     "fill": 2.1,
+     "exposure_mul": 1.52
+    }
+   },
+   "actions": [
+    {
+     "char": "D",
+     "action": "idle",
+     "t": 0.0,
+     "dur": 45.747
+    },
+    {
+     "char": "A",
+     "action": "face",
+     "t": 0.0,
+     "dur": 0.3,
+     "name": "tired"
+    },
+    {
+     "char": "A",
+     "action": "idle",
+     "t": 0.3,
+     "dur": 2.236,
+     "emotion": "sad",
+     "intensity": 0.4
+    }
+   ]
+  },
+  {
+   "id": "S02",
+   "treatment": "skeleton",
+   "t0": 2.536,
+   "t1": 4.361,
+   "beats": [
+    "n02"
+   ],
+   "segs": [
+    "n02"
+   ],
+   "purpose": "The phone lights up",
+   "act": "PHONE_ALERT",
+   "gp": [
+    {
+     "effect": "arcs",
+     "anchor": "phone_free",
+     "start": 0.05,
+     "duration": 1.1,
+     "intensity": 0.85,
+     "relationship": "the phone vibrating on the nightstand"
+    }
+   ],
+   "transition_in": "cut",
+   "sfx": [],
+   "phase": "-",
+   "location": "bedroom",
+   "lighting": {
+    "mood": "dim",
+    "moon": 1.0,
+    "phone": 1.0,
+    "fill": 2.1,
+    "exposure_mul": 1.52
+   },
+   "camera": {
+    "target": "A.reach",
+    "size": "two_reach",
+    "move": "reveal",
+    "dir": 1,
+    "dx": -166.7,
+    "dy": 0.0,
+    "zoom_mul": 0.85
+   },
+   "fixes": {
+    "camera": {
+     "zoom_mul": 0.85,
+     "dx": -166.7,
+     "dy": 0.0
+    },
+    "lighting": {
+     "fill": 2.1,
+     "exposure_mul": 1.52
+    }
+   },
+   "actions": [
+    {
+     "char": "A",
+     "action": "buzz",
+     "t": 2.586,
+     "dur": 1.0,
+     "intensity": 0.9
+    },
+    {
+     "char": "A",
+     "action": "flinch",
+     "t": 2.786,
+     "dur": 0.6,
+     "emotion": "fearful",
+     "intensity": 0.4
+    }
+   ]
+  },
+  {
+   "id": "S03",
+   "treatment": "skeleton",
+   "t0": 4.361,
+   "t1": 6.246,
+   "beats": [
+    "n03"
+   ],
+   "segs": [
+    "n03"
+   ],
+   "purpose": "He looks at the phone",
+   "act": "LOOK_AT_PHONE",
+   "gp": [],
+   "transition_in": "cut",
+   "sfx": [],
+   "phase": "-",
+   "location": "bedroom",
+   "lighting": {
+    "mood": "dim",
+    "moon": 1.0,
+    "phone": 1.0,
+    "fill": 1.4,
+    "exposure_mul": 1.322
+   },
+   "camera": {
+    "target": "A.head",
+    "size": "medium",
+    "move": "isolate"
+   },
+   "fixes": {
+    "lighting": {
+     "fill": 1.4,
+     "exposure_mul": 1.322
+    }
+   },
+   "actions": [
+    {
+     "char": "A",
+     "action": "look_at",
+     "t": 4.411,
+     "dur": 1.8350000000000006,
+     "target": "PHONE",
+     "track": true,
+     "emotion": "curious",
+     "intensity": 0.6
+    },
+    {
+     "char": "A",
+     "action": "face",
+     "t": 4.460999999999999,
+     "dur": 0.35,
+     "name": "curious"
+    }
+   ]
+  },
+  {
+   "id": "S04",
+   "treatment": "skeleton",
+   "t0": 6.246,
+   "t1": 8.666,
+   "beats": [
+    "n04"
+   ],
+   "segs": [
+    "n04"
+   ],
+   "purpose": "His eyes change",
+   "act": "EYES_CHANGE",
+   "gp": [
+    {
+     "effect": "ticks",
+     "anchor": "eyes",
+     "start": 0.1,
+     "duration": 0.7,
+     "intensity": 0.6,
+     "relationship": "the eyes narrow: something is off"
+    }
+   ],
+   "transition_in": "cut",
+   "sfx": [],
+   "phase": "-",
+   "location": "bedroom",
+   "lighting": {
+    "mood": "fear",
+    "moon": 0.8,
+    "phone": 1.0,
+    "fill": 2.1,
+    "exposure_mul": 1.52
+   },
+   "camera": {
+    "target": "A.head",
+    "size": "close",
+    "move": "push"
+   },
+   "fixes": {
+    "lighting": {
+     "fill": 2.1,
+     "exposure_mul": 1.52
+    }
+   },
+   "actions": [
+    {
+     "char": "A",
+     "action": "face",
+     "t": 6.296,
+     "dur": 0.3,
+     "name": "determination"
+    },
+    {
+     "char": "A",
+     "action": "face",
+     "t": 7.146000000000001,
+     "dur": 0.4,
+     "name": "worried"
+    }
+   ]
+  },
+  {
+   "id": "S05",
+   "treatment": "skeleton",
+   "t0": 8.666,
+   "t1": 10.516,
+   "beats": [
+    "n05"
+   ],
+   "segs": [
+    "n05"
+   ],
+   "purpose": "He reaches for the phone",
+   "act": "REACH_PHONE",
+   "gp": [],
+   "transition_in": "cut",
+   "sfx": [],
+   "phase": "-",
+   "location": "bedroom",
+   "lighting": {
+    "mood": "fear",
+    "moon": 0.9,
+    "phone": 1.0,
+    "fill": 2.1,
+    "exposure_mul": 1.52
+   },
+   "camera": {
+    "target": "A.reach",
+    "size": "two_reach",
+    "move": "drift"
+   },
+   "fixes": {
+    "lighting": {
+     "fill": 2.1,
+     "exposure_mul": 1.52
+    }
+   },
+   "actions": [
+    {
+     "char": "A",
+     "action": "reach",
+     "t": 8.686,
+     "dur": 1.5499999999999996,
+     "target": "PHONE",
+     "emotion": "hesitant",
+     "intensity": 0.8,
+     "grip": "hold_phone"
+    }
+   ]
+  },
+  {
+   "id": "S06",
+   "treatment": "skeleton",
+   "t0": 10.516,
+   "t1": 11.756,
+   "beats": [
+    "n06"
+   ],
+   "segs": [
+    "n06"
+   ],
+   "purpose": "He picks it up",
+   "act": "PICK_UP",
+   "gp": [
+    {
+     "effect": "rays",
+     "anchor": "phone",
+     "start": 0.3,
+     "duration": 0.9400000000000002,
+     "intensity": 0.35,
+     "relationship": "light from the screen"
+    }
+   ],
+   "transition_in": "cut",
+   "sfx": [],
+   "phase": "-",
+   "location": "bedroom",
+   "lighting": {
+    "mood": "fear",
+    "moon": 0.8,
+    "phone": 1.0,
+    "fill": 1.4,
+    "exposure_mul": 1.322
+   },
+   "camera": {
+    "target": "A.phone",
+    "size": "close",
+    "move": "push",
+    "dx": -122.1,
+    "dy": -140.8,
+    "zoom_mul": 0.95
+   },
+   "fixes": {
+    "camera": {
+     "zoom_mul": 0.95,
+     "dx": -122.1,
+     "dy": -140.8
+    },
+    "lighting": {
+     "fill": 1.4,
+     "exposure_mul": 1.322
+    }
+   },
+   "actions": [
+    {
+     "char": "A",
+     "action": "grab",
+     "t": 10.636,
+     "dur": 0.1,
+     "prop": "phone",
+     "from_table": true
+    },
+    {
+     "char": "A",
+     "action": "hold_phone",
+     "t": 10.816,
+     "dur": 0.9400000000000002,
+     "pos": "chest",
+     "emotion": "hesitant",
+     "intensity": 0.6
+    }
+   ]
+  },
+  {
+   "id": "S07",
+   "treatment": "skeleton",
+   "t0": 11.756,
+   "t1": 13.427,
+   "beats": [
+    "n07"
+   ],
+   "segs": [
+    "n07"
+   ],
+   "purpose": "He reads the message",
+   "act": "READ_MESSAGE",
+   "gp": [],
+   "transition_in": "cut",
+   "sfx": [],
+   "phase": "-",
+   "location": "bedroom",
+   "lighting": {
+    "mood": "fear",
+    "moon": 0.7,
+    "phone": 1.0,
+    "fill": 0.7,
+    "exposure_mul": 1.15
+   },
+   "camera": {
+    "target": "A.head",
+    "size": "medium",
+    "move": "rack_focus"
+   },
+   "fixes": {
+    "lighting": {
+     "fill": 0.7,
+     "exposure_mul": 1.15
+    }
+   },
+   "actions": [
+    {
+     "char": "A",
+     "action": "hold_phone",
+     "t": 10.816,
+     "dur": 0.9400000000000002,
+     "pos": "chest",
+     "emotion": "hesitant",
+     "intensity": 0.6
+    },
+    {
+     "char": "A",
+     "action": "read_phone",
+     "t": 11.806000000000001,
+     "dur": 1.6209999999999993,
+     "emotion": "nervous",
+     "intensity": 0.6
+    },
+    {
+     "char": "A",
+     "action": "face",
+     "t": 11.856,
+     "dur": 0.3,
+     "name": "concerned"
+    }
+   ]
+  },
+  {
+   "id": "S08",
+   "treatment": "skeleton",
+   "t0": 13.427,
+   "t1": 14.987,
+   "beats": [
+    "n08"
+   ],
+   "segs": [
+    "n08"
+   ],
+   "purpose": "His expression changes",
+   "act": "REALIZE",
+   "gp": [
+    {
+     "effect": "worry",
+     "anchor": "temple",
+     "start": 0.4,
+     "duration": 1.1600000000000006,
+     "intensity": 0.9,
+     "relationship": "dread"
+    }
+   ],
+   "transition_in": "cut",
+   "sfx": [],
+   "phase": "-",
+   "location": "bedroom",
+   "lighting": {
+    "mood": "fear",
+    "moon": 0.6,
+    "phone": 1.0,
+    "fill": 0.7,
+    "exposure_mul": 1.15
+   },
+   "camera": {
+    "target": "A.head",
+    "size": "close",
+    "move": "push"
+   },
+   "fixes": {
+    "lighting": {
+     "fill": 0.7,
+     "exposure_mul": 1.15
+    }
+   },
+   "actions": [
+    {
+     "char": "A",
+     "action": "realization",
+     "t": 13.477,
+     "dur": 1.5100000000000005,
+     "emotion": "shocked",
+     "intensity": 0.8
+    }
+   ]
+  },
+  {
+   "id": "S09",
+   "treatment": "skeleton",
+   "t0": 14.987,
+   "t1": 16.787,
+   "beats": [
+    "n09"
+   ],
+   "segs": [
+    "n09"
+   ],
+   "purpose": "He stands: full body",
+   "act": "STAND_UP",
+   "gp": [],
+   "transition_in": "cut",
+   "sfx": [],
+   "phase": "-",
+   "location": "bedroom",
+   "lighting": {
+    "mood": "fear",
+    "moon": 0.9,
+    "phone": 1.0,
+    "fill": 0.7,
+    "exposure_mul": 1.15
+   },
+   "camera": {
+    "target": "A.full",
+    "size": "full",
+    "move": "pull"
+   },
+   "fixes": {
+    "lighting": {
+     "fill": 0.7,
+     "exposure_mul": 1.15
+    }
+   },
+   "actions": [
+    {
+     "char": "A",
+     "action": "fear",
+     "t": 14.987,
+     "dur": 1.0,
+     "emotion": "fearful",
+     "intensity": 0.7,
+     "body": false
+    },
+    {
+     "char": "A",
+     "action": "stand",
+     "t": 15.067,
+     "dur": 1.3,
+     "emotion": "fearful",
+     "intensity": 0.7
+    }
+   ]
+  },
+  {
+   "id": "S10",
+   "treatment": "skeleton",
+   "t0": 16.787,
+   "t1": 18.822,
+   "beats": [
+    "n10"
+   ],
+   "segs": [
+    "n10"
+   ],
+   "purpose": "He walks across the room",
+   "act": "WALK_ACROSS",
+   "gp": [],
+   "transition_in": "cut",
+   "sfx": [],
+   "phase": "-",
+   "location": "bedroom",
+   "lighting": {
+    "mood": "fear",
+    "moon": 0.9,
+    "phone": 1.0,
+    "fill": 0.7,
+    "exposure_mul": 1.15
+   },
+   "camera": {
+    "target": "A.full",
+    "size": "full",
+    "move": "track"
+   },
+   "fixes": {
+    "lighting": {
+     "fill": 0.7,
+     "exposure_mul": 1.15
+    }
+   },
+   "actions": [
+    {
+     "char": "A",
+     "action": "walk_to",
+     "t": 16.837,
+     "dur": 1.935,
+     "target": "A_STOP",
+     "stop_before": 0.0,
+     "fill": true,
+     "stride_scale": 0.6,
+     "hold_R": true,
+     "emotion": "nervous",
+     "intensity": 0.7
+    },
+    {
+     "char": "D",
+     "action": "walk_to",
+     "t": 17.721999999999998,
+     "dur": 3.315000000000002,
+     "target": "D_STOP",
+     "stop_before": 0.0,
+     "speed": 205.0,
+     "stride_scale": 0.7,
+     "emotion": "hesitant",
+     "intensity": 0.5
+    }
+   ]
+  },
+  {
+   "id": "S11",
+   "treatment": "skeleton",
+   "t0": 18.822,
+   "t1": 20.937,
+   "beats": [
+    "n11"
+   ],
+   "segs": [
+    "n11"
+   ],
+   "purpose": "The door opens; a second person comes in",
+   "act": "PERSON_ENTERS",
+   "gp": [],
+   "transition_in": "cut",
+   "sfx": [],
+   "phase": "-",
+   "location": "bedroom",
+   "lighting": {
+    "mood": "dim",
+    "moon": 0.8,
+    "phone": 0.7,
+    "hall": 1.0,
+    "fill": 0.7,
+    "exposure_mul": 1.15
+   },
+   "camera": {
+    "target": "A+D",
+    "size": "two",
+    "move": "reveal",
+    "dir": -1,
+    "dx": 196.5,
+    "dy": 0.0,
+    "zoom_mul": 0.81
+   },
+   "fixes": {
+    "camera": {
+     "zoom_mul": 0.81,
+     "dx": 196.5,
+     "dy": 0.0
+    },
+    "lighting": {
+     "fill": 0.7,
+     "exposure_mul": 1.15
+    }
+   },
+   "actions": [
+    {
+     "char": "D",
+     "action": "face",
+     "t": 19.122,
+     "dur": 0.4,
+     "name": "concerned"
+    },
+    {
+     "char": "D",
+     "action": "notice",
+     "t": 19.172,
+     "dur": 0.7,
+     "target": "PERSON_A",
+     "emotion": "hesitant",
+     "intensity": 0.5
+    },
+    {
+     "char": "A",
+     "action": "notice",
+     "t": 19.022,
+     "dur": 0.7,
+     "target": "DOOR",
+     "emotion": "shocked",
+     "intensity": 0.5
+    },
+    {
+     "char": "A",
+     "action": "eye_contact",
+     "t": 19.772,
+     "dur": 1.265000000000002,
+     "target": "PERSON_D"
+    },
+    {
+     "char": "D",
+     "action": "eye_contact",
+     "t": 19.922,
+     "dur": 1.215000000000002,
+     "target": "PERSON_A"
+    }
+   ]
+  },
+  {
+   "id": "S12",
+   "treatment": "skeleton",
+   "t0": 20.937,
+   "t1": 22.793,
+   "beats": [
+    "n12"
+   ],
+   "segs": [
+    "n12"
+   ],
+   "purpose": "They look at each other",
+   "act": "EYE_CONTACT",
+   "gp": [],
+   "transition_in": "cut",
+   "sfx": [],
+   "phase": "-",
+   "location": "bedroom",
+   "lighting": {
+    "mood": "dim",
+    "moon": 0.8,
+    "phone": 0.7,
+    "hall": 1.0
+   },
+   "camera": {
+    "target": "A+D",
+    "size": "two",
+    "move": "hold"
+   },
+   "actions": [
+    {
+     "char": "A",
+     "action": "eye_contact",
+     "t": 20.957,
+     "dur": 1.835999999999998,
+     "target": "PERSON_D",
+     "emotion": "nervous",
+     "intensity": 0.5
+    },
+    {
+     "char": "D",
+     "action": "eye_contact",
+     "t": 20.987000000000002,
+     "dur": 1.805999999999998,
+     "target": "PERSON_A",
+     "emotion": "hesitant",
+     "intensity": 0.5
+    },
+    {
+     "char": "D",
+     "action": "confusion",
+     "t": 21.337,
+     "dur": 1.1,
+     "emotion": "hesitant",
+     "intensity": 0.5
+    }
+   ]
+  },
+  {
+   "id": "S13",
+   "treatment": "skeleton",
+   "t0": 22.793,
+   "t1": 25.391,
+   "beats": [
+    "n13"
+   ],
+   "segs": [
+    "n13"
+   ],
+   "purpose": "She looks at the phone in his hand",
+   "act": "OTHER_LOOKS_AT_PHONE",
+   "gp": [
+    {
+     "effect": "arrow",
+     "anchor": "phone",
+     "start": 0.3,
+     "duration": 1.1,
+     "intensity": 0.8,
+     "relationship": "attention drawn to the phone"
+    }
+   ],
+   "transition_in": "cut",
+   "sfx": [],
+   "phase": "-",
+   "location": "bedroom",
+   "lighting": {
+    "mood": "dim",
+    "moon": 0.7,
+    "phone": 1.0,
+    "hall": 1.0
+   },
+   "camera": {
+    "target": "D.head",
+    "size": "medium",
+    "move": "isolate"
+   },
+   "actions": [
+    {
+     "char": "D",
+     "action": "look_at",
+     "t": 22.843,
+     "dur": 2.547999999999999,
+     "target": "PHONE",
+     "track": true,
+     "emotion": "suspicious",
+     "intensity": 0.6
+    },
+    {
+     "char": "A",
+     "action": "hold_phone",
+     "t": 22.993,
+     "dur": 0.6,
+     "pos": "face",
+     "emotion": "hesitant",
+     "intensity": 0.4
+    },
+    {
+     "char": "A",
+     "action": "look_at",
+     "t": 23.393,
+     "dur": 0.5,
+     "target": "PERSON_D",
+     "emotion": "nervous",
+     "intensity": 0.4
+    }
+   ]
+  },
+  {
+   "id": "S14",
+   "treatment": "skeleton",
+   "t0": 25.391,
+   "t1": 27.584,
+   "beats": [
+    "n14"
+   ],
+   "segs": [
+    "n14"
+   ],
+   "purpose": "He hands her the phone",
+   "act": "HAND_OVER",
+   "gp": [],
+   "transition_in": "cut",
+   "sfx": [],
+   "phase": "-",
+   "location": "bedroom",
+   "lighting": {
+    "mood": "dim",
+    "moon": 0.8,
+    "phone": 1.0,
+    "hall": 1.0,
+    "fill": 0.7,
+    "exposure_mul": 1.15
+   },
+   "camera": {
+    "target": "A+D",
+    "size": "two",
+    "move": "truck",
+    "dir": 1,
+    "dx": -14.8,
+    "dy": 0.0,
+    "zoom_mul": 0.99
+   },
+   "fixes": {
+    "camera": {
+     "zoom_mul": 0.99,
+     "dx": -14.8,
+     "dy": 0.0
+    },
+    "lighting": {
+     "fill": 0.7,
+     "exposure_mul": 1.15
+    }
+   },
+   "actions": [
+    {
+     "char": "A",
+     "action": "hand_over",
+     "t": 25.441,
+     "dur": 1.156000000000003,
+     "target": "PERSON_D",
+     "point": "HANDOVER",
+     "prop": "phone",
+     "emotion": "hesitant",
+     "intensity": 0.6
+    },
+    {
+     "char": "D",
+     "action": "receive",
+     "t": 25.540999999999997,
+     "dur": 1.106000000000003,
+     "point": "HANDOVER",
+     "prop": "phone",
+     "emotion": "hesitant",
+     "intensity": 0.5
+    },
+    {
+     "char": "A",
+     "action": "release",
+     "t": 27.147000000000002,
+     "dur": 0.5,
+     "prop": "phone"
+    },
+    {
+     "char": "D",
+     "action": "hold_phone",
+     "t": 27.247,
+     "dur": 0.4,
+     "pos": "chest",
+     "emotion": "hesitant",
+     "intensity": 0.5
+    }
+   ]
+  },
+  {
+   "id": "S15",
+   "treatment": "skeleton",
+   "t0": 27.584,
+   "t1": 29.111,
+   "beats": [
+    "n15"
+   ],
+   "segs": [
+    "n15"
+   ],
+   "purpose": "She reacts; the screen lights her face",
+   "act": "OTHER_REACTS",
+   "gp": [
+    {
+     "effect": "scribble",
+     "anchor": "head",
+     "start": 0.6,
+     "duration": 0.927000000000001,
+     "intensity": 0.6,
+     "relationship": "alarm"
+    }
+   ],
+   "transition_in": "cut",
+   "sfx": [],
+   "phase": "-",
+   "location": "bedroom",
+   "lighting": {
+    "mood": "fear",
+    "moon": 0.5,
+    "phone": 1.0,
+    "hall": 1.0
+   },
+   "camera": {
+    "target": "D.head",
+    "size": "close",
+    "move": "push"
+   },
+   "actions": [
+    {
+     "char": "A",
+     "action": "release",
+     "t": 27.147000000000002,
+     "dur": 0.5,
+     "prop": "phone"
+    },
+    {
+     "char": "D",
+     "action": "hold_phone",
+     "t": 27.247,
+     "dur": 0.4,
+     "pos": "chest",
+     "emotion": "hesitant",
+     "intensity": 0.5
+    },
+    {
+     "char": "D",
+     "action": "fear",
+     "t": 27.634,
+     "dur": 1.2,
+     "emotion": "fearful",
+     "intensity": 0.6
+    },
+    {
+     "char": "D",
+     "action": "read_phone",
+     "t": 28.084,
+     "dur": 1.027000000000001,
+     "emotion": "nervous",
+     "intensity": 0.5
+    },
+    {
+     "char": "D",
+     "action": "face",
+     "t": 27.884,
+     "dur": 0.4,
+     "name": "worried"
+    },
+    {
+     "char": "A",
+     "action": "look_at",
+     "t": 27.684,
+     "dur": 1.427000000000001,
+     "target": "PERSON_D",
+     "track": true
+    }
+   ]
+  },
+  {
+   "id": "S16",
+   "treatment": "insert_ui",
+   "t0": 29.111,
+   "t1": 32.245,
+   "beats": [
+    "n16"
+   ],
+   "segs": [
+    "n16"
+   ],
+   "purpose": "The suspicious message",
+   "act": "INSERT_SCREEN",
+   "gp": [
+    {
+     "effect": "ring",
+     "start": 0.5,
+     "duration": 1.0,
+     "anchor": "ui",
+     "intensity": 0.9,
+     "relationship": "the demand"
+    }
+   ],
+   "transition_in": "cut",
+   "sfx": [],
+   "phase": "-",
+   "location": "bedroom",
+   "lighting": {
+    "mood": "fear"
+   },
+   "ui": {
+    "screen": "sms",
+    "data": {
+     "sender": "LOTTERY-2025",
+     "time": "अभी",
+     "text": "बधाई! आपने इनाम जीता है। इनाम पाने के लिए पहले प्रोसेसिंग फ़ीस भेजें। tinyurl.com/claim-now"
+    },
+    "bloom": 0.15
+   },
+   "fixes": {
+    "ui": {
+     "bloom": 0.15
+    }
+   },
+   "actions": []
+  },
+  {
+   "id": "S17",
+   "treatment": "procedural",
+   "t0": 32.245,
+   "t1": 35.476,
+   "beats": [
+    "n17"
+   ],
+   "segs": [
+    "n17"
+   ],
+   "purpose": "Money and account network visualisation",
+   "act": "VISUALIZE_FLOW",
+   "gp": [],
+   "transition_in": "cut",
+   "sfx": [],
+   "phase": "-",
+   "location": "bedroom",
+   "lighting": {
+    "mood": "fear"
+   },
+   "procedural": {
+    "type": "money_flow",
+    "data": {
+     "amount": 500000,
+     "from_label": "आपकी बचत",
+     "to": [
+      "खाता 1",
+      "खाता 2",
+      "खाता 3"
+     ]
+    }
+   },
+   "actions": []
+  },
+  {
+   "id": "S18",
+   "treatment": "skeleton",
+   "t0": 35.476,
+   "t1": 38.076,
+   "beats": [
+    "n18"
+   ],
+   "segs": [
+    "n18"
+   ],
+   "purpose": "Both realise the danger",
+   "act": "BOTH_REALIZE",
+   "gp": [
+    {
+     "effect": "ticks",
+     "anchor": "eyes",
+     "start": 0.1,
+     "duration": 0.7,
+     "intensity": 0.9,
+     "relationship": "the jolt of realisation"
+    }
+   ],
+   "transition_in": "dip",
+   "sfx": [],
+   "phase": "-",
+   "location": "bedroom",
+   "lighting": {
+    "mood": "fear",
+    "moon": 0.6,
+    "phone": 1.0,
+    "hall": 1.0,
+    "fill": 0.7,
+    "exposure_mul": 1.15
+   },
+   "camera": {
+    "target": "A+D",
+    "size": "two",
+    "move": "pull"
+   },
+   "fixes": {
+    "lighting": {
+     "fill": 0.7,
+     "exposure_mul": 1.15
+    }
+   },
+   "actions": [
+    {
+     "char": "A",
+     "action": "realization",
+     "t": 35.525999999999996,
+     "dur": 2.5500000000000016,
+     "emotion": "shocked",
+     "intensity": 0.8
+    },
+    {
+     "char": "D",
+     "action": "freeze",
+     "t": 35.525999999999996,
+     "dur": 0.6
+    },
+    {
+     "char": "D",
+     "action": "look_at",
+     "t": 36.176,
+     "dur": 1.9000000000000015,
+     "target": "PERSON_A",
+     "emotion": "fearful",
+     "intensity": 0.6
+    }
+   ]
+  },
+  {
+   "id": "S19",
+   "treatment": "skeleton",
+   "t0": 38.076,
+   "t1": 40.787,
+   "beats": [
+    "n19"
+   ],
+   "segs": [
+    "n19"
+   ],
+   "purpose": "Final close-up",
+   "act": "CLOSE_UP",
+   "gp": [],
+   "transition_in": "cut",
+   "sfx": [],
+   "phase": "-",
+   "location": "bedroom",
+   "lighting": {
+    "mood": "dim",
+    "moon": 0.9,
+    "phone": 0.4,
+    "hall": 0.8,
+    "fill": 0.7,
+    "exposure_mul": 1.15
+   },
+   "camera": {
+    "target": "A.head",
+    "size": "close",
+    "move": "isolate"
+   },
+   "fixes": {
+    "lighting": {
+     "fill": 0.7,
+     "exposure_mul": 1.15
+    }
+   },
+   "actions": [
+    {
+     "char": "A",
+     "action": "face",
+     "t": 38.126,
+     "dur": 0.5,
+     "name": "determination"
+    },
+    {
+     "char": "A",
+     "action": "look_at",
+     "t": 38.176,
+     "dur": 2.6109999999999984,
+     "target": "CAMERA"
+    },
+    {
+     "char": "D",
+     "action": "hand_pose",
+     "t": 38.076,
+     "dur": 0.1,
+     "side": "R",
+     "pose": "open"
+    }
+   ]
+  },
+  {
+   "id": "S20",
+   "treatment": "skeleton",
+   "t0": 40.787,
+   "t1": 45.747,
+   "beats": [
+    "n20"
+   ],
+   "segs": [
+    "n20"
+   ],
+   "purpose": "They stop and think; the lamp comes on; wide pull-out",
+   "act": "RESOLVE",
+   "gp": [
+    {
+     "effect": "rays",
+     "anchor": "lamp",
+     "start": 0.3,
+     "duration": 2.6,
+     "intensity": 0.5,
+     "relationship": "warm light returns"
+    }
+   ],
+   "transition_in": "cut",
+   "sfx": [],
+   "phase": "-",
+   "location": "bedroom",
+   "lighting": {
+    "mood": "relief",
+    "moon": 0.6,
+    "phone": 0.0,
+    "hall": 0.4,
+    "lamp": 1.0
+   },
+   "camera": {
+    "target": "A+D",
+    "size": "reveal",
+    "move": "pull"
+   },
+   "actions": [
+    {
+     "char": "A",
+     "action": "relief",
+     "t": 40.987,
+     "dur": 7.5600000000000005,
+     "emotion": "relieved",
+     "intensity": 0.6
+    },
+    {
+     "char": "D",
+     "action": "relief",
+     "t": 41.387,
+     "dur": 6.960000000000001,
+     "emotion": "relieved",
+     "intensity": 0.5
+    },
+    {
+     "char": "A",
+     "action": "look_at",
+     "t": 40.987,
+     "dur": 1.0,
+     "target": "PERSON_D",
+     "head": true
+    }
+   ]
+  }
+ ],
+ "sfx": [
+  {
+   "t": 2.586,
+   "kind": "buzz",
+   "gain": 0.9
+  },
+  {
+   "t": 2.636,
+   "kind": "ding",
+   "gain": 0.55
+  },
+  {
+   "t": 6.346,
+   "kind": "heartbeat",
+   "gain": 0.6
+  },
+  {
+   "t": 15.087,
+   "kind": "impact",
+   "gain": 0.5
+  },
+  {
+   "t": 18.922,
+   "kind": "impact",
+   "gain": 0.35
+  },
+  {
+   "t": 27.684,
+   "kind": "impact",
+   "gain": 0.6
+  },
+  {
+   "t": 35.576,
+   "kind": "heartbeat",
+   "gain": 0.8
+  },
+  {
+   "t": 2.476,
+   "kind": "whoosh",
+   "gain": 0.2
+  },
+  {
+   "t": 4.301,
+   "kind": "whoosh",
+   "gain": 0.2
+  },
+  {
+   "t": 6.186,
+   "kind": "whoosh",
+   "gain": 0.2
+  },
+  {
+   "t": 8.606,
+   "kind": "whoosh",
+   "gain": 0.2
+  },
+  {
+   "t": 10.456,
+   "kind": "whoosh",
+   "gain": 0.2
+  },
+  {
+   "t": 11.696,
+   "kind": "whoosh",
+   "gain": 0.2
+  },
+  {
+   "t": 13.367,
+   "kind": "whoosh",
+   "gain": 0.2
+  },
+  {
+   "t": 14.927,
+   "kind": "whoosh",
+   "gain": 0.2
+  },
+  {
+   "t": 16.727,
+   "kind": "whoosh",
+   "gain": 0.2
+  },
+  {
+   "t": 18.762,
+   "kind": "whoosh",
+   "gain": 0.2
+  },
+  {
+   "t": 20.877,
+   "kind": "whoosh",
+   "gain": 0.2
+  },
+  {
+   "t": 22.733,
+   "kind": "whoosh",
+   "gain": 0.2
+  },
+  {
+   "t": 25.331,
+   "kind": "whoosh",
+   "gain": 0.2
+  },
+  {
+   "t": 27.524,
+   "kind": "whoosh",
+   "gain": 0.2
+  },
+  {
+   "t": 29.051,
+   "kind": "whoosh",
+   "gain": 0.2
+  },
+  {
+   "t": 32.185,
+   "kind": "whoosh",
+   "gain": 0.2
+  },
+  {
+   "t": 35.416,
+   "kind": "whoosh",
+   "gain": 0.2
+  },
+  {
+   "t": 38.016,
+   "kind": "whoosh",
+   "gain": 0.2
+  },
+  {
+   "t": 40.727,
+   "kind": "whoosh",
+   "gain": 0.2
+  }
+ ],
+ "mood_track": [
+  [
+   0.0,
+   6.246,
+   "dim"
+  ],
+  [
+   6.246,
+   18.822,
+   "fear"
+  ],
+  [
+   18.822,
+   27.584,
+   "dim"
+  ],
+  [
+   27.584,
+   38.076,
+   "fear"
+  ],
+  [
+   38.076,
+   40.787,
+   "dim"
+  ],
+  [
+   40.787,
+   45.747,
+   "relief"
+  ]
+ ],
+ "title_card": {
+  "t0": 43.847,
+  "t1": 45.747,
+  "text": "जो इनाम माँगा ही नहीं"
+ },
+ "lamp_on": 41.087,
+ "hall_on": 18.322,
+ "rim": {
+  "moon": 0.5
+ },
+ "duration_range": [
+  45.0,
+  60.0
+ ],
+ "acts": [
+  "ESTABLISH",
+  "PHONE_ALERT",
+  "LOOK_AT_PHONE",
+  "EYES_CHANGE",
+  "REACH_PHONE",
+  "PICK_UP",
+  "READ_MESSAGE",
+  "REALIZE",
+  "STAND_UP",
+  "WALK_ACROSS",
+  "PERSON_ENTERS",
+  "EYE_CONTACT",
+  "OTHER_LOOKS_AT_PHONE",
+  "HAND_OVER",
+  "OTHER_REACTS",
+  "INSERT_SCREEN",
+  "VISUALIZE_FLOW",
+  "BOTH_REALIZE",
+  "CLOSE_UP",
+  "RESOLVE"
+ ]
+}

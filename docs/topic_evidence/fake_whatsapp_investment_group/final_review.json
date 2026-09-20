@@ -1,0 +1,423 @@
+{
+ "frames": [
+  {
+   "shot": "S01",
+   "t": 1.52,
+   "frame_luma": 0.205,
+   "vlm": {
+    "subject_fully_visible": true,
+    "face_readable": false,
+    "too_dark": true,
+    "text_legible": true,
+    "cluttered": false,
+    "issues": [
+     "low contrast reduces facial detail",
+     "ambient lighting obscures expression"
+    ],
+    "score": 6
+   }
+  },
+  {
+   "shot": "S02",
+   "t": 3.85,
+   "frame_luma": 0.269,
+   "vlm": {
+    "subject_fully_visible": true,
+    "face_readable": false,
+    "too_dark": true,
+    "text_legible": true,
+    "cluttered": false,
+    "issues": [
+     "Face is not lit enough to read expression",
+     "Overall scene too dark for clear visibility"
+    ],
+    "score": 5
+   }
+  },
+  {
+   "shot": "S03",
+   "t": 5.86,
+   "frame_luma": 0.249,
+   "vlm": {
+    "subject_fully_visible": true,
+    "face_readable": false,
+    "too_dark": true,
+    "text_legible": true,
+    "cluttered": false,
+    "issues": [
+     "Face is not clearly visible due to low lighting",
+     "Overall scene darkness reduces visual clarity"
+    ],
+    "score": 5
+   }
+  },
+  {
+   "shot": "S04",
+   "t": 7.95,
+   "frame_luma": 0.286,
+   "vlm": {
+    "subject_fully_visible": true,
+    "face_readable": true,
+    "too_dark": false,
+    "text_legible": true,
+    "cluttered": false,
+    "issues": [],
+    "score": 10
+   }
+  },
+  {
+   "shot": "S05",
+   "t": 9.95,
+   "frame_luma": 0.29,
+   "vlm": {
+    "subject_fully_visible": true,
+    "face_readable": true,
+    "too_dark": false,
+    "text_legible": true,
+    "cluttered": false,
+    "issues": [
+     "character's hand is not clearly reaching for a phone",
+     "no visible phone in frame to match intent"
+    ],
+    "score": 7
+   }
+  },
+  {
+   "shot": "S06",
+   "t": 11.43,
+   "frame_luma": 0.287,
+   "vlm": {
+    "subject_fully_visible": true,
+    "face_readable": true,
+    "too_dark": false,
+    "text_legible": true,
+    "cluttered": false,
+    "issues": [],
+    "score": 10
+   }
+  },
+  {
+   "shot": "S07",
+   "t": 13.22,
+   "frame_luma": 0.241,
+   "vlm": {
+    "subject_fully_visible": true,
+    "face_readable": true,
+    "too_dark": false,
+    "text_legible": true,
+    "cluttered": false,
+    "issues": [],
+    "score": 10
+   }
+  },
+  {
+   "shot": "S08",
+   "t": 15.02,
+   "frame_luma": 0.272,
+   "vlm": {
+    "subject_fully_visible": true,
+    "face_readable": true,
+    "too_dark": false,
+    "text_legible": false,
+    "cluttered": false,
+    "issues": [
+     "Hindi caption text is present and not legible to non-Hindi speakers",
+     "Phone screen content is indistinct"
+    ],
+    "score": 8
+   }
+  },
+  {
+   "shot": "S09",
+   "t": 16.68,
+   "frame_luma": 0.219,
+   "vlm": {
+    "subject_fully_visible": true,
+    "face_readable": true,
+    "too_dark": false,
+    "text_legible": true,
+    "cluttered": false,
+    "issues": [],
+    "score": 10
+   }
+  },
+  {
+   "shot": "S10",
+   "t": 18.58,
+   "frame_luma": 0.227,
+   "vlm": {
+    "subject_fully_visible": true,
+    "face_readable": false,
+    "too_dark": true,
+    "text_legible": true,
+    "cluttered": false,
+    "issues": [
+     "Face is not clearly visible due to lighting",
+     "Overall scene too dark for clear character expression"
+    ],
+    "score": 5
+   }
+  },
+  {
+   "shot": "S11",
+   "t": 20.67,
+   "frame_luma": 0.232,
+   "vlm": {
+    "subject_fully_visible": true,
+    "face_readable": false,
+    "too_dark": true,
+    "text_legible": true,
+    "cluttered": false,
+    "issues": [
+     "faces are too small and dimly lit to read expressions",
+     "overall scene is underexposed with low contrast"
+    ],
+    "score": 4
+   }
+  },
+  {
+   "shot": "S12",
+   "t": 22.63,
+   "frame_luma": 0.242,
+   "vlm": {
+    "subject_fully_visible": true,
+    "face_readable": false,
+    "too_dark": true,
+    "text_legible": false,
+    "cluttered": false,
+    "issues": [
+     "faces are too small to read expressions",
+     "overall lighting is dim and moody (not for drama)",
+     "phone screen text is illegible"
+    ],
+    "score": 5
+   }
+  },
+  {
+   "shot": "S13",
+   "t": 24.93,
+   "frame_luma": 0.227,
+   "vlm": {
+    "subject_fully_visible": true,
+    "face_readable": false,
+    "too_dark": true,
+    "text_legible": true,
+    "cluttered": false,
+    "issues": [
+     "low lighting obscures facial expressions",
+     "character faces lack sufficient contrast for clear emotion reading"
+    ],
+    "score": 5
+   }
+  },
+  {
+   "shot": "S14",
+   "t": 27.3,
+   "frame_luma": 0.297,
+   "vlm": {
+    "subject_fully_visible": true,
+    "face_readable": true,
+    "too_dark": false,
+    "text_legible": true,
+    "cluttered": false,
+    "issues": [],
+    "score": 10
+   }
+  },
+  {
+   "shot": "S15",
+   "t": 29.1,
+   "frame_luma": 0.27,
+   "vlm": {
+    "subject_fully_visible": true,
+    "face_readable": false,
+    "too_dark": true,
+    "text_legible": true,
+    "cluttered": false,
+    "issues": [
+     "Face is underlit and shadowed",
+     "Overall scene too dark for clear expression reading"
+    ],
+    "score": 5
+   }
+  },
+  {
+   "shot": "S16",
+   "t": 31.44,
+   "frame_luma": 0.457,
+   "vlm": {
+    "subject_fully_visible": false,
+    "face_readable": false,
+    "too_dark": true,
+    "text_legible": true,
+    "cluttered": false,
+    "issues": [
+     "No character or face visible — only phone screen shown",
+     "Background too dark for cinematic clarity",
+     "Text is central but lacks emotional context from characters"
+    ],
+    "score": 4
+   }
+  },
+  {
+   "shot": "S17",
+   "t": 34.24,
+   "frame_luma": 0.608,
+   "vlm": {
+    "subject_fully_visible": false,
+    "face_readable": false,
+    "too_dark": true,
+    "text_legible": true,
+    "cluttered": false,
+    "issues": [
+     "No human subject present",
+     "Face not visible or readable",
+     "Overall dim lighting reduces clarity"
+    ],
+    "score": 4
+   }
+  },
+  {
+   "shot": "S18",
+   "t": 37.49,
+   "frame_luma": 0.281,
+   "vlm": {
+    "subject_fully_visible": true,
+    "face_readable": false,
+    "too_dark": true,
+    "text_legible": true,
+    "cluttered": false,
+    "issues": [
+     "faces are too small and dimly lit to read expressions",
+     "overall scene is underexposed with low contrast"
+    ],
+    "score": 4
+   }
+  },
+  {
+   "shot": "S19",
+   "t": 40.69,
+   "frame_luma": 0.303,
+   "vlm": {
+    "subject_fully_visible": true,
+    "face_readable": true,
+    "too_dark": false,
+    "text_legible": true,
+    "cluttered": false,
+    "issues": [],
+    "score": 10
+   }
+  },
+  {
+   "shot": "S20",
+   "t": 44.84,
+   "frame_luma": 0.336,
+   "vlm": {
+    "subject_fully_visible": true,
+    "face_readable": false,
+    "too_dark": true,
+    "text_legible": true,
+    "cluttered": false,
+    "issues": [
+     "faces are too small and dimly lit to read expressions",
+     "overall scene is underexposed with low contrast"
+    ],
+    "score": 4
+   }
+  }
+ ],
+ "vlm_mean_score": 6.55,
+ "low_scoring": [
+  {
+   "shot": "S02",
+   "score": 5,
+   "issues": [
+    "Face is not lit enough to read expression",
+    "Overall scene too dark for clear visibility"
+   ]
+  },
+  {
+   "shot": "S03",
+   "score": 5,
+   "issues": [
+    "Face is not clearly visible due to low lighting",
+    "Overall scene darkness reduces visual clarity"
+   ]
+  },
+  {
+   "shot": "S10",
+   "score": 5,
+   "issues": [
+    "Face is not clearly visible due to lighting",
+    "Overall scene too dark for clear character expression"
+   ]
+  },
+  {
+   "shot": "S11",
+   "score": 4,
+   "issues": [
+    "faces are too small and dimly lit to read expressions",
+    "overall scene is underexposed with low contrast"
+   ]
+  },
+  {
+   "shot": "S12",
+   "score": 5,
+   "issues": [
+    "faces are too small to read expressions",
+    "overall lighting is dim and moody (not for drama)",
+    "phone screen text is illegible"
+   ]
+  },
+  {
+   "shot": "S13",
+   "score": 5,
+   "issues": [
+    "low lighting obscures facial expressions",
+    "character faces lack sufficient contrast for clear emotion reading"
+   ]
+  },
+  {
+   "shot": "S15",
+   "score": 5,
+   "issues": [
+    "Face is underlit and shadowed",
+    "Overall scene too dark for clear expression reading"
+   ]
+  },
+  {
+   "shot": "S16",
+   "score": 4,
+   "issues": [
+    "No character or face visible — only phone screen shown",
+    "Background too dark for cinematic clarity",
+    "Text is central but lacks emotional context from characters"
+   ]
+  },
+  {
+   "shot": "S17",
+   "score": 4,
+   "issues": [
+    "No human subject present",
+    "Face not visible or readable",
+    "Overall dim lighting reduces clarity"
+   ]
+  },
+  {
+   "shot": "S18",
+   "score": 4,
+   "issues": [
+    "faces are too small and dimly lit to read expressions",
+    "overall scene is underexposed with low contrast"
+   ]
+  },
+  {
+   "shot": "S20",
+   "score": 4,
+   "issues": [
+    "faces are too small and dimly lit to read expressions",
+    "overall scene is underexposed with low contrast"
+   ]
+  }
+ ]
+}

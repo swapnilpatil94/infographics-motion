@@ -79,7 +79,7 @@ def sms(d, t):
     h = 40 + 38 * len(lines)
     b += f'<rect x="28" y="170" width="{UW - 90}" height="{h}" rx="26" fill="#e9eef6"/>'
     for i, ln in enumerate(lines):
-        b += _t(52, 218 + 38 * i, ln, 28, "#1a2333", 400, "start")
+        b += _t(52, 218 + 38 * i, ln, 29, "#05080f", 700, "start")
     b += _t(60, 170 + h + 34, d.get("time", "अभी"), 20, "#7b8799", 400, "start")
     return _svg(b, "#f7f9fc")
 

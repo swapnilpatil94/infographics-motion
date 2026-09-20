@@ -244,7 +244,7 @@ class InsertShot:
         u = (t - sh["t0"]) / max(sh["t1"] - sh["t0"], 1e-6)
         ui.t = max(0.0, t - sh["t0"])
         img = self.ins.apply(self.bg, t, u, 1.0, 1.0, 0.0, 0.05)
-        img = bloom(img, strength=0.4)
+        img = bloom(img, strength=sh["ui"].get("bloom", 0.4))                # critic fix: a bright white screen washes its own text out under bloom
         self.ctx.post.exposure = 1.0
         img = self.ctx.post.apply(img, f, 1.0)
         bank = self.ctx.bank

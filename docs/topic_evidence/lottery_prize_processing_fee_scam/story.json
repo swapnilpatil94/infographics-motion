@@ -1,0 +1,327 @@
+{
+ "topic": "lottery prize processing fee scam",
+ "title": "जो इनाम माँगा ही नहीं",
+ "story_id": "lottery_d357f",
+ "slug": "lottery_prize_processing_fee_scam",
+ "domain": "lottery",
+ "cast": {
+  "protagonist": {
+   "name": "राहुल",
+   "gender": "male"
+  },
+  "other": {
+   "relation": "mother",
+   "name": "माँ"
+  }
+ },
+ "beats": [
+  {
+   "id": "n01",
+   "act": "ESTABLISH",
+   "text": "रात के ग्यारह बजे। कमरे में अकेला राहुल।",
+   "data": {}
+  },
+  {
+   "id": "n02",
+   "act": "PHONE_ALERT",
+   "text": "तभी फ़ोन पर मैसेज चमका।",
+   "data": {}
+  },
+  {
+   "id": "n03",
+   "act": "LOOK_AT_PHONE",
+   "text": "राहुल ने स्क्रीन की तरफ़ देखा।",
+   "data": {}
+  },
+  {
+   "id": "n04",
+   "act": "EYES_CHANGE",
+   "text": "अनजान भेजने वाला। आँखें सिकुड़ गईं।",
+   "data": {}
+  },
+  {
+   "id": "n05",
+   "act": "REACH_PHONE",
+   "text": "उसने काँपता हाथ बढ़ाया।",
+   "data": {}
+  },
+  {
+   "id": "n06",
+   "act": "PICK_UP",
+   "text": "और फ़ोन उठा लिया।",
+   "data": {}
+  },
+  {
+   "id": "n07",
+   "act": "READ_MESSAGE",
+   "text": "मैसेज: अजीब संदेश आया",
+   "data": {}
+  },
+  {
+   "id": "n08",
+   "act": "REALIZE",
+   "text": "चेहरे का रंग उड़ गया।",
+   "data": {}
+  },
+  {
+   "id": "n09",
+   "act": "STAND_UP",
+   "text": "वो घबराकर उठ खड़ा हुआ।",
+   "data": {}
+  },
+  {
+   "id": "n10",
+   "act": "WALK_ACROSS",
+   "text": "बेचैन क़दम, कमरे के आर-पार।",
+   "data": {}
+  },
+  {
+   "id": "n11",
+   "act": "PERSON_ENTERS",
+   "text": "तभी दरवाज़ा खुला। माँ अंदर आईं।",
+   "data": {}
+  },
+  {
+   "id": "n12",
+   "act": "EYE_CONTACT",
+   "text": "राहुल ने माँ की तरफ़ देखा।",
+   "data": {}
+  },
+  {
+   "id": "n13",
+   "act": "OTHER_LOOKS_AT_PHONE",
+   "text": "माँ की नज़र उसके हाथ के फ़ोन पर पड़ी।",
+   "data": {}
+  },
+  {
+   "id": "n14",
+   "act": "HAND_OVER",
+   "text": "उसने चुपचाप फ़ोन माँ को थमा दिया।",
+   "data": {}
+  },
+  {
+   "id": "n15",
+   "act": "OTHER_REACTS",
+   "text": "माँ का चेहरा बदल गया।",
+   "data": {}
+  },
+  {
+   "id": "n16",
+   "act": "INSERT_SCREEN",
+   "text": "स्क्रीन पर लिखा था: इनाम पाने के लिए फ़ीस भेजिए",
+   "data": {
+    "sender": "LOTTERY-2025",
+    "time": "अभी",
+    "text": "बधाई! आपने इनाम जीता है। इनाम पाने के लिए पहले प्रोसेसिंग फ़ीस भेजें। tinyurl.com/claim-now"
+   }
+  },
+  {
+   "id": "n17",
+   "act": "VISUALIZE_FLOW",
+   "text": "पाँच लाख रुपये, तीन खाते... एक पूरा जाल।",
+   "data": {
+    "amount": 500000,
+    "to": [
+     "खाता 1",
+     "खाता 2",
+     "खाता 3"
+    ],
+    "from": "आपकी बचत"
+   }
+  },
+  {
+   "id": "n18",
+   "act": "BOTH_REALIZE",
+   "text": "दोनों समझ गए, इनाम नहीं, ये ठगी है।",
+   "data": {}
+  },
+  {
+   "id": "n19",
+   "act": "CLOSE_UP",
+   "text": "जो इनाम माँगा नहीं, उसकी फ़ीस कभी मत भरिए।",
+   "data": {}
+  },
+  {
+   "id": "n20",
+   "act": "RESOLVE",
+   "text": "पर इस बार, दोनों ने रुककर सोचा।",
+   "data": {}
+  }
+ ],
+ "words": 127,
+ "est_duration_s": 48.3,
+ "provenance": [
+  {
+   "step": "domain",
+   "result": "lottery",
+   "why": "topic matches pack 'lottery' (2 keyword(s))"
+  },
+  {
+   "step": "llm",
+   "model": "qwen3:14b",
+   "raw": {
+    "title": "जो इनाम माँगा ही नहीं",
+    "protagonist_name": "राहुल",
+    "protagonist_gender": "male",
+    "other": "mother",
+    "sender": "LOTTERY-2025",
+    "sms_text": "बधाई! आपने इनाम जीता है। इनाम पाने के लिए पहले प्रोसेसिंग फ़ीस भेजें। tinyurl.com/claim-now",
+    "teaser": "अजीब संदेश आया",
+    "hook": "इनाम पाने के लिए फ़ीस भेजिए",
+    "flow_from": "आपकी बचत",
+    "lesson": "जो इनाम माँगा नहीं, उसकी फ़ीस कभी मत भरिए।",
+    "amount": 500000,
+    "arc": [
+     "ESTABLISH",
+     "PHONE_ALERT",
+     "LOOK_AT_PHONE",
+     "EYES_CHANGE",
+     "REACH_PHONE",
+     "PICK_UP",
+     "READ_MESSAGE",
+     "REALIZE",
+     "STAND_UP",
+     "WALK_ACROSS",
+     "PERSON_ENTERS",
+     "EYE_CONTACT",
+     "OTHER_LOOKS_AT_PHONE",
+     "HAND_OVER",
+     "OTHER_REACTS",
+     "INSERT_SCREEN",
+     "VISUALIZE_FLOW",
+     "BOTH_REALIZE",
+     "CLOSE_UP",
+     "RESOLVE"
+    ]
+   }
+  },
+  {
+   "step": "llm_validation",
+   "accepted": [
+    "title",
+    "teaser",
+    "hook",
+    "lesson",
+    "flow_from",
+    "protagonist",
+    "other",
+    "sender",
+    "sms_text",
+    "arc"
+   ],
+   "rejected_fallback_to_pack": []
+  }
+ ],
+ "fixes": {
+  "n02": {
+   "camera": {
+    "zoom_mul": 0.85,
+    "dx": -166.7,
+    "dy": 0.0
+   },
+   "lighting": {
+    "fill": 2.1,
+    "exposure_mul": 1.52
+   }
+  },
+  "n06": {
+   "camera": {
+    "zoom_mul": 0.95,
+    "dx": -122.1,
+    "dy": -140.8
+   },
+   "lighting": {
+    "fill": 1.4,
+    "exposure_mul": 1.322
+   }
+  },
+  "n11": {
+   "camera": {
+    "zoom_mul": 0.81,
+    "dx": 196.5,
+    "dy": 0.0
+   },
+   "lighting": {
+    "fill": 0.7,
+    "exposure_mul": 1.15
+   }
+  },
+  "n14": {
+   "camera": {
+    "zoom_mul": 0.99,
+    "dx": -14.8,
+    "dy": 0.0
+   },
+   "lighting": {
+    "fill": 0.7,
+    "exposure_mul": 1.15
+   }
+  },
+  "n01": {
+   "lighting": {
+    "fill": 2.1,
+    "exposure_mul": 1.52
+   }
+  },
+  "n03": {
+   "lighting": {
+    "fill": 1.4,
+    "exposure_mul": 1.322
+   }
+  },
+  "n04": {
+   "lighting": {
+    "fill": 2.1,
+    "exposure_mul": 1.52
+   }
+  },
+  "n05": {
+   "lighting": {
+    "fill": 2.1,
+    "exposure_mul": 1.52
+   }
+  },
+  "n07": {
+   "lighting": {
+    "fill": 0.7,
+    "exposure_mul": 1.15
+   }
+  },
+  "n08": {
+   "lighting": {
+    "fill": 0.7,
+    "exposure_mul": 1.15
+   }
+  },
+  "n09": {
+   "lighting": {
+    "fill": 0.7,
+    "exposure_mul": 1.15
+   }
+  },
+  "n10": {
+   "lighting": {
+    "fill": 0.7,
+    "exposure_mul": 1.15
+   }
+  },
+  "n16": {
+   "ui": {
+    "bloom": 0.15
+   }
+  },
+  "n18": {
+   "lighting": {
+    "fill": 0.7,
+    "exposure_mul": 1.15
+   }
+  },
+  "n19": {
+   "lighting": {
+    "fill": 0.7,
+    "exposure_mul": 1.15
+   }
+  }
+ },
+ "presets": false
+}
