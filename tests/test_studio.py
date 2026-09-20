@@ -300,6 +300,65 @@ class Movie(unittest.TestCase):
         self.assertFalse(imp["audio_remixed"])
 
 
+class Guide(unittest.TestCase):
+    def test_prompts_list_every_value_the_parser_accepts(self):
+        from engine.environments import locations as LOC
+        from engine.skeleton import story_semantics as SS
+        g = C.guide()
+        for pr in g["prompts"][:2]:
+            t = pr["template"]
+            for name in LOC.ALL + list(SS.NOTE_TYPES) + list(SS.ROLE_IDS):
+                self.assertIn(name, t, f"{pr['id']} prompt lacks '{name}'")
+            for rule in ("Devanagari", "UNSUPPORTED:", "17 to 21", "मैसेज", "स्क्रीन पर लिखा था", "रुककर सोचा", "---"):
+                self.assertIn(rule, t)
+        self.assertEqual([p["id"] for p in g["prompts"]], ["script", "convert", "segments"])
+        self.assertIn("UPLOADED", g["prompts"][2]["template"])
+        self.assertEqual({r["id"] for r in g["vocab"]["roles"]}, set(SS.ROLE_IDS))
+        self.assertTrue(all(r["hindi"] for r in g["vocab"]["roles"]))
+        for f in g["prompts"][0]["fields"]:
+            self.assertIn("{{%s}}" % f["key"], g["prompts"][0]["template"])
+
+    def test_the_worked_example_is_accepted_and_fenced_replies_are_unwrapped(self):
+        g = C.guide()
+        for wrapped in (g["example"], "```\n" + g["example"] + "\n```", "Sure, here it is:\n```text\n" + g["example"] + "\n```\nHope that helps!"):
+            d = C.create_draft(dict(mode="script", script_text=wrapped))
+            self.assertEqual(len(d["lines"]), 19)
+            self.assertEqual(d["notes"]["sender"], "VIP-GROUP")
+            self.assertEqual(d["graph"]["cast"]["principal"]["role"], "friend")
+
+    def test_notes_slips_are_repaired_and_reported_but_unknown_values_are_refused(self):
+        lines = "\n".join(l["text"] for l in C.create_draft(dict(mode="create", topic="lottery prize scam"))["lines"])
+        head = "# इनाम\nprotagonist: रोहन, male, young man\nother: पापा, Father\nsender: prize desk\namount: 50,000\nlocation: living_room [day]\ntime: Day\n---\n"
+        d = C.create_draft(dict(mode="script", script_text=head + lines))
+        self.assertEqual((d["notes"]["location"], d["notes"]["time"], d["notes"]["amount"], d["notes"]["sender"], d["notes"]["other"]["role"]), ("living_room", "day", 50000, "PRIZE-DESK", "father"))
+        self.assertGreaterEqual(len(d["warnings"]), 4)
+        for bad, frag in (("other: पापा, dad", "'dad' is not a role"), ("protagonist: रोहन, male, wizard", "'wizard' is not a type"), ("location: moon", "'moon' is not a place"), ("time: teatime", "day, dusk or night"), ("amount: पचास", "digits only")):
+            key = bad.split(":")[0]
+            txt = "\n".join(bad if l.startswith(key + ":") else l for l in head.splitlines()) if head.count(key + ":") else head.replace("---", bad + "\n---", 1)
+            with self.assertRaises(C.StudioError, msg=bad) as cm:
+                C.create_draft(dict(mode="script", script_text=txt + lines))
+            self.assertEqual(cm.exception.code, "notes_invalid")
+            self.assertIn(frag, " ".join(cm.exception.reasons))
+
+    def test_a_refusal_line_from_the_writer_is_shown_as_the_reason(self):
+        with self.assertRaises(C.StudioError) as cm:
+            C.create_draft(dict(mode="script", script_text="UNSUPPORTED: the story is about a temple festival"))
+        self.assertEqual(cm.exception.code, "unsupported_story")
+        self.assertIn("temple festival", cm.exception.reasons[0])
+
+    def test_reply_checker_for_segments_json(self):
+        seg = json.load(open(os.path.join(ROOT, "stories/production/c_atm_helper/segments.json"), encoding="utf-8"))["segments"]
+        ok = C.check_reply("segments", "```json\n" + json.dumps(dict(segments=seg, audio="UPLOADED", tts="provided", tempo=1.0), ensure_ascii=False) + "\n```")
+        self.assertEqual((ok["ok"], ok["segments"]), (True, 21))
+        self.assertEqual(json.loads(ok["json"])["audio"], "UPLOADED")
+        for bad in ("nope", json.dumps(dict(segments=[dict(id="a", text="x", start=2, end=1)] * 9)), json.dumps(dict(segments=seg[:3]))):
+            with self.assertRaises(C.StudioError):
+                C.check_reply("segments", bad)
+        with self.assertRaises(C.StudioError) as cm:                                               # 'UPLOADED' without an uploaded file is explained, not a stack trace
+            C.create_draft(dict(mode="production", segments_json=json.dumps(dict(segments=seg, audio="UPLOADED"))))
+        self.assertIn("upload the audio", " ".join(cm.exception.reasons))
+
+
 class Api(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -447,6 +506,14 @@ class Api(unittest.TestCase):
         s = EVT.fold(EVT.read(os.path.join(d, "events.jsonl")))
         self.assertEqual(s.status, "failed")
         self.assertEqual(s.error["type"], "ServerRestart")
+
+    def test_guide_endpoints(self):
+        g = self.c.get("/api/guide").json()
+        self.assertEqual(len(g["prompts"]), 3)
+        r = self.c.post("/api/guide/check", json=dict(kind="script", text=g["example"])).json()
+        self.assertTrue(r["ok"] and r["draft"]["review"]["title"])
+        bad = self.c.post("/api/guide/check", json=dict(kind="script", text="# x\nprotagonist: रोहन, male, wizard\n---\nरात हुई।"))
+        self.assertEqual((bad.status_code, bad.json()["error"]["code"]), (422, "notes_invalid"))
 
     def test_upload_accepts_only_declared_types(self):
         r = self.c.post("/api/upload?kind=audio&name=x.wav", content=b"RIFF0000")

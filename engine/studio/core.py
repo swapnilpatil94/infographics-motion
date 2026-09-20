@@ -79,8 +79,65 @@ def split_script(text):
     return out
 
 
+def strip_fences(text):
+    """a chat reply usually arrives inside a ``` code block (sometimes with a lead-in sentence): keep only the block"""
+    m = re.search(r"```[a-zA-Z]*\n(.*?)```", text or "", re.S)
+    return m.group(1) if m else re.sub(r"^```[a-zA-Z]*\s*|\s*```$", "", (text or "").strip())
+
+
+def normalize_notes(notes, warnings=None):
+    """harmless formatting slips are repaired (and reported); a value that names something unknown is left for `check_notes` to refuse"""
+    n = dict(notes or {})
+    say = (warnings.append if warnings is not None else (lambda _m: None))
+
+    def fix(k, new):
+        if new is not None and new != n.get(k):
+            say(f"note '{k}': '{n.get(k)}' read as '{new}'")
+            n[k] = new
+    if isinstance(n.get("location"), str):
+        v = n["location"].lower().replace(" ", "_").replace("-", "_")
+        fix("location", next((p for p in sorted(LOC.ALL, key=len, reverse=True) if p in v), None))
+    if isinstance(n.get("time"), str):
+        fix("time", next((t for t in ("night", "dusk", "day") if t in n["time"].lower()), None))
+    if isinstance(n.get("amount"), str) and re.sub(r"[,\s_]", "", n["amount"]).isdigit():
+        fix("amount", int(re.sub(r"[,\s_]", "", n["amount"])))
+    if isinstance(n.get("sender"), str):
+        fix("sender", re.sub(r"[^A-Z0-9\-]", "", n["sender"].upper().replace(" ", "-").replace("_", "-"))[:16] or None)
+    if isinstance(n.get("other"), dict) and n["other"].get("role"):
+        fix_role = n["other"]["role"].strip().lower().replace(" ", "_")
+        n["other"] = dict(n["other"], role=fix_role)
+    return n
+
+
+def check_notes(notes):
+    """the story.md notes are typed by a person (or a chat model): every value must be one the studio knows, and the message says which"""
+    errs = []
+    for k in ("protagonist", "other"):
+        v = (notes or {}).get(k)
+        if not v:
+            continue
+        if v.get("role") and k == "protagonist":
+            errs.append(f"protagonist: '{v['role']}' is not a type; use one of: {', '.join(SS.NOTE_TYPES)}")
+        if k == "other" and v.get("role") and v["role"] not in SS.ROLE_IDS:
+            errs.append(f"other: '{v['role']}' is not a role; use one of: {', '.join(SS.ROLE_IDS)}")
+    loc = (notes or {}).get("location")
+    if loc and loc not in LOC.ALL:
+        errs.append(f"location: '{loc}' is not a place; use one of: {', '.join(LOC.ALL)}")
+    tm = (notes or {}).get("time")
+    if tm and tm not in ("day", "dusk", "night"):
+        errs.append(f"time: '{tm}' must be day, dusk or night")
+    am = (notes or {}).get("amount")
+    if am is not None and not isinstance(am, int):
+        errs.append(f"amount: '{am}' must be digits only, e.g. 50000")
+    if errs:
+        raise StudioError("notes_invalid", "The story notes contain values the studio does not know.", reasons=errs, hint="Fix the notes block (the lines above the --- line), or delete a note to let the studio choose (Auto).")
+
+
 def parse_story_text(text):
     """story.md / plain script -> (notes, lines).  `# Title`, `key: value` notes (protagonist, other, location, time, sender, amount) and an optional `---` separator are understood."""
+    text = strip_fences(text)
+    if re.match(r"\s*UNSUPPORTED\s*:", text):
+        raise StudioError("unsupported_story", "The writer refused this story as unsupported.", reasons=[text.split(":", 1)[1].strip()[:300]], hint="Pick a story about money, a scam or money psychology, told in the supported places.")
     tmp = os.path.join(STUDIO_DIR, "_tmp_story_%s.md" % uuid.uuid4().hex[:8])
     os.makedirs(STUDIO_DIR, exist_ok=True)
     body = text
@@ -415,8 +472,8 @@ def load_segments_input(req, dest_dir):
         seg["audio"] = ap
     elif req.get("audio_path"):
         seg["audio"] = req["audio_path"]
-    if not seg.get("audio"):
-        raise StudioError("narration_invalid", "Production mode needs the narration audio.", reasons=["'audio' is missing from the segments JSON (or upload the audio file)"])
+    if not seg.get("audio") or str(seg.get("audio")).strip().upper() == "UPLOADED":
+        raise StudioError("narration_invalid", "Production mode needs the narration audio file.", reasons=["upload the audio file next to the JSON (its 'audio' value is empty or 'UPLOADED')"], hint="Use the audio file input in Production mode.")
     a = seg["audio"]
     seg["audio"] = a if os.path.isabs(a) else os.path.join(ROOT, a)
     os.makedirs(dest_dir, exist_ok=True)
@@ -448,7 +505,8 @@ def create_draft(req):
         if not raw:
             raise StudioError("empty_input", "Paste the story or script, or upload a story.md / story.json / script file.")
         notes, lines = parse_story_text(raw)
-        d["notes"] = {**(d.get("notes") or {}), **notes}
+        d["notes"] = normalize_notes({**(d.get("notes") or {}), **notes}, d["warnings"])
+        check_notes(d["notes"])
         d["input"] = dict(chars=len(raw))
         d["lines"] = [dict(id=f"n{i + 1:02d}", text=t) for i, t in enumerate(lines)]
         errs, warns = lint_script(lines)
@@ -459,6 +517,8 @@ def create_draft(req):
         path, story_text = load_segments_input(req, dd)
         d["narration"] = path
         notes, _ = parse_story_text(story_text) if story_text.strip() else ({}, [])
+        notes = normalize_notes(notes, d["warnings"])
+        check_notes(notes)
         d["notes"] = notes
         segs = json.load(open(path, encoding="utf-8"))["segments"]
         d["lines"] = [dict(id=s["id"], text=s["text"]) for s in segs]
@@ -612,3 +672,155 @@ def job_request(d, kind="generate"):
     return dict(kind=kind, mode=d["mode"], draft_id=d["id"], settings=d["settings"], lines=d["lines"], notes=d.get("notes") or {}, story_edits=d.get("story_edits") or {}, variation=d.get("variation", 0), graph=g,
                 narration=d.get("narration"), seed=11, samples=10, critique_rounds=1,
                 tts=dict(voice=d["settings"]["voice"], tempo=1.08, lo=(dur - 2.5) if dur else 44.0, hi=(dur + 2.5) if dur else 60.0, target=dur), title=g["title"], created=time.time())
+
+
+# ------------------------------------------------------------------------------------------------ guide: what to prepare + strict chat prompts
+_ROLE_HI = {"mother": "माँ", "father": "पापा", "grandmother": "दादी", "grandfather": "दादा", "sister": "बहन", "brother": "भाई", "friend": "दोस्त", "shopkeeper": "दुकानदार", "bank_employee": "क्लर्क",
+            "police_officer": "पुलिस", "teacher": "टीचर", "stranger": "अजनबी", "stranger_woman": "औरत", "neighbour": "पड़ोसी", "boss": "बॉस", "caller": "एजेंट"}
+
+
+def _example():
+    d = os.path.join(ROOT, "stories/production/a_whatsapp_investment")
+    notes = open(os.path.join(d, "story.md"), encoding="utf-8").read().strip()
+    lines = "\n".join(s["text"] for s in json.load(open(os.path.join(d, "segments.json"), encoding="utf-8"))["segments"])
+    return notes + "\n---\n" + lines
+
+
+def _vocab():
+    types = ", ".join(SS.NOTE_TYPES)
+    roles = ", ".join(f"{rid} ({_ROLE_HI.get(rid, '')})" for rid in SS.ROLE_IDS)
+    places = "; ".join(f"{n} (can be shown at: {', '.join(v[1])})" for n, v in LOC.LOCATIONS.items())
+    return types, roles, places
+
+
+_RULES = """SCRIPT RULES (every line is checked by a machine and a bad line is refused)
+1. Devanagari Hindi only. No English letters, no digits, no emoji. Allowed punctuation: , । ? ! . - : ' " …  Write numbers and English words in Devanagari (OTP -> ओटीपी, 50,000 -> पचास हज़ार, WhatsApp -> व्हाट्सएप, UPI -> यूपीआई).
+2. One sentence per line, 4 to 14 words, plain spoken Hindi. No numbering, no bullets, no blank lines, no stage directions in brackets.
+3. Every line shows something that can be DRAWN: a person does, sees, says or feels something. Abstract commentary is allowed only in the two closing lines.
+4. Keep the grammar gender consistent with the protagonist (अकेला/अकेली, उठाया/उठाई, देखा/देखी).
+5. Use ONE main supporting person (the `other:` role) and at most 2 more roles from ROLES. Never more than 3 different supporting people. If the person you want is not in ROLES, pick the closest one by looks (daughter -> sister, son -> brother, wife -> mother, husband -> father, uncle -> grandfather, aunt -> grandmother, colleague -> friend, officer -> police_officer, courier or caller -> caller) and still write the Hindi word you want in the script.
+6. The story must be about money or a scam (words such as पैसे, खाता, ठगी, ओटीपी, फ़ीस, लॉटरी, निवेश, कार्ड). Never set it in a hospital, temple, airport, railway station, mall, village, forest, sea or mountains.
+7. Line 1 says where and when the story starts (e.g. रात के ग्यारह बजे। कमरे में अकेला रोहन।). Change place only when the story really moves, and name the new place with में / पर / पहुँचा (कैफ़े में, एटीएम पर, बैंक पहुँचीं). Do NOT write a place word (घर, चाय, कैफ़े, दुकान, बैंक, पुलिस, सड़क, स्कूल, ऑफ़िस, शिकायत, नौकरी, बाहर) followed by में / पर unless the scene really is there.
+8. A message read from the phone is its own line that starts with the word मैसेज and a colon: `मैसेज: <text of the fake message>`. What a screen shows starts with `स्क्रीन पर लिखा था: <text>`. These are the only lines that may contain a colon.
+9. Dialogue has no quotation marks and no colon: `अजनबी बोला, लाइए मैं पिन डाल देता हूँ।`"""
+
+_ORDER = """STORY ORDER TO FOLLOW (the studio recognises these beats from the wording, so keep the verbs; you may merge or repeat a beat but keep the order)
+ 1 place + time + who is alone (कमरे में अकेला ...)
+ 2 the phone rings or a message flashes (फ़ोन बजा / मैसेज चमका)
+ 3 looks at the screen (स्क्रीन की तरफ़ देखा)
+ 4 the face reacts (आँखें फैल गईं / माथे पर शिकन)
+ 5 reaches out (हाथ बढ़ाया)
+ 6 picks up the phone (फ़ोन उठा लिया)
+ 7 मैसेज: <the bait>
+ 8 स्क्रीन पर लिखा था: <the demand>
+ 9 greed or fear on the face (चेहरा खिल उठा / चेहरे का रंग उड़ गया)
+10 doubt (शक की आवाज़ उठी / झिझक हुई)
+11 the second person arrives or is met (दरवाज़ा खुला, माँ अंदर आईं / कैफ़े में दोस्त मिला)
+12 tells them or looks at them (की तरफ़ देखा / सारी बात बताई)
+13 they look at the phone (की नज़र फ़ोन पर पड़ी)
+14 the phone / card / money is handed over (थमा दिया)
+15 their face changes (चेहरा बदल गया)
+16 the money trail in one line (पैसे, खाते, नक़ली नंबर... एक पूरा जाल।)
+17 both understand (दोनों समझ गए, ...)
+18 the lesson, one memorable sentence
+19 LAST LINE, always: पर इस बार, <name> ने रुककर सोचा।"""
+
+_FORMAT = """FORMAT INSIDE THE CODE BLOCK (exact, in this order)
+# <title in Hindi, at most 5 words>
+protagonist: <Hindi first name>, <male or female>, <one type from TYPES>
+other: <Hindi word for the supporting person>, <ONE role id from ROLES, just the id, e.g. mother>
+sender: <ASCII sender id in capitals, e.g. VIP-GROUP or BANK-ALERT; never a real company>
+amount: <digits only, e.g. 50000>
+location: <ONE place id from PLACES, just the id, e.g. bank>   (optional: only when the story starts somewhere other than a bedroom)
+time: <night, day or dusk, just one word>                      (optional; must be allowed for that place)
+---
+<script: 17 to 21 lines, one narration line per row>"""
+
+
+def guide():
+    types, roles, places = _vocab()
+    ex = _example()
+    lists = f"TYPES = {types}\nROLES = {roles}\nPLACES [times allowed] = {places}"
+    head = ("You write scripts for Kathaaya Studio, a system that turns a short Hindi money-scam / money-psychology story into a 45-60 second animated Short. "
+            "Your reply is pasted into the studio unchanged, so it must follow the format below EXACTLY.")
+    out_rule = ("OUTPUT\nReply with ONE code block and nothing else: no greeting, no explanation, no text outside the block.\n"
+                "If the story is impossible under the rules (not about money or a scam, or it needs a place that is not in PLACES), reply with exactly one line instead: UNSUPPORTED: <reason in English>")
+    check = ("BEFORE YOU ANSWER, CHECK SILENTLY: 17-21 lines; no Latin letters or digits in any script line; every line 4-14 words; the last line is the closing line; every note value comes from TYPES / ROLES / PLACES. "
+             "Fix any problem, then output only the code block.")
+    p1 = "\n\n".join([f"ROLE\n{head}", out_rule, "MY REQUEST\nTopic: {{TOPIC}}\nProtagonist: {{PROTAGONIST}}\nSupporting person: {{PARTNER}}\nPlaces: {{PLACES}}\n(\"auto\" means: you choose, inside the rules.)", _FORMAT, lists, _RULES, _ORDER,
+                      f"WORKED EXAMPLE (this exact format is accepted by the studio)\n```\n{ex}\n```", check])
+    p2 = "\n\n".join([f"ROLE\n{head} Today you do not invent a story: you convert MY script.", out_rule + "\nAlso keep my story: change only what breaks a rule (split long sentences, convert digits and English words to Devanagari, fix places, add the notes block, make line 1 name the place and time, make the last line the closing line).",
+                      "MY SCRIPT (any language or format)\n[PASTE YOUR SCRIPT HERE]", _FORMAT, lists, _RULES, _ORDER.replace("STORY ORDER TO FOLLOW", "STORY ORDER (follow it as far as my story allows; do not invent new events)"), check])
+    p3 = """ROLE
+You convert a timed transcript of a Hindi narration into the narration-segments JSON that Kathaaya Studio's PRODUCTION mode reads.
+
+OUTPUT
+Reply with ONE code block containing valid JSON and nothing else.
+
+MY TRANSCRIPT (SRT, WebVTT, or lines of "start end text"; times in seconds or hh:mm:ss)
+[PASTE THE TIMED TRANSCRIPT HERE]
+
+AUDIO LENGTH IN SECONDS: [e.g. 47.3]
+
+FORMAT (exact)
+{"segments": [{"id": "n01", "text": "<one narration line>", "start": 0.26, "end": 2.80}], "audio": "UPLOADED", "tts": "provided", "tempo": 1.0}
+
+RULES
+1. One segment per narration line, 8 to 40 segments, in spoken order.
+2. text is exactly what is spoken, in Devanagari. Do not add, remove or reword anything.
+3. ids are n01, n02, n03 ... in order (two digits).
+4. start and end are seconds from the start of the audio file, numbers with at most 3 decimals, start < end, and every start >= the previous end.
+5. If one sentence is spread over several cues, merge them. If one cue holds several sentences, split it and divide its time in proportion to the number of words.
+6. Keep "audio": "UPLOADED" exactly (the studio attaches the audio file you upload next to it).
+7. The last end must be within 0.5 s of the audio length above.
+8. Before answering, check silently that the JSON parses, the times only increase, and no text was changed."""
+    return dict(
+        needs=[dict(mode="create", title="Create - a topic", you_bring=["one sentence: the scam or money-psychology topic"], studio_makes=["story", "script", "narration (Chatterbox Hindi)", "the film"], note="Topics: " + ", ".join(sorted(TS.PACKS)) + " (fixed story shapes)."),
+               dict(mode="script", title="Script - your story", you_bring=["a Hindi script: 8-40 lines (17-21 lines is about 45-60 s)", "a title (shown on the end card)", "optional notes: protagonist, other, sender, amount, location, time"],
+                    studio_makes=["narration (Chatterbox Hindi)", "the film"], note="Use prompt 1 or 2 below to get exactly this."),
+               dict(mode="production", title="Production - your story and your voice", you_bring=["the narration audio file (.wav .mp3 .m4a .flac)", "narration segments JSON: one segment per line with start and end seconds (prompt 3 makes it from a timed transcript)", "optional notes (from prompt 1)"],
+                    studio_makes=["the film (your audio is used as it is)"], note="Text cannot be edited afterwards: the words and timings are yours.")],
+        not_needed=["characters, faces, clothes", "backgrounds and rooms", "props (phone, card, money, laptop ...)", "music, sound effects, room sound", "fonts and captions", "images or videos of any kind"],
+        not_needed_note="All art, sets and sound are built in and licence-audited. Do not ask a chat model for images, and do not upload art.",
+        limits=["Hindi (Devanagari) only", "8-40 narration lines; 17-21 lines gives the best 45-60 s Short", "one protagonist + one main supporting person + at most 2 more roles", "12 places: " + ", ".join(LOC.ALL),
+                "money / scam / money-psychology stories only", "no digits, English letters or emoji in narrated lines"],
+        vocab=dict(types=list(SS.NOTE_TYPES), roles=[dict(id=r, hindi=_ROLE_HI.get(r, "")) for r in SS.ROLE_IDS], places=[dict(id=n, times=list(v[1])) for n, v in LOC.LOCATIONS.items()]),
+        prompts=[dict(id="script", title="1 - Write the story and script (for Script mode)", when="Start here. Fill the four fields, copy, paste into ChatGPT, then paste its reply into the checker below (or into Script mode).", template=p1,
+                      fields=[dict(key="TOPIC", label="Topic", placeholder="e.g. fake WhatsApp investment group", default=""), dict(key="PROTAGONIST", label="Protagonist", placeholder="e.g. a young woman named नेहा", default="auto"),
+                              dict(key="PARTNER", label="Supporting person", placeholder="e.g. her mother", default="auto"), dict(key="PLACES", label="Places", placeholder="e.g. bedroom at night, then a bank", default="bedroom at night")]),
+                 dict(id="convert", title="2 - Fix or convert a script I already have", when="You already wrote (or generated) a script in any format or language: this rewrites it into what the studio accepts, keeping your story.", template=p2, fields=[]),
+                 dict(id="segments", title="3 - Timed transcript to narration segments JSON (for Production mode)", when="You recorded (or generated) the narration yourself. Get a timed transcript from your audio tool, paste it here, and use the JSON in Production mode together with the audio file.", template=p3, fields=[])],
+        example=ex, checker_hint="Paste ChatGPT's reply. The studio applies exactly the checks the film uses; you see the review or the reasons.")
+
+
+def check_reply(kind, text):
+    """the Guide's 'check the reply' box: a pasted chat reply goes through the same checks the film uses"""
+    text = strip_fences(text or "")
+    if not text.strip():
+        raise StudioError("empty_input", "Paste the reply first.")
+    if kind == "segments":
+        try:
+            seg = json.loads(text)
+        except ValueError as e:
+            raise StudioError("narration_invalid", "That is not valid JSON.", reasons=[str(e)], hint="Copy only the JSON (the code block), nothing before or after it.")
+        seg = dict(segments=seg) if isinstance(seg, list) else dict(seg)
+        seg["audio"] = None                                                              # the audio file is uploaded separately
+        tmp = os.path.join(STUDIO_DIR, "_tmp_seg_%s.json" % uuid.uuid4().hex[:8])
+        os.makedirs(STUDIO_DIR, exist_ok=True)
+        json.dump(seg, open(tmp, "w", encoding="utf-8"), ensure_ascii=False)
+        try:
+            n = _wrap(NI.load, tmp)
+        except KeyError as e:
+            raise StudioError("narration_invalid", f"a segment lacks {e}", hint='Every segment needs "id", "text", "start" and "end".')
+        finally:
+            os.remove(tmp)
+        segs = n["segments"]
+        reasons = [f"{len(segs)} segments: a Short needs 8-40"] if not 8 <= len(segs) <= 40 else []
+        ids = [s["id"] for s in segs]
+        if len(set(ids)) != len(ids):
+            reasons.append("segment ids must be unique")
+        if reasons:
+            raise StudioError("narration_invalid", "The segments JSON is not usable.", reasons=reasons)
+        return dict(kind="segments", ok=True, segments=len(segs), duration=round(segs[-1]["end"], 2), first=segs[0]["text"], last=segs[-1]["text"], json=json.dumps(dict(seg, audio="UPLOADED"), ensure_ascii=False, indent=1))
+    d = create_draft(dict(mode="script", script_text=text))
+    return dict(kind="script", ok=True, draft=view(d))

@@ -36,6 +36,13 @@ Levels: **Simple** (topic → generate) · **Director** (character, environment,
 
 All defaults leave the plan **byte-identical** to the CLI's (`tests/test_studio.py::test_production_mode_graph_is_the_cli_graph_and_plan_is_byte_identical`).
 
+## Inputs and ChatGPT prompts (nav: *Inputs & prompts*)
+
+Shows what to bring per mode (and that no art, sound or images are needed), the limits, the allowed values, and three copy-paste prompts:
+**1** write the story + script (fill topic / protagonist / partner / places, copy) · **2** convert a script you already have · **3** timed transcript -> narration-segments JSON for Production mode.
+The prompts are generated from the parser's real vocabulary (places, roles, person types) and contain the format, the machine-checked rules, the story order the parser recognises, and a worked example; a test fails if they drift from the parser.
+*Check the reply* runs a pasted reply through the same checks as the film (code fences stripped, `UNSUPPORTED:` refusals shown, slips such as `location: bank [day]` or `amount: 50,000` repaired and reported, unknown values refused with the allowed list).
+
 ## Unsupported input
 
 Refused with `422 {"error": {"code", "message", "reasons": [...], "hint"}}` — never a film: not Hindi, digits / Latin in the narration, fewer than 8 or more than 40 segments,
@@ -45,6 +52,8 @@ places without a stage (hospital, temple …), no money / scam cue, more than 3 
 
 ```
 GET  /api/options
+GET  /api/guide                     what to bring + the three copy-paste ChatGPT prompts (built from the live vocabulary)
+POST /api/guide/check               {kind:"script"|"segments", text}   check a pasted chat reply exactly as the film would
 POST /api/story                     {mode, topic|script_text|story_md|story_json|example|segments_json,audio_upload, language, format, duration, voice, style,
                                      character, environment, typography, director, variation}   → draft {id, review, script, graph, warnings}
                                     {draft_id, edits:{title, beats:{id:{act,emotion,loc,time}}, cast:{protagonist,partner,extras}}}   or   {draft_id, regenerate:true}

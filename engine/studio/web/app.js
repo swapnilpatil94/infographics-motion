@@ -36,13 +36,14 @@ window.addEventListener("hashchange", route);
 async function route() {
   stopWatch();
   const h = location.hash.replace(/^#/, "") || "/";
-  $$("[data-nav]").forEach(a => a.classList.toggle("on", (a.dataset.nav === "create" && (h === "/" || h.startsWith("/review"))) || (a.dataset.nav === "productions" && h.startsWith("/productions"))));
+  $$("[data-nav]").forEach(a => a.classList.toggle("on", (a.dataset.nav === "create" && (h === "/" || h.startsWith("/review"))) || (a.dataset.nav === "productions" && h.startsWith("/productions")) || (a.dataset.nav === "guide" && h.startsWith("/guide"))));
   $$(".levels button").forEach(b => b.classList.toggle("on", b.dataset.level === S.level));
   if (!S.opts) { try { S.opts = await api("/options"); } catch (e) { view.innerHTML = errBox(e); return; } }
   let m;
   if ((m = h.match(/^\/review\/(d_[0-9a-f]+)$/))) return viewReview(m[1]);
   if ((m = h.match(/^\/production\/([\w-]+)$/))) return viewProduction(m[1]);
   if (h.startsWith("/productions")) return viewList();
+  if (h.startsWith("/guide")) return viewGuide();
   return viewCreate();
 }
 $(".levels").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; S.level = b.dataset.level; localStorage.setItem("ks.level", S.level); route(); });
@@ -72,7 +73,7 @@ function viewCreate(err) {
   const dur = opt(o.durations, f.duration, x => x.id, x => x.label);
   const director = L >= 1 ? directorPanel() : "";
   view.innerHTML = `<section class="create">
-    <div class="hero"><h1>Make a Kathaaya film</h1><p>One screen from an idea to a finished cinematic Short. Everything is <b>Auto</b> unless you say otherwise.</p></div>
+    <div class="hero"><h1>Make a Kathaaya film</h1><p>One screen from an idea to a finished cinematic Short. Everything is <b>Auto</b> unless you say otherwise.</p><p style="margin-top:8px"><a href="#/guide">What do I need to bring? · copy-paste ChatGPT prompts →</a></p></div>
     <div class="seg tabs-mode" role="tablist">${o.modes.map(m => `<button data-mode="${m.id}" class="${f.mode === m.id ? "on" : ""}">${esc(m.label)}<small>${esc(m.hint)}</small></button>`).join("")}</div>
     <div class="card input-card"><div class="muted" style="margin-bottom:14px">${modeHint[f.mode]}</div>${input}
       <hr><div class="grid g5">
@@ -464,5 +465,56 @@ async function viewList() {
     <div class="b"><div class="row sp"><b>${esc(p.title || p.id)}</b><span class="pill ${p.status}">${p.status}</span></div><small class="muted">${esc(p.mode)}${p.kind === "rerender" ? " · re-render" : ""} · ${esc(p.id)}</small></div></div>`).join("")}</div>` : '<div class="muted">No productions yet.</div>'}</section>`;
   $$("[data-go]").forEach(c => c.addEventListener("click", () => { location.hash = "#/production/" + c.dataset.go; }));
 }
+
+// ------------------------------------------------------------------------------------------------ GUIDE (inputs + copy-paste prompts)
+S.guideVals = {}; S.guideOut = null;
+function fillPrompt(p) {
+  let t = p.template;
+  (p.fields || []).forEach(f => { const v = (S.guideVals[p.id + "." + f.key] || "").trim(); t = t.split("{{" + f.key + "}}").join(v || (f.key === "TOPIC" ? "[write your topic here]" : f.default)); });
+  return t;
+}
+async function viewGuide() {
+  view.innerHTML = '<div class="muted"><span class="spin"></span>Loading…</div>';
+  if (!S.guide) { try { S.guide = await api("/guide"); } catch (e) { view.innerHTML = errBox(e); return; } }
+  const g = S.guide, chips = a => a.map(x => `<span class="chip">${esc(x)}</span>`).join(" ");
+  const needs = g.needs.map(n => `<div class="dcard"><h3>${esc(n.title)}</h3><div class="muted" style="font-size:12px;text-transform:uppercase;letter-spacing:.1em">You bring</div><ul style="margin:6px 0 10px;padding-left:18px">${n.you_bring.map(x => `<li>${esc(x)}</li>`).join("")}</ul>
+    <div class="muted" style="font-size:12px;text-transform:uppercase;letter-spacing:.1em">The studio makes</div><div style="margin:6px 0 10px">${chips(n.studio_makes)}</div><small class="dim">${esc(n.note)}</small></div>`).join("");
+  const prompts = g.prompts.map(p => `<div class="card" data-prompt="${p.id}"><div class="row sp"><h2 style="font-size:19px">${esc(p.title)}</h2><div class="row"><button class="btn sm" data-copy="${p.id}">Copy prompt</button><a class="btn sm ghost" href="https://chatgpt.com/" target="_blank" rel="noopener">Open ChatGPT ↗</a></div></div>
+    <p class="muted" style="margin:6px 0 12px">${esc(p.when)}</p>
+    ${(p.fields || []).length ? `<div class="grid g4" style="margin-bottom:12px">${p.fields.map(f => `<label class="f">${esc(f.label)}<input data-pf="${p.id}.${f.key}" placeholder="${esc(f.placeholder)}" value="${esc(S.guideVals[p.id + "." + f.key] || "")}"></label>`).join("")}</div>` : ""}
+    <textarea readonly rows="16" id="pt-${p.id}" style="font-family:var(--mono);font-size:12px;min-height:260px">${esc(fillPrompt(p))}</textarea></div>`).join("");
+  const out = S.guideOut;
+  view.innerHTML = `<section><div class="hero"><h1>What to bring, and the prompts to get it</h1><p>The studio needs a Hindi script (and optionally a few notes). It does <b>not</b> need any art, sound or images. These prompts make ChatGPT reply in exactly the format the studio accepts; paste the reply into the checker to see it accepted or refused with the reason before you spend a render.</p></div>
+    <div class="sect" style="margin-top:0"><h3>1 · What you need</h3><div class="director-grid">${needs}</div>
+      <div class="card" style="margin-top:14px"><b>Not needed:</b> <span class="muted">${esc(g.not_needed.join(" · "))}.</span> <span class="dim">${esc(g.not_needed_note)}</span>
+      <div style="margin-top:12px"><b>Limits:</b> <span class="muted">${esc(g.limits.join(" · "))}</span></div></div></div>
+    <div class="sect"><h3>2 · Copy-paste prompts for ChatGPT</h3>${prompts}</div>
+    <div class="sect"><h3>3 · Check ChatGPT's reply</h3><div class="card"><div class="row" style="margin-bottom:10px"><div class="seg"><button data-gk="script" class="${S.guideKind !== "segments" ? "on" : ""}">Script (from prompt 1 or 2)</button><button data-gk="segments" class="${S.guideKind === "segments" ? "on" : ""}">Segments JSON (from prompt 3)</button></div></div>
+      <textarea id="reply" rows="10" placeholder="Paste the reply here. A code block is fine: the studio strips the fences." style="min-height:200px">${esc(S.guideReply || "")}</textarea>
+      <div class="row" style="margin-top:12px"><button class="btn primary" id="btn-check">Check the reply</button><small class="muted">Nothing is rendered. A script that passes becomes a draft you can review.</small></div><div id="check-out">${out || ""}</div></div></div>
+    <div class="sect"><h3>Worked example · accepted by the studio</h3><div class="row" style="margin-bottom:8px"><button class="btn sm" data-copy="example">Copy example</button></div><pre class="json" id="pt-example">${esc(g.example)}</pre></div>
+    <div class="sect"><h3>Allowed values</h3><div class="card"><div class="muted" style="margin-bottom:6px">protagonist type</div>${chips(g.vocab.types)}<div class="muted" style="margin:14px 0 6px">other: role id (the Hindi word it is recognised by)</div>${chips(g.vocab.roles.map(r => r.id + " (" + r.hindi + ")"))}<div class="muted" style="margin:14px 0 6px">places (times each can be shown)</div>${chips(g.vocab.places.map(p => p.id + " · " + p.times.join("/")))}</div></div></section>`;
+}
+view.addEventListener("input", e => { const t = e.target; if (t.dataset.pf) { S.guideVals[t.dataset.pf] = t.value; const id = t.dataset.pf.split(".")[0], p = S.guide.prompts.find(x => x.id === id); $("#pt-" + id).value = fillPrompt(p); } if (t.id === "reply") S.guideReply = t.value; });
+async function copyText(txt) { try { await navigator.clipboard.writeText(txt); return true; } catch (e) { const ta = document.createElement("textarea"); ta.value = txt; document.body.appendChild(ta); ta.select(); const ok = document.execCommand("copy"); ta.remove(); return ok; } }
+view.addEventListener("click", async e => {
+  const c = e.target.closest("[data-copy]");
+  if (c) { const id = c.dataset.copy, txt = id === "example" ? S.guide.example : fillPrompt(S.guide.prompts.find(x => x.id === id)); toast((await copyText(txt)) ? "copied to the clipboard" : "copy failed - select the text and copy it"); return; }
+  const k = e.target.closest("[data-gk]"); if (k) { S.guideKind = k.dataset.gk; S.guideOut = null; return viewGuide(); }
+  if (e.target.id === "btn-check") {
+    const box = $("#check-out"), text = $("#reply").value; S.guideReply = text; box.innerHTML = '<div class="note"><span class="spin"></span>Checking…</div>';
+    try {
+      const r = await api("/guide/check", { kind: S.guideKind || "script", text });
+      if (r.kind === "script") { S.draft = r.draft; const d = r.draft, v = d.review;
+        S.guideOut = `<div class="card" style="margin-top:14px;border-color:#1f4d3b"><b class="ok">✓ Accepted</b> · ${esc(v.title)} · ${d.script.segments.length} lines · about ${v.est_duration_s} s (estimated) · ${v.scenes.map(x => esc(x.loc.replace(/_/g, " ")) + " " + esc(x.time)).join(", ")}
+          <div class="muted" style="margin-top:6px">${esc(v.protagonist.name || v.protagonist.archetype)} (${esc(v.protagonist.archetype)})${v.supporting.length ? " with " + v.supporting.map(x => esc(x.role.replace(/_/g, " "))).join(", ") : ""}</div>${(d.warnings || []).length ? `<div class="note">${d.warnings.map(esc).join("<br>")}</div>` : ""}
+          <div class="row" style="margin-top:12px"><a class="btn primary sm" href="#/review/${esc(d.id)}">Open the story review →</a></div></div>`; }
+      else { S.guideOut = `<div class="card" style="margin-top:14px;border-color:#1f4d3b"><b class="ok">✓ Valid segments JSON</b> · ${r.segments} segments · ${r.duration} s<div class="muted" style="margin-top:6px">first: ${esc(r.first)}<br>last: ${esc(r.last)}</div>
+          <div class="row" style="margin-top:12px"><button class="btn primary sm" id="btn-useseg">Use in Production mode →</button><small class="muted">You still upload the narration audio there.</small></div></div>`; S.guideSeg = r.json; }
+    } catch (er) { S.guideOut = errBox(er); }
+    box.innerHTML = S.guideOut; return;
+  }
+  if (e.target.id === "btn-useseg") { S.form.mode = "production"; S.form.example = null; S.form.segments_text = S.guideSeg; saveForm(); location.hash = "#/"; }
+});
 
 ping(); route();

@@ -302,6 +302,10 @@ def analyze(segments, notes=None, use_llm=False):
     return story
 
 
+NOTE_TYPES = ("young man", "young woman", "middle-aged man", "middle-aged woman", "older man", "older woman", "student", "shopkeeper", "bank employee", "office worker", "teacher", "security guard", "customer", "parent")
+ROLE_IDS = tuple(rid for _, rid, _, _ in ROLES)
+
+
 def load_script(path):
     """story.md: '# Title' + optional `key: value` notes (protagonist/other/location/time/sender/amount) before a `---` line; the narration segments come from the segments JSON, not from here."""
     txt = open(path, encoding="utf-8").read()
@@ -321,7 +325,7 @@ def load_script(path):
                 for p in parts[1:]:
                     if p in ("male", "female"):
                         d["gender"] = p
-                    elif p in ("young man", "young woman", "middle-aged man", "middle-aged woman", "older man", "older woman", "student", "shopkeeper", "bank employee", "office worker", "teacher", "security guard", "customer", "parent"):
+                    elif p in NOTE_TYPES:
                         d["archetype"] = p
                     else:
                         d["role"] = p

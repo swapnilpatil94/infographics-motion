@@ -62,6 +62,16 @@ def options():
     return C.options()
 
 
+@router.get("/guide")
+def guide():
+    return C.guide()
+
+
+@router.post("/guide/check")
+def guide_check(body: dict):
+    return C.check_reply(body.get("kind", "script"), body.get("text"))
+
+
 @router.post("/story")
 def story(body: dict):
     if body.get("draft_id"):
