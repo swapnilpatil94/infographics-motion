@@ -1,0 +1,26 @@
+{
+ "proportions": {
+  "creomoto": {
+   "thigh_over_leg": 0.5,
+   "shin_over_leg": 0.5,
+   "upper_arm_over_leg": 0.378,
+   "forearm_over_leg": 0.357,
+   "spine_over_leg": 0.743,
+   "head_over_leg": 0.179
+  },
+  "ours": {
+   "thigh_over_leg": 0.51,
+   "shin_over_leg": 0.49,
+   "upper_arm_over_leg": 0.381,
+   "forearm_over_leg": 0.346,
+   "spine_over_leg": 0.619,
+   "head_over_leg": 0.448
+  }
+ },
+ "bones": 27,
+ "actions": [
+  "idle (111 frames)",
+  "run (20 frames)"
+ ],
+ "verdict": "the .blend is a 27-bone ARMATURE with 8 IK constraints and 2 actions (the visible 'Cube' mesh is a bone-shape widget: it renders as a grey block, there is no stickman geometry) -> skeleton/gait reference; a stick-figure crowd has to be DRAWN from the bone positions (done here, 2D)"
+}

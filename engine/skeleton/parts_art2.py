@@ -510,6 +510,36 @@ def bake2(d2, view="profile", hand_set="full"):
     return man
 
 
+FACE_ATOMS = {  # emotion -> Open Peeps face atom (30 expression drawings we own and, before the audit, threw away)
+    "calm": "Calm", "smile": "Smile", "happy": "Smile Big", "fear": "Fear", "worried": "Concerned", "dread": "Concerned Fear", "suspicious": "Suspicious", "surprise": "Awe", "realization": "Awe", "anger": "Very Angry",
+    "rage": "Rage", "tired": "Tired", "determination": "Driven", "contempt": "Contempt", "solemn": "Solemn", "cute": "Cute", "cheeky": "Cheeky", "closed": "Eyes Closed", "serious": "Serious", "hectic": "Hectic"}
+FACE_ATOM_IDS = {name: i + 1 for i, name in enumerate(FACE_ATOMS)}            # channel `face_atom_id`: 0 = the procedural face, k = FACE_ATOMS[k-1]
+
+
+def bake_face_atoms(d2, view="three_quarter", names=None):
+    """Replacement FACE drawings from the Open Peeps face atoms, registered on the same canvas as the head shell (so they sit exactly where the procedural face is). Adds `faceatom_<emotion>` parts to the
+    cached manifest (idempotent). Blender swaps them in via the `face_atom_id` channel and hides the procedural eyes/brows/mouth/nose while one is shown."""
+    from asset_pipeline import cast_builder as cb, compose_character as cc
+    man = bake2(d2, view, "full")
+    d = os.path.join(ROOT, man["dir"])
+    todo = [n for n in (names or FACE_ATOMS) if f"faceatom_{n}" not in man["parts"]]
+    if not todo:
+        return man
+    k = Kit(d2, view)
+    v1 = dna2.peeps_view(d2)
+    for emo in todo:
+        doc, hair_id, body_id = cb._compose(v1["hair"], "* None", "* None", FACE_ATOMS[emo], "Tee 1")
+        for gid in (body_id, hair_id, "facial-hair/*-None", "accessories/*-None"):
+            doc = cc._replace_group(doc, gid, "")
+        arr, (ox, oy) = rasterize(doc, zoom=TEX * k.P["hs"])
+        Image.fromarray(arr).save(os.path.join(d, f"faceatom_{emo}.png"))
+        z = TEX * k.P["hs"]
+        man["parts"][f"faceatom_{emo}"] = dict(png=os.path.relpath(os.path.join(d, f"faceatom_{emo}.png"), ROOT), pivot=[R.NECK_PIVOT_CANVAS[0] * z - ox, R.NECK_PIVOT_CANVAS[1] * z - oy], size=[arr.shape[1], arr.shape[0]], res=TEX)
+    man["face_atoms"] = {n: FACE_ATOM_IDS[n] for n in FACE_ATOMS if f"faceatom_{n}" in man["parts"]}
+    json.dump(man, open(os.path.join(d, "parts.json"), "w"), indent=1)
+    return man
+
+
 REQUIRED_PARTS = ["upperarm_L", "forearm_L", "thigh_L", "shin_L", "foot_L", "upperarm_R", "forearm_R", "thigh_R", "shin_R", "foot_R", "pelvis", "torso", "neck", "skull", "hair", "nose", "phone", "card", "money"]
 
 

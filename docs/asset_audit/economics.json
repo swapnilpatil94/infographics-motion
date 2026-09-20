@@ -1,0 +1,32 @@
+{
+ "sample_size": 6000,
+ "distinct_structural_identities_in_sample": 6000,
+ "singletons": 6000,
+ "doubletons": 0,
+ "packing": {
+  "pairwise_differ_on_>=4_of_12_axes": 5669,
+  "pairwise_differ_on_>=6_of_12_axes": 1396,
+  "pairwise_differ_on_>=8_of_12_axes": 98,
+  "pairwise_differ_on_>=10_of_12_axes": 12
+ },
+ "distinct_head_kinds": 90,
+ "axes": {
+  "hair/head atoms": 45,
+  "facial hair": 17,
+  "glasses": 8,
+  "eyes": 7,
+  "brows": 5,
+  "mouths": 4,
+  "silhouettes": 6,
+  "tops": 7,
+  "bottoms": 5,
+  "shoes": 4,
+  "accessory subsets (bag/backpack/cap/watch/earrings)": 32,
+  "age groups": 3,
+  "skin tones": 5,
+  "palettes": 17,
+  "patterns": 4
+ },
+ "theoretical_permutations": 5872849920000,
+ "note": "A Chao1 count is not reported: every one of the 6000 sampled identities was unique (no repeats), so the space is >> 6000 but cannot be estimated from repeats; PACKING numbers are lower bounds limited by the pool size. Colour (palette, skin tone, hair colour) is excluded from every count: a palette swap is not a new person. Head/hair/facial hair/glasses carry most of the perceived identity (see the 50-character sheet); torso/limb silhouettes vary little (measured rendered-silhouette IoU mean 0.59), so 'body' contributes fewer real identities than its axes suggest."
+}

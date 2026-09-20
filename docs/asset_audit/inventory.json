@@ -1,0 +1,1205 @@
+{
+ "records": [
+  {
+   "id": "kenney_platformer_characters_v1",
+   "source": "Kenney (kenney.nl)",
+   "url": "https://kenney.nl/assets/platformer-characters",
+   "license": "CC0-1.0",
+   "local_path": "assets/raw/kenney/kenney_platformer-characters.zip",
+   "file_types": {
+    ".zip": 1
+   },
+   "n_files": 1,
+   "size_mb": 1.4,
+   "dimensions": null,
+   "vector_or_raster": "raster PNG",
+   "blender_compat": "as image planes",
+   "grease_pencil_compat": "no",
+   "rig_compat": "own bone rig in a test only: one-segment limbs, baked face",
+   "modifiable": "yes (CC0)",
+   "commercial_use": true,
+   "classes": [
+    "REFERENCE ONLY"
+   ],
+   "registry_status": "DOWNLOADED_EVALUATED",
+   "production_use": "TESTED-NOT-USED",
+   "reason_unused": "chibi proportions + baked face; style is a game sprite, arm/leg are one segment -> cannot carry our IK",
+   "downloaded": true
+  },
+  {
+   "id": "kenney_modular_characters_v1",
+   "source": "Kenney (kenney.nl)",
+   "url": "https://kenney.nl/assets/modular-characters",
+   "license": "CC0-1.0",
+   "local_path": "assets/raw/kenney/kenney_modular-characters.zip",
+   "file_types": {
+    ".zip": 1
+   },
+   "n_files": 1,
+   "size_mb": 1.8,
+   "dimensions": null,
+   "vector_or_raster": "raster PNG",
+   "blender_compat": "as image planes",
+   "grease_pencil_compat": "no",
+   "rig_compat": "front-view chibi wardrobe, no limb split",
+   "modifiable": "yes (CC0)",
+   "commercial_use": true,
+   "classes": [
+    "REFERENCE ONLY",
+    "CLOTHING"
+   ],
+   "registry_status": "DOWNLOADED_EVALUATED",
+   "production_use": "TESTED-NOT-USED",
+   "reason_unused": "wrong scale/style for an editorial film; wardrobe pieces are pre-shaded raster",
+   "downloaded": true
+  },
+  {
+   "id": "open_peeps_flat_v1",
+   "source": "Open Peeps (Pablo Stanley)",
+   "url": "https://www.openpeeps.com/",
+   "license": "CC0-1.0",
+   "local_path": "assets/character/raw/open_peeps/open_peeps_flat_assets.zip",
+   "file_types": {
+    ".zip": 1
+   },
+   "n_files": 1,
+   "size_mb": 43.9,
+   "dimensions": null,
+   "vector_or_raster": "vector SVG (Sketch export)",
+   "blender_compat": "textured planes / SVG import",
+   "grease_pencil_compat": "no (SVG import -> mesh possible)",
+   "rig_compat": "heads/hair/facial hair/glasses -> HEAD slot (used)",
+   "modifiable": "yes (CC0)",
+   "commercial_use": true,
+   "classes": [
+    "FOUNDATION",
+    "HAIR",
+    "FACE",
+    "COMPONENT"
+   ],
+   "registry_status": "USED",
+   "production_use": "USED (partly)",
+   "reason_unused": "USED: 2 of 46 heads in the trace (36 reachable in the vocabulary); the 30 face atoms, 30 bodies, 34 poses are unused - see the atlas",
+   "downloaded": true
+  },
+  {
+   "id": "humaaans_site",
+   "source": "Humaaans (Pablo Stanley)",
+   "url": "https://www.humaaans.com/",
+   "license": "CC0-1.0",
+   "local_path": null,
+   "file_types": null,
+   "n_files": 0,
+   "size_mb": 0.0,
+   "dimensions": null,
+   "vector_or_raster": "vector SVG-in-JS (mirror jktzes/humaaans, MIT code / CC0 art) - NOT ON DISK",
+   "blender_compat": "would import as textured planes",
+   "grease_pencil_compat": "no",
+   "rig_compat": "heads/hair 17, torsos 10 (with arms), legs 8 standing + 4 sitting; no separate arms",
+   "modifiable": "yes",
+   "commercial_use": true,
+   "classes": [
+    "COMPONENT",
+    "CLOTHING",
+    "REPLACEMENT"
+   ],
+   "registry_status": "EVALUATED_NOT_USED",
+   "production_use": "NOT DOWNLOADED",
+   "reason_unused": "never downloaded (only evaluated on the web). Read via the GitHub tree: fills only (no ink), hard-coded colours, legs are separate paths -> harvestable as replacement drawings (running legs, lab coat, trench coat, wheelchair). Needs a download approval.",
+   "downloaded": false
+  },
+  {
+   "id": "coa_tools2",
+   "source": "GitHub",
+   "url": "https://github.com/Aodaruma/coa_tools2",
+   "license": "GPL-3.0",
+   "local_path": null,
+   "file_types": null,
+   "n_files": 0,
+   "size_mb": 0.0,
+   "dimensions": null,
+   "vector_or_raster": "code (GPL-3)",
+   "blender_compat": "-",
+   "grease_pencil_compat": "-",
+   "rig_compat": "architecture reference",
+   "modifiable": "no (GPL)",
+   "commercial_use": true,
+   "classes": [
+    "REFERENCE ONLY"
+   ],
+   "registry_status": "REFERENCE_ONLY",
+   "production_use": "REFERENCE",
+   "reason_unused": "GPL-3: never vendored",
+   "downloaded": false
+  },
+  {
+   "id": "tiny_2d_rig_tools",
+   "source": "GitHub",
+   "url": "https://github.com/NickTiny/Tiny-2D-Rig-Tools",
+   "license": "NOASSERTION",
+   "local_path": null,
+   "file_types": null,
+   "n_files": 0,
+   "size_mb": 0.0,
+   "dimensions": null,
+   "vector_or_raster": "code (no licence)",
+   "blender_compat": "-",
+   "grease_pencil_compat": "-",
+   "rig_compat": "-",
+   "modifiable": "no",
+   "commercial_use": null,
+   "classes": [
+    "REFERENCE ONLY"
+   ],
+   "registry_status": "REFERENCE_ONLY",
+   "production_use": "REFERENCE",
+   "reason_unused": "no licence -> quarantined",
+   "downloaded": false
+  },
+  {
+   "id": "puppet_mode",
+   "source": "GitHub",
+   "url": "https://github.com/8bitbyadog/puppet-mode",
+   "license": "NOASSERTION",
+   "local_path": null,
+   "file_types": null,
+   "n_files": 0,
+   "size_mb": 0.0,
+   "dimensions": null,
+   "vector_or_raster": "code (no licence)",
+   "blender_compat": "-",
+   "grease_pencil_compat": "-",
+   "rig_compat": "-",
+   "modifiable": "no",
+   "commercial_use": null,
+   "classes": [
+    "REFERENCE ONLY"
+   ],
+   "registry_status": "REFERENCE_ONLY",
+   "production_use": "REFERENCE",
+   "reason_unused": "no licence -> quarantined",
+   "downloaded": false
+  },
+  {
+   "id": "skeleton_rig_frycz",
+   "source": "GitHub",
+   "url": "https://github.com/frycz/skeleton-rig",
+   "license": "NOASSERTION",
+   "local_path": null,
+   "file_types": null,
+   "n_files": 0,
+   "size_mb": 0.0,
+   "dimensions": null,
+   "vector_or_raster": "code (no licence)",
+   "blender_compat": "-",
+   "grease_pencil_compat": "-",
+   "rig_compat": "data-model idea",
+   "modifiable": "no",
+   "commercial_use": null,
+   "classes": [
+    "REFERENCE ONLY"
+   ],
+   "registry_status": "REFERENCE_ONLY",
+   "production_use": "REFERENCE",
+   "reason_unused": "no licence -> quarantined",
+   "downloaded": false
+  },
+  {
+   "id": "oga_creomoto_stickman_fixed_v1",
+   "source": "OpenGameArt",
+   "url": "https://opengameart.org/content/creomotos-stick-man-fixed-up",
+   "license": "CC0-1.0",
+   "local_path": "assets/raw/blender_audit/oga_stickman_fixed.blend",
+   "file_types": {
+    ".blend": 1
+   },
+   "n_files": 1,
+   "size_mb": 0.7,
+   "dimensions": null,
+   "vector_or_raster": "Blender 2.71 .blend, armature + IK",
+   "blender_compat": "opens (converted)",
+   "grease_pencil_compat": "own rig replaces it",
+   "rig_compat": "proportions / IK pole layout / idle+run action curves as reference",
+   "modifiable": "yes (CC0)",
+   "commercial_use": true,
+   "classes": [
+    "REFERENCE ONLY",
+    "RIG",
+    "MOTION"
+   ],
+   "registry_status": "DOWNLOADED_TESTED",
+   "production_use": "TESTED-NOT-USED",
+   "reason_unused": "stickman limbs are lines; we use its proportions and gait curves only as reference (see creomoto_test)",
+   "downloaded": true
+  },
+  {
+   "id": "oga_lowpoly_rigged_man_v1",
+   "source": "OpenGameArt",
+   "url": "https://opengameart.org/content/low-poly-rigged-man",
+   "license": "CC0-1.0",
+   "local_path": "assets/raw/blender_audit/oga_lowpoly_rigged_man.blend",
+   "file_types": {
+    ".blend": 1
+   },
+   "n_files": 1,
+   "size_mb": 0.6,
+   "dimensions": null,
+   "vector_or_raster": "Blender .blend",
+   "blender_compat": "no",
+   "grease_pencil_compat": "no",
+   "rig_compat": "leg IK 6 cm off in our walk test",
+   "modifiable": "yes (CC0)",
+   "commercial_use": true,
+   "classes": [
+    "REFERENCE ONLY"
+   ],
+   "registry_status": "DOWNLOADED_TESTED",
+   "production_use": "TESTED-NOT-USED",
+   "reason_unused": "fails our IK gate; blocky 3D",
+   "downloaded": true
+  },
+  {
+   "id": "oga_old_lady_rigged_v1",
+   "source": "OpenGameArt",
+   "url": "https://opengameart.org/content/old-lady",
+   "license": "CC0-1.0",
+   "local_path": "assets/raw/blender_audit/oga_old_lady.blend",
+   "file_types": {
+    ".blend": 1
+   },
+   "n_files": 1,
+   "size_mb": 14.6,
+   "dimensions": null,
+   "vector_or_raster": "Blender .blend, 84 bones",
+   "blender_compat": "opens",
+   "grease_pencil_compat": "no",
+   "rig_compat": "finger + eye/brow bone layout reference",
+   "modifiable": "yes (CC0)",
+   "commercial_use": true,
+   "classes": [
+    "REFERENCE ONLY",
+    "RIG"
+   ],
+   "registry_status": "DOWNLOADED_TESTED",
+   "production_use": "TESTED-NOT-USED",
+   "reason_unused": "fixed sculpted dress/hair; reference for a hand/face bone layout",
+   "downloaded": true
+  },
+  {
+   "id": "oga_puppet_base_rigged_v1",
+   "source": "OpenGameArt",
+   "url": "https://opengameart.org/content/puppet-base-rigged",
+   "license": "CC0-1.0",
+   "local_path": "assets/raw/blender_audit/oga_puppet_base.7z",
+   "file_types": {
+    ".7z": 1
+   },
+   "n_files": 1,
+   "size_mb": 0.3,
+   "dimensions": null,
+   "vector_or_raster": "Blender .blend (7z)",
+   "blender_compat": "opens",
+   "grease_pencil_compat": "no",
+   "rig_compat": "eye bones move the mesh",
+   "modifiable": "yes (CC0)",
+   "commercial_use": true,
+   "classes": [
+    "REFERENCE ONLY"
+   ],
+   "registry_status": "DOWNLOADED_TESTED",
+   "production_use": "TESTED-NOT-USED",
+   "reason_unused": "no IK/actions",
+   "downloaded": true
+  },
+  {
+   "id": "blenderstudio_gp_cutout_pepe_v1",
+   "source": "Blender Studio - Grease Pencil Fundamentals",
+   "url": "https://studio.blender.org/training/grease-pencil-fundamentals/5cba1d2e53491006f35d95d0/",
+   "license": "CC-BY-4.0",
+   "local_path": "assets/raw/blender_audit/gp_pepe_cutout.blend",
+   "file_types": {
+    ".blend": 1
+   },
+   "n_files": 1,
+   "size_mb": 4.3,
+   "dimensions": null,
+   "vector_or_raster": "Blender GP cutout (GPv2 -> GPv3 auto-convert)",
+   "blender_compat": "yes",
+   "grease_pencil_compat": "yes",
+   "rig_compat": "separate GP layers per face part + pupil layers",
+   "modifiable": "yes (CC-BY-4.0, attribution)",
+   "commercial_use": true,
+   "classes": [
+    "GREASE_PENCIL",
+    "FACE",
+    "REFERENCE ONLY"
+   ],
+   "registry_status": "DOWNLOADED_TESTED",
+   "production_use": "TESTED-NOT-USED",
+   "reason_unused": "pupil-in-eye technique ADOPTED (gaze_pupil_in_sclera_test); the drawings themselves are a different (3D-head GP) style",
+   "downloaded": true
+  },
+  {
+   "id": "blenderstudio_gp_cutout_cowboy_v1",
+   "source": "Blender Studio - Grease Pencil Fundamentals",
+   "url": "https://studio.blender.org/training/grease-pencil-fundamentals/5d9c6ee20f9018baaca071c3/",
+   "license": "CC-BY-4.0",
+   "local_path": "assets/raw/blender_audit/gp_cowboy_cutout.blend",
+   "file_types": {
+    ".blend": 1
+   },
+   "n_files": 1,
+   "size_mb": 32.1,
+   "dimensions": null,
+   "vector_or_raster": "Blender GP cutout",
+   "blender_compat": "yes",
+   "grease_pencil_compat": "yes",
+   "rig_compat": "as Pepe",
+   "modifiable": "yes (CC-BY-4.0)",
+   "commercial_use": true,
+   "classes": [
+    "GREASE_PENCIL",
+    "FACE",
+    "REFERENCE ONLY"
+   ],
+   "registry_status": "DOWNLOADED_TESTED",
+   "production_use": "TESTED-NOT-USED",
+   "reason_unused": "as Pepe; hat/face parts are character-specific",
+   "downloaded": true
+  },
+  {
+   "id": "blenderstudio_gp_cutout_boyhead282_v1",
+   "source": "Blender Studio - Grease Pencil Fundamentals",
+   "url": "https://studio.blender.org/training/grease-pencil-fundamentals/5d9c6fbd2ed9a72b3fae65b0/",
+   "license": "CC-BY-4.0",
+   "local_path": "assets/raw/blender_audit/gp_boyhead_cutout_282.blend",
+   "file_types": {
+    ".blend": 1
+   },
+   "n_files": 1,
+   "size_mb": 18.7,
+   "dimensions": null,
+   "vector_or_raster": "Blender GP cutout",
+   "blender_compat": "yes",
+   "grease_pencil_compat": "yes",
+   "rig_compat": "pupil layers + eyelid layers",
+   "modifiable": "yes (CC-BY-4.0)",
+   "commercial_use": true,
+   "classes": [
+    "GREASE_PENCIL",
+    "FACE",
+    "REFERENCE ONLY"
+   ],
+   "registry_status": "DOWNLOADED_TESTED",
+   "production_use": "TESTED (technique adopted)",
+   "reason_unused": "the source of the pupil-in-sclera gaze now in production (gaze_mode 'pupil')",
+   "downloaded": true
+  },
+  {
+   "id": "blenderstudio_gp_brush_pack_v2",
+   "source": "Blender Studio - Grease Pencil Fundamentals",
+   "url": "https://studio.blender.org/training/grease-pencil-fundamentals/5f235cc297f8815e74ffb90b/",
+   "license": "CC-BY-4.0",
+   "local_path": "assets/raw/blender_audit/gp_brush_pack_v2.zip",
+   "file_types": {
+    ".zip": 1
+   },
+   "n_files": 1,
+   "size_mb": 7.2,
+   "dimensions": null,
+   "vector_or_raster": "Blender asset .blend (brushes/materials)",
+   "blender_compat": "yes",
+   "grease_pencil_compat": "yes",
+   "rig_compat": "-",
+   "modifiable": "yes (CC-BY-4.0)",
+   "commercial_use": true,
+   "classes": [
+    "GREASE_PENCIL",
+    "FX"
+   ],
+   "registry_status": "DOWNLOADED_TESTED",
+   "production_use": "TESTED-NOT-USED",
+   "reason_unused": "brushes need a live Blender GP session; our compositor draws GP-style FX procedurally (deterministic)",
+   "downloaded": true
+  },
+  {
+   "id": "artell_mike_rig_v1",
+   "source": "Artell (lucky3d.fr) via BlenderNation",
+   "url": "https://www.blendernation.com/2019/02/13/free-download-mike-fully-rigged-character-cc-0/",
+   "license": "CC0-1.0",
+   "local_path": "assets/raw/blender_audit/mike_rig.zip",
+   "file_types": {
+    ".zip": 1
+   },
+   "n_files": 1,
+   "size_mb": 44.6,
+   "dimensions": null,
+   "vector_or_raster": "Blender .blend, 956 bones, 371 drivers",
+   "blender_compat": "opens only with autoexec",
+   "grease_pencil_compat": "no",
+   "rig_compat": "face/finger bone layout",
+   "modifiable": "yes (CC0)",
+   "commercial_use": true,
+   "classes": [
+    "REFERENCE ONLY",
+    "RIG"
+   ],
+   "registry_status": "DOWNLOADED_TESTED",
+   "production_use": "TESTED-NOT-USED",
+   "reason_unused": "needs script drivers (autoexec) -> against our deterministic policy",
+   "downloaded": true
+  },
+  {
+   "id": "blender_human_base_meshes_v1_4_1",
+   "source": "Blender Foundation / Blender Studio",
+   "url": "https://www.blender.org/download/demo-files/",
+   "license": "CC0-1.0",
+   "local_path": "assets/raw/blender_audit/human_base_meshes_v1.4.1.zip",
+   "file_types": {
+    ".zip": 1
+   },
+   "n_files": 1,
+   "size_mb": 50.6,
+   "dimensions": null,
+   "vector_or_raster": "Blender .blend, 17 unrigged meshes",
+   "blender_compat": "yes",
+   "grease_pencil_compat": "no",
+   "rig_compat": "no",
+   "modifiable": "yes (CC0)",
+   "commercial_use": true,
+   "classes": [
+    "REFERENCE ONLY"
+   ],
+   "registry_status": "DOWNLOADED_TESTED",
+   "production_use": "TESTED-NOT-USED",
+   "reason_unused": "sculpting bases; usable as pose/anatomy reference renders",
+   "downloaded": true
+  },
+  {
+   "id": "mpfb2_extension_2_0_17",
+   "source": "MakeHuman Community (Blender Extensions)",
+   "url": "https://extensions.blender.org/add-ons/mpfb/",
+   "license": "GPL-3.0-or-later",
+   "local_path": "assets/raw/blender_audit/mpfb_2.0.17.zip",
+   "file_types": {
+    ".zip": 1
+   },
+   "n_files": 1,
+   "size_mb": 45.0,
+   "dimensions": null,
+   "vector_or_raster": "Blender extension (GPL-3.0 code; CC0 outputs)",
+   "blender_compat": "yes",
+   "grease_pencil_compat": "no",
+   "rig_compat": "Rigify",
+   "modifiable": "outputs CC0",
+   "commercial_use": true,
+   "classes": [
+    "REFERENCE ONLY"
+   ],
+   "registry_status": "EXTERNAL_TOOL",
+   "production_use": "EXTERNAL TOOL",
+   "reason_unused": "used only as an external generator; see mpfb_pose_reference",
+   "downloaded": true
+  },
+  {
+   "id": "mpfb2_generated_humans_cc0",
+   "source": "generated locally with MPFB 2.0.17 in Blender 5.2.2",
+   "url": "https://static.makehumancommunity.org/about/license.html",
+   "license": "CC0-1.0",
+   "local_path": "assets/raw/blender_audit/mpfb_out/mpfb_rigify.blend",
+   "file_types": {
+    ".blend": 1
+   },
+   "n_files": 1,
+   "size_mb": 2.2,
+   "dimensions": null,
+   "vector_or_raster": "Blender .blend (Rigify 1090 bones)",
+   "blender_compat": "yes",
+   "grease_pencil_compat": "no",
+   "rig_compat": "Rigify",
+   "modifiable": "yes (CC0)",
+   "commercial_use": true,
+   "classes": [
+    "REFERENCE ONLY",
+    "RIG"
+   ],
+   "registry_status": "DOWNLOADED_TESTED",
+   "production_use": "TESTED (reference generator)",
+   "reason_unused": "reference poses/turnarounds, not the final look",
+   "downloaded": true
+  },
+  {
+   "id": "blendswap_stickman_basic_rig_30507",
+   "source": "Blend Swap",
+   "url": "https://blendswap.com/blend/30507",
+   "license": "CC0-1.0",
+   "local_path": null,
+   "file_types": null,
+   "n_files": 0,
+   "size_mb": 0.0,
+   "dimensions": null,
+   "vector_or_raster": "not downloaded",
+   "blender_compat": "-",
+   "grease_pencil_compat": "-",
+   "rig_compat": "-",
+   "modifiable": "-",
+   "commercial_use": true,
+   "classes": [
+    "UNUSABLE"
+   ],
+   "registry_status": "BLOCKED_LOGIN",
+   "production_use": "BLOCKED (login)",
+   "reason_unused": "Blend Swap needs an account",
+   "downloaded": false
+  },
+  {
+   "id": "blendswap_2d_stickman_rig_v2_15217",
+   "source": "Blend Swap",
+   "url": "https://blendswap.com/blend/15217",
+   "license": "CC-BY-4.0",
+   "local_path": null,
+   "file_types": null,
+   "n_files": 0,
+   "size_mb": 0.0,
+   "dimensions": null,
+   "vector_or_raster": "not downloaded",
+   "blender_compat": "-",
+   "grease_pencil_compat": "-",
+   "rig_compat": "-",
+   "modifiable": "-",
+   "commercial_use": true,
+   "classes": [
+    "UNUSABLE"
+   ],
+   "registry_status": "BLOCKED_LOGIN",
+   "production_use": "BLOCKED (login)",
+   "reason_unused": "Blend Swap needs an account",
+   "downloaded": false
+  },
+  {
+   "id": "gumroad_gp_spider_rig_dantti",
+   "source": "Gumroad",
+   "url": "https://dantti.gumroad.com/l/gp_spider_rig",
+   "license": null,
+   "local_path": null,
+   "file_types": null,
+   "n_files": 0,
+   "size_mb": 0.0,
+   "dimensions": null,
+   "vector_or_raster": "not downloaded",
+   "blender_compat": "-",
+   "grease_pencil_compat": "-",
+   "rig_compat": "-",
+   "modifiable": "-",
+   "commercial_use": null,
+   "classes": [
+    "UNUSABLE"
+   ],
+   "registry_status": "BLOCKED_CHECKOUT",
+   "production_use": "BLOCKED (checkout)",
+   "reason_unused": "e-mail checkout; licence unverified",
+   "downloaded": false
+  },
+  {
+   "id": "gumroad_super_stickman_ahmad",
+   "source": "Gumroad",
+   "url": "https://ahmadanimation.gumroad.com/l/xptxd",
+   "license": null,
+   "local_path": null,
+   "file_types": null,
+   "n_files": 0,
+   "size_mb": 0.0,
+   "dimensions": null,
+   "vector_or_raster": "not downloaded",
+   "blender_compat": "-",
+   "grease_pencil_compat": "-",
+   "rig_compat": "-",
+   "modifiable": "-",
+   "commercial_use": null,
+   "classes": [
+    "UNUSABLE"
+   ],
+   "registry_status": "BLOCKED_CHECKOUT",
+   "production_use": "BLOCKED (checkout)",
+   "reason_unused": "e-mail checkout; licence unverified",
+   "downloaded": false
+  },
+  {
+   "id": "gumroad_gp_character_rigs_yadoob",
+   "source": "Gumroad",
+   "url": "https://gumroad.com/l/zGJZB",
+   "license": null,
+   "local_path": null,
+   "file_types": null,
+   "n_files": 0,
+   "size_mb": 0.0,
+   "dimensions": null,
+   "vector_or_raster": "not downloaded",
+   "blender_compat": "-",
+   "grease_pencil_compat": "-",
+   "rig_compat": "-",
+   "modifiable": "-",
+   "commercial_use": null,
+   "classes": [
+    "UNUSABLE"
+   ],
+   "registry_status": "BLOCKED_CHECKOUT",
+   "production_use": "BLOCKED (checkout)",
+   "reason_unused": "licence unknown",
+   "downloaded": false
+  },
+  {
+   "id": "quaternius_universal_base_characters",
+   "source": "Quaternius",
+   "url": "https://quaternius.com/packs/universalbasecharacters.html",
+   "license": "CC0-1.0",
+   "local_path": null,
+   "file_types": null,
+   "n_files": 0,
+   "size_mb": 0.0,
+   "dimensions": null,
+   "vector_or_raster": "not downloaded",
+   "blender_compat": "-",
+   "grease_pencil_compat": "-",
+   "rig_compat": "-",
+   "modifiable": "-",
+   "commercial_use": true,
+   "classes": [
+    "UNUSABLE"
+   ],
+   "registry_status": "BLOCKED_GATED",
+   "production_use": "BLOCKED (gated)",
+   "reason_unused": "itch/Patreon gate",
+   "downloaded": false
+  },
+  {
+   "id": "stickman_v4gp_2d",
+   "source": "unknown",
+   "url": null,
+   "license": null,
+   "local_path": null,
+   "file_types": null,
+   "n_files": 0,
+   "size_mb": 0.0,
+   "dimensions": null,
+   "vector_or_raster": "not found",
+   "blender_compat": "-",
+   "grease_pencil_compat": "-",
+   "rig_compat": "-",
+   "modifiable": "-",
+   "commercial_use": null,
+   "classes": [
+    "UNUSABLE"
+   ],
+   "registry_status": "NOT_FOUND",
+   "production_use": "NOT FOUND",
+   "reason_unused": "no such asset located",
+   "downloaded": false
+  },
+  {
+   "id": "blenderstudio_gp_cutout_suzanno_v1",
+   "source": "Blender Institute Archive (grease-pencil-samples)",
+   "url": "https://download.blender.org/archive/gallery/grease-pencil-samples/cutout-rig-suzanno-cutout-test-by-francisco-antonio-peinado-currobot-for-2-83-or-above/",
+   "license": null,
+   "local_path": "assets/raw/blender_audit/gp_suzanno_cutout.blend",
+   "file_types": {
+    ".blend": 1
+   },
+   "n_files": 1,
+   "size_mb": 9.4,
+   "dimensions": null,
+   "vector_or_raster": "Blender GP cutout",
+   "blender_compat": "opens",
+   "grease_pencil_compat": "yes",
+   "rig_compat": "-",
+   "modifiable": "NO (no licence stated)",
+   "commercial_use": null,
+   "classes": [
+    "UNUSABLE"
+   ],
+   "registry_status": "DOWNLOADED_QUARANTINED",
+   "production_use": "QUARANTINED",
+   "reason_unused": "downloaded for inspection only",
+   "downloaded": true
+  },
+  {
+   "id": "blenderstudio_gp_cutout_simplehead_v1",
+   "source": "Blender Institute Archive (grease-pencil-samples)",
+   "url": "https://download.blender.org/archive/gallery/grease-pencil-samples/cutout-rig-simple-head-by-maisam-hosaini-for-2-83-or-above/",
+   "license": null,
+   "local_path": "assets/raw/blender_audit/gp_simplehead_cutout.blend",
+   "file_types": {
+    ".blend": 1
+   },
+   "n_files": 1,
+   "size_mb": 21.8,
+   "dimensions": null,
+   "vector_or_raster": "Blender GP cutout",
+   "blender_compat": "opens",
+   "grease_pencil_compat": "yes",
+   "rig_compat": "-",
+   "modifiable": "NO (no licence stated)",
+   "commercial_use": null,
+   "classes": [
+    "UNUSABLE"
+   ],
+   "registry_status": "DOWNLOADED_QUARANTINED",
+   "production_use": "QUARANTINED",
+   "reason_unused": "downloaded for inspection only",
+   "downloaded": true
+  },
+  {
+   "id": "blenderstudio_gp_cutout_eye282_v1",
+   "source": "Blender Institute Archive (grease-pencil-samples)",
+   "url": "https://download.blender.org/archive/gallery/grease-pencil-samples/cutout-rig-eye-by-jefferson-nascimento-only-for-2-82/",
+   "license": null,
+   "local_path": "assets/raw/blender_audit/gp_eye_cutout_282.blend",
+   "file_types": {
+    ".blend": 1
+   },
+   "n_files": 1,
+   "size_mb": 0.4,
+   "dimensions": null,
+   "vector_or_raster": "Blender GP cutout",
+   "blender_compat": "opens",
+   "grease_pencil_compat": "yes",
+   "rig_compat": "-",
+   "modifiable": "NO (no licence stated)",
+   "commercial_use": null,
+   "classes": [
+    "UNUSABLE"
+   ],
+   "registry_status": "DOWNLOADED_QUARANTINED",
+   "production_use": "QUARANTINED",
+   "reason_unused": "downloaded for inspection only",
+   "downloaded": true
+  },
+  {
+   "id": "rgs_cc0_modular_animated_vector_characters",
+   "source": "OpenGameArt (RGS_Dev)",
+   "url": "https://opengameart.org/content/free-cc0-modular-animated-vector-characters-2d",
+   "license": "CC0-1.0",
+   "local_path": "assets/raw/rgs/free_2d_animated_vector_game_character_sprites.zip",
+   "file_types": {
+    ".zip": 1
+   },
+   "n_files": 1,
+   "size_mb": 72.7,
+   "dimensions": null,
+   "vector_or_raster": "raster PNG sprites 2048 px (42 frames per part)",
+   "blender_compat": "as image planes",
+   "grease_pencil_compat": "no",
+   "rig_compat": "registered parts (canvas-aligned) but game-monster style",
+   "modifiable": "yes (CC0)",
+   "commercial_use": true,
+   "classes": [
+    "REFERENCE ONLY"
+   ],
+   "registry_status": "DOWNLOADED_EVALUATED",
+   "production_use": "TESTED-NOT-USED",
+   "reason_unused": "see rgs_combination_test: thick rims + cel gloss; normalising leaves generic shapes",
+   "downloaded": true
+  },
+  {
+   "id": "openpeeps_device_hand_harvest_v1",
+   "source": "derived from Open Peeps (Pablo Stanley) 'Device' body atom",
+   "url": "https://www.openpeeps.com/",
+   "license": "CC0-1.0",
+   "local_path": "assets/character/harvest/openpeeps_device_hand.fill.npy",
+   "file_types": {
+    ".npy": 1
+   },
+   "n_files": 1,
+   "size_mb": 0.3,
+   "dimensions": null,
+   "vector_or_raster": "raster masks (npy) from an Open Peeps atom",
+   "blender_compat": "textured plane",
+   "grease_pencil_compat": "hand bone",
+   "rig_compat": "yes (CC0)",
+   "modifiable": "yes",
+   "commercial_use": true,
+   "classes": [
+    "HAND",
+    "REPLACEMENT"
+   ],
+   "registry_status": "USED",
+   "production_use": "USED",
+   "reason_unused": "the real hand drawing under hold_phone",
+   "downloaded": true
+  },
+  {
+   "id": "openpeeps_face_atoms_30",
+   "source": "Open Peeps",
+   "url": "https://www.openpeeps.com/",
+   "license": "CC0-1.0",
+   "local_path": "assets/character/raw/open_peeps/extracted/Flat Assets/Separate Atoms/face",
+   "file_types": {
+    ".svg": 30
+   },
+   "n_files": 30,
+   "size_mb": 0.2,
+   "dimensions": "289x293 svg units (first svg)",
+   "vector_or_raster": "vector SVG (1 filled path each)",
+   "blender_compat": "textured plane",
+   "grease_pencil_compat": "-",
+   "rig_compat": "head slot: same canvas as the head shell",
+   "modifiable": "yes",
+   "commercial_use": true,
+   "classes": [
+    "FACE",
+    "REPLACEMENT"
+   ],
+   "registry_status": "(library index / not a registry v2 record)",
+   "production_use": "TESTED -> ADOPTED AS A TEST (face_atom action)",
+   "reason_unused": "before this audit: only 'Serious' was read (as the composition base); 29 expression drawings were thrown away",
+   "downloaded": true
+  },
+  {
+   "id": "openpeeps_bodies_30",
+   "source": "Open Peeps",
+   "url": "https://www.openpeeps.com/",
+   "license": "CC0-1.0",
+   "local_path": "assets/character/raw/open_peeps/extracted/Flat Assets/Separate Atoms/body",
+   "file_types": {
+    ".svg": 30
+   },
+   "n_files": 30,
+   "size_mb": 0.5,
+   "dimensions": "818x733 svg units (first svg)",
+   "vector_or_raster": "vector SVG (Background + Ink groups)",
+   "blender_compat": "textured plane",
+   "grease_pencil_compat": "-",
+   "rig_compat": "none: torso+arms+hands are one silhouette",
+   "modifiable": "yes",
+   "commercial_use": true,
+   "classes": [
+    "REFERENCE ONLY",
+    "HAND"
+   ],
+   "registry_status": "(library index / not a registry v2 record)",
+   "production_use": "UNUSED (1 hand harvested)",
+   "reason_unused": "one hand harvested (Device); the rest need raster hand harvesting per atom",
+   "downloaded": true
+  },
+  {
+   "id": "openpeeps_poses_34",
+   "source": "Open Peeps",
+   "url": "https://www.openpeeps.com/",
+   "license": "CC0-1.0",
+   "local_path": "assets/character/raw/open_peeps/extracted/Flat Assets/Separate Atoms/pose",
+   "file_types": {
+    ".svg": 34
+   },
+   "n_files": 34,
+   "size_mb": 0.9,
+   "dimensions": "1645x2500 svg units (first svg)",
+   "vector_or_raster": "vector SVG (whole figure)",
+   "blender_compat": "textured plane",
+   "grease_pencil_compat": "-",
+   "rig_compat": "none",
+   "modifiable": "yes",
+   "commercial_use": true,
+   "classes": [
+    "REFERENCE ONLY"
+   ],
+   "registry_status": "(library index / not a registry v2 record)",
+   "production_use": "UNUSED",
+   "reason_unused": "whole standing/sitting illustrations: pose REFERENCE only",
+   "downloaded": true
+  },
+  {
+   "id": "openpeeps_templates_189",
+   "source": "Open Peeps",
+   "url": "https://www.openpeeps.com/",
+   "license": "CC0-1.0",
+   "local_path": "assets/character/raw/open_peeps/extracted/Flat Assets/Templates",
+   "file_types": {
+    ".svg": 189,
+    ".png": 185
+   },
+   "n_files": 374,
+   "size_mb": 26.3,
+   "dimensions": "166x244 svg units (first svg)",
+   "vector_or_raster": "vector SVG + PNG",
+   "blender_compat": "textured plane",
+   "grease_pencil_compat": "-",
+   "rig_compat": "none",
+   "modifiable": "yes",
+   "commercial_use": true,
+   "classes": [
+    "REFERENCE ONLY"
+   ],
+   "registry_status": "(library index / not a registry v2 record)",
+   "production_use": "PARTLY (bust.svg = composition base)",
+   "reason_unused": "105 bust / 30 standing / 18 sitting / 36 covid templates: unused apart from the bust base",
+   "downloaded": true
+  },
+  {
+   "id": "openpeeps_head_hair_46",
+   "source": "Open Peeps",
+   "url": "https://www.openpeeps.com/",
+   "license": "CC0-1.0",
+   "local_path": "assets/character/raw/open_peeps/extracted/Flat Assets/Separate Atoms/head",
+   "file_types": {
+    ".svg": 46
+   },
+   "n_files": 46,
+   "size_mb": 0.4,
+   "dimensions": "473x567 svg units (first svg)",
+   "vector_or_raster": "vector SVG",
+   "blender_compat": "textured plane",
+   "grease_pencil_compat": "-",
+   "rig_compat": "HEAD slot",
+   "modifiable": "yes",
+   "commercial_use": true,
+   "classes": [
+    "HAIR",
+    "COMPONENT"
+   ],
+   "registry_status": "(library index / not a registry v2 record)",
+   "production_use": "USED (36 reachable, 10 unreachable)",
+   "reason_unused": "10 unreachable atoms include Turban, beanie, hip hat, Twists: reachable now via dna2 overrides (lab_dna)",
+   "downloaded": true
+  },
+  {
+   "id": "openpeeps_facial_hair_17",
+   "source": "Open Peeps",
+   "url": "https://www.openpeeps.com/",
+   "license": "CC0-1.0",
+   "local_path": "assets/character/raw/open_peeps/extracted/Flat Assets/Separate Atoms/facial-hair",
+   "file_types": {
+    ".svg": 17
+   },
+   "n_files": 17,
+   "size_mb": 0.0,
+   "dimensions": "280x230 svg units (first svg)",
+   "vector_or_raster": "vector SVG",
+   "blender_compat": "textured plane",
+   "grease_pencil_compat": "-",
+   "rig_compat": "HEAD slot",
+   "modifiable": "yes",
+   "commercial_use": true,
+   "classes": [
+    "COMPONENT"
+   ],
+   "registry_status": "(library index / not a registry v2 record)",
+   "production_use": "USED (5 of 17 reachable)",
+   "reason_unused": "dna2 picks only None / Moustache 1 / Moustache 2 / Full / Chin",
+   "downloaded": true
+  },
+  {
+   "id": "openpeeps_accessories_9",
+   "source": "Open Peeps",
+   "url": "https://www.openpeeps.com/",
+   "license": "CC0-1.0",
+   "local_path": "assets/character/raw/open_peeps/extracted/Flat Assets/Separate Atoms/accessories",
+   "file_types": {
+    ".svg": 9
+   },
+   "n_files": 9,
+   "size_mb": 0.0,
+   "dimensions": "392x138 svg units (first svg)",
+   "vector_or_raster": "vector SVG",
+   "blender_compat": "textured plane",
+   "grease_pencil_compat": "-",
+   "rig_compat": "HEAD slot",
+   "modifiable": "yes",
+   "commercial_use": true,
+   "classes": [
+    "COMPONENT"
+   ],
+   "registry_status": "(library index / not a registry v2 record)",
+   "production_use": "USED (Glasses only)",
+   "reason_unused": "Glasses 2-5 and Sunglasses were unreachable",
+   "downloaded": true
+  },
+  {
+   "id": "own_parts_v2",
+   "source": "hand-authored (this project)",
+   "url": "-",
+   "license": "CC0-1.0",
+   "local_path": "engine/skeleton/parts_art2.py + hands3.py -> assets/character/skeleton/generated_v2",
+   "file_types": {
+    ".py": 1
+   },
+   "n_files": 1,
+   "size_mb": 0.0,
+   "dimensions": null,
+   "vector_or_raster": "generated vector -> PNG (2x)",
+   "blender_compat": "textured planes",
+   "grease_pencil_compat": "-",
+   "rig_compat": "26-bone rig",
+   "modifiable": "yes",
+   "commercial_use": true,
+   "classes": [
+    "COMPONENT",
+    "CLOTHING",
+    "HAND"
+   ],
+   "registry_status": "(library index / not a registry v2 record)",
+   "production_use": "USED",
+   "reason_unused": "torso/limbs/hands/shoes/clothing (7 tops, 5 bottoms, 4 shoes, 6 accessories): the whole body below the neck is own-work",
+   "downloaded": true
+  },
+  {
+   "id": "own_environment_sets",
+   "source": "hand-authored (this project)",
+   "url": "-",
+   "license": "CC0-1.0",
+   "local_path": "assets/environment/generated (+ engine/environments)",
+   "file_types": null,
+   "n_files": 0,
+   "size_mb": 0.0,
+   "dimensions": null,
+   "vector_or_raster": "generated SVG layers",
+   "blender_compat": "planes",
+   "grease_pencil_compat": "-",
+   "rig_compat": "-",
+   "modifiable": "yes",
+   "commercial_use": true,
+   "classes": [
+    "ENVIRONMENT"
+   ],
+   "registry_status": "(library index / not a registry v2 record)",
+   "production_use": "USED (bedroom_wide only for skeleton films)",
+   "reason_unused": "8 families exist; only bedroom_wide is scaled for full-body actors (study_room partly); the others are bust-scale",
+   "downloaded": true
+  },
+  {
+   "id": "openmoji_icons_30",
+   "source": "OpenMoji",
+   "url": "https://openmoji.org/",
+   "license": "CC-BY-SA-4.0",
+   "local_path": "assets/props/icons + assets/raw/openmoji",
+   "file_types": {
+    ".svg": 30
+   },
+   "n_files": 30,
+   "size_mb": 0.1,
+   "dimensions": "72x72 svg units (first svg)",
+   "vector_or_raster": "vector SVG",
+   "blender_compat": "planes",
+   "grease_pencil_compat": "-",
+   "rig_compat": "-",
+   "modifiable": "yes (share-alike + attribution)",
+   "commercial_use": true,
+   "classes": [
+    "PROP",
+    "FX"
+   ],
+   "registry_status": "(library index / not a registry v2 record)",
+   "production_use": "USED by legacy pipeline (concept cards)",
+   "reason_unused": "not used by skeleton films",
+   "downloaded": true
+  },
+  {
+   "id": "noto_sans_devanagari",
+   "source": "Google Fonts",
+   "url": "https://fonts.google.com/noto/specimen/Noto+Sans+Devanagari",
+   "license": "OFL-1.1",
+   "local_path": "assets/typography/NotoSansDevanagari-VF.ttf",
+   "file_types": {
+    ".ttf": 1
+   },
+   "n_files": 1,
+   "size_mb": 0.6,
+   "dimensions": null,
+   "vector_or_raster": "variable font",
+   "blender_compat": "-",
+   "grease_pencil_compat": "-",
+   "rig_compat": "-",
+   "modifiable": "yes",
+   "commercial_use": true,
+   "classes": [
+    "FX"
+   ],
+   "registry_status": "(library index / not a registry v2 record)",
+   "production_use": "USED (captions, UI)",
+   "reason_unused": "-",
+   "downloaded": true
+  }
+ ],
+ "runtime_trace_files": {
+  "assets/character/harvest/openpeeps_device_hand.fill.npy": [
+   "open"
+  ],
+  "assets/character/harvest/openpeeps_device_hand.ink.npy": [
+   "open"
+  ],
+  "assets/character/raw/open_peeps/extracted/Flat Assets/Separate Atoms/a person/bust.svg": [
+   "open"
+  ],
+  "assets/character/raw/open_peeps/extracted/Flat Assets/Separate Atoms/accessories/* None.svg": [
+   "open"
+  ],
+  "assets/character/raw/open_peeps/extracted/Flat Assets/Separate Atoms/body/Tee 1.svg": [
+   "open"
+  ],
+  "assets/character/raw/open_peeps/extracted/Flat Assets/Separate Atoms/face/Serious.svg": [
+   "open"
+  ],
+  "assets/character/raw/open_peeps/extracted/Flat Assets/Separate Atoms/facial-hair/* None.svg": [
+   "open"
+  ],
+  "assets/character/raw/open_peeps/extracted/Flat Assets/Separate Atoms/head/Short 1.svg": [
+   "open"
+  ],
+  "assets/character/raw/open_peeps/extracted/Flat Assets/Separate Atoms/head/Short 4.svg": [
+   "open"
+  ],
+  "assets/environment/generated/bedroom_wide_b107684e/bed.svg": [
+   "open"
+  ],
+  "assets/environment/generated/bedroom_wide_b107684e/curtain_fg.svg": [
+   "open"
+  ],
+  "assets/environment/generated/bedroom_wide_b107684e/decor.svg": [
+   "open"
+  ],
+  "assets/environment/generated/bedroom_wide_b107684e/door.svg": [
+   "open"
+  ],
+  "assets/environment/generated/bedroom_wide_b107684e/floor.svg": [
+   "open"
+  ],
+  "assets/environment/generated/bedroom_wide_b107684e/layers.json": [
+   "open"
+  ],
+  "assets/environment/generated/bedroom_wide_b107684e/nightstand.svg": [
+   "open"
+  ],
+  "assets/environment/generated/bedroom_wide_b107684e/phone_free.svg": [
+   "open"
+  ],
+  "assets/environment/generated/bedroom_wide_b107684e/plant_fg.svg": [
+   "open"
+  ],
+  "assets/environment/generated/bedroom_wide_b107684e/rug_fg.svg": [
+   "open"
+  ],
+  "assets/environment/generated/bedroom_wide_b107684e/sky.svg": [
+   "open"
+  ],
+  "assets/environment/generated/bedroom_wide_b107684e/wall.svg": [
+   "open"
+  ],
+  "assets/environment/generated/bedroom_wide_b107684e/window.svg": [
+   "open"
+  ]
+ },
+ "trace_scenario": "topic story 'fake WhatsApp investment group' -> plan -> cold bake of 2 characters -> 3 composited stills (skeleton / insert_ui / procedural)",
+ "films_scanned": 10,
+ "film_atoms_used": {
+  "heads": [
+   "Bun 2",
+   "Short 4"
+  ],
+  "facial_hair": [
+   "* None"
+  ],
+  "glasses": [
+   "* None",
+   "Glasses"
+  ]
+ }
+}

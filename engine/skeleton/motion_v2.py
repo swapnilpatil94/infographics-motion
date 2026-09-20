@@ -777,6 +777,94 @@ def a_eye_contact(perf, t, dur, st, target="PERSON_D", **kw):
     return t + dur
 
 
+def a_face_atom(perf, t, dur, st, name="fear", **kw):
+    """REPLACEMENT FACE DRAWING: swap the procedural face for the Open Peeps face atom of emotion `name` for `dur` seconds (a peak-expression frame; gaze is baked into the drawing while it is up).
+    Needs the character baked with parts_art2.bake_face_atoms. Step keys (the id is an integer, never interpolated)."""
+    from engine.skeleton import parts_art2 as PA2
+    k = PA2.FACE_ATOM_IDS[name]
+    ch = perf.ch["face_atom_id"]
+    ch.key(t - 0.001, 0.0, "linear")
+    ch.key(t, float(k), "linear")
+    ch.key(t + dur, float(k), "linear")
+    ch.key(t + dur + 0.001, 0.0, "linear")
+    perf.events.append((t, "face_atom", dict(name=name, dur=dur)))
+    return t + dur
+
+
+_RUN = {}
+
+
+def _run_cycle():
+    if not _RUN:
+        import json as _j
+        import os as _o
+        from engine.shorts.raster import ROOT as _ROOT
+        d = _j.load(open(_o.path.join(_ROOT, "assets/library/creomoto_run_cycle.json")))
+        cyc = d["cycle"]
+        floor = min(c["hip_z"] + c[k][1] for c in cyc for k in ("ankle_L", "ankle_R"))
+        _RUN.update(cycle=cyc, fps=d["fps"], v_legs=d["stance_travel_speed_legs_per_s"], floor=floor)
+    return _RUN
+
+
+def a_run(perf, t, dur, st, speed_scale=1.0, **kw):
+    """RUN: joint motion from ONE cycle of the CC0 Creomoto stickman (assets/library/creomoto_run_cycle.json, 20 frames) retargeted onto our rig by leg length: hips bob, feet leave the ground (a flight
+    phase the walk grammar cannot make), arms drive, the trunk leans. The root travels at the speed at which the stance foot stays planted (measured from the cycle). Eases in and out from / to standing."""
+    C = _run_cycle()
+    P = perf.P
+    L = (P["thigh"] + P["shin"]) * 0.985
+    cyc, fps_c = C["cycle"], C["fps"]
+    n_c = len(cyc)
+    T = n_c / fps_c / max(speed_scale, 0.3)
+    v = C["v_legs"] * L * max(speed_scale, 0.3)
+    ramp = min(0.35, dur * 0.3)
+    x0 = perf.v("root_x", t)
+    base_dy = perf.v("pelvis_dy", t)
+    so = perf.so
+    stand_x = dict(L=perf.v("foot_L_x", t) - x0, R=perf.v("foot_R_x", t) - x0)              # relative to the root: the blend in/out follows the body
+    sh0 = perf.shoulder(t)
+    stand_hand = {sd: (perf.v(f"hand_{sd}_x", t) - sh0[0], perf.v(f"hand_{sd}_y", t) - sh0[1]) for sd in ("L", "R")}
+    lean_avg = sum(math.degrees(math.atan2(c["neck"][0], c["neck"][1])) for c in cyc) / n_c
+    n = int(dur * 30)
+    x = x0
+    prev_w = 0.0
+    for i in range(n + 1):
+        u = i / 30.0
+        w = M.ease("smooth", max(0.0, min(1.0, u / max(ramp, 1e-3), (dur - u) / max(ramp, 1e-3))))
+        if i:
+            x += 0.5 * (w + prev_w) * v / 30.0
+        prev_w = w
+        ph = (u / T) % 1.0 * n_c
+        i0 = int(ph) % n_c
+        i1 = (i0 + 1) % n_c
+        fr = ph - int(ph)
+        lerp = lambda a, b: a + (b - a) * fr
+        pt = lambda c0, c1, k: (lerp(c0[k][0], c1[k][0]), lerp(c0[k][1], c1[k][1]))
+        c0, c1 = cyc[i0], cyc[i1]
+        tt = t + u
+        hip_h = (lerp(c0["hip_z"], c1["hip_z"]) - C["floor"]) * L
+        dy = P["foot_h"] + hip_h - P["hip_y"]
+        perf.ch["root_x"].key(tt, x, "linear")
+        perf.ch["pelvis_dy"].key(tt, (1 - w) * base_dy + w * dy, "linear")
+        for side in ("L", "R"):
+            a = pt(c0, c1, "ankle_" + side)
+            fx = x + a[0] * L + so["h" + side]
+            fy = P["foot_h"] + (lerp(c0["hip_z"] + c0["ankle_" + side][1], c1["hip_z"] + c1["ankle_" + side][1]) - C["floor"]) * L
+            perf.ch[f"foot_{side}_x"].key(tt, (1 - w) * (x + stand_x[side]) + w * fx, "linear")
+            perf.ch[f"foot_{side}_y"].key(tt, (1 - w) * P["foot_h"] + w * max(P["foot_h"], fy), "linear")
+            perf.ch[f"foot_{side}_rot"].key(tt, 0.0, "linear")
+            wr = pt(c0, c1, "wrist_" + side)
+            shx, shy = perf.shoulder(tt)
+            hx, hy = shx + so["s" + side] + wr[0] * L, shy + wr[1] * L
+            perf.ch[f"hand_{side}_x"].key(tt, (1 - w) * (shx + stand_hand[side][0]) + w * hx, "linear")
+            perf.ch[f"hand_{side}_y"].key(tt, (1 - w) * (shy + stand_hand[side][1]) + w * hy, "linear")
+        nk = pt(c0, c1, "neck")
+        lean = math.degrees(math.atan2(nk[0], nk[1]))
+        perf.ch["spine_rot"].key(tt, w * (14.0 * st["lean"] + 0.5 * (lean - lean_avg)), "linear")
+        perf.ch["head_rot"].key(tt, -0.6 * w * (14.0 * st["lean"]), "linear")
+    perf.events.append((t, "walk", dict(t1=t + dur, T=T, x0=x0, x1=x, run=True)))
+    return t + dur
+
+
 def register():
     A = M.ACTIONS
     A["sit"], A["stand"] = _relax_wrap(M.a_sit, "sit"), _relax_wrap(M.a_stand, "stand")
@@ -784,7 +872,7 @@ def register():
               "grab": a_grab, "pickup_phone": a_grab, "hold": a_hold, "release": a_release, "hold_phone": a_hold_phone, "read_phone": a_read_phone, "type": a_type, "call": a_call,
               "hesitate": a_hesitate, "freeze": a_freeze, "flinch": a_flinch, "relief": a_relief, "anger": a_anger, "point": a_point, "gesture": a_gesture, "speak": a_speak,
               "hand_over": a_hand_over, "receive": a_receive, "place": a_place, "realization": a_realization, "fear": a_fear, "confusion": a_confusion, "notice": a_notice, "eye_contact": a_eye_contact, "look_at": a_look_at, "look_at_phone": lambda p, t, d, st, **k: a_look_at(p, t, d, st, target="PHONE", **{x: y for x, y in k.items() if x != "target"}),
-              "hand_pose": lambda p, t, d, st, side="R", pose="open", **k: (set_pose(p, t, side, pose), t + d)[1]})
+              "hand_pose": lambda p, t, d, st, side="R", pose="open", **k: (set_pose(p, t, side, pose), t + d)[1], "face_atom": a_face_atom, "run": a_run})
     for nm in ("worried", "sadness", "determination", "neutral", "curious"):
         A["emotion_" + nm] = a_emotion_named(nm)
 

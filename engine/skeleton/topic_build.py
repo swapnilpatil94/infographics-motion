@@ -57,9 +57,12 @@ def real_narration(story, out_dir, tempo=1.08, log=print):
 
 
 def bake_cast(plan):
+    atoms = sorted({a["name"] for s in plan["shots"] for a in s.get("actions", []) if a["action"] == "face_atom"})          # replacement faces the style asks for
     for cid in plan["cast_in_short"]:
         c = plan["characters"][cid]
         PA2.bake2(c["dna"], c.get("view", "profile"), c.get("hand_set", "full"))
+        if atoms:
+            PA2.bake_face_atoms(c["dna"], c.get("view", "profile"), atoms)
 
 
 def make(topic, out_dir=None, use_llm=True, rounds=3, draft=False, samples=10, seed=11, log=print, story=None, tempo=1.08):

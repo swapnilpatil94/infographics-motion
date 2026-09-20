@@ -32,6 +32,7 @@ FACE_LUMA_MIN = 0.38
 FRAME_LUMA_MIN = 0.16
 TEXT_CONTRAST_MIN = 0.60
 SAMPLES_U = (0.08, 0.5, 0.92)
+SET_X = (-150.0, 1230.0)                              # world x extent of the set's wall/floor layers (bedroom_wide / study_room): a frame edge beyond it shows the black void
 OLLAMA = "http://localhost:11434/api/chat"
 VLM = "qwen3.5:9b"
 
@@ -85,7 +86,7 @@ def _interval(v_lo, v_hi):
     return (v_lo, v_hi) if v_lo <= v_hi else None
 
 
-def solve_camera(sh, actors, cam, fps, cur_head_min):
+def solve_camera(sh, actors, cam, fps, cur_head_min, bounds=True):
     """Smallest camera change (zoom_mul m, dx, dy in world px) so every required point of every sample is inside its screen range and the head is big enough. -> dict | None (no solution)."""
     samples = []
     for u in SAMPLES_U:
@@ -105,6 +106,9 @@ def solve_camera(sh, actors, cam, fps, cur_head_min):
                 dxhi = min(dxhi, (wx - float(cam["cx"][f])) - (xlo - C0[0]) / z)
                 dylo = max(dylo, (wy - float(cam["cy"][f])) - (yhi - C0[1]) / z)
                 dyhi = min(dyhi, (wy - float(cam["cy"][f])) - (ylo - C0[1]) / z)
+            if bounds:
+                dxlo = max(dxlo, (SET_X[0] + C0[0] / z) - float(cam["cx"][f]) + 8.0)            # frame left edge inside the set:  cx + dx - 540/z >= SET_X0
+                dxhi = min(dxhi, (SET_X[1] - C0[0] / z) - float(cam["cx"][f]) - 8.0)            # frame right edge inside the set: cx + dx + 540/z <= SET_X1
             heads = [p for p in pts if p[6] == "head"]
             if heads and MIN_HEAD_PX.get(sh["camera"]["size"], 0) > 0:
                 span = max(p[1] for p in heads[:4]) - min(p[1] for p in heads[:4])
@@ -127,7 +131,7 @@ def measure_geometry(plan, actors, cam):
     for sh in plan["shots"]:
         if sh["treatment"] != "skeleton" or not sh.get("camera"):
             continue
-        probs, met = [], []
+        probs, met, warns = [], [], []
         for u in SAMPLES_U:
             t = sh["t0"] + u * (sh["t1"] - sh["t0"])
             f = min(int(round(t * fps)), len(cam["cx"]) - 1)
@@ -137,6 +141,10 @@ def measure_geometry(plan, actors, cam):
                     probs.append(dict(kind=f"{kind}_clipped_x", u=u, sx=round(sx), limit=[xlo, xhi]))
                 if sy < ylo - 1 or sy > yhi + 1:
                     probs.append(dict(kind=f"{kind}_out_y" if kind != "head" or sy < CAP_TOP else "face_under_caption", u=u, sy=round(sy), limit=[ylo, yhi]))
+            zf = _screen(cam, f, 0.0, 0.0)[2]
+            left, right = float(cam["cx"][f]) - C0[0] / zf, float(cam["cx"][f]) + C0[0] / zf
+            if left < SET_X[0] or right > SET_X[1]:
+                warns.append(dict(kind="frame_beyond_set", u=u, left=round(left), right=round(right), limit=list(SET_X)))
             cid = subjects(sh, actors, t)[0]
             hpx = 2 * 0.56 * actors[cid].P["head"] * (1.0 + (float(cam["zoom"][f]) - 1.0) * float(cam["gain"][f]))
             met.append(round(hpx))
@@ -146,7 +154,8 @@ def measure_geometry(plan, actors, cam):
         uniq = {}
         for p in probs:
             uniq.setdefault(p["kind"], p)
-        rep.append(dict(shot=sh["id"], beat=sh["beats"][0], act=sh.get("act"), size=sh["camera"]["size"], target=sh["camera"]["target"], ok=not uniq, problems=list(uniq.values()), head_px=met))
+        rep.append(dict(shot=sh["id"], beat=sh["beats"][0], act=sh.get("act"), size=sh["camera"]["size"], target=sh["camera"]["target"], ok=not uniq, problems=list(uniq.values()), head_px=met,
+                        warnings=list({w["kind"]: w for w in warns}.values())))
     return rep
 
 
@@ -341,13 +350,17 @@ def improve(plan, story, nar, out_dir, rounds=3, log=print, samples=10, seed=11,
             rec["vlm"] = _run_vlm(plan, stills)
         log(f"[critic] round {r}: geometry-bad shots={n_geo}  pixel flags={n_pix}  repeated framings={n_rh}")
         history.append(rec)
-        if r == rounds or (n_geo == 0 and n_pix == 0 and n_rh == 0):
+        n_warn = sum(1 for g in geo if g.get("warnings"))
+        if r == rounds or (n_geo == 0 and n_pix == 0 and n_rh == 0 and (n_warn == 0 or r > 0 and history[-2].get("_warn", -1) == n_warn)):
             break
+        rec["_warn"] = n_warn
         for g in geo:                                                                  # ---- fixers
-            if g["ok"]:
+            if g["ok"] and not g.get("warnings"):
                 continue
             sh = next(s for s in plan["shots"] if s["id"] == g["shot"])
             sol = solve_camera(sh, actors, cam, plan["fps"], None)
+            if sol is None and not g["ok"]:
+                sol = solve_camera(sh, actors, cam, plan["fps"], None, bounds=False)      # no framing satisfies the set edges too: clipping the subject is worse than showing the void
             if sol:
                 _merge(fixes, g["beat"], "camera", sol)
                 rec["applied"].append(dict(shot=g["shot"], beat=g["beat"], problems=[p["kind"] for p in g["problems"]], fix=dict(camera=sol)))

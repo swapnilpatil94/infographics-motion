@@ -1,0 +1,14 @@
+{
+ "families": [
+  "bedroom_wide",
+  "study_room",
+  "bank_branch",
+  "call_centre",
+  "indian_living_room",
+  "atm_area",
+  "office_day",
+  "street_dusk",
+  "night_bedroom"
+ ],
+ "errors": {}
+}

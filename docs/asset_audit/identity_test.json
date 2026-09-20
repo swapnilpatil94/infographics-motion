@@ -1,0 +1,24 @@
+{
+ "dna_id": "cdna_ff50cb5293",
+ "places": [
+  "bedroom",
+  "office",
+  "bank",
+  "street",
+  "ATM at night"
+ ],
+ "situations": [
+  "standing",
+  "sitting",
+  "walking",
+  "phone reading",
+  "talking",
+  "fear"
+ ],
+ "stills": 30,
+ "hue_histogram_overlap": {
+  "min": 0.947,
+  "mean": 0.982
+ },
+ "note": "hue-histogram overlap of the character's own pixels between every pair of stills (1.0 = identical colour identity); lighting-independent by construction. Identity is by construction (one DNA); this measures that the render keeps it."
+}

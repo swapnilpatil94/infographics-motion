@@ -1,0 +1,1664 @@
+{
+ "summary": {
+  "rounds_run": 1,
+  "vlm_vs_measured_clipping": {
+   "shots_compared": 15,
+   "measured_clipped": 5,
+   "vlm_said_clipped": 1,
+   "both": 1,
+   "vlm_missed": 4,
+   "vlm_false_alarm": 0
+  },
+  "before": {
+   "geometry_bad_shots": 5,
+   "pixel_flags": 1,
+   "repeated_framings": 0
+  },
+  "after": {
+   "geometry_bad_shots": 0,
+   "pixel_flags": 0,
+   "repeated_framings": 0
+  },
+  "unresolved_measured": [],
+  "vlm_advisory": [
+   {
+    "shot": "S02",
+    "issues": [
+     "Face expression is neutral and lacks emotional clarity",
+     "Character's face could be more expressive for narrative impact"
+    ],
+    "score": 7
+   },
+   {
+    "shot": "S07",
+    "issues": [
+     "No character present",
+     "Frame too dark for facial analysis"
+    ],
+    "score": 2
+   },
+   {
+    "shot": "S14",
+    "issues": [
+     "No character face visible",
+     "Overall dim lighting reduces clarity"
+    ],
+    "score": 5
+   },
+   {
+    "shot": "S17",
+    "issues": [
+     "faces are too small to read expressions",
+     "overall lighting is dim and flat"
+    ],
+    "score": 5
+   }
+  ],
+  "vlm_mean_score_first": 8.24,
+  "vlm_mean_score_last": 7.94,
+  "before_after": "critique/before_after.png",
+  "fixes": {
+   "n02": {
+    "camera": {
+     "zoom_mul": 0.77,
+     "dx": -182.0,
+     "dy": 0.0
+    }
+   },
+   "n05": {
+    "camera": {
+     "zoom_mul": 0.81,
+     "dx": -145.7,
+     "dy": -56.0
+    }
+   },
+   "n10": {
+    "camera": {
+     "zoom_mul": 0.69,
+     "dx": 176.6,
+     "dy": 0.0
+    }
+   },
+   "n12": {
+    "camera": {
+     "zoom_mul": 0.81,
+     "dx": 10.7,
+     "dy": 0.0
+    }
+   },
+   "n13": {
+    "camera": {
+     "zoom_mul": 1.01,
+     "dx": -19.7,
+     "dy": 0.0
+    }
+   },
+   "n17": {
+    "camera": {
+     "zoom_mul": 1.01,
+     "dx": 42.6,
+     "dy": 0.0
+    }
+   },
+   "n07": {
+    "ui": {
+     "bloom": 0.15
+    }
+   }
+  },
+  "rhythm_unfixable": []
+ },
+ "rounds": [
+  {
+   "round": 0,
+   "geometry_bad_shots": 5,
+   "pixel_flags": 1,
+   "repeated_framings": 0,
+   "geometry": [
+    {
+     "shot": "S01",
+     "beat": "n01",
+     "act": "ESTABLISH",
+     "size": "wide",
+     "target": "stage",
+     "ok": true,
+     "problems": [],
+     "head_px": [
+      205,
+      218,
+      230
+     ],
+     "warnings": []
+    },
+    {
+     "shot": "S02",
+     "beat": "n02",
+     "act": "PHONE_ALERT",
+     "size": "two_reach",
+     "target": "A.reach",
+     "ok": false,
+     "problems": [
+      {
+       "kind": "head_clipped_x",
+       "u": 0.08,
+       "sx": -435,
+       "limit": [
+        46.0,
+        1034.0
+       ]
+      }
+     ],
+     "head_px": [
+      361,
+      349,
+      338
+     ],
+     "warnings": []
+    },
+    {
+     "shot": "S03",
+     "beat": "n03",
+     "act": "LOOK_AT_PHONE",
+     "size": "medium",
+     "target": "A.head",
+     "ok": true,
+     "problems": [],
+     "head_px": [
+      297,
+      302,
+      307
+     ],
+     "warnings": []
+    },
+    {
+     "shot": "S04",
+     "beat": "n04",
+     "act": "REACH_PHONE",
+     "size": "two_reach",
+     "target": "A.reach",
+     "ok": true,
+     "problems": [],
+     "head_px": [
+      307,
+      313,
+      319
+     ],
+     "warnings": []
+    },
+    {
+     "shot": "S05",
+     "beat": "n05",
+     "act": "PICK_UP",
+     "size": "close",
+     "target": "A.phone",
+     "ok": false,
+     "problems": [
+      {
+       "kind": "head_clipped_x",
+       "u": 0.08,
+       "sx": -415,
+       "limit": [
+        46.0,
+        1034.0
+       ]
+      },
+      {
+       "kind": "head_out_y",
+       "u": 0.08,
+       "sy": 100,
+       "limit": [
+        110.0,
+        1335.0
+       ]
+      }
+     ],
+     "head_px": [
+      512,
+      543,
+      576
+     ],
+     "warnings": []
+    },
+    {
+     "shot": "S06",
+     "beat": "n06",
+     "act": "READ_MESSAGE",
+     "size": "medium",
+     "target": "A.head",
+     "ok": true,
+     "problems": [],
+     "head_px": [
+      358,
+      365,
+      372
+     ],
+     "warnings": []
+    },
+    {
+     "shot": "S08",
+     "beat": "n08",
+     "act": "REALIZE",
+     "size": "medium",
+     "target": "A.head",
+     "ok": true,
+     "problems": [],
+     "head_px": [
+      297,
+      302,
+      307
+     ],
+     "warnings": []
+    },
+    {
+     "shot": "S09",
+     "beat": "n09",
+     "act": "STAND_UP",
+     "size": "full",
+     "target": "A.full",
+     "ok": true,
+     "problems": [],
+     "head_px": [
+      277,
+      261,
+      246
+     ],
+     "warnings": []
+    },
+    {
+     "shot": "S10",
+     "beat": "n10",
+     "act": "PERSON_ENTERS",
+     "size": "two",
+     "target": "A+D",
+     "ok": false,
+     "problems": [
+      {
+       "kind": "head_clipped_x",
+       "u": 0.08,
+       "sx": 1198,
+       "limit": [
+        46.0,
+        1034.0
+       ]
+      }
+     ],
+     "head_px": [
+      316,
+      306,
+      295
+     ],
+     "warnings": []
+    },
+    {
+     "shot": "S11",
+     "beat": "n11",
+     "act": "EYE_CONTACT",
+     "size": "two",
+     "target": "A+D",
+     "ok": true,
+     "problems": [],
+     "head_px": [
+      274,
+      276,
+      277
+     ],
+     "warnings": []
+    },
+    {
+     "shot": "S12",
+     "beat": "n12",
+     "act": "HAND_OVER",
+     "size": "two",
+     "target": "A+D",
+     "ok": false,
+     "problems": [
+      {
+       "kind": "head_clipped_x",
+       "u": 0.08,
+       "sx": 1171,
+       "limit": [
+        46.0,
+        1034.0
+       ]
+      }
+     ],
+     "head_px": [
+      291,
+      296,
+      301
+     ],
+     "warnings": []
+    },
+    {
+     "shot": "S13",
+     "beat": "n13",
+     "act": "OTHER_REACTS",
+     "size": "medium",
+     "target": "D.head",
+     "ok": true,
+     "problems": [],
+     "head_px": [
+      425,
+      450,
+      478
+     ],
+     "warnings": [
+      {
+       "kind": "frame_beyond_set",
+       "u": 0.08,
+       "left": 629,
+       "right": 1245,
+       "limit": [
+        -150.0,
+        1230.0
+       ]
+      }
+     ]
+    },
+    {
+     "shot": "S15",
+     "beat": "n15",
+     "act": "BOTH_REALIZE",
+     "size": "two",
+     "target": "A+D",
+     "ok": true,
+     "problems": [],
+     "head_px": [
+      309,
+      291,
+      275
+     ],
+     "warnings": []
+    },
+    {
+     "shot": "S16",
+     "beat": "n16",
+     "act": "CLOSE_UP",
+     "size": "medium",
+     "target": "A.head",
+     "ok": true,
+     "problems": [],
+     "head_px": [
+      358,
+      360,
+      362
+     ],
+     "warnings": []
+    },
+    {
+     "shot": "S17",
+     "beat": "n17",
+     "act": "RESOLVE",
+     "size": "reveal",
+     "target": "A+D",
+     "ok": false,
+     "problems": [
+      {
+       "kind": "head_clipped_x",
+       "u": 0.08,
+       "sx": 1067,
+       "limit": [
+        46.0,
+        1034.0
+       ]
+      }
+     ],
+     "head_px": [
+      258,
+      244,
+      229
+     ],
+     "warnings": []
+    }
+   ],
+   "pixels": [
+    {
+     "shot": "S01",
+     "t": 2.16,
+     "treatment": "skeleton",
+     "frame_luma": 0.489,
+     "flags": [],
+     "face_luma": 0.484,
+     "face_box": [
+      247,
+      663,
+      444,
+      861
+     ]
+    },
+    {
+     "shot": "S02",
+     "t": 4.92,
+     "treatment": "skeleton",
+     "frame_luma": 0.523,
+     "flags": [],
+     "face_luma": 0.429,
+     "face_box": [
+      0,
+      407,
+      158,
+      716
+     ]
+    },
+    {
+     "shot": "S03",
+     "t": 7.04,
+     "treatment": "skeleton",
+     "frame_luma": 0.48,
+     "flags": [],
+     "face_luma": 0.481,
+     "face_box": [
+      389,
+      811,
+      660,
+      1082
+     ]
+    },
+    {
+     "shot": "S04",
+     "t": 9.04,
+     "treatment": "skeleton",
+     "frame_luma": 0.438,
+     "flags": [],
+     "face_luma": 0.411,
+     "face_box": [
+      137,
+      466,
+      418,
+      746
+     ]
+    },
+    {
+     "shot": "S05",
+     "t": 10.66,
+     "treatment": "skeleton",
+     "frame_luma": 0.458,
+     "flags": [],
+     "face_luma": 0.384,
+     "face_box": [
+      0,
+      0,
+      375,
+      412
+     ]
+    },
+    {
+     "shot": "S06",
+     "t": 12.57,
+     "treatment": "skeleton",
+     "frame_luma": 0.459,
+     "flags": [],
+     "face_luma": 0.49,
+     "face_box": [
+      334,
+      778,
+      662,
+      1105
+     ]
+    },
+    {
+     "shot": "S07",
+     "t": 15.7,
+     "treatment": "insert_ui",
+     "frame_luma": 0.482,
+     "flags": [
+      "screen_text_low_contrast"
+     ],
+     "text_contrast": 0.466
+    },
+    {
+     "shot": "S08",
+     "t": 18.3,
+     "treatment": "skeleton",
+     "frame_luma": 0.435,
+     "flags": [],
+     "face_luma": 0.469,
+     "face_box": [
+      347,
+      805,
+      618,
+      1076
+     ]
+    },
+    {
+     "shot": "S09",
+     "t": 20.26,
+     "treatment": "skeleton",
+     "frame_luma": 0.444,
+     "flags": [],
+     "face_luma": 0.525,
+     "face_box": [
+      387,
+      406,
+      615,
+      635
+     ]
+    },
+    {
+     "shot": "S10",
+     "t": 22.73,
+     "treatment": "skeleton",
+     "frame_luma": 0.504,
+     "flags": [],
+     "face_luma": 0.556,
+     "face_box": [
+      192,
+      568,
+      462,
+      838
+     ]
+    },
+    {
+     "shot": "S11",
+     "t": 25.06,
+     "treatment": "skeleton",
+     "frame_luma": 0.51,
+     "flags": [],
+     "face_luma": 0.536,
+     "face_box": [
+      117,
+      608,
+      364,
+      854
+     ]
+    },
+    {
+     "shot": "S12",
+     "t": 27.52,
+     "treatment": "skeleton",
+     "frame_luma": 0.517,
+     "flags": [],
+     "face_luma": 0.528,
+     "face_box": [
+      107,
+      580,
+      373,
+      846
+     ]
+    },
+    {
+     "shot": "S13",
+     "t": 29.73,
+     "treatment": "skeleton",
+     "frame_luma": 0.486,
+     "flags": [],
+     "face_luma": 0.476,
+     "face_box": [
+      297,
+      731,
+      707,
+      1141
+     ]
+    },
+    {
+     "shot": "S14",
+     "t": 32.84,
+     "treatment": "procedural",
+     "frame_luma": 0.615,
+     "flags": []
+    },
+    {
+     "shot": "S15",
+     "t": 36.34,
+     "treatment": "skeleton",
+     "frame_luma": 0.454,
+     "flags": [],
+     "face_luma": 0.474,
+     "face_box": [
+      133,
+      594,
+      389,
+      849
+     ]
+    },
+    {
+     "shot": "S16",
+     "t": 39.56,
+     "treatment": "skeleton",
+     "frame_luma": 0.532,
+     "flags": [],
+     "face_luma": 0.549,
+     "face_box": [
+      349,
+      781,
+      671,
+      1103
+     ]
+    },
+    {
+     "shot": "S17",
+     "t": 44.04,
+     "treatment": "skeleton",
+     "frame_luma": 0.511,
+     "flags": [],
+     "face_luma": 0.536,
+     "face_box": [
+      301,
+      641,
+      514,
+      854
+     ]
+    }
+   ],
+   "rhythm": [],
+   "vlm": {
+    "S01": {
+     "subject_fully_visible": true,
+     "face_readable": true,
+     "too_dark": false,
+     "text_legible": true,
+     "cluttered": false,
+     "issues": [
+      "character's hands are tied behind back which may be unintended",
+      "lamp on desk is not lit despite being night scene"
+     ],
+     "score": 8
+    },
+    "S02": {
+     "subject_fully_visible": false,
+     "face_readable": true,
+     "too_dark": false,
+     "text_legible": true,
+     "cluttered": false,
+     "issues": [
+      "character partially cut off on left",
+      "no phone visible despite caption implying it"
+     ],
+     "score": 7
+    },
+    "S03": {
+     "subject_fully_visible": true,
+     "face_readable": true,
+     "too_dark": false,
+     "text_legible": false,
+     "cluttered": false,
+     "issues": [
+      "Hindi text overlay obscures lower body and chair",
+      "No phone visible despite intent to show character looking at one"
+     ],
+     "score": 7
+    },
+    "S04": {
+     "subject_fully_visible": true,
+     "face_readable": true,
+     "too_dark": false,
+     "text_legible": true,
+     "cluttered": false,
+     "issues": [
+      "character's hand is empty but caption implies reaching for phone",
+      "no visible phone in frame despite action described"
+     ],
+     "score": 8
+    },
+    "S05": {
+     "subject_fully_visible": true,
+     "face_readable": true,
+     "too_dark": false,
+     "text_legible": true,
+     "cluttered": false,
+     "issues": [],
+     "score": 10
+    },
+    "S06": {
+     "subject_fully_visible": true,
+     "face_readable": true,
+     "too_dark": false,
+     "text_legible": true,
+     "cluttered": false,
+     "issues": [],
+     "score": 10
+    },
+    "S07": {
+     "subject_fully_visible": false,
+     "face_readable": false,
+     "too_dark": true,
+     "text_legible": true,
+     "cluttered": false,
+     "issues": [
+      "No character present",
+      "Frame too dark for cinematic quality"
+     ],
+     "score": 4
+    },
+    "S08": {
+     "subject_fully_visible": true,
+     "face_readable": true,
+     "too_dark": false,
+     "text_legible": true,
+     "cluttered": false,
+     "issues": [
+      "Hindi caption text is present and may distract from visual storytelling",
+      "Background elements (frames, shelf) are slightly cluttering the upper space"
+     ],
+     "score": 8
+    },
+    "S09": {
+     "subject_fully_visible": true,
+     "face_readable": true,
+     "too_dark": false,
+     "text_legible": true,
+     "cluttered": false,
+     "issues": [],
+     "score": 10
+    },
+    "S10": {
+     "subject_fully_visible": true,
+     "face_readable": true,
+     "too_dark": false,
+     "text_legible": true,
+     "cluttered": false,
+     "issues": [],
+     "score": 10
+    },
+    "S11": {
+     "subject_fully_visible": true,
+     "face_readable": true,
+     "too_dark": false,
+     "text_legible": false,
+     "cluttered": false,
+     "issues": [
+      "Hindi text overlay obscures lower scene",
+      "Phone screen content unreadable"
+     ],
+     "score": 7
+    },
+    "S12": {
+     "subject_fully_visible": true,
+     "face_readable": true,
+     "too_dark": false,
+     "text_legible": true,
+     "cluttered": false,
+     "issues": [],
+     "score": 10
+    },
+    "S13": {
+     "subject_fully_visible": true,
+     "face_readable": true,
+     "too_dark": false,
+     "text_legible": true,
+     "cluttered": false,
+     "issues": [],
+     "score": 10
+    },
+    "S14": {
+     "subject_fully_visible": false,
+     "face_readable": false,
+     "too_dark": true,
+     "text_legible": true,
+     "cluttered": false,
+     "issues": [
+      "No character face visible",
+      "Overall dim lighting reduces clarity"
+     ],
+     "score": 5
+    },
+    "S15": {
+     "subject_fully_visible": true,
+     "face_readable": true,
+     "too_dark": false,
+     "text_legible": true,
+     "cluttered": false,
+     "issues": [],
+     "score": 10
+    },
+    "S16": {
+     "subject_fully_visible": true,
+     "face_readable": true,
+     "too_dark": false,
+     "text_legible": true,
+     "cluttered": false,
+     "issues": [],
+     "score": 10
+    },
+    "S17": {
+     "subject_fully_visible": true,
+     "face_readable": false,
+     "too_dark": false,
+     "text_legible": true,
+     "cluttered": false,
+     "issues": [
+      "faces lack clear expression detail",
+      "characters appear flat and disconnected"
+     ],
+     "score": 6
+    }
+   },
+   "applied": [
+    {
+     "shot": "S02",
+     "beat": "n02",
+     "problems": [
+      "head_clipped_x"
+     ],
+     "fix": {
+      "camera": {
+       "zoom_mul": 0.77,
+       "dx": -182.0,
+       "dy": 0.0
+      }
+     }
+    },
+    {
+     "shot": "S05",
+     "beat": "n05",
+     "problems": [
+      "head_clipped_x",
+      "head_out_y"
+     ],
+     "fix": {
+      "camera": {
+       "zoom_mul": 0.81,
+       "dx": -145.7,
+       "dy": -56.0
+      }
+     }
+    },
+    {
+     "shot": "S10",
+     "beat": "n10",
+     "problems": [
+      "head_clipped_x"
+     ],
+     "fix": {
+      "camera": {
+       "zoom_mul": 0.69,
+       "dx": 176.6,
+       "dy": 0.0
+      }
+     }
+    },
+    {
+     "shot": "S12",
+     "beat": "n12",
+     "problems": [
+      "head_clipped_x"
+     ],
+     "fix": {
+      "camera": {
+       "zoom_mul": 0.81,
+       "dx": 10.7,
+       "dy": 0.0
+      }
+     }
+    },
+    {
+     "shot": "S13",
+     "beat": "n13",
+     "problems": [],
+     "fix": {
+      "camera": {
+       "zoom_mul": 1.01,
+       "dx": -19.7,
+       "dy": 0.0
+      }
+     }
+    },
+    {
+     "shot": "S17",
+     "beat": "n17",
+     "problems": [
+      "head_clipped_x"
+     ],
+     "fix": {
+      "camera": {
+       "zoom_mul": 1.01,
+       "dx": 42.6,
+       "dy": 0.0
+      }
+     }
+    },
+    {
+     "shot": "S07",
+     "beat": "n07",
+     "problems": [
+      "screen_text_low_contrast"
+     ],
+     "fix": {
+      "ui": {
+       "bloom": 0.15
+      }
+     },
+     "text_contrast": 0.466
+    }
+   ],
+   "fixes_snapshot": {},
+   "sheet": "critique/round_0_sheet.png",
+   "_warn": 1
+  },
+  {
+   "round": 1,
+   "geometry_bad_shots": 0,
+   "pixel_flags": 0,
+   "repeated_framings": 0,
+   "geometry": [
+    {
+     "shot": "S01",
+     "beat": "n01",
+     "act": "ESTABLISH",
+     "size": "wide",
+     "target": "stage",
+     "ok": true,
+     "problems": [],
+     "head_px": [
+      205,
+      218,
+      230
+     ],
+     "warnings": []
+    },
+    {
+     "shot": "S02",
+     "beat": "n02",
+     "act": "PHONE_ALERT",
+     "size": "two_reach",
+     "target": "A.reach",
+     "ok": true,
+     "problems": [],
+     "head_px": [
+      264,
+      255,
+      246
+     ],
+     "warnings": []
+    },
+    {
+     "shot": "S03",
+     "beat": "n03",
+     "act": "LOOK_AT_PHONE",
+     "size": "medium",
+     "target": "A.head",
+     "ok": true,
+     "problems": [],
+     "head_px": [
+      297,
+      302,
+      307
+     ],
+     "warnings": []
+    },
+    {
+     "shot": "S04",
+     "beat": "n04",
+     "act": "REACH_PHONE",
+     "size": "two_reach",
+     "target": "A.reach",
+     "ok": true,
+     "problems": [],
+     "head_px": [
+      307,
+      313,
+      319
+     ],
+     "warnings": []
+    },
+    {
+     "shot": "S05",
+     "beat": "n05",
+     "act": "PICK_UP",
+     "size": "close",
+     "target": "A.phone",
+     "ok": true,
+     "problems": [],
+     "head_px": [
+      415,
+      440,
+      467
+     ],
+     "warnings": []
+    },
+    {
+     "shot": "S06",
+     "beat": "n06",
+     "act": "READ_MESSAGE",
+     "size": "medium",
+     "target": "A.head",
+     "ok": true,
+     "problems": [],
+     "head_px": [
+      358,
+      365,
+      372
+     ],
+     "warnings": []
+    },
+    {
+     "shot": "S08",
+     "beat": "n08",
+     "act": "REALIZE",
+     "size": "medium",
+     "target": "A.head",
+     "ok": true,
+     "problems": [],
+     "head_px": [
+      297,
+      302,
+      307
+     ],
+     "warnings": []
+    },
+    {
+     "shot": "S09",
+     "beat": "n09",
+     "act": "STAND_UP",
+     "size": "full",
+     "target": "A.full",
+     "ok": true,
+     "problems": [],
+     "head_px": [
+      277,
+      261,
+      246
+     ],
+     "warnings": []
+    },
+    {
+     "shot": "S10",
+     "beat": "n10",
+     "act": "PERSON_ENTERS",
+     "size": "two",
+     "target": "A+D",
+     "ok": true,
+     "problems": [],
+     "head_px": [
+      199,
+      192,
+      185
+     ],
+     "warnings": [
+      {
+       "kind": "frame_beyond_set",
+       "u": 0.92,
+       "left": 312,
+       "right": 1508,
+       "limit": [
+        -150.0,
+        1230.0
+       ]
+      }
+     ]
+    },
+    {
+     "shot": "S11",
+     "beat": "n11",
+     "act": "EYE_CONTACT",
+     "size": "two",
+     "target": "A+D",
+     "ok": true,
+     "problems": [],
+     "head_px": [
+      274,
+      276,
+      277
+     ],
+     "warnings": []
+    },
+    {
+     "shot": "S12",
+     "beat": "n12",
+     "act": "HAND_OVER",
+     "size": "two",
+     "target": "A+D",
+     "ok": true,
+     "problems": [],
+     "head_px": [
+      226,
+      230,
+      234
+     ],
+     "warnings": [
+      {
+       "kind": "frame_beyond_set",
+       "u": 0.92,
+       "left": 382,
+       "right": 1324,
+       "limit": [
+        -150.0,
+        1230.0
+       ]
+      }
+     ]
+    },
+    {
+     "shot": "S13",
+     "beat": "n13",
+     "act": "OTHER_REACTS",
+     "size": "medium",
+     "target": "D.head",
+     "ok": true,
+     "problems": [],
+     "head_px": [
+      429,
+      455,
+      482
+     ],
+     "warnings": []
+    },
+    {
+     "shot": "S15",
+     "beat": "n15",
+     "act": "BOTH_REALIZE",
+     "size": "two",
+     "target": "A+D",
+     "ok": true,
+     "problems": [],
+     "head_px": [
+      309,
+      291,
+      275
+     ],
+     "warnings": []
+    },
+    {
+     "shot": "S16",
+     "beat": "n16",
+     "act": "CLOSE_UP",
+     "size": "medium",
+     "target": "A.head",
+     "ok": true,
+     "problems": [],
+     "head_px": [
+      358,
+      360,
+      362
+     ],
+     "warnings": []
+    },
+    {
+     "shot": "S17",
+     "beat": "n17",
+     "act": "RESOLVE",
+     "size": "reveal",
+     "target": "A+D",
+     "ok": true,
+     "problems": [],
+     "head_px": [
+      261,
+      246,
+      232
+     ],
+     "warnings": []
+    }
+   ],
+   "pixels": [
+    {
+     "shot": "S01",
+     "t": 2.16,
+     "treatment": "skeleton",
+     "frame_luma": 0.489,
+     "flags": [],
+     "face_luma": 0.484,
+     "face_box": [
+      247,
+      663,
+      444,
+      861
+     ]
+    },
+    {
+     "shot": "S02",
+     "t": 4.92,
+     "treatment": "skeleton",
+     "frame_luma": 0.477,
+     "flags": [],
+     "face_luma": 0.467,
+     "face_box": [
+      261,
+      557,
+      486,
+      782
+     ]
+    },
+    {
+     "shot": "S03",
+     "t": 7.04,
+     "treatment": "skeleton",
+     "frame_luma": 0.48,
+     "flags": [],
+     "face_luma": 0.481,
+     "face_box": [
+      389,
+      811,
+      660,
+      1082
+     ]
+    },
+    {
+     "shot": "S04",
+     "t": 9.04,
+     "treatment": "skeleton",
+     "frame_luma": 0.438,
+     "flags": [],
+     "face_luma": 0.411,
+     "face_box": [
+      137,
+      466,
+      418,
+      746
+     ]
+    },
+    {
+     "shot": "S05",
+     "t": 10.66,
+     "treatment": "skeleton",
+     "frame_luma": 0.433,
+     "flags": [],
+     "face_luma": 0.468,
+     "face_box": [
+      326,
+      238,
+      727,
+      639
+     ]
+    },
+    {
+     "shot": "S06",
+     "t": 12.57,
+     "treatment": "skeleton",
+     "frame_luma": 0.459,
+     "flags": [],
+     "face_luma": 0.49,
+     "face_box": [
+      334,
+      778,
+      662,
+      1105
+     ]
+    },
+    {
+     "shot": "S07",
+     "t": 15.7,
+     "treatment": "insert_ui",
+     "frame_luma": 0.461,
+     "flags": [],
+     "text_contrast": 0.74
+    },
+    {
+     "shot": "S08",
+     "t": 18.3,
+     "treatment": "skeleton",
+     "frame_luma": 0.435,
+     "flags": [],
+     "face_luma": 0.469,
+     "face_box": [
+      347,
+      805,
+      618,
+      1076
+     ]
+    },
+    {
+     "shot": "S09",
+     "t": 20.26,
+     "treatment": "skeleton",
+     "frame_luma": 0.444,
+     "flags": [],
+     "face_luma": 0.525,
+     "face_box": [
+      387,
+      406,
+      615,
+      635
+     ]
+    },
+    {
+     "shot": "S10",
+     "t": 22.73,
+     "treatment": "skeleton",
+     "frame_luma": 0.493,
+     "flags": [],
+     "face_luma": 0.554,
+     "face_box": [
+      158,
+      714,
+      327,
+      883
+     ]
+    },
+    {
+     "shot": "S11",
+     "t": 25.06,
+     "treatment": "skeleton",
+     "frame_luma": 0.51,
+     "flags": [],
+     "face_luma": 0.536,
+     "face_box": [
+      117,
+      608,
+      364,
+      854
+     ]
+    },
+    {
+     "shot": "S12",
+     "t": 27.52,
+     "treatment": "skeleton",
+     "frame_luma": 0.519,
+     "flags": [],
+     "face_luma": 0.558,
+     "face_box": [
+      191,
+      665,
+      398,
+      872
+     ]
+    },
+    {
+     "shot": "S13",
+     "t": 29.73,
+     "treatment": "skeleton",
+     "frame_luma": 0.485,
+     "flags": [],
+     "face_luma": 0.473,
+     "face_box": [
+      332,
+      729,
+      746,
+      1143
+     ]
+    },
+    {
+     "shot": "S14",
+     "t": 32.84,
+     "treatment": "procedural",
+     "frame_luma": 0.615,
+     "flags": []
+    },
+    {
+     "shot": "S15",
+     "t": 36.34,
+     "treatment": "skeleton",
+     "frame_luma": 0.454,
+     "flags": [],
+     "face_luma": 0.474,
+     "face_box": [
+      133,
+      594,
+      389,
+      849
+     ]
+    },
+    {
+     "shot": "S16",
+     "t": 39.56,
+     "treatment": "skeleton",
+     "frame_luma": 0.532,
+     "flags": [],
+     "face_luma": 0.549,
+     "face_box": [
+      349,
+      781,
+      671,
+      1103
+     ]
+    },
+    {
+     "shot": "S17",
+     "t": 44.04,
+     "treatment": "skeleton",
+     "frame_luma": 0.516,
+     "flags": [],
+     "face_luma": 0.531,
+     "face_box": [
+      248,
+      637,
+      464,
+      853
+     ]
+    }
+   ],
+   "rhythm": [],
+   "vlm": {
+    "S01": {
+     "subject_fully_visible": true,
+     "face_readable": true,
+     "too_dark": false,
+     "text_legible": true,
+     "cluttered": false,
+     "issues": [
+      "character's hands are tied behind back which may be unintended",
+      "lamp on desk is not lit despite being night scene"
+     ],
+     "score": 8
+    },
+    "S02": {
+     "subject_fully_visible": true,
+     "face_readable": false,
+     "too_dark": false,
+     "text_legible": true,
+     "cluttered": false,
+     "issues": [
+      "Face expression is neutral and lacks emotional clarity",
+      "Character's face could be more expressive for narrative impact"
+     ],
+     "score": 7
+    },
+    "S03": {
+     "subject_fully_visible": true,
+     "face_readable": true,
+     "too_dark": false,
+     "text_legible": false,
+     "cluttered": false,
+     "issues": [
+      "Hindi text overlay obscures lower body and chair",
+      "No phone visible despite intent to show character looking at one"
+     ],
+     "score": 7
+    },
+    "S04": {
+     "subject_fully_visible": true,
+     "face_readable": true,
+     "too_dark": false,
+     "text_legible": true,
+     "cluttered": false,
+     "issues": [
+      "character's hand is empty but caption implies reaching for phone",
+      "no visible phone in frame despite action described"
+     ],
+     "score": 8
+    },
+    "S05": {
+     "subject_fully_visible": true,
+     "face_readable": true,
+     "too_dark": false,
+     "text_legible": true,
+     "cluttered": false,
+     "issues": [],
+     "score": 10
+    },
+    "S06": {
+     "subject_fully_visible": true,
+     "face_readable": true,
+     "too_dark": false,
+     "text_legible": true,
+     "cluttered": false,
+     "issues": [],
+     "score": 10
+    },
+    "S07": {
+     "subject_fully_visible": false,
+     "face_readable": false,
+     "too_dark": true,
+     "text_legible": true,
+     "cluttered": false,
+     "issues": [
+      "No character present",
+      "Frame too dark for facial analysis"
+     ],
+     "score": 2
+    },
+    "S08": {
+     "subject_fully_visible": true,
+     "face_readable": true,
+     "too_dark": false,
+     "text_legible": true,
+     "cluttered": false,
+     "issues": [
+      "Hindi caption text is present and may distract from visual storytelling",
+      "Background elements (frames, shelf) are slightly cluttering the upper space"
+     ],
+     "score": 8
+    },
+    "S09": {
+     "subject_fully_visible": true,
+     "face_readable": true,
+     "too_dark": false,
+     "text_legible": true,
+     "cluttered": false,
+     "issues": [],
+     "score": 10
+    },
+    "S10": {
+     "subject_fully_visible": true,
+     "face_readable": true,
+     "too_dark": false,
+     "text_legible": true,
+     "cluttered": false,
+     "issues": [],
+     "score": 10
+    },
+    "S11": {
+     "subject_fully_visible": true,
+     "face_readable": true,
+     "too_dark": false,
+     "text_legible": false,
+     "cluttered": false,
+     "issues": [
+      "Hindi text overlay obscures lower scene",
+      "Phone screen content unreadable"
+     ],
+     "score": 7
+    },
+    "S12": {
+     "subject_fully_visible": true,
+     "face_readable": true,
+     "too_dark": false,
+     "text_legible": true,
+     "cluttered": false,
+     "issues": [
+      "phone screen is blank and unreadable",
+      "caption text uses non-standard Devanagari characters (e.g., 'फ़' instead of standard 'फ')"
+     ],
+     "score": 8
+    },
+    "S13": {
+     "subject_fully_visible": true,
+     "face_readable": true,
+     "too_dark": false,
+     "text_legible": true,
+     "cluttered": false,
+     "issues": [],
+     "score": 10
+    },
+    "S14": {
+     "subject_fully_visible": false,
+     "face_readable": false,
+     "too_dark": true,
+     "text_legible": true,
+     "cluttered": false,
+     "issues": [
+      "No character face visible",
+      "Overall dim lighting reduces clarity"
+     ],
+     "score": 5
+    },
+    "S15": {
+     "subject_fully_visible": true,
+     "face_readable": true,
+     "too_dark": false,
+     "text_legible": true,
+     "cluttered": false,
+     "issues": [],
+     "score": 10
+    },
+    "S16": {
+     "subject_fully_visible": true,
+     "face_readable": true,
+     "too_dark": false,
+     "text_legible": true,
+     "cluttered": false,
+     "issues": [],
+     "score": 10
+    },
+    "S17": {
+     "subject_fully_visible": true,
+     "face_readable": false,
+     "too_dark": true,
+     "text_legible": true,
+     "cluttered": false,
+     "issues": [
+      "faces are too small to read expressions",
+      "overall lighting is dim and flat"
+     ],
+     "score": 5
+    }
+   },
+   "applied": [
+    {
+     "shot": "S10",
+     "beat": "n10",
+     "problems": [],
+     "fix": null,
+     "note": "no camera satisfies every constraint (needs a different shot size)"
+    },
+    {
+     "shot": "S12",
+     "beat": "n12",
+     "problems": [],
+     "fix": null,
+     "note": "no camera satisfies every constraint (needs a different shot size)"
+    }
+   ],
+   "fixes_snapshot": {
+    "n02": {
+     "camera": {
+      "zoom_mul": 0.77,
+      "dx": -182.0,
+      "dy": 0.0
+     }
+    },
+    "n05": {
+     "camera": {
+      "zoom_mul": 0.81,
+      "dx": -145.7,
+      "dy": -56.0
+     }
+    },
+    "n10": {
+     "camera": {
+      "zoom_mul": 0.69,
+      "dx": 176.6,
+      "dy": 0.0
+     }
+    },
+    "n12": {
+     "camera": {
+      "zoom_mul": 0.81,
+      "dx": 10.7,
+      "dy": 0.0
+     }
+    },
+    "n13": {
+     "camera": {
+      "zoom_mul": 1.01,
+      "dx": -19.7,
+      "dy": 0.0
+     }
+    },
+    "n17": {
+     "camera": {
+      "zoom_mul": 1.01,
+      "dx": 42.6,
+      "dy": 0.0
+     }
+    },
+    "n07": {
+     "ui": {
+      "bloom": 0.15
+     }
+    }
+   },
+   "sheet": "critique/round_1_sheet.png",
+   "_warn": 2
+  }
+ ]
+}

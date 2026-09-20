@@ -1,0 +1,75 @@
+{
+ "scenario": "topic story 'fake WhatsApp investment group' -> plan -> cold bake of 2 characters -> 3 composited stills (skeleton / insert_ui / procedural)",
+ "files": {
+  "assets/character/harvest/openpeeps_device_hand.fill.npy": [
+   "open"
+  ],
+  "assets/character/harvest/openpeeps_device_hand.ink.npy": [
+   "open"
+  ],
+  "assets/character/raw/open_peeps/extracted/Flat Assets/Separate Atoms/a person/bust.svg": [
+   "open"
+  ],
+  "assets/character/raw/open_peeps/extracted/Flat Assets/Separate Atoms/accessories/* None.svg": [
+   "open"
+  ],
+  "assets/character/raw/open_peeps/extracted/Flat Assets/Separate Atoms/body/Tee 1.svg": [
+   "open"
+  ],
+  "assets/character/raw/open_peeps/extracted/Flat Assets/Separate Atoms/face/Serious.svg": [
+   "open"
+  ],
+  "assets/character/raw/open_peeps/extracted/Flat Assets/Separate Atoms/facial-hair/* None.svg": [
+   "open"
+  ],
+  "assets/character/raw/open_peeps/extracted/Flat Assets/Separate Atoms/head/Short 1.svg": [
+   "open"
+  ],
+  "assets/character/raw/open_peeps/extracted/Flat Assets/Separate Atoms/head/Short 4.svg": [
+   "open"
+  ],
+  "assets/environment/generated/bedroom_wide_b107684e/bed.svg": [
+   "open"
+  ],
+  "assets/environment/generated/bedroom_wide_b107684e/curtain_fg.svg": [
+   "open"
+  ],
+  "assets/environment/generated/bedroom_wide_b107684e/decor.svg": [
+   "open"
+  ],
+  "assets/environment/generated/bedroom_wide_b107684e/door.svg": [
+   "open"
+  ],
+  "assets/environment/generated/bedroom_wide_b107684e/floor.svg": [
+   "open"
+  ],
+  "assets/environment/generated/bedroom_wide_b107684e/layers.json": [
+   "open"
+  ],
+  "assets/environment/generated/bedroom_wide_b107684e/nightstand.svg": [
+   "open"
+  ],
+  "assets/environment/generated/bedroom_wide_b107684e/phone_free.svg": [
+   "open"
+  ],
+  "assets/environment/generated/bedroom_wide_b107684e/plant_fg.svg": [
+   "open"
+  ],
+  "assets/environment/generated/bedroom_wide_b107684e/rug_fg.svg": [
+   "open"
+  ],
+  "assets/environment/generated/bedroom_wide_b107684e/sky.svg": [
+   "open"
+  ],
+  "assets/environment/generated/bedroom_wide_b107684e/wall.svg": [
+   "open"
+  ],
+  "assets/environment/generated/bedroom_wide_b107684e/window.svg": [
+   "open"
+  ]
+ },
+ "parts_manifests": [
+  "parts/e587a14fcd00/parts.json",
+  "parts/2afcb609faae/parts.json"
+ ]
+}

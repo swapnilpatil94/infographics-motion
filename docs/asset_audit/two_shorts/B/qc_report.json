@@ -1,0 +1,279 @@
+{
+ "file": "final.mp4",
+ "passed": true,
+ "n_checks": 50,
+ "checks": {
+  "1080x1920": true,
+  "30fps": true,
+  "duration_45_60s": true,
+  "has_audio": true,
+  "loudness_-19_to_-13_LUFS": true,
+  "no_unintended_black_frames_(fades_and_the_S12_dip_excluded)": true,
+  "no_frozen_frames": true,
+  "skeleton_26_bones_per_character": true,
+  "blender_ik_4_constraints_per_character": true,
+  "ik_reaches_targets_(<2px)": true,
+  "same_rig_architecture_for_all_characters": true,
+  "two_different_characters": true,
+  "full_body_character_visible_head_to_feet": true,
+  "sitting_and_standing": true,
+  "reaching_(hand_travel>=half_the_arm_length)": true,
+  "holding_phone_(>=90_frames)": true,
+  "prop_interaction_(pick_up_event_and_free_phone_hidden_after)": true,
+  "eye_movement_(gaze_range)": true,
+  "blinking_(>=4_blinks)": true,
+  "head_movement_(range>=20deg)": true,
+  "facial_variation_(>=12_distinct_expressions)": true,
+  "environment_layers_(>=10,_>=6_parallax_factors)": true,
+  "parallax_measured_(far_vs_near_layer_shift>60px)": true,
+  "camera_movement_(>=4_move_types,_>=4_sizes)": true,
+  "lighting_variation_(luma_span>=0.08)": true,
+  "grease_pencil_fx_(>=4_effects,_procedural_money_shot)": true,
+  "narration_sync_(every_cut_lands_0-0.35s_before_its_beat)": true,
+  "captions_inside_safe_zone": true,
+  "cinematic_composition_(shot_size_variety_and_subject_in_frame)": true,
+  "dna_v2_valid_(schema_and_wardrobe_vocabulary)": true,
+  "assets_licensed_(registry:_ACCEPT,_sha256,_licence_proof)": true,
+  "non_profile_view_used_(three_quarter_or_front)": true,
+  "hand_poses_used_(>=5_distinct)": true,
+  "gaze_targets_(>=8_events,_>=4_targets,_bearing_sign_correct)": true,
+  "walk_stance_feet_planted_(max_slide_<=45px)": true,
+  "contact_shadows_rim_light_face_light_enabled": true,
+  "camera_vocabulary_(>=7_moves,_>=6_sizes)": true,
+  "rack_focus_(focus_depth_changes_>=0.5)": true,
+  "character_isolation_(>=2_shallow-DoF_shots)": true,
+  "foreground_occlusion_(fg_layer_overlaps_the_actor_in_>=10_sampled_frames)": true,
+  "hand_over_(phone_centres_coincide_<=8px;_phone_changes_owner)": true,
+  "phone_never_disappears_during_hand-over": true,
+  "hand_library_(>=20_poses_per_hand)": true,
+  "phone_grip_contact_(hand_closes_on_the_phone_<=3px)": true,
+  "planted_feet_(flat-foot_slide_<=8px)": true,
+  "no_teleporting_feet_(<=60px_per_frame_=_human_swing_peak)": true,
+  "mother_enters_(starts_off-screen,_walks_>=300px,_notices_him)": true,
+  "eye_contact_both_ways": true,
+  "acting_sequences_(realization,fear,confusion_with_>=5_steps)": true,
+  "characters_never_intersect_(torso_spacing)": true
+ },
+ "evidence": {
+  "black_frames_outside_fades": [],
+  "duration_s": 46.17,
+  "loudness": {
+   "integrated_lufs": -16.26,
+   "true_peak_db": -1.44
+  },
+  "frozen_frames": 0,
+  "ik_max_error_px": 1.43,
+  "blender": {
+   "version": "5.2.2 LTS",
+   "objects": 155,
+   "frames_rendered": 1158,
+   "actions": 125
+  },
+  "full_body_frames_sampled": 75,
+  "sitting_frames": 588,
+  "standing_frames": 784,
+  "pelvis_travel_px": 169.8567735,
+  "walk": {
+   "steps": 0,
+   "root_distance_px": 0,
+   "foot_swing_frames": 0,
+   "speed_px_s": []
+  },
+  "reach_hand_travel_px": 348.1,
+  "arm_length_px": 314.4,
+  "gaze_range": [
+   1.35,
+   1.96
+  ],
+  "blinks": 17,
+  "head_rot_range_deg": 28.4,
+  "distinct_expressions": 26,
+  "second_character_visible_in_sample": 108,
+  "layers": 11,
+  "parallax_factors": [
+   0.6,
+   0.62,
+   0.66,
+   0.8,
+   0.86,
+   1.0,
+   1.12,
+   1.22,
+   1.3
+  ],
+  "dolly_through_screen_shift_px_by_layer_par": {
+   "0.6": 223.0,
+   "1.0": 400.0,
+   "1.3": 547.8
+  },
+  "camera": {
+   "moves": [
+    "drift",
+    "hold",
+    "isolate",
+    "pull",
+    "push",
+    "rack_focus",
+    "reveal",
+    "truck"
+   ],
+   "sizes": [
+    "close",
+    "full",
+    "medium",
+    "reveal",
+    "two",
+    "two_reach",
+    "wide"
+   ],
+   "zoom_range": [
+    0.92,
+    2.29
+   ],
+   "path_px": 6258
+  },
+  "luma_by_shot": {
+   "S01": 0.447,
+   "S02": 0.49,
+   "S03": 0.492,
+   "S04": 0.445,
+   "S05": 0.446,
+   "S06": 0.469,
+   "S07": 0.461,
+   "S08": 0.448,
+   "S09": 0.448,
+   "S10": 0.504,
+   "S11": 0.512,
+   "S12": 0.524,
+   "S13": 0.493,
+   "S14": 0.608,
+   "S15": 0.434,
+   "S16": 0.54,
+   "S17": 0.427
+  },
+  "gp_effects": [
+   "arcs",
+   "ring",
+   "scribble",
+   "ticks"
+  ],
+  "gp_bank": {
+   "renders": 128,
+   "blender": "5.2.2 LTS"
+  },
+  "cut_to_beat_offsets_s": [
+   0.12,
+   0.12,
+   0.12,
+   0.12,
+   0.12,
+   0.12,
+   0.12,
+   0.12,
+   0.12,
+   0.12,
+   0.12,
+   0.12,
+   0.12,
+   0.12,
+   0.12,
+   0.12
+  ],
+  "words": 107,
+  "speech_rate_words_per_s": 2.5,
+  "assets_used": [
+   "open_peeps_flat_v1",
+   "openpeeps_device_hand_harvest_v1"
+  ],
+  "views": [
+   "three_quarter"
+  ],
+  "hand_pose_ids_used": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   10
+  ],
+  "gaze": {
+   "events": 16,
+   "distinct_targets": [
+    "CAMERA",
+    "DOOR",
+    "PERSON_A",
+    "PERSON_D",
+    "PHONE",
+    "{"
+   ],
+   "wrong_direction": 0
+  },
+  "hand_over": {
+   "meet_error_px": 106.9,
+   "ownership": {
+    "a_phone_after": 0.0,
+    "d_phone_after": 1.0,
+    "release_t": [
+     27.931
+    ],
+    "take_t": 27.82326865671642,
+    "give_t": 27.774052845528455
+   }
+  },
+  "stance_slide_px_max": 0.0,
+  "lamp_luma_delta": -0.043,
+  "camera_vocab": {
+   "moves": [
+    "drift",
+    "hold",
+    "isolate",
+    "pull",
+    "push",
+    "rack_focus",
+    "reveal",
+    "truck"
+   ],
+   "sizes": [
+    "close",
+    "full",
+    "medium",
+    "reveal",
+    "two",
+    "two_reach",
+    "wide"
+   ]
+  },
+  "focus_range": [
+   0.85,
+   1.6
+  ],
+  "fg_overlap_frames_sampled": 107,
+  "hand_over_phone_centre_error_px": 5.68,
+  "hand_over_phone_gap_frames": 0,
+  "phone_contact_error_px": [
+   0.0
+  ],
+  "flat_foot_slide_px_max": 0.03,
+  "foot_step_px_per_frame_max": 29.98,
+  "entrance": {
+   "start_x": 1290.0,
+   "walk_px": 340,
+   "notice_events": 1,
+   "eye_contact": {
+    "A": 2,
+    "D": 2
+   }
+  },
+  "not_applicable_gates": [
+   "real_skeletal_walk",
+   "lamp_raises_brightness"
+  ],
+  "acting_sequences": {
+   "realization": 8,
+   "fear": 5,
+   "notice": 0,
+   "confusion": 5
+  },
+  "min_torso_centre_distance_px": 441.2
+ }
+}

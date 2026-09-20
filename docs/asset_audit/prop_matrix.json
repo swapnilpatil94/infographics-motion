@@ -1,0 +1,407 @@
+{
+ "props": {
+  "PHONE": {
+   "pose": "hold_phone",
+   "anchor": "grip",
+   "note": "SOLVED in v3 by motion_v2._phone_wrist; here solved generically to compare",
+   "phases": {
+    "REACH": {
+     "fk_contact_error_px": 0.24,
+     "reachable": true,
+     "hand_angle": 20.0
+    },
+    "CONTACT": {
+     "fk_contact_error_px": 0.06,
+     "reachable": true,
+     "hand_angle": 20.0
+    },
+    "GRAB": {
+     "fk_contact_error_px": 0.0,
+     "reachable": true,
+     "hand_angle": 20.0
+    },
+    "HOLD": {
+     "fk_contact_error_px": 0.17,
+     "reachable": true,
+     "hand_angle": 20.0
+    },
+    "USE": {
+     "fk_contact_error_px": 0.27,
+     "reachable": true,
+     "hand_angle": 20.0
+    },
+    "RELEASE": {
+     "fk_contact_error_px": 0.0,
+     "reachable": true,
+     "hand_angle": null
+    }
+   },
+   "all_phases_ok": true,
+   "production_art": true
+  },
+  "CARD": {
+   "pose": "hold_card",
+   "anchor": "grip",
+   "note": "use = push into the ATM / reader slot",
+   "phases": {
+    "REACH": {
+     "fk_contact_error_px": 0.27,
+     "reachable": true,
+     "hand_angle": 25.0
+    },
+    "CONTACT": {
+     "fk_contact_error_px": 0.03,
+     "reachable": true,
+     "hand_angle": 25.0
+    },
+    "GRAB": {
+     "fk_contact_error_px": 0.0,
+     "reachable": true,
+     "hand_angle": 25.0
+    },
+    "HOLD": {
+     "fk_contact_error_px": 0.17,
+     "reachable": true,
+     "hand_angle": 25.0
+    },
+    "USE": {
+     "fk_contact_error_px": 0.16,
+     "reachable": true,
+     "hand_angle": 25.0
+    },
+    "RELEASE": {
+     "fk_contact_error_px": 0.0,
+     "reachable": true,
+     "hand_angle": null
+    }
+   },
+   "all_phases_ok": true,
+   "production_art": true
+  },
+  "MONEY": {
+   "pose": "hold_money",
+   "anchor": "grip",
+   "note": "use = hold out to hand over",
+   "phases": {
+    "REACH": {
+     "fk_contact_error_px": 0.27,
+     "reachable": true,
+     "hand_angle": 25.0
+    },
+    "CONTACT": {
+     "fk_contact_error_px": 0.03,
+     "reachable": true,
+     "hand_angle": 25.0
+    },
+    "GRAB": {
+     "fk_contact_error_px": 0.0,
+     "reachable": true,
+     "hand_angle": 25.0
+    },
+    "HOLD": {
+     "fk_contact_error_px": 0.17,
+     "reachable": true,
+     "hand_angle": 25.0
+    },
+    "USE": {
+     "fk_contact_error_px": 0.14,
+     "reachable": true,
+     "hand_angle": 25.0
+    },
+    "RELEASE": {
+     "fk_contact_error_px": 0.0,
+     "reachable": true,
+     "hand_angle": null
+    }
+   },
+   "all_phases_ok": true,
+   "production_art": true
+  },
+  "DOCUMENT": {
+   "pose": "pinch",
+   "anchor": "grip",
+   "note": "use = raised to reading position",
+   "phases": {
+    "REACH": {
+     "fk_contact_error_px": 0.26,
+     "reachable": true,
+     "hand_angle": 20.0
+    },
+    "CONTACT": {
+     "fk_contact_error_px": 0.02,
+     "reachable": true,
+     "hand_angle": 20.0
+    },
+    "GRAB": {
+     "fk_contact_error_px": 0.0,
+     "reachable": true,
+     "hand_angle": 20.0
+    },
+    "HOLD": {
+     "fk_contact_error_px": 0.48,
+     "reachable": true,
+     "hand_angle": 20.0
+    },
+    "USE": {
+     "fk_contact_error_px": 0.13,
+     "reachable": true,
+     "hand_angle": 20.0
+    },
+    "RELEASE": {
+     "fk_contact_error_px": 0.0,
+     "reachable": true,
+     "hand_angle": null
+    }
+   },
+   "all_phases_ok": true,
+   "production_art": false
+  },
+  "CUP": {
+   "pose": "hold_cup",
+   "anchor": "grip",
+   "note": "use = to the mouth (drinking)",
+   "phases": {
+    "REACH": {
+     "fk_contact_error_px": 0.26,
+     "reachable": true,
+     "hand_angle": 8.0
+    },
+    "CONTACT": {
+     "fk_contact_error_px": 0.04,
+     "reachable": true,
+     "hand_angle": 8.0
+    },
+    "GRAB": {
+     "fk_contact_error_px": 0.0,
+     "reachable": true,
+     "hand_angle": 8.0
+    },
+    "HOLD": {
+     "fk_contact_error_px": 0.17,
+     "reachable": true,
+     "hand_angle": 8.0
+    },
+    "USE": {
+     "fk_contact_error_px": 0.25,
+     "reachable": true,
+     "hand_angle": -17.0
+    },
+    "RELEASE": {
+     "fk_contact_error_px": 0.0,
+     "reachable": true,
+     "hand_angle": null
+    }
+   },
+   "all_phases_ok": true,
+   "production_art": false
+  },
+  "LAPTOP": {
+   "pose": "type",
+   "anchor": "tip",
+   "note": "both hands; use = typing bob; the laptop stays on the desk",
+   "phases": {
+    "REACH": {
+     "fk_contact_error_px": 0.26,
+     "reachable": true,
+     "hand_angle": 35.0
+    },
+    "CONTACT": {
+     "fk_contact_error_px": 0.07,
+     "reachable": true,
+     "hand_angle": 35.0
+    },
+    "GRAB": {
+     "fk_contact_error_px": 0.0,
+     "reachable": true,
+     "hand_angle": 35.0
+    },
+    "HOLD": {
+     "fk_contact_error_px": 0.0,
+     "reachable": true,
+     "hand_angle": 35.0
+    },
+    "USE": {
+     "fk_contact_error_px": 0.34,
+     "reachable": true,
+     "hand_angle": 35.0
+    },
+    "RELEASE": {
+     "fk_contact_error_px": 0.0,
+     "reachable": true,
+     "hand_angle": null
+    }
+   },
+   "all_phases_ok": true,
+   "production_art": false
+  },
+  "DOOR": {
+   "pose": "grab",
+   "anchor": "grip",
+   "note": "use = handle down then pull the door towards the body",
+   "phases": {
+    "REACH": {
+     "fk_contact_error_px": 0.35,
+     "reachable": true,
+     "hand_angle": 10.0
+    },
+    "CONTACT": {
+     "fk_contact_error_px": 0.05,
+     "reachable": true,
+     "hand_angle": 10.0
+    },
+    "GRAB": {
+     "fk_contact_error_px": 0.0,
+     "reachable": true,
+     "hand_angle": 10.0
+    },
+    "HOLD": {
+     "fk_contact_error_px": 0.06,
+     "reachable": true,
+     "hand_angle": 10.0
+    },
+    "USE": {
+     "fk_contact_error_px": 0.12,
+     "reachable": true,
+     "hand_angle": 25.0
+    },
+    "RELEASE": {
+     "fk_contact_error_px": 0.0,
+     "reachable": true,
+     "hand_angle": null
+    }
+   },
+   "all_phases_ok": true,
+   "production_art": false
+  },
+  "ATM": {
+   "pose": "touch_screen",
+   "anchor": "tip",
+   "note": "use = press keypad (push forward); fingertip anchor",
+   "phases": {
+    "REACH": {
+     "fk_contact_error_px": 0.37,
+     "reachable": true,
+     "hand_angle": 30.0
+    },
+    "CONTACT": {
+     "fk_contact_error_px": 0.03,
+     "reachable": true,
+     "hand_angle": 30.0
+    },
+    "GRAB": {
+     "fk_contact_error_px": 0.0,
+     "reachable": true,
+     "hand_angle": 30.0
+    },
+    "HOLD": {
+     "fk_contact_error_px": 0.0,
+     "reachable": true,
+     "hand_angle": 30.0
+    },
+    "USE": {
+     "fk_contact_error_px": 0.33,
+     "reachable": true,
+     "hand_angle": 30.0
+    },
+    "RELEASE": {
+     "fk_contact_error_px": 0.0,
+     "reachable": true,
+     "hand_angle": null
+    }
+   },
+   "all_phases_ok": true,
+   "production_art": false
+  },
+  "KEYBOARD": {
+   "pose": "type",
+   "anchor": "tip",
+   "note": "both hands, lower desk",
+   "phases": {
+    "REACH": {
+     "fk_contact_error_px": 0.22,
+     "reachable": true,
+     "hand_angle": 35.0
+    },
+    "CONTACT": {
+     "fk_contact_error_px": 0.06,
+     "reachable": true,
+     "hand_angle": 35.0
+    },
+    "GRAB": {
+     "fk_contact_error_px": 0.0,
+     "reachable": true,
+     "hand_angle": 35.0
+    },
+    "HOLD": {
+     "fk_contact_error_px": 0.0,
+     "reachable": true,
+     "hand_angle": 35.0
+    },
+    "USE": {
+     "fk_contact_error_px": 0.34,
+     "reachable": true,
+     "hand_angle": 35.0
+    },
+    "RELEASE": {
+     "fk_contact_error_px": 0.0,
+     "reachable": true,
+     "hand_angle": null
+    }
+   },
+   "all_phases_ok": true,
+   "production_art": false
+  },
+  "BAG": {
+   "pose": "grab",
+   "anchor": "grip",
+   "note": "use = lift the bag to the shoulder",
+   "phases": {
+    "REACH": {
+     "fk_contact_error_px": 0.12,
+     "reachable": true,
+     "hand_angle": 0.0
+    },
+    "CONTACT": {
+     "fk_contact_error_px": 0.05,
+     "reachable": true,
+     "hand_angle": 0.0
+    },
+    "GRAB": {
+     "fk_contact_error_px": 0.0,
+     "reachable": true,
+     "hand_angle": 0.0
+    },
+    "HOLD": {
+     "fk_contact_error_px": 0.03,
+     "reachable": true,
+     "hand_angle": 0.0
+    },
+    "USE": {
+     "fk_contact_error_px": 0.18,
+     "reachable": true,
+     "hand_angle": 15.0
+    },
+    "RELEASE": {
+     "fk_contact_error_px": 0.0,
+     "reachable": true,
+     "hand_angle": null
+    }
+   },
+   "all_phases_ok": true,
+   "production_art": false
+  }
+ },
+ "ik_max_error_px_blender": 0.01,
+ "solved_generically": [
+  "PHONE",
+  "CARD",
+  "MONEY",
+  "DOCUMENT",
+  "CUP",
+  "LAPTOP",
+  "DOOR",
+  "ATM",
+  "KEYBOARD",
+  "BAG"
+ ]
+}

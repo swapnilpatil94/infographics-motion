@@ -1,0 +1,88 @@
+{
+ "eye_states": [
+  "neutral",
+  "wide",
+  "narrow",
+  "half_lid",
+  "closed",
+  "squint",
+  "glance_side",
+  "glance_up"
+ ],
+ "brow_states": [
+  "neutral",
+  "raised",
+  "lowered",
+  "angry",
+  "worried",
+  "asym_up",
+  "flat_low",
+  "sad"
+ ],
+ "mouth_states": [
+  "closed",
+  "smile",
+  "grin",
+  "frown",
+  "worried",
+  "open_small",
+  "open_wide",
+  "O_shape"
+ ],
+ "combos": 512,
+ "targets": {
+  "neutral": [
+   "neutral",
+   "serious"
+  ],
+  "happy": [
+   "happy",
+   "smile"
+  ],
+  "fear": [
+   "fear",
+   "fear"
+  ],
+  "confusion": [
+   "confused",
+   "worried"
+  ],
+  "suspicion": [
+   "suspicious",
+   "suspicious"
+  ],
+  "anger": [
+   "anger",
+   "anger"
+  ],
+  "surprise": [
+   "surprise",
+   "surprise"
+  ],
+  "realization": [
+   "realization",
+   "dread"
+  ]
+ },
+ "face_atoms_available": 20,
+ "seconds": 79.3,
+ "distinct_states_leader_clustering_of_512": {
+  "differ_by_more_than_150px": 320,
+  "differ_by_more_than_400px": 320,
+  "differ_by_more_than_1000px": 280
+ },
+ "axis_separability": {
+  "eye": {
+   "median_px": 8375,
+   "share_pairs_below_150px": 0.0
+  },
+  "brow": {
+   "median_px": 6278,
+   "share_pairs_below_150px": 0.0
+  },
+  "mouth": {
+   "median_px": 2446,
+   "share_pairs_below_150px": 0.21
+  }
+ }
+}

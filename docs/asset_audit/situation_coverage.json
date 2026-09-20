@@ -1,0 +1,350 @@
+{
+ "counts": {
+  "SUPPORTED": 15,
+  "PARTIAL": 13,
+  "MISSING": 3
+ },
+ "situations": [
+  {
+   "n": 1,
+   "label": "SITTING",
+   "status": "SUPPORTED",
+   "declared": "SUPPORTED",
+   "note": "sit pose on the seat height of the set (a bench glyph is drawn)",
+   "ik_max_error_px": 0.0,
+   "flat_foot_slide_px": 0.0,
+   "frames": 78,
+   "face_atom": null
+  },
+  {
+   "n": 2,
+   "label": "STANDING",
+   "status": "SUPPORTED",
+   "declared": "SUPPORTED",
+   "note": "standing idle, breathing, gaze",
+   "ik_max_error_px": 0.0,
+   "flat_foot_slide_px": 0.0,
+   "frames": 78,
+   "face_atom": null
+  },
+  {
+   "n": 3,
+   "label": "WALKING",
+   "status": "SUPPORTED",
+   "declared": "SUPPORTED",
+   "note": "planted-foot gait to a target",
+   "ik_max_error_px": 0.0,
+   "flat_foot_slide_px": 0.0,
+   "frames": 78,
+   "face_atom": null
+  },
+  {
+   "n": 4,
+   "label": "RUNNING",
+   "status": "PARTIAL",
+   "declared": "PARTIAL",
+   "note": "run gait retargeted from the CC0 Creomoto cycle (flight phase); the torso/limb ART has no running lean / arm-swing drawings",
+   "ik_max_error_px": 0.0,
+   "flat_foot_slide_px": 0.0,
+   "frames": 63,
+   "face_atom": null
+  },
+  {
+   "n": 5,
+   "label": "REACHING",
+   "status": "SUPPORTED",
+   "declared": "SUPPORTED",
+   "note": "seated reach to the nightstand phone (the film geometry)",
+   "ik_max_error_px": 0.0,
+   "flat_foot_slide_px": 0.0,
+   "frames": 78,
+   "face_atom": null
+  },
+  {
+   "n": 6,
+   "label": "BENDING",
+   "status": "MISSING",
+   "declared": "PARTIAL",
+   "note": "spine/pelvis keys work, but the torso is ONE drawing: no bent-torso replacement art  [MEASURED: IK error 21px - the pose is not reachable]",
+   "ik_max_error_px": 20.7,
+   "flat_foot_slide_px": 0.0,
+   "frames": 84,
+   "face_atom": null
+  },
+  {
+   "n": 7,
+   "label": "TURNING",
+   "status": "MISSING",
+   "declared": "MISSING",
+   "note": "only an in-plane head tilt: the head is one drawing for every view, no body turn",
+   "ik_max_error_px": 0.0,
+   "flat_foot_slide_px": 0.0,
+   "frames": 78,
+   "face_atom": null
+  },
+  {
+   "n": 8,
+   "label": "LOOKING",
+   "status": "SUPPORTED",
+   "declared": "SUPPORTED",
+   "note": "gaze + head (pupil moves inside the eye white)",
+   "ik_max_error_px": 0.0,
+   "flat_foot_slide_px": 0.0,
+   "frames": 78,
+   "face_atom": null
+  },
+  {
+   "n": 9,
+   "label": "TALKING",
+   "status": "SUPPORTED",
+   "declared": "SUPPORTED",
+   "note": "Hindi lip-sync from word timings + gesture",
+   "ik_max_error_px": 0.0,
+   "flat_foot_slide_px": 0.0,
+   "frames": 90,
+   "face_atom": null
+  },
+  {
+   "n": 10,
+   "label": "POINTING",
+   "status": "SUPPORTED",
+   "declared": "SUPPORTED",
+   "note": "point at a target with gaze",
+   "ik_max_error_px": 0.0,
+   "flat_foot_slide_px": 0.0,
+   "frames": 78,
+   "face_atom": null
+  },
+  {
+   "n": 11,
+   "label": "HOLDING PHONE",
+   "status": "SUPPORTED",
+   "declared": "SUPPORTED",
+   "note": "solved grip on real Open Peeps hand",
+   "ik_max_error_px": 0.0,
+   "flat_foot_slide_px": 0.0,
+   "frames": 81,
+   "face_atom": null
+  },
+  {
+   "n": 12,
+   "label": "READING",
+   "status": "PARTIAL",
+   "declared": "PARTIAL",
+   "note": "reading a PHONE works; reading a paper/book needs a document glyph + reading pose (DOCUMENT primitive below)",
+   "ik_max_error_px": 0.0,
+   "flat_foot_slide_px": 0.0,
+   "frames": 90,
+   "face_atom": null
+  },
+  {
+   "n": 13,
+   "label": "TYPING",
+   "status": "PARTIAL",
+   "declared": "PARTIAL",
+   "note": "hands/type pose solved on a keyboard glyph; no keyboard/desk art",
+   "ik_max_error_px": 0.0,
+   "flat_foot_slide_px": 0.0,
+   "frames": 96,
+   "face_atom": null
+  },
+  {
+   "n": 14,
+   "label": "DRINKING",
+   "status": "PARTIAL",
+   "declared": "PARTIAL",
+   "note": "cup interaction solved; no cup art, no head tilt/sip",
+   "ik_max_error_px": 0.0,
+   "flat_foot_slide_px": 0.0,
+   "frames": 96,
+   "face_atom": null
+  },
+  {
+   "n": 15,
+   "label": "EATING",
+   "status": "MISSING",
+   "declared": "MISSING",
+   "note": "hand-to-mouth is solved, but there is no food art, no chewing / mouth animation",
+   "ik_max_error_px": 0.0,
+   "flat_foot_slide_px": 0.0,
+   "frames": 96,
+   "face_atom": null
+  },
+  {
+   "n": 16,
+   "label": "CARRYING",
+   "status": "PARTIAL",
+   "declared": "PARTIAL",
+   "note": "bag grip + walk with the carrying hand pinned; no bag-in-hand art beyond a strap accessory",
+   "ik_max_error_px": 0.0,
+   "flat_foot_slide_px": 0.0,
+   "frames": 102,
+   "face_atom": null
+  },
+  {
+   "n": 17,
+   "label": "OPENING DOOR",
+   "status": "PARTIAL",
+   "declared": "PARTIAL",
+   "note": "handle grab + pull solved; no door art in the skeleton sets, no door-swing",
+   "ik_max_error_px": 0.0,
+   "flat_foot_slide_px": 0.0,
+   "frames": 96,
+   "face_atom": null
+  },
+  {
+   "n": 18,
+   "label": "SITTING AT DESK",
+   "status": "PARTIAL",
+   "declared": "PARTIAL",
+   "note": "seated writing pose solved; the set has no desk/chair layers at this scale",
+   "ik_max_error_px": 0.0,
+   "flat_foot_slide_px": 0.0,
+   "frames": 84,
+   "face_atom": null
+  },
+  {
+   "n": 19,
+   "label": "USING LAPTOP",
+   "status": "PARTIAL",
+   "declared": "PARTIAL",
+   "note": "two-hand type on a laptop glyph; no laptop art",
+   "ik_max_error_px": 0.0,
+   "flat_foot_slide_px": 0.0,
+   "frames": 96,
+   "face_atom": null
+  },
+  {
+   "n": 20,
+   "label": "USING ATM",
+   "status": "PARTIAL",
+   "declared": "PARTIAL",
+   "note": "fingertip-anchored keypad press solved; ATM art exists only in the atm_area set (bust scale)",
+   "ik_max_error_px": 0.0,
+   "flat_foot_slide_px": 0.0,
+   "frames": 96,
+   "face_atom": null
+  },
+  {
+   "n": 21,
+   "label": "HOLDING CARD",
+   "status": "PARTIAL",
+   "declared": "PARTIAL",
+   "note": "grip solved; real 'hold_card' pose is procedural (not a harvested hand)",
+   "ik_max_error_px": 0.0,
+   "flat_foot_slide_px": 0.0,
+   "frames": 96,
+   "face_atom": null
+  },
+  {
+   "n": 22,
+   "label": "HOLDING MONEY",
+   "status": "PARTIAL",
+   "declared": "PARTIAL",
+   "note": "grip solved; note art exists as a part",
+   "ik_max_error_px": 0.0,
+   "flat_foot_slide_px": 0.0,
+   "frames": 96,
+   "face_atom": null
+  },
+  {
+   "n": 23,
+   "label": "HOLDING DOCUMENT",
+   "status": "PARTIAL",
+   "declared": "PARTIAL",
+   "note": "pinch grip solved; no paper art",
+   "ik_max_error_px": 0.0,
+   "flat_foot_slide_px": 0.0,
+   "frames": 96,
+   "face_atom": null
+  },
+  {
+   "n": 24,
+   "label": "TALKING TO ANOTHER PERSON",
+   "status": "SUPPORTED",
+   "declared": "SUPPORTED",
+   "note": "two characters: speech + eye contact",
+   "ik_max_error_px": 0.0,
+   "flat_foot_slide_px": 0.0,
+   "frames": 90,
+   "face_atom": null
+  },
+  {
+   "n": 25,
+   "label": "RECEIVING OBJECT",
+   "status": "SUPPORTED",
+   "declared": "SUPPORTED",
+   "note": "phone hand-over, receiving side (the man receives from the woman)",
+   "ik_max_error_px": 0.0,
+   "flat_foot_slide_px": 0.0,
+   "frames": 108,
+   "face_atom": null
+  },
+  {
+   "n": 26,
+   "label": "GIVING OBJECT",
+   "status": "SUPPORTED",
+   "declared": "SUPPORTED",
+   "note": "phone hand-over, giving side",
+   "ik_max_error_px": 0.0,
+   "flat_foot_slide_px": 0.0,
+   "frames": 108,
+   "face_atom": null
+  },
+  {
+   "n": 27,
+   "label": "ARGUING",
+   "status": "PARTIAL",
+   "declared": "PARTIAL",
+   "note": "anger, pointing, speech on both; no leaning-in / body turn",
+   "ik_max_error_px": 0.0,
+   "flat_foot_slide_px": 0.0,
+   "frames": 90,
+   "face_atom": null
+  },
+  {
+   "n": 28,
+   "label": "SURPRISED",
+   "status": "SUPPORTED",
+   "declared": "SUPPORTED",
+   "note": "surprise sequence; peak frame swaps in the Open Peeps 'Awe' face atom",
+   "ik_max_error_px": 2.06,
+   "flat_foot_slide_px": 0.0,
+   "frames": 78,
+   "face_atom": "surprise"
+  },
+  {
+   "n": 29,
+   "label": "SCARED",
+   "status": "SUPPORTED",
+   "declared": "SUPPORTED",
+   "note": "fear sequence; peak frame swaps in the Open Peeps 'Fear' face atom",
+   "ik_max_error_px": 0.0,
+   "flat_foot_slide_px": 0.0,
+   "frames": 78,
+   "face_atom": "fear"
+  },
+  {
+   "n": 30,
+   "label": "CONFUSED",
+   "status": "SUPPORTED",
+   "declared": "SUPPORTED",
+   "note": "confusion sequence; peak frame swaps in the 'Concerned' face atom",
+   "ik_max_error_px": 0.0,
+   "flat_foot_slide_px": 0.0,
+   "frames": 78,
+   "face_atom": "worried"
+  },
+  {
+   "n": 31,
+   "label": "REALIZATION",
+   "status": "SUPPORTED",
+   "declared": "SUPPORTED",
+   "note": "realization sequence; peak frame swaps in the 'Concerned Fear' face atom",
+   "ik_max_error_px": 0.0,
+   "flat_foot_slide_px": 0.0,
+   "frames": 78,
+   "face_atom": "dread"
+  }
+ ]
+}

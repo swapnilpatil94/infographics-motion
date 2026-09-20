@@ -162,6 +162,30 @@ def _clamp_reach(a, fps):
                 hx[f], hy[f] = sx + dx * reach / d, sy + dy * reach / d
 
 
+def _clamp_reach(a, fps):
+    """No hand target may lie farther from ITS shoulder than the straight arm (eases with overshoot - out_back in point / reach - used to push targets 10-50 px past the reach; Blender's IK then missed by that
+    much: measured 15-55 px in the asset audit's situation clips). Shoulder = perf.shoulder + the per-side offset (verified against Blender to < 1 px by the prop matrix)."""
+    reach = 0.985 * (a.P["upper_arm"] + a.P["forearm"])
+    near = 0.32 * (a.P["upper_arm"] + a.P["forearm"])
+    n = len(a.channels["root_x"])
+    hit = 0
+    for side in ("L", "R"):
+        hx, hy = a.channels[f"hand_{side}_x"], a.channels[f"hand_{side}_y"]
+        for f in range(n):
+            sx, sy = a.perf.shoulder(f / fps)
+            sx += a.perf.so["s" + side]
+            dx, dy = hx[f] - sx, hy[f] - sy
+            d = math.hypot(dx, dy)
+            if d > reach:
+                hx[f], hy[f] = sx + dx * reach / d, sy + dy * reach / d
+                hit += 1
+            elif d < near:                                                              # the elbow cannot fold beyond its joint limit: the wrist stays >= `near` from the shoulder
+                ux, uy = (dx / d, dy / d) if d > 1e-3 else (0.35, -0.94)
+                hx[f], hy[f] = sx + ux * near, sy + uy * near
+                hit += 1
+    return hit
+
+
 def build_actors(plan, log=print):
     actors = {}
     for cid in plan["cast_in_short"]:
@@ -188,6 +212,7 @@ def build_actors(plan, log=print):
     for a in actors.values():
         M.auto_blinks(a.perf, 0.0, plan["duration"], VAR.seed_int(plan["story_id"], a.id, "blink") % 1000)
         a.channels = M.sample(a.perf, plan["fps"], 0.0, plan["duration"])
+        a.reach_clamped_frames = _clamp_reach(a, plan["fps"])
     return actors
 
 
@@ -304,7 +329,7 @@ def render_actors(plan, actors, cam, workdir, log=print, samples=10, only_frames
     for cid, a in actors.items():
         chars.append(dict(id=cid, manifest=os.path.join(ROOT, a.man["dir"], "parts.json"), facing=a.facing, origin=list(a.origin), channels=a.job_channels()))
     zoom_eff = [view_zoom(cam["zoom"][i], cam["gain"][i]) for i in range(n)]
-    job = dict(width=W, height=H, fps=plan["fps"], start=0, end=n - 1, out=out, prefix="a", samples=samples, characters=chars,
+    job = dict(width=W, height=H, fps=plan["fps"], start=0, end=n - 1, out=out, prefix="a", samples=samples, characters=chars, gaze_mode=plan.get("gaze_mode", "pupil"),
                camera=dict(cx=[round(float(x), 3) for x in cam["cx"]], cy=[round(float(x), 3) for x in cam["cy"]], zoom=[round(float(x), 4) for x in zoom_eff]),
                render_frames=fr, probe_frames=fr[::max(1, len(fr) // 40)], save_blend=os.path.join(workdir, "skeleton_scene.blend"))
     rep = blender_job.run(job, workdir, log)

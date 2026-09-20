@@ -1,0 +1,1088 @@
+{
+ "selection": {
+  "chosen": 50,
+  "min_axes_differing": 8,
+  "mean_axes_differing": 9.95,
+  "pairs_with_lt6_axes": 0,
+  "distinct_heads": 37,
+  "distinct_body_bins": 46,
+  "distinct_tops": 22
+ },
+ "pool": 420,
+ "rendered_silhouette_iou": {
+  "mean": 0.591,
+  "max": 0.932,
+  "pairs_iou_gt_0_85": 21
+ },
+ "axes_differing_percentiles": {
+  "0": 8,
+  "5": 8,
+  "25": 9,
+  "50": 10,
+  "75": 11,
+  "100": 12
+ },
+ "characters": [
+  {
+   "n": 1,
+   "id": "cdna_a3d5b9506b",
+   "role": "young_man",
+   "age": 29,
+   "hair": "Cornrows",
+   "facial_hair": "Moustache 1",
+   "glasses": "Glasses 4",
+   "silhouette": "stocky",
+   "top": "shirt",
+   "bottom": "trousers",
+   "shoes": "formal",
+   "accessories": [
+    "glasses"
+   ],
+   "eyes": "round",
+   "brows": "thin",
+   "mouth": "wide"
+  },
+  {
+   "n": 2,
+   "id": "cdna_58a7073283",
+   "role": "banker",
+   "age": 36,
+   "hair": "hat-hip",
+   "facial_hair": "Chin",
+   "glasses": "Glasses 3",
+   "silhouette": "stocky",
+   "top": "tee",
+   "bottom": "salwar",
+   "shoes": "sneakers",
+   "accessories": [
+    "glasses",
+    "watch"
+   ],
+   "eyes": "small",
+   "brows": "bold",
+   "mouth": "small"
+  },
+  {
+   "n": 3,
+   "id": "cdna_34e00aaea3",
+   "role": "office_worker",
+   "age": 36,
+   "hair": "Bun 2",
+   "facial_hair": "* None",
+   "glasses": "Glasses 2",
+   "silhouette": "stocky",
+   "top": "hoodie",
+   "bottom": "skirt",
+   "shoes": "sandals",
+   "accessories": [
+    "bag",
+    "glasses",
+    "watch"
+   ],
+   "eyes": "small",
+   "brows": "straight",
+   "mouth": "thin"
+  },
+  {
+   "n": 4,
+   "id": "cdna_c16ae64f9f",
+   "role": "delivery_worker",
+   "age": 28,
+   "hair": "Short 2",
+   "facial_hair": "Goatee 1",
+   "glasses": "Sunglasses",
+   "silhouette": "standard",
+   "top": "sweater",
+   "bottom": "shorts",
+   "shoes": "slippers",
+   "accessories": [
+    "cap",
+    "glasses"
+   ],
+   "eyes": "almond",
+   "brows": "straight",
+   "mouth": "full"
+  },
+  {
+   "n": 5,
+   "id": "cdna_7027a365c4",
+   "role": "shopkeeper",
+   "age": 52,
+   "hair": "No Hair 2",
+   "facial_hair": "Moustache 3",
+   "glasses": "Glasses",
+   "silhouette": "athletic",
+   "top": "tee",
+   "bottom": "salwar",
+   "shoes": "slippers",
+   "accessories": [
+    "glasses"
+   ],
+   "eyes": "wide",
+   "brows": "thin",
+   "mouth": "thin"
+  },
+  {
+   "n": 6,
+   "id": "cdna_bdbbbb9b1e",
+   "role": "student",
+   "age": 19,
+   "hair": "hat-beanie",
+   "facial_hair": "Moustache 3",
+   "glasses": "Glasses 5",
+   "silhouette": "standard",
+   "top": "jacket",
+   "bottom": "jeans",
+   "shoes": "sandals",
+   "accessories": [
+    "backpack",
+    "glasses"
+   ],
+   "eyes": "lashed",
+   "brows": "thin",
+   "mouth": "thin"
+  },
+  {
+   "n": 7,
+   "id": "cdna_52bb1f2855",
+   "role": "middle_aged_man",
+   "age": 54,
+   "hair": "Short 5",
+   "facial_hair": "Moustache 9",
+   "glasses": "* None",
+   "silhouette": "athletic",
+   "top": "hoodie",
+   "bottom": "shorts",
+   "shoes": "formal",
+   "accessories": [
+    "watch"
+   ],
+   "eyes": "lashed",
+   "brows": "arched",
+   "mouth": "full"
+  },
+  {
+   "n": 8,
+   "id": "cdna_feb53e4485",
+   "role": "student",
+   "age": 16,
+   "hair": "Mohawk",
+   "facial_hair": "* None",
+   "glasses": "Glasses 5",
+   "silhouette": "athletic",
+   "top": "tee",
+   "bottom": "salwar",
+   "shoes": "sandals",
+   "accessories": [
+    "glasses"
+   ],
+   "eyes": "wide",
+   "brows": "straight",
+   "mouth": "thin"
+  },
+  {
+   "n": 9,
+   "id": "cdna_2afbceab71",
+   "role": "middle_aged_woman",
+   "age": 36,
+   "hair": "Bangs",
+   "facial_hair": "* None",
+   "glasses": "Sunglasses",
+   "silhouette": "stocky",
+   "top": "jacket",
+   "bottom": "jeans",
+   "shoes": "sneakers",
+   "accessories": [
+    "glasses"
+   ],
+   "eyes": "small",
+   "brows": "straight",
+   "mouth": "small"
+  },
+  {
+   "n": 10,
+   "id": "cdna_101e0d2282",
+   "role": "elderly_woman",
+   "age": 74,
+   "hair": "Gray Medium",
+   "facial_hair": "* None",
+   "glasses": "* None",
+   "silhouette": "standard",
+   "top": "hoodie",
+   "bottom": "salwar",
+   "shoes": "formal",
+   "accessories": [
+    "earrings"
+   ],
+   "eyes": "wide",
+   "brows": "arched",
+   "mouth": "thin"
+  },
+  {
+   "n": 11,
+   "id": "cdna_688e4c1bf0",
+   "role": "teacher",
+   "age": 49,
+   "hair": "Long Curly",
+   "facial_hair": "Full",
+   "glasses": "Glasses 3",
+   "silhouette": "stocky",
+   "top": "sweater",
+   "bottom": "trousers",
+   "shoes": "sneakers",
+   "accessories": [
+    "bag",
+    "glasses"
+   ],
+   "eyes": "almond",
+   "brows": "straight",
+   "mouth": "thin"
+  },
+  {
+   "n": 12,
+   "id": "cdna_184d899bf8",
+   "role": "security_guard",
+   "age": 35,
+   "hair": "Shaved 1",
+   "facial_hair": "Moustache 4",
+   "glasses": "Glasses 4",
+   "silhouette": "petite",
+   "top": "jacket",
+   "bottom": "trousers",
+   "shoes": "formal",
+   "accessories": [
+    "cap",
+    "glasses",
+    "watch"
+   ],
+   "eyes": "droopy",
+   "brows": "normal",
+   "mouth": "small"
+  },
+  {
+   "n": 13,
+   "id": "cdna_954ba11ef6",
+   "role": "elderly_man",
+   "age": 64,
+   "hair": "Short 4",
+   "facial_hair": "Moustache 9",
+   "glasses": "Sunglasses 2",
+   "silhouette": "stocky",
+   "top": "tee",
+   "bottom": "jeans",
+   "shoes": "slippers",
+   "accessories": [
+    "glasses"
+   ],
+   "eyes": "narrow",
+   "brows": "bold",
+   "mouth": "small"
+  },
+  {
+   "n": 14,
+   "id": "cdna_89a2c2fb59",
+   "role": "shopkeeper",
+   "age": 47,
+   "hair": "hat-hip",
+   "facial_hair": "Full 4",
+   "glasses": "* None",
+   "silhouette": "petite",
+   "top": "kurta",
+   "bottom": "jeans",
+   "shoes": "slippers",
+   "accessories": [],
+   "eyes": "round",
+   "brows": "normal",
+   "mouth": "wide"
+  },
+  {
+   "n": 15,
+   "id": "cdna_cc1b72b245",
+   "role": "delivery_worker",
+   "age": 39,
+   "hair": "Short 1",
+   "facial_hair": "Moustache 1",
+   "glasses": "Glasses 4",
+   "silhouette": "stocky",
+   "top": "sweater",
+   "bottom": "jeans",
+   "shoes": "sneakers",
+   "accessories": [
+    "backpack",
+    "cap",
+    "glasses"
+   ],
+   "eyes": "lashed",
+   "brows": "straight",
+   "mouth": "small"
+  },
+  {
+   "n": 16,
+   "id": "cdna_4bd993fd4c",
+   "role": "young_man",
+   "age": 17,
+   "hair": "No Hair 1",
+   "facial_hair": "Goatee 1",
+   "glasses": "* None",
+   "silhouette": "stocky",
+   "top": "hoodie",
+   "bottom": "jeans",
+   "shoes": "sneakers",
+   "accessories": [
+    "backpack"
+   ],
+   "eyes": "droopy",
+   "brows": "straight",
+   "mouth": "full"
+  },
+  {
+   "n": 17,
+   "id": "cdna_7583abc99d",
+   "role": "teacher",
+   "age": 29,
+   "hair": "Medium Bangs",
+   "facial_hair": "* None",
+   "glasses": "Glasses 3",
+   "silhouette": "stocky",
+   "top": "tee",
+   "bottom": "shorts",
+   "shoes": "slippers",
+   "accessories": [
+    "glasses",
+    "watch"
+   ],
+   "eyes": "wide",
+   "brows": "bold",
+   "mouth": "full"
+  },
+  {
+   "n": 18,
+   "id": "cdna_c3e82c2074",
+   "role": "parent",
+   "age": 41,
+   "hair": "Shaved 3",
+   "facial_hair": "Moustache 5",
+   "glasses": "* None",
+   "silhouette": "standard",
+   "top": "polo",
+   "bottom": "jeans",
+   "shoes": "sandals",
+   "accessories": [
+    "bag"
+   ],
+   "eyes": "wide",
+   "brows": "thin",
+   "mouth": "small"
+  },
+  {
+   "n": 19,
+   "id": "cdna_fc518b9557",
+   "role": "young_man",
+   "age": 29,
+   "hair": "Shaved 2",
+   "facial_hair": "Moustache 1",
+   "glasses": "* None",
+   "silhouette": "stocky",
+   "top": "polo",
+   "bottom": "shorts",
+   "shoes": "sandals",
+   "accessories": [
+    "cap",
+    "watch"
+   ],
+   "eyes": "almond",
+   "brows": "thin",
+   "mouth": "wide"
+  },
+  {
+   "n": 20,
+   "id": "cdna_9d798d5e13",
+   "role": "teacher",
+   "age": 38,
+   "hair": "hat-beanie",
+   "facial_hair": "Moustache 2",
+   "glasses": "Sunglasses 2",
+   "silhouette": "standard",
+   "top": "shirt",
+   "bottom": "shorts",
+   "shoes": "formal",
+   "accessories": [
+    "bag",
+    "glasses",
+    "watch"
+   ],
+   "eyes": "droopy",
+   "brows": "straight",
+   "mouth": "full"
+  },
+  {
+   "n": 21,
+   "id": "cdna_8eae86b7b0",
+   "role": "elderly_man",
+   "age": 71,
+   "hair": "No Hair 1",
+   "facial_hair": "Moustache 7",
+   "glasses": "Glasses 2",
+   "silhouette": "stocky",
+   "top": "shirt",
+   "bottom": "trousers",
+   "shoes": "sandals",
+   "accessories": [
+    "glasses",
+    "watch"
+   ],
+   "eyes": "almond",
+   "brows": "normal",
+   "mouth": "wide"
+  },
+  {
+   "n": 22,
+   "id": "cdna_2520bc4456",
+   "role": "customer",
+   "age": 48,
+   "hair": "Mohawk",
+   "facial_hair": "Chin",
+   "glasses": "Glasses 4",
+   "silhouette": "petite",
+   "top": "hoodie",
+   "bottom": "trousers",
+   "shoes": "sandals",
+   "accessories": [
+    "glasses"
+   ],
+   "eyes": "almond",
+   "brows": "bold",
+   "mouth": "small"
+  },
+  {
+   "n": 23,
+   "id": "cdna_34ef77fe3f",
+   "role": "customer",
+   "age": 32,
+   "hair": "Mohawk 2",
+   "facial_hair": "Moustache 1",
+   "glasses": "Sunglasses",
+   "silhouette": "standard",
+   "top": "shirt",
+   "bottom": "shorts",
+   "shoes": "slippers",
+   "accessories": [
+    "bag",
+    "glasses"
+   ],
+   "eyes": "narrow",
+   "brows": "thin",
+   "mouth": "thin"
+  },
+  {
+   "n": 24,
+   "id": "cdna_4d6157eb74",
+   "role": "elderly_woman",
+   "age": 71,
+   "hair": "Bun 2",
+   "facial_hair": "* None",
+   "glasses": "Glasses",
+   "silhouette": "petite",
+   "top": "shirt",
+   "bottom": "salwar",
+   "shoes": "sneakers",
+   "accessories": [
+    "glasses"
+   ],
+   "eyes": "almond",
+   "brows": "bold",
+   "mouth": "full"
+  },
+  {
+   "n": 25,
+   "id": "cdna_ca50ed6284",
+   "role": "office_worker",
+   "age": 29,
+   "hair": "Twists 2",
+   "facial_hair": "* None",
+   "glasses": "Glasses 2",
+   "silhouette": "pear",
+   "top": "jacket",
+   "bottom": "shorts",
+   "shoes": "sneakers",
+   "accessories": [
+    "bag",
+    "glasses"
+   ],
+   "eyes": "almond",
+   "brows": "normal",
+   "mouth": "thin"
+  },
+  {
+   "n": 26,
+   "id": "cdna_f47fc91845",
+   "role": "delivery_worker",
+   "age": 33,
+   "hair": "Short 2",
+   "facial_hair": "Moustache 8",
+   "glasses": "Glasses",
+   "silhouette": "petite",
+   "top": "hoodie",
+   "bottom": "shorts",
+   "shoes": "formal",
+   "accessories": [
+    "backpack",
+    "cap",
+    "glasses"
+   ],
+   "eyes": "wide",
+   "brows": "arched",
+   "mouth": "thin"
+  },
+  {
+   "n": 27,
+   "id": "cdna_729abfff40",
+   "role": "elderly_woman",
+   "age": 66,
+   "hair": "Gray Bun",
+   "facial_hair": "* None",
+   "glasses": "Glasses 5",
+   "silhouette": "petite",
+   "top": "polo",
+   "bottom": "shorts",
+   "shoes": "sandals",
+   "accessories": [
+    "earrings",
+    "glasses"
+   ],
+   "eyes": "droopy",
+   "brows": "arched",
+   "mouth": "thin"
+  },
+  {
+   "n": 28,
+   "id": "cdna_d70a6cbb17",
+   "role": "customer",
+   "age": 41,
+   "hair": "Shaved 3",
+   "facial_hair": "Goatee 1",
+   "glasses": "Glasses 3",
+   "silhouette": "standard",
+   "top": "sweater",
+   "bottom": "shorts",
+   "shoes": "slippers",
+   "accessories": [
+    "glasses"
+   ],
+   "eyes": "round",
+   "brows": "thin",
+   "mouth": "full"
+  },
+  {
+   "n": 29,
+   "id": "cdna_0cc681ea3b",
+   "role": "teacher",
+   "age": 53,
+   "hair": "Bangs 2",
+   "facial_hair": "* None",
+   "glasses": "Sunglasses 2",
+   "silhouette": "standard",
+   "top": "tee",
+   "bottom": "skirt",
+   "shoes": "slippers",
+   "accessories": [
+    "bag",
+    "glasses"
+   ],
+   "eyes": "narrow",
+   "brows": "thin",
+   "mouth": "small"
+  },
+  {
+   "n": 30,
+   "id": "cdna_2f5280ea78",
+   "role": "middle_aged_woman",
+   "age": 47,
+   "hair": "Bun",
+   "facial_hair": "* None",
+   "glasses": "* None",
+   "silhouette": "standard",
+   "top": "polo",
+   "bottom": "jeans",
+   "shoes": "slippers",
+   "accessories": [
+    "earrings"
+   ],
+   "eyes": "lashed",
+   "brows": "bold",
+   "mouth": "full"
+  },
+  {
+   "n": 31,
+   "id": "cdna_96bb5511fe",
+   "role": "shopkeeper",
+   "age": 36,
+   "hair": "Shaved 1",
+   "facial_hair": "Goatee 2",
+   "glasses": "Glasses",
+   "silhouette": "athletic",
+   "top": "shirt",
+   "bottom": "jeans",
+   "shoes": "formal",
+   "accessories": [
+    "glasses"
+   ],
+   "eyes": "wide",
+   "brows": "arched",
+   "mouth": "wide"
+  },
+  {
+   "n": 32,
+   "id": "cdna_3b5f42666f",
+   "role": "middle_aged_man",
+   "age": 43,
+   "hair": "Flat Top Long",
+   "facial_hair": "Moustache 5",
+   "glasses": "Sunglasses",
+   "silhouette": "stocky",
+   "top": "kurta",
+   "bottom": "shorts",
+   "shoes": "formal",
+   "accessories": [
+    "bag",
+    "glasses",
+    "watch"
+   ],
+   "eyes": "droopy",
+   "brows": "arched",
+   "mouth": "thin"
+  },
+  {
+   "n": 33,
+   "id": "cdna_5e1811176f",
+   "role": "shopkeeper",
+   "age": 35,
+   "hair": "Shaved 3",
+   "facial_hair": "Full 3",
+   "glasses": "* None",
+   "silhouette": "stocky",
+   "top": "polo",
+   "bottom": "salwar",
+   "shoes": "sneakers",
+   "accessories": [],
+   "eyes": "droopy",
+   "brows": "normal",
+   "mouth": "full"
+  },
+  {
+   "n": 34,
+   "id": "cdna_f885986f7b",
+   "role": "young_man",
+   "age": 29,
+   "hair": "Shaved 2",
+   "facial_hair": "Goatee 1",
+   "glasses": "Glasses 4",
+   "silhouette": "stocky",
+   "top": "kurta",
+   "bottom": "salwar",
+   "shoes": "sneakers",
+   "accessories": [
+    "cap",
+    "glasses"
+   ],
+   "eyes": "almond",
+   "brows": "straight",
+   "mouth": "small"
+  },
+  {
+   "n": 35,
+   "id": "cdna_a8c3fecaa4",
+   "role": "customer",
+   "age": 31,
+   "hair": "Long Bangs",
+   "facial_hair": "Moustache 1",
+   "glasses": "Glasses 4",
+   "silhouette": "petite",
+   "top": "jacket",
+   "bottom": "trousers",
+   "shoes": "slippers",
+   "accessories": [
+    "backpack",
+    "glasses"
+   ],
+   "eyes": "lashed",
+   "brows": "thin",
+   "mouth": "full"
+  },
+  {
+   "n": 36,
+   "id": "cdna_9178c042c5",
+   "role": "student",
+   "age": 17,
+   "hair": "Short 1",
+   "facial_hair": "Goatee 1",
+   "glasses": "Glasses",
+   "silhouette": "stocky",
+   "top": "hoodie",
+   "bottom": "trousers",
+   "shoes": "slippers",
+   "accessories": [
+    "glasses"
+   ],
+   "eyes": "round",
+   "brows": "arched",
+   "mouth": "thin"
+  },
+  {
+   "n": 37,
+   "id": "cdna_e918dc39c4",
+   "role": "delivery_worker",
+   "age": 31,
+   "hair": "Short 1",
+   "facial_hair": "Moustache 9",
+   "glasses": "Glasses",
+   "silhouette": "standard",
+   "top": "kurta",
+   "bottom": "salwar",
+   "shoes": "sandals",
+   "accessories": [
+    "backpack",
+    "glasses"
+   ],
+   "eyes": "almond",
+   "brows": "normal",
+   "mouth": "wide"
+  },
+  {
+   "n": 38,
+   "id": "cdna_ef26b4bb72",
+   "role": "elderly_man",
+   "age": 62,
+   "hair": "Turban",
+   "facial_hair": "Goatee 1",
+   "glasses": "Glasses",
+   "silhouette": "stocky",
+   "top": "tee",
+   "bottom": "jeans",
+   "shoes": "formal",
+   "accessories": [
+    "glasses"
+   ],
+   "eyes": "lashed",
+   "brows": "straight",
+   "mouth": "small"
+  },
+  {
+   "n": 39,
+   "id": "cdna_dd9213bea1",
+   "role": "banker",
+   "age": 32,
+   "hair": "Buns",
+   "facial_hair": "Moustache 1",
+   "glasses": "Sunglasses",
+   "silhouette": "stocky",
+   "top": "hoodie",
+   "bottom": "jeans",
+   "shoes": "formal",
+   "accessories": [
+    "glasses",
+    "watch"
+   ],
+   "eyes": "wide",
+   "brows": "straight",
+   "mouth": "thin"
+  },
+  {
+   "n": 40,
+   "id": "cdna_d9cbabfd3a",
+   "role": "young_woman",
+   "age": 24,
+   "hair": "Buns",
+   "facial_hair": "* None",
+   "glasses": "* None",
+   "silhouette": "stocky",
+   "top": "sweater",
+   "bottom": "trousers",
+   "shoes": "formal",
+   "accessories": [
+    "bag",
+    "earrings"
+   ],
+   "eyes": "narrow",
+   "brows": "normal",
+   "mouth": "thin"
+  },
+  {
+   "n": 41,
+   "id": "cdna_0a3795f19b",
+   "role": "elderly_man",
+   "age": 65,
+   "hair": "Turban",
+   "facial_hair": "* None",
+   "glasses": "* None",
+   "silhouette": "pear",
+   "top": "jacket",
+   "bottom": "shorts",
+   "shoes": "sandals",
+   "accessories": [
+    "watch"
+   ],
+   "eyes": "almond",
+   "brows": "bold",
+   "mouth": "thin"
+  },
+  {
+   "n": 42,
+   "id": "cdna_851940ae3d",
+   "role": "parent",
+   "age": 44,
+   "hair": "Turban",
+   "facial_hair": "Moustache 5",
+   "glasses": "Glasses 3",
+   "silhouette": "petite",
+   "top": "sweater",
+   "bottom": "trousers",
+   "shoes": "formal",
+   "accessories": [
+    "bag",
+    "earrings",
+    "glasses"
+   ],
+   "eyes": "small",
+   "brows": "normal",
+   "mouth": "thin"
+  },
+  {
+   "n": 43,
+   "id": "cdna_3455e14d31",
+   "role": "delivery_worker",
+   "age": 24,
+   "hair": "hat-beanie",
+   "facial_hair": "* None",
+   "glasses": "Glasses",
+   "silhouette": "stocky",
+   "top": "polo",
+   "bottom": "trousers",
+   "shoes": "slippers",
+   "accessories": [
+    "backpack",
+    "glasses"
+   ],
+   "eyes": "lashed",
+   "brows": "bold",
+   "mouth": "full"
+  },
+  {
+   "n": 44,
+   "id": "cdna_dfd5712de9",
+   "role": "parent",
+   "age": 38,
+   "hair": "Medium 2",
+   "facial_hair": "Moustache 2",
+   "glasses": "Glasses",
+   "silhouette": "stocky",
+   "top": "tee",
+   "bottom": "salwar",
+   "shoes": "sneakers",
+   "accessories": [
+    "bag",
+    "earrings",
+    "glasses"
+   ],
+   "eyes": "droopy",
+   "brows": "bold",
+   "mouth": "wide"
+  },
+  {
+   "n": 45,
+   "id": "cdna_f71ff055fe",
+   "role": "security_guard",
+   "age": 37,
+   "hair": "No Hair 3",
+   "facial_hair": "Goatee 1",
+   "glasses": "Glasses 2",
+   "silhouette": "stocky",
+   "top": "sweater",
+   "bottom": "salwar",
+   "shoes": "sneakers",
+   "accessories": [
+    "glasses",
+    "watch"
+   ],
+   "eyes": "small",
+   "brows": "thin",
+   "mouth": "small"
+  },
+  {
+   "n": 46,
+   "id": "cdna_fcbcf153dc",
+   "role": "delivery_worker",
+   "age": 33,
+   "hair": "Mohawk",
+   "facial_hair": "Moustache 8",
+   "glasses": "Glasses 2",
+   "silhouette": "stocky",
+   "top": "jacket",
+   "bottom": "jeans",
+   "shoes": "formal",
+   "accessories": [
+    "backpack",
+    "glasses"
+   ],
+   "eyes": "droopy",
+   "brows": "arched",
+   "mouth": "thin"
+  },
+  {
+   "n": 47,
+   "id": "cdna_3a69f15e82",
+   "role": "banker",
+   "age": 38,
+   "hair": "Bun",
+   "facial_hair": "Full",
+   "glasses": "Glasses",
+   "silhouette": "petite",
+   "top": "jacket",
+   "bottom": "shorts",
+   "shoes": "sandals",
+   "accessories": [
+    "glasses"
+   ],
+   "eyes": "round",
+   "brows": "normal",
+   "mouth": "full"
+  },
+  {
+   "n": 48,
+   "id": "cdna_4b76053760",
+   "role": "elderly_man",
+   "age": 60,
+   "hair": "No Hair 2",
+   "facial_hair": "Moustache 5",
+   "glasses": "Glasses 5",
+   "silhouette": "petite",
+   "top": "hoodie",
+   "bottom": "shorts",
+   "shoes": "sneakers",
+   "accessories": [
+    "glasses",
+    "watch"
+   ],
+   "eyes": "lashed",
+   "brows": "straight",
+   "mouth": "wide"
+  },
+  {
+   "n": 49,
+   "id": "cdna_16e74eefdb",
+   "role": "young_man",
+   "age": 23,
+   "hair": "Short 5",
+   "facial_hair": "Moustache 1",
+   "glasses": "Glasses",
+   "silhouette": "stocky",
+   "top": "shirt",
+   "bottom": "jeans",
+   "shoes": "formal",
+   "accessories": [
+    "cap",
+    "glasses"
+   ],
+   "eyes": "droopy",
+   "brows": "bold",
+   "mouth": "full"
+  },
+  {
+   "n": 50,
+   "id": "cdna_3053aac7b0",
+   "role": "banker",
+   "age": 54,
+   "hair": "No Hair 3",
+   "facial_hair": "Moustache 2",
+   "glasses": "Glasses 5",
+   "silhouette": "lanky",
+   "top": "kurta",
+   "bottom": "jeans",
+   "shoes": "sandals",
+   "accessories": [
+    "glasses",
+    "watch"
+   ],
+   "eyes": "narrow",
+   "brows": "arched",
+   "mouth": "thin"
+  }
+ ],
+ "atoms_used": {
+  "hair_heads": 29,
+  "facial_hair": 15,
+  "glasses": 8,
+  "tops": 7,
+  "bottoms": 5,
+  "shoes": 4,
+  "silhouettes": 6
+ },
+ "archetypes": {
+  "young man": {
+   "id": "cdna_2d481a4fb6",
+   "role": "young_man"
+  },
+  "young woman": {
+   "id": "cdna_c38c1a24d5",
+   "role": "young_woman"
+  },
+  "middle-aged man": {
+   "id": "cdna_f50230a9b1",
+   "role": "middle_aged_man"
+  },
+  "middle-aged woman": {
+   "id": "cdna_772045d4a1",
+   "role": "middle_aged_woman"
+  },
+  "older man": {
+   "id": "cdna_4b003a4baf",
+   "role": "elderly_man"
+  },
+  "older woman": {
+   "id": "cdna_8b5d3806aa",
+   "role": "elderly_woman"
+  },
+  "office worker": {
+   "id": "cdna_6b04d69af2",
+   "role": "office_worker"
+  },
+  "student": {
+   "id": "cdna_3470f19713",
+   "role": "student"
+  },
+  "shopkeeper": {
+   "id": "cdna_d595544dc7",
+   "role": "shopkeeper"
+  },
+  "bank employee": {
+   "id": "cdna_c5d6ffd037",
+   "role": "banker"
+  },
+  "delivery worker": {
+   "id": "cdna_d8badae794",
+   "role": "delivery_worker"
+  },
+  "parent": {
+   "id": "cdna_776e3c0073",
+   "role": "parent"
+  },
+  "teacher": {
+   "id": "cdna_2f096b5a11",
+   "role": "teacher"
+  },
+  "customer": {
+   "id": "cdna_c2710e6b5f",
+   "role": "customer"
+  },
+  "security guard": {
+   "id": "cdna_5b16283813",
+   "role": "security_guard"
+  }
+ },
+ "production": {
+  "A": "cdna_ff50cb5293",
+  "B": "cdna_2832fef2bd",
+  "C": "cdna_a6b523ce34"
+ },
+ "seconds": 92.9
+}

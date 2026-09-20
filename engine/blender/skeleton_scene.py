@@ -26,6 +26,7 @@ S = R.S
 job = json.load(open(sys.argv[sys.argv.index("--") + 1]))
 W, H = job["width"], job["height"]
 FPS = job["fps"]
+GAZE_MODE = job.get("gaze_mode", "pupil")           # 'eye': the whole eyeball slides (v1-v3); 'pupil': the pupil moves INSIDE a fixed eye white (Blender Studio 'Boy Head' style; v3.6)
 F0, F1 = job["start"], job["end"]
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
@@ -196,6 +197,12 @@ def build_char(spec, idx):
             continue
         add_textured_part(c, pname, i)
     add_face(c, order.index("@face"))
+    c.faceatoms = []
+    for pname in sorted(man["parts"]):                                                     # replacement FACE drawings (Open Peeps face atoms), hidden until the face_atom_id channel selects one
+        if pname.startswith("faceatom_"):
+            ob = add_textured_part(c, pname, order.index("nose"))
+            ob.scale = (0.0001, 0.0001, 0.0001)
+            c.faceatoms.append((man["face_atoms"][pname[len("faceatom_"):]], ob))
     add_phone(c, order.index("phone"))
     if man.get("view") == "back":                                                          # seen from behind: no face features, no nose
         for ob in c.face.values():
@@ -203,6 +210,7 @@ def build_char(spec, idx):
         if "nose" in c.parts:
             c.parts["nose"].scale = (0.0001, 0.0001, 0.0001)
     c.all_objs = list(c.parts.values()) + list(c.face.values()) + [ob for _, ob in c.handposes["L"]] + [ob for _, ob in c.handposes["R"]]
+    c.all_objs = list(dict.fromkeys(c.all_objs))
     return c
 
 
@@ -244,7 +252,7 @@ def joint_of(c, pname):
     base = pname.split("_")[0]
     return {"upperarm": J["shoulder"], "forearm": J["elbow"], "hand": J["wrist"], "thigh": J["hip"], "shin": J["knee"], "foot": J["ankle"], "pelvis": J["hip"], "torso": J["hip"],
             "skirt": J["hip"], "backpack": J["hip"], "bag": J["hip"],
-            "neck": (0.0, P["shoulder_y"]), "skull": (0.0, P["neck_top_y"]), "hair": (0.0, P["neck_top_y"]), "nose": (0.0, P["neck_top_y"])}[base]
+            "neck": (0.0, P["shoulder_y"]), "skull": (0.0, P["neck_top_y"]), "hair": (0.0, P["neck_top_y"]), "nose": (0.0, P["neck_top_y"]), "faceatom": (0.0, P["neck_top_y"])}[base]
 
 
 def add_textured_part(c, pname, order_i, extra=None, bone_override=None):
@@ -265,7 +273,7 @@ def add_textured_part(c, pname, order_i, extra=None, bone_override=None):
     ob = _obj_from_mesh(pname + "_" + c.spec["id"], verts, [(0, 1, 2, 3)], uvs)
     ob.location = (c.arm.location.x, c.obj_y - 0.004 * order_i, c.arm.location.z)
     ob.data.materials.append(tex_material(os.path.join(ROOT, p["png"])))
-    bone = bone_override or R.PART_BONE[pname]
+    bone = bone_override or (R.PART_BONE[pname] if not pname.startswith("faceatom_") else "HEAD")
     skin_to(c, ob, bone)
     c.parts[pname] = ob
     return ob
@@ -328,6 +336,8 @@ def add_face(c, order_i):
         c.face["eyering_" + side].location.y += 0.0014
         c.face["pupil_" + side] = flat_mesh(c, "pupil_" + side, _rot(ellipse(e[0], e[1], eye_rx * (0.98 if big else 1.0), eye_ry * (0.96 if big else 1.0)), e[0], e[1], t), ink, "EYE_" + side, order_i)
         c.face["pupil_" + side].location.y -= 0.0012
+        c.pupil_base = getattr(c, "pupil_base", {})
+        c.pupil_base[side] = Vector(c.face["pupil_" + side].location)
         if st.get("lash"):                                                         # lash flick at the outer top corner
             lx = e[0] + eye_rx * 0.7
             ly = e[1] + eye_ry * 0.9
@@ -502,7 +512,12 @@ def key_pose(c, f, fi):
     ey_scale = max(0.06, (1.0 - ez) * (1.0 - 0.45 * lid) * (1.0 - 0.42 * g("narrow")))
     for side in ("L", "R"):
         eb = pb["EYE_" + side]
-        eb.location = local_vec(c, "EYE_" + side, g("gaze_x") * 8.5 * c.P["hs"], g("gaze_y") * 6.0 * c.P["hs"])
+        if GAZE_MODE == "pupil":
+            eb.location = (0.0, 0.0, 0.0)
+            pu = c.face["pupil_" + side]
+            pu.location = c.pupil_base[side] + Vector((c.facing * g("gaze_x") * 7.4 * c.P["hs"] * S, 0.0, g("gaze_y") * 5.0 * c.P["hs"] * S))
+        else:
+            eb.location = local_vec(c, "EYE_" + side, g("gaze_x") * 8.5 * c.P["hs"], g("gaze_y") * 6.0 * c.P["hs"])
         eb.scale = (ey_scale, 1.0, 1.0)                                         # local X is the bone's vertical
         sb = pb["BROW_" + side]
         sgn = -1.0 if side == "L" else 1.0
@@ -535,6 +550,15 @@ def key_pose(c, f, fi):
         c.parts[pn].scale = (v, v, v) if v else (0.0001, 0.0001, 0.0001)
     if getattr(c, "phone_flat", None) is not None:
         c.phone_flat.value = max(0.0, min(1.0, g("phone_flat")))
+    if c.faceatoms and "face_atom_id" in ch:                                              # replacement face drawing: show exactly one, hide the procedural face while it is up
+        fid = int(round(g("face_atom_id")))
+        for k_, ob in c.faceatoms:
+            v = 1.0 if k_ == fid else 0.0001
+            ob.scale = (v, v, v)
+        if c.man.get("view") != "back":
+            pv = 0.0001 if fid > 0 else 1.0
+            for ob in list(c.face.values()) + ([c.parts["nose"]] if "nose" in c.parts else []):
+                ob.scale = (pv, pv, pv)
     hidden = "char_vis" in ch and g("char_vis", 1.0) < 0.5                                   # replacement-drawing turns: only one view-set of a character is drawn at a time
     if hidden:
         for ob in c.all_objs:
@@ -549,9 +573,17 @@ def key_pose(c, f, fi):
         if ob.data.shape_keys:
             for kb in ob.data.shape_keys.key_blocks[1:]:
                 kb.keyframe_insert("value", frame=f)
+    if GAZE_MODE == "pupil":
+        for side in ("L", "R"):
+            c.face["pupil_" + side].keyframe_insert("location", frame=f)
     for pn in ("phone", "card", "money", "fingers"):
         if pn in c.parts:
             c.parts[pn].keyframe_insert("scale", frame=f)
+    if c.faceatoms and "face_atom_id" in ch:
+        for _, ob in c.faceatoms:
+            ob.keyframe_insert("scale", frame=f)
+        for ob in list(c.face.values()) + ([c.parts["nose"]] if "nose" in c.parts else []):
+            ob.keyframe_insert("scale", frame=f)
     if getattr(c, "phone_flat", None) is not None:
         c.phone_flat.keyframe_insert("value", frame=f)
     if "char_vis" in ch:

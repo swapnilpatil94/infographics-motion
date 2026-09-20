@@ -1,0 +1,55 @@
+{
+ "armature": "Human.rigify",
+ "poses": [
+  "stand",
+  "sit",
+  "walk",
+  "reach",
+  "hold_phone",
+  "turn"
+ ],
+ "views": [
+  "front",
+  "three_quarter",
+  "side",
+  "back"
+ ],
+ "ik_end_effector_error_rig_px": {
+  "stand": {
+   "hand_L": 0.0,
+   "foot_L": 0.0,
+   "hand_R": 0.0,
+   "foot_R": 0.0
+  },
+  "sit": {
+   "hand_L": 0.0,
+   "foot_L": 0.02,
+   "hand_R": 0.0,
+   "foot_R": 0.03
+  },
+  "walk": {
+   "hand_L": 0.0,
+   "foot_L": 0.09,
+   "hand_R": 0.0,
+   "foot_R": 0.09
+  },
+  "reach": {
+   "hand_L": 0.0,
+   "foot_L": 0.0,
+   "hand_R": 0.06,
+   "foot_R": 0.0
+  },
+  "hold_phone": {
+   "hand_L": 0.0,
+   "foot_L": 0.0,
+   "hand_R": 0.0,
+   "foot_R": 0.0
+  },
+  "turn": {
+   "hand_L": 0.06,
+   "foot_L": 0.1,
+   "hand_R": 0.06,
+   "foot_R": 0.1
+  }
+ }
+}

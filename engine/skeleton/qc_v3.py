@@ -105,7 +105,7 @@ def run(plan, actors, cam, rep, film, mp4, stats, frames_dir, log=print):
     notice = [e for e in D.perf.events if e[1] == "acting" and e[2].get("kind") == "notice"] if D else []
     ec = {cid: [e for e in a.perf.events if e[1] == "eye_contact"] for cid, a in actors.items()}
     if has("PERSON_ENTERS"):
-        checks["mother_enters_(starts_off-screen,_walks_>=300px,_notices_him)"] = bool(D) and D.origin[0] >= 1350 and dist >= 300 and len(notice) >= 1
+        checks["mother_enters_(starts_off-screen,_walks_>=300px,_notices_him)"] = bool(D) and D.origin[0] >= 1235 and dist >= 300 and len(notice) >= 1
     if has("PERSON_ENTERS", "EYE_CONTACT"):
         checks["eye_contact_both_ways"] = all(len(v) >= 1 for v in ec.values())
     ev["entrance"] = dict(start_x=D.origin[0] if D else None, walk_px=round(dist), notice_events=len(notice), eye_contact={k: len(v) for k, v in ec.items()})
@@ -125,5 +125,12 @@ def run(plan, actors, cam, rep, film, mp4, stats, frames_dir, log=print):
     half = 0.5 * 1.2 * (actors["A"].P["torso_w"] + actors["D"].P["torso_w"])
     checks["characters_never_intersect_(torso_spacing)"] = float(np.abs(xa - xd).min()) >= half
     ev["min_torso_centre_distance_px"] = round(float(np.abs(xa - xd).min()), 1)
+    if acts and "WALK_ACROSS" not in acts:                           # arc without a walk: the protagonist never walks -> the walk gate is not applicable
+        if checks.pop("real_skeletal_walk_(steps,distance,foot_lift)", None) is not None:
+            na.append("real_skeletal_walk")
+    if plan.get("lamp_on", 1.0) == 0.0:                               # daylight art direction: the room is lit from the first frame, there is no 'lamp comes on' moment
+        if checks.pop("lamp_raises_brightness_(lit_room_>_previous_shot)", None) is not None:
+            na.append("lamp_raises_brightness")
+    ev["not_applicable_gates"] = na
     ok = all(checks.values())
     return dict(base, checks=checks, evidence=ev, passed=ok, n_checks=len(checks))

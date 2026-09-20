@@ -13,7 +13,7 @@ import os
 import re
 import urllib.request
 
-from engine.skeleton import acts as AC
+from engine.skeleton import acts as AC, styles as ST
 
 OLLAMA = "http://localhost:11434/api/chat"
 DIRECTOR = "qwen3:14b"
@@ -226,6 +226,16 @@ def write(topic, use_llm=True, seed=7, log=print):
         else:
             rej.append("arc")
         prov.append(dict(step="llm_validation", accepted=acc, rejected_fallback_to_pack=rej))
+    style_id = ST.PACK_STYLE.get(pack_id, "night_bedroom")
+    style = ST.get(style_id)
+    prov.append(dict(step="art_direction", style=style_id, family=style["family"], psychology=style["psychology"]))
+    if style["cast"]["protagonist"]:                                       # the style casts the protagonist / the visitor (the LLM's names for them are replaced)
+        F["protagonist_gender"] = style["cast"]["protagonist"]["gender"]
+        F["protagonist_name"] = _pick(topic, "name", NAMES[F["protagonist_gender"]])
+    if style["cast"]["other"]:
+        F["relation"] = style["cast"]["other"]["relation"]
+    if style["arc"]:
+        F["arc"] = list(globals()[style["arc"]])
     arc, ch = AC.repair(F["arc"])
     assert not AC.validate(arc)
     fem = F["protagonist_gender"] == "female"
@@ -250,7 +260,7 @@ def write(topic, use_llm=True, seed=7, log=print):
     sid = f"{pack_id}_" + hashlib.sha1(topic.encode()).hexdigest()[:5]
     story = dict(topic=topic, title=F["title"], story_id=sid, slug=re.sub(r"[^a-z0-9]+", "_", topic.lower()).strip("_")[:40] or sid, domain=pack_id,
                  cast=dict(protagonist=dict(name=F["protagonist_name"], gender=F["protagonist_gender"]), other=dict(relation=F["relation"], name=REL[F["relation"]]["noun"])), beats=beats, words=words,
-                 est_duration_s=round(words / 3.0 + 6.0, 1), provenance=prov, presets=True)
+                 est_duration_s=round(words / 3.0 + 6.0, 1), provenance=prov, presets=style["presets"], style=style_id)
     return story
 
 

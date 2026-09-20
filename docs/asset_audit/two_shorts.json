@@ -1,0 +1,329 @@
+{
+ "A": {
+  "story": "दोगुना पैसे का वादा",
+  "domain": "investment",
+  "style": "night_bedroom",
+  "beats": 20,
+  "duration_s": 46.83,
+  "arc": [
+   "ESTABLISH",
+   "PHONE_ALERT",
+   "LOOK_AT_PHONE",
+   "EYES_CHANGE",
+   "REACH_PHONE",
+   "PICK_UP",
+   "READ_MESSAGE",
+   "REALIZE",
+   "STAND_UP",
+   "WALK_ACROSS",
+   "PERSON_ENTERS",
+   "EYE_CONTACT",
+   "OTHER_LOOKS_AT_PHONE",
+   "HAND_OVER",
+   "OTHER_REACTS",
+   "INSERT_SCREEN",
+   "VISUALIZE_FLOW",
+   "BOTH_REALIZE",
+   "CLOSE_UP",
+   "RESOLVE"
+  ],
+  "character_selection": {
+   "A": {
+    "name": "राहुल",
+    "role": "protagonist",
+    "dna": "cdna_dc785d3dee",
+    "hair": "Short 4",
+    "top": "hoodie",
+    "gender": "masculine",
+    "age": 22,
+    "glasses": "* None"
+   },
+   "D": {
+    "name": "माँ",
+    "role": "mother",
+    "dna": "cdna_4f6d87d477",
+    "hair": "Bun 2",
+    "top": "kurta",
+    "gender": "feminine",
+    "age": 47,
+    "glasses": "Glasses"
+   }
+  },
+  "environment": "bedroom_wide",
+  "blocking": {
+   "A_origin": 380.0,
+   "D_origin": 1440.0,
+   "A_stop": [
+    830.0,
+    1500
+   ],
+   "D_stop": [
+    1070.0,
+    1500
+   ],
+   "handover": [
+    905.0,
+    860.0
+   ],
+   "A_start": "sit"
+  },
+  "camera": {
+   "sizes": {
+    "wide": 1,
+    "two_reach": 2,
+    "medium": 3,
+    "close": 5,
+    "full": 2,
+    "two": 4,
+    "reveal": 1
+   },
+   "moves": {
+    "push": 5,
+    "reveal": 2,
+    "isolate": 3,
+    "drift": 1,
+    "rack_focus": 1,
+    "pull": 3,
+    "track": 1,
+    "hold": 1,
+    "truck": 1
+   },
+   "critic_fixed_shots": 4
+  },
+  "props": {
+   "phone_location": [
+    670.0,
+    1166.0
+   ],
+   "furniture": "bed + nightstand"
+  },
+  "psychology": {
+   "replacement_faces": [],
+   "acting": [
+    "buzz",
+    "confusion",
+    "eye_contact",
+    "face",
+    "fear",
+    "flinch",
+    "freeze",
+    "grab",
+    "hand_over",
+    "hand_pose",
+    "hold_phone",
+    "idle",
+    "look_at",
+    "notice",
+    "reach",
+    "read_phone",
+    "realization",
+    "receive",
+    "release",
+    "relief",
+    "stand",
+    "walk_to"
+   ]
+  },
+  "motifs": [
+   "arcs",
+   "arrow",
+   "rays",
+   "ring",
+   "scribble",
+   "ticks",
+   "worry"
+  ],
+  "lighting": {
+   "moods": [
+    "dim",
+    "fear",
+    "relief"
+   ],
+   "moon": true,
+   "sun": false,
+   "lamp_on_at": 42.16
+  },
+  "composition": {
+   "shots": 20,
+   "mean_shot_s": 2.34,
+   "insert_at_beat": 16
+  },
+  "qc": {
+   "passed": true,
+   "n": 52,
+   "not_applicable": []
+  },
+  "shared_library": {
+   "rig": "26 bones + 4 IK",
+   "hand_poses": 20,
+   "open_peeps_heads_used": [
+    "Bun 2",
+    "Short 4"
+   ]
+  }
+ },
+ "B": {
+  "story": "जो इनाम माँगा ही नहीं",
+  "domain": "lottery",
+  "style": "day_study",
+  "beats": 17,
+  "duration_s": 46.169,
+  "arc": [
+   "ESTABLISH",
+   "PHONE_ALERT",
+   "LOOK_AT_PHONE",
+   "REACH_PHONE",
+   "PICK_UP",
+   "READ_MESSAGE",
+   "INSERT_SCREEN",
+   "REALIZE",
+   "STAND_UP",
+   "PERSON_ENTERS",
+   "EYE_CONTACT",
+   "HAND_OVER",
+   "OTHER_REACTS",
+   "VISUALIZE_FLOW",
+   "BOTH_REALIZE",
+   "CLOSE_UP",
+   "RESOLVE"
+  ],
+  "character_selection": {
+   "A": {
+    "name": "नेहा",
+    "role": "protagonist",
+    "dna": "cdna_f8a0bc168a",
+    "hair": "Medium 1",
+    "top": "sweater",
+    "gender": "feminine",
+    "age": 24,
+    "glasses": "* None"
+   },
+   "D": {
+    "name": "पापा",
+    "role": "father",
+    "dna": "cdna_2fedb5651b",
+    "hair": "Short 2",
+    "top": "shirt",
+    "gender": "masculine",
+    "age": 50,
+    "glasses": "Glasses"
+   }
+  },
+  "environment": "study_room",
+  "blocking": {
+   "A_origin": 300.0,
+   "D_origin": 1290.0,
+   "A_stop": [
+    620.0,
+    1500
+   ],
+   "D_stop": [
+    950.0,
+    1500
+   ],
+   "handover": [
+    780.0,
+    880.0
+   ],
+   "A_start": "sit"
+  },
+  "camera": {
+   "sizes": {
+    "wide": 1,
+    "two_reach": 2,
+    "medium": 5,
+    "close": 1,
+    "full": 1,
+    "two": 4,
+    "reveal": 1
+   },
+   "moves": {
+    "push": 3,
+    "reveal": 2,
+    "isolate": 2,
+    "drift": 1,
+    "rack_focus": 1,
+    "pull": 3,
+    "hold": 2,
+    "truck": 1
+   },
+   "critic_fixed_shots": 6
+  },
+  "props": {
+   "phone_location": [
+    720.0,
+    1050.0
+   ],
+   "furniture": "chair + table + lamp"
+  },
+  "psychology": {
+   "replacement_faces": [
+    "dread",
+    "smile",
+    "suspicious"
+   ],
+   "acting": [
+    "buzz",
+    "confusion",
+    "eye_contact",
+    "face",
+    "face_atom",
+    "fear",
+    "flinch",
+    "freeze",
+    "grab",
+    "hand_over",
+    "hand_pose",
+    "hold_phone",
+    "idle",
+    "look_at",
+    "notice",
+    "reach",
+    "read_phone",
+    "realization",
+    "receive",
+    "release",
+    "relief",
+    "stand",
+    "walk_to"
+   ]
+  },
+  "motifs": [
+   "arcs",
+   "ring",
+   "scribble",
+   "ticks"
+  ],
+  "lighting": {
+   "moods": [
+    "bright",
+    "pressure",
+    "warm"
+   ],
+   "moon": false,
+   "sun": true,
+   "lamp_on_at": 0.0
+  },
+  "composition": {
+   "shots": 17,
+   "mean_shot_s": 2.72,
+   "insert_at_beat": 7
+  },
+  "qc": {
+   "passed": true,
+   "n": 50,
+   "not_applicable": [
+    "real_skeletal_walk",
+    "lamp_raises_brightness"
+   ]
+  },
+  "shared_library": {
+   "rig": "26 bones + 4 IK",
+   "hand_poses": 20,
+   "open_peeps_heads_used": [
+    "Medium 1",
+    "Short 2"
+   ]
+  }
+ }
+}

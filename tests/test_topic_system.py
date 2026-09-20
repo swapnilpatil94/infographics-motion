@@ -126,7 +126,7 @@ class CriticGeometryTests(unittest.TestCase):
                 break
             for g in bad:
                 sh = next(x for x in p["shots"] if x["id"] == g["shot"])
-                sol = CR.solve_camera(sh, actors, cam, p["fps"], None)
+                sol = CR.solve_camera(sh, actors, cam, p["fps"], None) or CR.solve_camera(sh, actors, cam, p["fps"], None, bounds=False)
                 self.assertIsNotNone(sol, g)
                 CR._merge(fixes, g["beat"], "camera", sol)
         self.assertGreaterEqual(bad0, 1, "the uncritiqued draft should contain clipped framings")
@@ -144,7 +144,8 @@ class CriticGeometryTests(unittest.TestCase):
             if not bad:
                 break
             for g in bad:
-                sol = CR.solve_camera(next(x for x in p["shots"] if x["id"] == g["shot"]), actors, cam, p["fps"], None)
+                sh_ = next(x for x in p["shots"] if x["id"] == g["shot"])
+                sol = CR.solve_camera(sh_, actors, cam, p["fps"], None) or CR.solve_camera(sh_, actors, cam, p["fps"], None, bounds=False)
                 self.assertIsNotNone(sol)
                 CR._merge(fixes, g["beat"], "camera", sol)
         self.assertEqual(bad, [])

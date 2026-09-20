@@ -19,7 +19,7 @@ from engine.shorts.performance import Channel, ease
 from engine.skeleton import rig_def as R
 
 FACE_CH = ["gaze_x", "gaze_y", "blink", "wide", "lid", "narrow", "brow_raise", "brow_tilt", "brow_asym", "mouth_open", "mouth_smile", "mouth_worried",
-           "vis_A", "vis_E", "vis_I", "vis_O", "vis_U", "vis_shocked"]
+           "vis_A", "vis_E", "vis_I", "vis_O", "vis_U", "vis_shocked", "face_atom_id"]
 POSE_CH = ["root_x", "root_y", "pelvis_dx", "pelvis_dy", "spine_rot", "chest_rot", "neck_rot", "head_rot", "hair_rot", "hand_L_rot", "hand_R_rot", "shrug",
            "foot_L_rot", "foot_R_rot", "phone_vis", "fingers_vis", "phone_glow", "phone_flat", "card_vis", "money_vis", "hand_L_pose_id", "hand_R_pose_id"]
 IK_CH = ["hand_L_x", "hand_L_y", "hand_R_x", "hand_R_y", "foot_L_x", "foot_L_y", "foot_R_x", "foot_R_y"]

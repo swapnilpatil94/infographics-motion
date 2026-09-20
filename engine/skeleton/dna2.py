@@ -44,7 +44,23 @@ ROLES = {   # role -> (age range, presentation weights, tops, bottoms, shoes, ac
     "student": ((16, 24), "any", ("tee", "hoodie", "sweater", "shirt"), ("jeans", "shorts", "trousers"), ("sneakers", "sneakers", "sandals"), dict(backpack=.6, cap=.2, glasses=.2)),
     "shopkeeper": ((30, 60), "masculine", ("kurta", "shirt", "polo"), ("trousers", "salwar"), ("sandals", "formal", "slippers"), dict(watch=.3, glasses=.2)),
     "banker": ((28, 56), "any", ("shirt", "jacket"), ("trousers", "skirt"), ("formal",), dict(watch=.6, glasses=.4)),
+    # v3.6 (asset audit): roles the factory was asked for but did not have. Appended: the seeded streams of the roles above are untouched (stream key = seed + role name).
+    "delivery_worker": ((20, 42), "masculine", ("tee", "polo", "jacket"), ("trousers", "jeans"), ("sneakers",), dict(backpack=.85, cap=.6, watch=.2)),
+    "security_guard": ((30, 58), "masculine", ("shirt", "jacket"), ("trousers",), ("formal",), dict(cap=.75, watch=.3)),
+    "teacher": ((28, 58), "any", ("kurta", "shirt", "sweater"), ("trousers", "salwar"), ("formal", "sandals"), dict(glasses=.6, bag=.6, watch=.3)),
+    "parent": ((34, 54), "any", ("kurta", "shirt", "sweater", "polo"), ("trousers", "salwar", "jeans"), ("sandals", "slippers", "formal"), dict(bag=.5, glasses=.3, earrings=.4)),
+    "customer": ((20, 62), "any", ("tee", "shirt", "kurta", "hoodie", "polo"), ("jeans", "trousers", "salwar", "skirt"), ("sneakers", "sandals", "formal"), dict(bag=.5, backpack=.2, glasses=.25)),
 }
+
+# Open Peeps atoms the factory could not reach before the audit. They are NOT in the seeded pools above (that would change every existing character); they are used through `overrides` / lab_dna.
+EXTRA_HAIR_MASC = {"Turban", "Mohawk 2", "Shaved 3", "No Hair 2", "No Hair 3", "hat-beanie", "hat-hip"}
+EXTRA_HAIR_FEM = {"Twists", "Twists 2"}
+NOVELTY_HAIR = {"Bear"}                                   # a bear costume head: never used for documentary casts
+ALL_FACIAL = ("* None", "Chin", "Full", "Full 2", "Full 3", "Full 4", "Goatee 1", "Goatee 2", "Moustache 1", "Moustache 2", "Moustache 3", "Moustache 4", "Moustache 5", "Moustache 6", "Moustache 7", "Moustache 8", "Moustache 9")
+ALL_GLASSES = ("* None", "Glasses", "Glasses 2", "Glasses 3", "Glasses 4", "Glasses 5", "Sunglasses", "Sunglasses 2")
+EXTRA_HAIR_LEN = {"Turban": "covered", "hat-beanie": "covered", "hat-hip": "covered", "Mohawk 2": "short", "Shaved 3": "buzz", "No Hair 2": "bald", "No Hair 3": "bald", "Twists": "medium", "Twists 2": "long"}
+EXTRA_PALETTES = {"khaki": ("#c2b280", "#5b5a48", "#2b2a26", "#8a3f3a"), "navy": ("#3f5a8a", "#252d44", "#1f2026", "#d9c9a3"), "maroon": ("#8a3f4a", "#3b3948", "#25232b", "#e6d4bd"),
+                  "saffron": ("#e08a2e", "#4a4d5a", "#2b2a2e", "#f0e4c8"), "grey_blue": ("#7f95ad", "#3a4460", "#26282e", "#d8c7a0")}
 
 FEM_HAIR = {"Long", "Long Curly", "Long Bangs", "Bun", "Bun 2", "Buns", "Medium 1", "Medium 2", "Medium 3", "Medium Bangs", "Medium Bangs 2", "Medium Bangs 3", "Medium Straight", "Gray Bun", "Bangs 2", "Bangs",
             "Bantu Knots", "Long Afro", "Cornrows 2", "Hijab"}
@@ -118,7 +134,8 @@ def make(seed, role="office_worker", overrides=None):
         cur[parts[-1]] = v
     if "wardrobe.palette" in (overrides or {}):
         pn = d["wardrobe"]["palette"]
-        d["wardrobe"].update(top_color=PALETTES[pn][0], bottom_color=PALETTES[pn][1], shoe_color=PALETTES[pn][2], accent=PALETTES[pn][3])
+        pal = {**PALETTES, **EXTRA_PALETTES}[pn]
+        d["wardrobe"].update(top_color=pal[0], bottom_color=pal[1], shoe_color=pal[2], accent=pal[3])
     d["id"] = "cdna_" + hashlib.sha1(_canon(d).encode()).hexdigest()[:10]
     return d
 
@@ -126,7 +143,7 @@ def make(seed, role="office_worker", overrides=None):
 def peeps_view(d):
     """The v1-style dict the Open Peeps head-shell builder needs."""
     return dict(id=d["id"], archetype=d["role"], gender="female" if d["gender_presentation"] == "feminine" else "male", age_group=d["age_group"], hair=d["hair"]["style"], facial_hair=d["facial_hair"],
-                glasses=("Glasses" if "glasses" in d["wardrobe"]["accessories"] or d.get("glasses", "* None") != "* None" else "* None"), skin=d["skin"]["id"], extra=[])
+                glasses=(d["glasses"] if d.get("glasses", "* None") in ALL_GLASSES and d["glasses"] != "* None" else "Glasses" if "glasses" in d["wardrobe"]["accessories"] else "* None"), skin=d["skin"]["id"], extra=[])
 
 
 def validate(d):

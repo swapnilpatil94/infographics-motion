@@ -5,7 +5,7 @@ import hashlib
 
 from engine.dsl import variation as VAR
 from engine.environments import bedroom_wide as BW
-from engine.skeleton import acts as AC, dna2
+from engine.skeleton import acts as AC, dna2, styles as ST
 
 FPS = 30
 HANDOVER = (905.0, 860.0)
@@ -29,6 +29,7 @@ OTHERS = {
 
 
 def cast(story):
+    style = ST.get(story.get("style"))
     c = story.get("cast", {})
     pro, oth = c.get("protagonist", {}), c.get("other", {})
     sid = story["story_id"]
@@ -36,8 +37,8 @@ def cast(story):
     A = dna2.make(f"{sid}:A", role, ov)
     role2, ov2 = OTHERS.get(oth.get("relation", "mother"), OTHERS["mother"])
     D = dna2.make(f"{sid}:D", role2, ov2)
-    return {"A": dict(name=pro.get("name", "A"), role="protagonist", dna=A, facing=1, origin=[380.0, BW.FLOOR_Y], view="three_quarter", hand_set="full", start="sit"),
-            "D": dict(name=oth.get("name", "D"), role=oth.get("relation", "family"), dna=D, facing=-1, origin=[1440.0, BW.FLOOR_Y], view="three_quarter", hand_set="full", start="stand")}
+    return {"A": dict(name=pro.get("name", "A"), role="protagonist", dna=A, facing=1, origin=[style["A_origin"], BW.FLOOR_Y], view="three_quarter", hand_set="full", start=style["A_start"]),
+            "D": dict(name=oth.get("name", "D"), role=oth.get("relation", "family"), dna=D, facing=-1, origin=[style["D_origin"], BW.FLOOR_Y], view="three_quarter", hand_set="full", start="stand")}
 
 
 # Framing corrections the CRITIC discovered on the first two generated films (the same 4 acts were clipped in both: heads cut by the frame edge at these stage positions). They are now the director's
@@ -97,13 +98,21 @@ def build_plan(story, nar, seed=11, name=None, tts=None, fixes=None, presets=Non
         first.setdefault(b["act"], i)
 
     fixes = fixes or {}
+    style = ST.get(story.get("style"))
     if presets is None:                                   # stories saved before the presets existed carry critic fixes solved WITHOUT them: never stack the two
-        presets = bool(story.get("presets", False))
+        presets = bool(story.get("presets", False)) and style["presets"]
 
     def shot(i, treat, purpose, **kw):
         t0, t1 = cuts[i], cuts[i + 1]
         if presets and beats[i]["act"] in PRESETS and kw.get("camera"):
             kw = dict(kw, camera=dict(kw["camera"], **PRESETS[beats[i]["act"]]))
+        if kw.get("camera") and beats[i]["act"] in style["camera_bias"]:                                   # composition: the style's own camera language
+            tg, sz, mv = style["camera_bias"][beats[i]["act"]]
+            kw = dict(kw, camera=dict(kw["camera"], target=tg, size=sz, move=mv))
+        if style["motif"] and kw.get("gp"):
+            kw = dict(kw, gp=[dict(g, effect=style["motif"].get(g["effect"], g["effect"])) for g in kw["gp"]])
+        lt0 = dict(dict(mood="dim", moon=1.0, phone=1.0), **kw.get("lighting", {}))
+        kw = dict(kw, lighting=ST.relight(style, lt0, beats[i]["act"]), audio_mood=lt0.get("mood", "dim"))
         shots.append(apply_fixes(dict(id=f"S{i + 1:02d}", treatment=treat, t0=t0, t1=t1, beats=[beats[i]["id"]], segs=[beats[i]["id"]], purpose=purpose, act=beats[i]["act"],
                           **{**dict(gp=[], transition_in="cut", sfx=[], phase="-", location="bedroom", lighting=dict(mood="dim", moon=1.0, phone=1.0)), **kw}), fixes.get(beats[i]["id"])))
 
@@ -211,6 +220,10 @@ def build_plan(story, nar, seed=11, name=None, tts=None, fixes=None, presets=Non
             shot(i, "skeleton", "They stop and think; the lamp comes on; wide pull-out", camera=_cam("A+D", "reveal", "pull"), lighting=dict(mood="relief", moon=0.6, phone=0.0, hall=0.4, lamp=1.0),
                  gp=[dict(effect="rays", anchor="lamp", start=0.3, duration=min(2.6, L + TAIL - 0.3), intensity=0.5, relationship="warm light returns")])
         prev = a
+    for i, b in enumerate(beats):                                                                          # psychology: the style's extra acting / replacement faces at beats
+        for cid, ex in style["extras"].get(b["act"], []):
+            ex = dict(ex)
+            acts.append(dict(char=cid, t=round(cuts[i] + ex.pop("dt"), 3), **ex))
     for s_ in shots:
         s_["actions"] = [x for x in acts if s_["t0"] - 1.0 <= x["t"] < s_["t1"]]
     T = {a: cuts[i] for a, i in first.items()}
@@ -227,7 +240,7 @@ def build_plan(story, nar, seed=11, name=None, tts=None, fixes=None, presets=Non
         sfx.append(dict(t=round(cuts[i] - 0.06, 3), kind="whoosh", gain=0.2))
     mood, cur = [], None
     for s_ in shots:
-        m = s_["lighting"].get("mood", "dim")
+        m = s_.get("audio_mood", s_["lighting"].get("mood", "dim"))
         if cur and cur[2] == m:
             cur[1] = s_["t1"]
         else:
@@ -237,12 +250,12 @@ def build_plan(story, nar, seed=11, name=None, tts=None, fixes=None, presets=Non
     ent = T.get("PERSON_ENTERS")
     lamp = T.get("RESOLVE")
     tfix = fixes.get("_targets", {})
-    targets = dict(PHONE=list(BW.PHONE_POS), DOOR=[960.0, 1000.0], NIGHTSTAND=[670.0, 1180.0], BED=[200.0, 1230.0], LAMP=[600.0, 1110.0], WINDOW=[865.0, 560.0], A_STOP=[830.0, BW.FLOOR_Y], D_STOP=[1070.0, BW.FLOOR_Y],
+    targets = dict(style["targets"]) if style["id"] != "night_bedroom" else dict(PHONE=list(BW.PHONE_POS), DOOR=[960.0, 1000.0], NIGHTSTAND=[670.0, 1180.0], BED=[200.0, 1230.0], LAMP=[600.0, 1110.0], WINDOW=[865.0, 560.0], A_STOP=[830.0, BW.FLOOR_Y], D_STOP=[1070.0, BW.FLOOR_Y],
                    HANDOVER=list(HANDOVER), SCREEN=[540.0, 900.0], MONEY=[540.0, 900.0], nightstand_phone=list(BW.PHONE_POS))
     targets.update({k: list(v) for k, v in tfix.items()})
     return dict(kind="skeleton_short", version=3, title=story["title"], story_id=sid, seed=seed, fps=FPS, format=dict(w=1080, h=1920, name="9x16"), duration=dur, name=name or story.get("slug", sid),
-                environment=dict(family="bedroom_wide", variation=dict(palette=VAR.seed_int(sid, "env", "pal") % 3), seed=VAR.seed_int(sid, "env", "seed") % 1000),
+                environment=dict(family=style["family"], variation=dict(palette=VAR.seed_int(sid, "env", "pal") % 3), seed=VAR.seed_int(sid, "env", "seed") % 1000),
                 characters=cast(story), cast_in_short=["A", "D"], narration=dict(segments=nar["segments"], audio=nar.get("audio"), tts=tts or nar.get("tts", "unknown"), tempo=nar.get("tempo", 1.0)),
                 targets=targets, shots=shots, sfx=sfx, mood_track=[tuple(m) for m in mood], title_card=dict(t0=round(dur - 1.9, 3), t1=dur, text=story["title"]),
-                lamp_on=round(lamp + 0.3, 3) if lamp is not None else 1e9, hall_on=round(ent - 0.5, 3) if ent is not None else 1e9, rim=dict(moon=0.5), duration_range=[45.0, 60.0],
+                lamp_on=0.0 if style["lamp_from_start"] else (round(lamp + 0.3, 3) if lamp is not None else 1e9), hall_on=round(ent - 0.5, 3) if ent is not None else 1e9, rim=dict(moon=0.5), duration_range=[45.0, 60.0],
                 acts=[b["act"] for b in beats])

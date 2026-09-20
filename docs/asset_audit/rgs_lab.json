@@ -1,0 +1,127 @@
+{
+ "pack": "RGS free_2d_animated_vector_game_character_sprites (CC0)",
+ "parts_available": {
+  "bodies": 1,
+  "heads": 3,
+  "hairs": 3,
+  "eyes": 7,
+  "mouths": 8,
+  "horns": 5,
+  "hands": 2,
+  "feet": 2,
+  "wings": 2,
+  "weapons": 3,
+  "frames_per_part": 42,
+  "canvas": "2048x2048"
+ },
+ "style_metrics": {
+  "RGS head1 (raw)": {
+   "part_px": 432,
+   "rim_px": 32.8,
+   "rim_ratio": 0.076,
+   "tones": 9,
+   "gloss": true,
+   "colours": 9
+  },
+  "RGS head1 (normalised)": {
+   "part_px": 432,
+   "rim_px": 12.4,
+   "rim_ratio": 0.029,
+   "tones": 1,
+   "gloss": false,
+   "colours": 2
+  },
+  "RGS hair1 (raw)": {
+   "part_px": 451,
+   "rim_px": 33.2,
+   "rim_ratio": 0.074,
+   "tones": 9,
+   "gloss": false,
+   "colours": 6
+  },
+  "RGS handR (raw)": {
+   "part_px": 131,
+   "rim_px": 111.8,
+   "rim_ratio": 0.851,
+   "tones": 0,
+   "gloss": false,
+   "colours": 1
+  },
+  "RGS eyes6 (raw)": {
+   "part_px": 192,
+   "rim_px": 20.0,
+   "rim_ratio": 0.104,
+   "tones": 9,
+   "gloss": true,
+   "colours": 10
+  },
+  "own torso": {
+   "part_px": 433,
+   "rim_px": 12.0,
+   "rim_ratio": 0.028,
+   "tones": 4,
+   "gloss": false,
+   "colours": 9
+  },
+  "own hand_R_relaxed": {
+   "part_px": 177,
+   "rim_px": 8.4,
+   "rim_ratio": 0.047,
+   "tones": 2,
+   "gloss": false,
+   "colours": 6
+  },
+  "own skull": {
+   "part_px": 353,
+   "rim_px": null,
+   "rim_ratio": null,
+   "tones": 1,
+   "gloss": false,
+   "colours": 2
+  }
+ },
+ "verdict": {
+  "head": "UNUSABLE as a head: a bare sphere with a 10 % rim and cel gloss; after normalising it is a plain circle (no expression, no neck, no ears, no hair slot) - Open Peeps heads are strictly better",
+  "hair": "UNUSABLE: tufts/mushroom shapes for monsters; no coherent hair for people",
+  "eyes": "PARTLY USABLE as eye-state references only: eyes5 (plain dots) / eyes6 (glossy) - our editorial eye already covers this; no gain",
+  "mouths": "REFERENCE: 8 simple mouth curves (mouth1-4 are ink strokes that fit our style); weaker than the Open Peeps face atoms",
+  "hands": "UNUSABLE: a solid black blob without fingers",
+  "body": "UNUSABLE: a pill-shaped torso without arms; feet solid black",
+  "clothing": "none exists in the pack",
+  "animation": "42 frames per part (idle/walk/roll/hit/death...) on registered 2048 px canvases: a clean sprite-sheet pipeline, but frame-by-frame raster: incompatible with our IK rig"
+ },
+ "tests": [
+  {
+   "name": "T1 RGS head + our torso",
+   "normalised": false
+  },
+  {
+   "name": "T2 RGS hair + Open Peeps head",
+   "normalised": false
+  },
+  {
+   "name": "T3 RGS hand + our arm",
+   "normalised": false
+  },
+  {
+   "name": "T5 RGS eyes+mouth + Open Peeps head",
+   "normalised": false
+  },
+  {
+   "name": "T1 RGS head + our torso",
+   "normalised": true
+  },
+  {
+   "name": "T2 RGS hair + Open Peeps head",
+   "normalised": true
+  },
+  {
+   "name": "T3 RGS hand + our arm",
+   "normalised": true
+  },
+  {
+   "name": "T5 RGS eyes+mouth + Open Peeps head",
+   "normalised": true
+  }
+ ]
+}

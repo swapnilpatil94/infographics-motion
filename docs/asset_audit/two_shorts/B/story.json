@@ -1,0 +1,254 @@
+{
+ "topic": "lottery prize processing fee scam",
+ "title": "जो इनाम माँगा ही नहीं",
+ "story_id": "lottery_d357f",
+ "slug": "lottery_prize_processing_fee_scam",
+ "domain": "lottery",
+ "cast": {
+  "protagonist": {
+   "name": "नेहा",
+   "gender": "female"
+  },
+  "other": {
+   "relation": "father",
+   "name": "पापा"
+  }
+ },
+ "beats": [
+  {
+   "id": "n01",
+   "act": "ESTABLISH",
+   "text": "रात के ग्यारह बजे। कमरे में अकेली नेहा।",
+   "data": {}
+  },
+  {
+   "id": "n02",
+   "act": "PHONE_ALERT",
+   "text": "तभी फ़ोन पर मैसेज चमका।",
+   "data": {}
+  },
+  {
+   "id": "n03",
+   "act": "LOOK_AT_PHONE",
+   "text": "नेहा ने स्क्रीन की तरफ़ देखा।",
+   "data": {}
+  },
+  {
+   "id": "n04",
+   "act": "REACH_PHONE",
+   "text": "उसने काँपता हाथ बढ़ाया।",
+   "data": {}
+  },
+  {
+   "id": "n05",
+   "act": "PICK_UP",
+   "text": "और फ़ोन उठा लिया।",
+   "data": {}
+  },
+  {
+   "id": "n06",
+   "act": "READ_MESSAGE",
+   "text": "मैसेज: अजीब संदेश आया",
+   "data": {}
+  },
+  {
+   "id": "n07",
+   "act": "INSERT_SCREEN",
+   "text": "स्क्रीन पर लिखा था: इनाम पाने के लिए फ़ीस भेजिए",
+   "data": {
+    "sender": "LOTTERY-2025",
+    "time": "अभी",
+    "text": "बधाई! आपने इनाम जीता है। इनाम पाने के लिए पहले प्रोसेसिंग फ़ीस भेजें। tinyurl.com/claim-now"
+   }
+  },
+  {
+   "id": "n08",
+   "act": "REALIZE",
+   "text": "चेहरे का रंग उड़ गया।",
+   "data": {}
+  },
+  {
+   "id": "n09",
+   "act": "STAND_UP",
+   "text": "वो घबराकर उठ खड़ी हुई।",
+   "data": {}
+  },
+  {
+   "id": "n10",
+   "act": "PERSON_ENTERS",
+   "text": "तभी दरवाज़ा खुला। पापा अंदर आए।",
+   "data": {}
+  },
+  {
+   "id": "n11",
+   "act": "EYE_CONTACT",
+   "text": "नेहा ने पापा की तरफ़ देखा।",
+   "data": {}
+  },
+  {
+   "id": "n12",
+   "act": "HAND_OVER",
+   "text": "उसने चुपचाप फ़ोन पापा को थमा दिया।",
+   "data": {}
+  },
+  {
+   "id": "n13",
+   "act": "OTHER_REACTS",
+   "text": "पापा का चेहरा बदल गया।",
+   "data": {}
+  },
+  {
+   "id": "n14",
+   "act": "VISUALIZE_FLOW",
+   "text": "पाँच लाख रुपये, तीन खाते... एक पूरा जाल।",
+   "data": {
+    "amount": 500000,
+    "to": [
+     "खाता 1",
+     "खाता 2",
+     "खाता 3"
+    ],
+    "from": "आपकी बचत"
+   }
+  },
+  {
+   "id": "n15",
+   "act": "BOTH_REALIZE",
+   "text": "दोनों समझ गए, इनाम नहीं, ये ठगी है।",
+   "data": {}
+  },
+  {
+   "id": "n16",
+   "act": "CLOSE_UP",
+   "text": "जो इनाम माँगा नहीं, उसकी फ़ीस कभी मत भरिए।",
+   "data": {}
+  },
+  {
+   "id": "n17",
+   "act": "RESOLVE",
+   "text": "पर इस बार, दोनों ने रुककर सोचा।",
+   "data": {}
+  }
+ ],
+ "words": 107,
+ "est_duration_s": 41.7,
+ "provenance": [
+  {
+   "step": "domain",
+   "result": "lottery",
+   "why": "topic matches pack 'lottery' (2 keyword(s))"
+  },
+  {
+   "step": "llm",
+   "model": "qwen3:14b",
+   "raw": {
+    "title": "जो इनाम माँगा ही नहीं",
+    "protagonist_name": "राहुल",
+    "protagonist_gender": "male",
+    "other": "mother",
+    "sender": "LOTTERY-2025",
+    "sms_text": "बधाई! आपने इनाम जीता है। इनाम पाने के लिए पहले प्रोसेसिंग फ़ीस भेजें। tinyurl.com/claim-now",
+    "teaser": "अजीब संदेश आया",
+    "hook": "इनाम पाने के लिए फ़ीस भेजिए",
+    "flow_from": "आपकी बचत",
+    "lesson": "जो इनाम माँगा नहीं, उसकी फ़ीस कभी मत भरिए।",
+    "amount": 500000,
+    "arc": [
+     "ESTABLISH",
+     "PHONE_ALERT",
+     "LOOK_AT_PHONE",
+     "EYES_CHANGE",
+     "REACH_PHONE",
+     "PICK_UP",
+     "READ_MESSAGE",
+     "REALIZE",
+     "STAND_UP",
+     "WALK_ACROSS",
+     "PERSON_ENTERS",
+     "EYE_CONTACT",
+     "OTHER_LOOKS_AT_PHONE",
+     "HAND_OVER",
+     "OTHER_REACTS",
+     "INSERT_SCREEN",
+     "VISUALIZE_FLOW",
+     "BOTH_REALIZE",
+     "CLOSE_UP",
+     "RESOLVE"
+    ]
+   }
+  },
+  {
+   "step": "llm_validation",
+   "accepted": [
+    "title",
+    "teaser",
+    "hook",
+    "lesson",
+    "flow_from",
+    "protagonist",
+    "other",
+    "sender",
+    "sms_text",
+    "arc"
+   ],
+   "rejected_fallback_to_pack": []
+  },
+  {
+   "step": "art_direction",
+   "style": "day_study",
+   "family": "study_room",
+   "psychology": "greed / hope first (smile at the prize), then dread; warm daylight, table between the two"
+  }
+ ],
+ "presets": false,
+ "style": "day_study",
+ "fixes": {
+  "n02": {
+   "camera": {
+    "zoom_mul": 0.77,
+    "dx": -182.0,
+    "dy": 0.0
+   }
+  },
+  "n05": {
+   "camera": {
+    "zoom_mul": 0.81,
+    "dx": -145.7,
+    "dy": -56.0
+   }
+  },
+  "n10": {
+   "camera": {
+    "zoom_mul": 0.69,
+    "dx": 176.6,
+    "dy": 0.0
+   }
+  },
+  "n12": {
+   "camera": {
+    "zoom_mul": 0.81,
+    "dx": 10.7,
+    "dy": 0.0
+   }
+  },
+  "n13": {
+   "camera": {
+    "zoom_mul": 1.01,
+    "dx": -19.7,
+    "dy": 0.0
+   }
+  },
+  "n17": {
+   "camera": {
+    "zoom_mul": 1.01,
+    "dx": 42.6,
+    "dy": 0.0
+   }
+  },
+  "n07": {
+   "ui": {
+    "bloom": 0.15
+   }
+  }
+ }
+}
