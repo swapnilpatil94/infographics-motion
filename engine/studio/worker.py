@@ -184,6 +184,89 @@ def _simulate(job, rep):
     return dict(simulated=True)
 
 
+# ------------------------------------------------------------------------------------------------ Kathaya flows (plan / build / render)
+def run_kplan(job, pdir, rep):
+    """narration -> timeline -> creative director -> asset check"""
+    from kathaya import pipeline as KP
+    pid = job["project"]
+    KP.set_state(pid, "planning", job=os.path.basename(pdir))
+    proj = KP.load(pid)
+    i = proj["input"]
+    tts = i.get("narration_mode", "auto") != "estimated" and not i.get("audio") and not i.get("timing")
+    rep.start("narration", message="synthesising the narration (Chatterbox Hindi; no progress is reported inside the TTS)" if tts else "reading the narration audio / timing")
+    stop = threading.Event()
+
+    def beat():
+        while not stop.wait(1.0):
+            rep.progress("narration", fraction=None, message="Chatterbox Hindi is synthesising" if tts else "analysing the narration audio", current_operation="text to speech (Chatterbox Hindi)" if tts else "audio analysis")
+    th = threading.Thread(target=beat, daemon=True)
+    th.start()
+    try:
+        tl = KP.build_timeline(pid, workdir=os.path.join(KP.pdir(pid), "narration"), log=lambda m: rep.log(m, "narration"))
+    finally:
+        stop.set()
+    rep.complete("narration", message=f"{tl['source']}: {len(tl['narration'])} segments, {tl['duration']:.1f} s", source=tl["source"], duration=tl["duration"])
+    with rep.stage("timeline", message="building the narration timeline") as done:
+        done["message"] = f"{len(tl['narration'])} timestamped segments, {tl['duration']:.1f} s" + (" - " + tl["warnings"][0][:90] if tl["warnings"] else "")
+        done["warnings"] = tl["warnings"]
+    if i.get("provider") == "chatgpt":                                                       # ChatGPT is the creative director: the user copies the prompt and pastes the reply (no LLM runs here)
+        rep.skip("visual_design", "waiting for ChatGPT's visual plan (copy the prompt, paste the reply)")
+        rep.skip("asset_check", "runs when the plan arrives")
+        KP.set_state(pid, "awaiting_chatgpt")
+        return dict(project=pid, state="awaiting_chatgpt")
+    rep.start("visual_design", message="the creative director designs the visuals for every narration segment", total_segments=len(tl["narration"]))
+
+    def cb(k, n, msg, nvis):
+        rep.progress("visual_design", fraction=(k + 1) / n, message=msg, segment=k + 1, total_segments=n, visuals=nvis, current_operation="creative director (local LLM): one visual at a time")
+    res = KP.design(pid, tl, log=lambda m: rep.log(m, "visual_design"), progress=cb)
+    rep.complete("visual_design", message=f"{res['report']['counts']['available'] + 0} assets used; plan {res['plan_hash']}", plan_hash=res["plan_hash"])
+    c = res["report"]["counts"]
+    with rep.stage("asset_check", message="checking every environment, character, prop and action against the catalog") as done:
+        done["message"] = f"{c['available']} assets available, {c['new_required']} new required, {c['capability_errors']} capability problem(s)"
+        done.update(available=c["available"], new_required=c["new_required"], capability_errors=c["capability_errors"])
+    return dict(project=pid, state=res["state"], counts=c)
+
+
+def run_kbuild(job, pdir, rep):
+    from kathaya.assets import builder as AB
+    from kathaya import pipeline as KP
+    pid, rid = job["project"], job["request_id"]
+    rep.start("asset_build", message=f"creating the Kathaya asset for request {rid}")
+    asset = AB.build_from_request(pid, rid, job["reference"], log=lambda m: rep.log(m, "asset_build"), progress=lambda f, m: rep.progress("asset_build", fraction=f, message=m))
+    rep.complete("asset_build", message=f"asset {asset['id']} created and added to the library", asset_id=asset["id"])
+    res = KP.recheck(pid)
+    return dict(project=pid, state=res["state"], asset_id=asset["id"], counts=res["report"]["counts"])
+
+
+def run_krender(job, pdir, rep):
+    from kathaya import pipeline as KP
+    from kathaya.cache import keys as KK
+    from kathaya.qc import technical as KQ
+    pid = job["project"]
+    KP.set_state(pid, "rendering", job=os.path.basename(pdir))
+    with rep.stage("compile", message="compiling the visual scene plan for the renderer") as done:
+        prep = KP.prepare_render(pid)
+        done["message"] = f"{len(prep['graph']['beats'])} visuals, {len(prep['graph']['scenes'])} scene(s), plan {prep['plan_hash']}"
+    json.dump(dict(narration=prep["narration_path"]), open(os.path.join(pdir, "inputs.json"), "w"))
+    r = PR.make(None, prep["narration_path"], out_dir=pdir, seed=job.get("seed", 11), samples=job.get("samples", 10), critique_rounds=job.get("critique_rounds", 1), log=rep.log, graph=prep["graph"])
+    rep.start("export", message="technical QC, previews and the summary")
+    fake = dict(job, mode="kathaya", settings=dict(format="16:9" if prep["plan"]["format"] == "long" else "9:16"), kind="generate")            # long-form: the 9:16 master plus a 16:9 export (the renderer's only native size is 9:16)
+    summary = _export(fake, pdir, r, rep)
+    plan, tl, cat = prep["plan"], prep["timeline"], prep["catalog"]
+    checks = KQ.plan_checks(plan, json.load(open(os.path.join(KP.pdir(pid), "report.json"))), tl, {a["id"] for a in cat["assets"]}) + KQ.film_checks(r["mp4"], r["plan"], tl, r["qc"], fmt=plan["format"])
+    k = KQ.summarize(checks, r["qc"])
+    adj = getattr(r["plan"], "get", lambda *_: None)("camera_adjustments")
+    summary["kathaya"] = dict(qc=k, keys=KK.run_keys(plan, tl, cat, prep["graph"]["plan_overrides"]["kathaya"]["renderer_version"]), title=plan.get("title"), narration_source=tl["source"], visuals=len(plan["visuals"]), camera_adjustments=(r["plan"].get("camera_adjustments") or []))
+    json.dump(summary, open(os.path.join(pdir, "summary.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    json.dump(k, open(os.path.join(pdir, "kathaya_qc.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    rep.complete("export", message="movie ready", video=summary["files"]["video"])
+    proj = KP.load(pid)
+    proj["render"] = dict(job=os.path.basename(pdir), video=summary["files"]["video"], qc=k["technical_passed"] and k["engine_passed"], at=time.time())
+    KP.save(proj)
+    KP.set_state(pid, "completed" if (k["technical_passed"] and k["engine_passed"]) else "completed_with_qc_failures", video=summary["files"]["video"])
+    return dict(project=pid, video=summary["files"]["video"], technical_qc=k["technical_passed"], engine_qc=k["engine_passed"])
+
+
 def run(job, pdir, rep):
     if job.get("test"):
         if os.environ.get("KATHAYA_STUDIO_TEST") != "1":
@@ -195,6 +278,8 @@ def run(job, pdir, rep):
             if k == "BLENDER":
                 from engine.skeleton import blender_job
                 blender_job.BLENDER = v
+    if job.get("kind") in ("kplan", "kbuild", "krender"):
+        return {"kplan": run_kplan, "kbuild": run_kbuild, "krender": run_krender}[job["kind"]](job, pdir, rep)
     if job.get("kind") == "rerender":
         _skip_story(rep, job.get("parent"))
         narration, graph = job["narration"], job["graph"]
@@ -213,7 +298,7 @@ def main(pdir):
     job = json.load(open(os.path.join(pdir, "job.json"), encoding="utf-8"))
     rep = EVT.install(EVT.Reporter(path=os.path.join(pdir, "events.jsonl"), resume=True))
     signal.signal(signal.SIGTERM, _term)
-    rep.emit("started", "job", message="production started", mode=job["mode"], kind=job.get("kind", "generate"), title=job.get("title"), pid=os.getpid())
+    rep.emit("started", "job", message="production started", mode=job["mode"], kind=job.get("kind", "generate"), title=job.get("title"), pid=os.getpid(), flow=job.get("flow"))
     def cancelled():
         signal.signal(signal.SIGTERM, signal.SIG_IGN)
         _cleanup(pdir)

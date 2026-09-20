@@ -205,6 +205,8 @@ class Manager:
                 j, st = self.job(pid), self.state(pid)
             except Exception:                                                               # noqa: BLE001
                 continue
+            if j.get("kind") in ("kplan", "kbuild"):                                            # internal planning / asset jobs are shown inside their project, not in the list
+                continue
             out.append(dict(id=pid, title=j.get("title"), mode=j.get("mode"), kind=j.get("kind", "generate"), status=st["status"], overall=st["overall"], created=j.get("created"), parent=j.get("parent"),
                             poster=os.path.exists(os.path.join(C.PRODS, pid, "poster.jpg")), format=(j.get("settings") or {}).get("format")))
         return out

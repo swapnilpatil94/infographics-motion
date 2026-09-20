@@ -751,6 +751,19 @@ def _font(size):
     return ImageFont.load_default()
 
 
+def _transition_alpha(trans, t, fps):
+    """brightness factor of the frame at time t: 'fade' = from black over 0.5 s, 'dip' = 0.15 s out to black before the cut, 0.3 s back in"""
+    a = 1.0
+    for t0, kind in trans:
+        if kind == "fade":
+            a = min(a, max(0.0, min(1.0, (t - t0) / 0.5))) if t >= t0 else a
+        elif t0 - 0.15 <= t < t0:
+            a = min(a, max(0.0, (t0 - t) / 0.15) if (t0 - t) > 1.5 / fps else 0.0)
+        elif t0 <= t < t0 + 0.3:
+            a = min(a, (t - t0) / 0.3)
+    return a
+
+
 def _draw_overlays(img, plan, t):
     """Debug/label text for test videos: plan['overlays'] = [{t0,t1,text,x,y,size,color}]. Text may be a callable-free string with {t} placeholder."""
     ov = [o for o in plan.get("overlays", []) if o["t0"] <= t <= o["t1"]]
@@ -876,6 +889,7 @@ def render_film(plan, out_dir, log=print, skip_blender=False, samples=10, stills
     t = time.time()
     EV.start("compositing", message="compositing layers, lighting, captions and encoding", total_frames=n, total_shots=len(plan["shots"]))
     show_caps = plan.get("captions", True)
+    trans = [(sh["t0"], sh["transition_in"]) for sh in plan["shots"] if sh.get("transition_in") in ("fade", "dip")] if plan.get("transitions_render") else []
     for f in range(n):
         tt = f / fps
         img = film.frame_at(tt, f)
@@ -895,6 +909,10 @@ def render_film(plan, out_dir, log=print, skip_blender=False, samples=10, stills
                     img = captions.overlay(img, arr, op)
                     text = c[2]
                     break
+        if trans:                                                                  # planned fade / dip-to-black (Kathaya plans only: `plan["transitions_render"]`)
+            a_ = _transition_alpha(trans, tt, fps)
+            if a_ < 1.0:
+                img = img * a_
         small = img[::40, ::40]
         stats.append(dict(f=f, shot=plan["shots"][shot_i]["id"], mean=float(small.mean()), diff=float(np.abs(small - prev).mean()) if prev is not None else 1.0, bbox=bbox, text=text))
         prev = small.copy()

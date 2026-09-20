@@ -40,6 +40,7 @@ LOCATIONS = {
                ["street", "सड़क", "गली", "बाज़ार", "बाहर", "road", "मोहल्ला"]),
 }
 TIME_WORDS = {"night": ["रात के", "रात में", "रात को", "night", "आधी रात", "देर रात", "midnight"], "day": ["सुबह", "दोपहर", "morning", "afternoon", "दिन के समय", "दिनदहाड़े", "दिन की रोशनी", "दिन चढ़"], "dusk": ["शाम", "evening", "dusk", "sunset"]}
+EXTRA = {}                                                       # per-location render extras (Kathaya library assets: {"backdrop": path, "floor": colour}); empty for the built-in sets
 ALL = ["bedroom", "study", "living_room", "office", "classroom", "cafe", "bank", "shop", "police", "atm", "call_center", "street"]
 
 

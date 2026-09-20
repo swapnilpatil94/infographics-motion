@@ -1,0 +1,60 @@
+{
+ "id": "env_lib_bombay_stock_exchange_mumbai",
+ "type": "environment",
+ "name": "Bombay Stock Exchange Mumbai",
+ "tags": [
+  "bombay",
+  "exchange",
+  "generated",
+  "landmark",
+  "mumbai",
+  "reference-derived",
+  "stock"
+ ],
+ "subjects": [
+  "bombay stock exchange mumbai"
+ ],
+ "landmark": "Bombay Stock Exchange Mumbai",
+ "source": "Kathaya asset builder from an approved reference",
+ "license": "CC BY 4.0",
+ "local_path": "assets/library/kathaya/env_lib_bombay_stock_exchange_mumbai",
+ "status": "production_ready",
+ "supports": {
+  "time_of_day": [
+   "day"
+  ],
+  "default_time": "day",
+  "kind": "real_landmark"
+ },
+ "anchors": {},
+ "capabilities": [
+  "stand",
+  "walk"
+ ],
+ "binding": {
+  "location": "lib_bombay_stock_exchange_mumbai",
+  "family": "photo_backdrop",
+  "backdrop": "assets/library/kathaya/env_lib_bombay_stock_exchange_mumbai/backdrop.png",
+  "floor": "#171b20"
+ },
+ "derived_from": {
+  "request": "REQ_ENV_BOMBAY_STOCK_EXCHANGE_MUMBAI",
+  "project": "k_20260920-215215_bb49",
+  "title": "File:Oriental Building and BSE as seen from M. G. Road, Mumbai.jpg",
+  "page_url": "https://commons.wikimedia.org/wiki/File:Oriental_Building_and_BSE_as_seen_from_M._G._Road,_Mumbai.jpg",
+  "licence": "CC BY 4.0",
+  "licence_key": "cc-by-4.0",
+  "author": "DesiBoy101",
+  "attribution": "DesiBoy101, CC BY 4.0, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Oriental_Building_and_BSE_as_seen_from_M._G._Road,_Mumbai.jpg)",
+  "share_alike": false,
+  "reference_file": "assets/references/REQ_ENV_BOMBAY_STOCK_EXCHANGE_MUMBAI/approved_854cc72a1f4a.jpg",
+  "reference_sha256": "14547b2191748f0c4b731f9de6db83f33097b48633685e402f4de45d6b5d4ead",
+  "approved_by": "user"
+ },
+ "builder": {
+  "version": "photo-backdrop-1",
+  "built_at": "2026-09-20T21:52:19",
+  "fidelity": "stylised single-plane backdrop from one reference photograph; no 3D reconstruction; the parallax is that of a flat layer"
+ },
+ "backdrop_sha256": "8f690cff50fcc956bbf0904a0f697debcea109c09173237e4000e018541c2459"
+}

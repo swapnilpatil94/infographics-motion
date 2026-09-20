@@ -138,7 +138,7 @@ class Director:
             lay = loc["layout"]
             a_start = "sit" if (lay.get("sit") and acts[0] in ("ESTABLISH", "SIT_DOWN") and not lay.get("D_sit_x")) else "stand"      # a table for two: the protagonist arrives standing beside it (a hand-over across the table is out of reach)
             self.scenes.append(dict(loc=s["loc"], time=loc["time"], family=loc["family"], lay=lay, notes=loc["notes"], i0=i0, i1=i1, partners=partners, A_start=a_start, arrive=acts[0] == "ARRIVE",
-                                    enters=next((b["act"] for b in (self.beats[i] for i in idx) if b["act"] in ("PERSON_ENTERS", "MEET")), None), env=dict(family=loc["family"], variation=dict(palette=VAR.seed_int(self.g["story_id"], s["loc"], "pal") % 3, time=loc["time"]), seed=VAR.seed_int(self.g["story_id"], s["loc"], "seed") % 1000)))
+                                    enters=next((b["act"] for b in (self.beats[i] for i in idx) if b["act"] in ("PERSON_ENTERS", "MEET")), None), env=dict(family=loc["family"], variation=dict(palette=VAR.seed_int(self.g["story_id"], s["loc"], "pal") % 3, time=loc["time"], **LOC.EXTRA.get(s["loc"], {})), seed=VAR.seed_int(self.g["story_id"], s["loc"], "seed") % 1000)))
         self.scene_of = {}
         for k, sc in enumerate(self.scenes):
             for i in range(sc["i0"], sc["i1"] + 1):
@@ -229,4 +229,6 @@ def build_plan(graph, nar, seed=11, name=None, tts=None, fixes=None):
                 targets=target_scenes[0]["targets"], target_scenes=target_scenes, shots=shots, sfx=sfx, mood_track=[tuple(m) for m in mood], title_card=dict(t0=round(d.dur - 1.9, 3), t1=d.dur, text=graph["title"]),
                 lamp_on=round(res_t + 0.3, 3) if (res_t is not None and night_res) else 1e9, hall_on=1e9, rim=dict(moon=0.5), duration_range=[40.0, 62.0], acts=[b["act"] for b in d.beats],
                 scenes=[dict(loc=s["loc"], time=s["time"], family=s["family"], t0=target_scenes[k]["t0"], t1=target_scenes[k]["t1"], notes=s["notes"], cast=["A"] + list(s["partners"]) + ([c for c in chars if chars[c]["role"] == "crowd"] if any(d.beats[i]["act"] == "CROWD_WATCH" for i in range(s["i0"], s["i1"] + 1)) else [])) for k, s in enumerate(d.scenes)], story_graph=graph["story_id"], audio_cfg=dict(fixes.get("_audio", {})))
+    if getattr(d, "camera_adjustments", None):                                       # explicit camera intents the geometry could not honour as asked (recorded, never silent)
+        plan["camera_adjustments"] = d.camera_adjustments
     return plan

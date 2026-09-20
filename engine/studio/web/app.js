@@ -25,6 +25,7 @@ function errBox(e) {
   const x = (e && e.error) || e || {};
   return `<div class="err" role="alert"><b>${esc(x.message || "Something went wrong")}</b>${(x.reasons || []).length ? "<ul>" + x.reasons.map(r => `<li>${esc(r)}</li>`).join("") + "</ul>" : ""}${x.hint ? `<div class="hint">${esc(x.hint)}</div>` : ""}<div class="dim mono" style="margin-top:8px">${esc(x.code || "")}</div></div>`;
 }
+S.k = { fmt: "short", provider: "ollama", mode: "auto", audio: null, audioName: "", timing: "", text: sessionStorage.getItem("ks.ktext") || "", poll: null, id: null, data: null, sub: {}, chatPrompt: null, catalog: null, busy: {} };
 function saveForm() { try { sessionStorage.setItem("ks.form", JSON.stringify(S.form)); } catch (e) { /* quota */ } }
 function setPath(o, path, v) { const k = path.split("."); let t = o; for (let i = 0; i < k.length - 1; i++) t = t[k[i]] = t[k[i]] || {}; t[k[k.length - 1]] = v; }
 function getPath(o, path) { return path.split(".").reduce((a, k) => (a == null ? a : a[k]), o); }
@@ -40,11 +41,15 @@ async function route() {
   $$(".levels button").forEach(b => b.classList.toggle("on", b.dataset.level === S.level));
   if (!S.opts) { try { S.opts = await api("/options"); } catch (e) { view.innerHTML = errBox(e); return; } }
   let m;
+  document.body.classList.toggle("dev", /^\/(dev|review|guide|production\/)/.test(h));
+  $$("[data-nav]").forEach(a => a.classList.toggle("on", (a.dataset.nav === "home" && (h === "/" || h.startsWith("/k/"))) || (a.dataset.nav === "productions" && h.startsWith("/productions")) || (a.dataset.nav === "dev" && /^\/(dev|review|guide)/.test(h))));
+  if ((m = h.match(/^\/k\/(k_[\w-]+)$/))) return viewProject(m[1]);
+  if (h === "/" || h === "") return viewHome();
   if ((m = h.match(/^\/review\/(d_[0-9a-f]+)$/))) return viewReview(m[1]);
   if ((m = h.match(/^\/production\/([\w-]+)$/))) return viewProduction(m[1]);
   if (h.startsWith("/productions")) return viewList();
   if (h.startsWith("/guide")) return viewGuide();
-  return viewCreate();
+  return viewCreate();                                                                     // #/dev : the previous authoring tools (Create / Script / Production, director controls, expert views)
 }
 $(".levels").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; S.level = b.dataset.level; localStorage.setItem("ks.level", S.level); route(); });
 async function ping() { try { await fetch("/api/options"); $("#conn").className = "conn ok"; } catch (e) { $("#conn").className = "conn bad"; } }
@@ -266,7 +271,7 @@ async function approve() {
 }
 
 // ------------------------------------------------------------------------------------------------ PRODUCTION (dashboard + final)
-function stopWatch() { const P = S.prod; if (P.es) { P.es.close(); P.es = null; } clearInterval(P.tick); clearInterval(P.poll); P.tick = P.poll = null; }
+function stopWatch() { clearInterval(S.k.poll); S.k.poll = null; const P = S.prod; if (P.es) { P.es.close(); P.es = null; } clearInterval(P.tick); clearInterval(P.poll); P.tick = P.poll = null; }
 async function viewProduction(pid) {
   const P = S.prod; P.id = pid; P.state = null; P.meta = null; P.logs = []; S.insp = { plan: null, sel: null, raw: null, tab: "overview", preview: null, busy: false, last: null };
   view.innerHTML = '<div class="muted"><span class="spin"></span>Loading production…</div>';
@@ -516,5 +521,148 @@ view.addEventListener("click", async e => {
   }
   if (e.target.id === "btn-useseg") { S.form.mode = "production"; S.form.example = null; S.form.segments_text = S.guideSeg; saveForm(); location.hash = "#/"; }
 });
+
+// ------------------------------------------------------------------------------------------------ KATHAYA: the simple flow
+function viewHome(err) {
+  const k = S.k;
+  view.innerHTML = `<section class="kflow"><div class="khero"><h1 class="kmark">Kath<em>aa</em>ya</h1><p>Paste a story. Kathaya designs the film, checks what it needs, and renders it. You only step in when a new asset is required.</p></div>
+    <div class="card kcard"><label class="f">Story / narration<textarea id="ktext" placeholder="कहानी या narration यहाँ paste करें — Hindi, Hinglish या English">${esc(k.text)}</textarea></label>
+      <div class="grid g2" style="margin-top:16px;align-items:end"><label class="f">Narration audio · optional<input type="file" id="kaudio" accept=".wav,.mp3,.m4a,.flac">${k.audioName ? `<small class="ok">${esc(k.audioName)} uploaded - its timing drives the film</small>` : `<small class="dim">Without audio the narrator (Chatterbox Hindi) voices the story.</small>`}</label>
+        <div class="grid" style="gap:10px"><div class="muted" style="font-size:12px;text-transform:uppercase;letter-spacing:.08em">Format</div><div class="radio">${[["short", "Shorts"], ["long", "Long-form"]].map(([v, l]) => `<label class="${k.fmt === v ? "on" : ""}"><input type="radio" name="kfmt" value="${v}" ${k.fmt === v ? "checked" : ""}>${l}</label>`).join("")}</div></div></div>
+      <div class="grid g2" style="margin-top:16px"><label class="f">Style<select id="kstyle"><option value="kathaya_default">Kathaya default</option></select></label><span></span></div>
+      <details class="adv"><summary>Advanced / Developer</summary><div class="grid g3" style="margin-top:14px">
+        <label class="f">Creative director<select id="kprov"><option value="ollama" ${k.provider === "ollama" ? "selected" : ""}>Local LLM (qwen3:14b)</option><option value="chatgpt" ${k.provider === "chatgpt" ? "selected" : ""}>ChatGPT (copy / paste)</option></select></label>
+        <label class="f">Narration timing<select id="kmode"><option value="auto" ${k.mode === "auto" ? "selected" : ""}>Auto (audio / TTS)</option><option value="estimated" ${k.mode === "estimated" ? "selected" : ""}>Estimated (no voice yet)</option></select></label>
+        <label class="f">Timing JSON · optional<input type="file" id="ktiming" accept=".json"></label></div>
+        <p class="dim" style="margin-top:12px;font-size:13px">The previous authoring tools (topics, scripts, shot-level edits, director controls) are under <a href="#/dev">Advanced / Developer</a>.</p></details>
+      <div id="kerr">${err ? errBox(err) : ""}</div>
+      <div class="row" style="justify-content:center;margin-top:24px"><button class="btn primary bigbtn" id="kgo">Generate</button></div></div></section>`;
+}
+view.addEventListener("input", e => { if (e.target.id === "ktext") { S.k.text = e.target.value; try { sessionStorage.setItem("ks.ktext", S.k.text); } catch (er) { /* quota */ } } });
+view.addEventListener("change", async e => {
+  const t = e.target;
+  if (t.name === "kfmt") { S.k.fmt = t.value; $$(".radio label").forEach(l => l.classList.toggle("on", l.querySelector("input").checked)); }
+  if (t.id === "kprov") S.k.provider = t.value;
+  if (t.id === "kmode") S.k.mode = t.value;
+  if (t.id === "kaudio" && t.files[0]) { try { const f = t.files[0]; const r = await fetch(`/api/upload?kind=audio&name=${encodeURIComponent(f.name)}`, { method: "POST", body: f }); const j = await r.json(); if (!r.ok) throw j; S.k.audio = j.upload_id; S.k.audioName = f.name; viewHome(); } catch (er) { $("#kerr").innerHTML = errBox(er); } }
+  if (t.id === "ktiming" && t.files[0]) { S.k.timing = await t.files[0].text(); toast("timing JSON loaded"); }
+});
+async function kGenerate() {
+  const b = $("#kgo"); b.disabled = true; b.innerHTML = '<span class="spin"></span>Starting…';
+  try { const r = await api("/k/project", { text: S.k.text, format: S.k.fmt, style: "kathaya_default", audio_upload: S.k.audio, timing_json: S.k.timing || null, provider: S.k.provider, narration_mode: S.k.mode }); location.hash = "#/k/" + r.project_id; }
+  catch (e) { $("#kerr").innerHTML = errBox(e); b.disabled = false; b.textContent = "Generate"; }
+}
+const KSTEP = { narration: "Analyzing story", timeline: "Building narration timeline", visual_design: "Designing visuals", asset_check: "Checking assets", asset_build: "Creating Kathaya asset", compile: "Preparing the scene plan", scene_direction: "Scene direction", asset_preparation: "Asset preparation",
+  blender_render: "Blender rendering", audio: "Audio", compositing: "Compositing", qc: "QC", export: "Export" };
+async function viewProject(id) {
+  S.k.id = id; S.k.data = null; S.k.chatPrompt = null;
+  view.innerHTML = '<div class="muted"><span class="spin"></span>Loading…</div>';
+  clearInterval(S.k.poll); S.k.poll = setInterval(kPoll, 1200);
+  await kPoll();
+}
+async function kPoll() {
+  if (location.hash.indexOf(S.k.id) < 0) return;
+  try { S.k.data = await api("/k/project/" + S.k.id); renderProject(); if (!S.k.poll && ["created", "planning", "rendering"].includes(S.k.data.project.state)) S.k.poll = setInterval(kPoll, 1200); } catch (e) { view.innerHTML = errBox(e) + '<p><a href="#/">Start again</a></p>'; clearInterval(S.k.poll); }
+}
+function kSteps(job) {
+  if (!job) return "";
+  const now = Date.now() / 1000;
+  return `<div class="card"><ul class="steps">${job.stages.map(s => `<li class="step ${s.status}"><span class="ic">${ICON[s.status] || "○"}</span><span class="nm">${esc(KSTEP[s.id] || s.name)}<span class="ms">${esc(s.message || "")}</span></span><span class="tm mono muted">${s.seconds ? s.seconds.toFixed(1) + " s" : ""}</span></li>`).join("")}</ul></div>`;
+}
+function kJobDetail(job) { return job && job.status === "running" ? detail(job, Date.now() / 1000 + (job.now - Date.now() / 1000)) : ""; }
+function renderProjectBase() {
+  const d = S.k.data, p = d.project, st = p.state, rep = d.report, plan = d.plan, L = lvl();
+  const pj = d.plan_job, rj = d.render_job, bj = d.build_job;
+  const title = (plan && plan.title) || "Your film";
+  const running = j => j && ["pending", "running", "queued"].includes(j.status);
+  let body = "";
+  if (["created", "planning"].includes(st) || (running(pj) && st !== "rendering")) {
+    body = `<div class="muted" style="margin-bottom:10px">DESIGNING THE FILM · <span class="mono">${Math.round(((pj && pj.overall) || 0) * 100)}%</span></div>${kSteps(pj)}${kJobDetail(pj)}`;
+  }
+  if (pj && pj.status === "failed") body += kFail(pj, "Planning stopped");
+  if (st === "awaiting_chatgpt") body = kSteps(pj) + chatgptPanel();
+  if (["needs_assets", "blocked", "ready"].includes(st) || (rep && !["created", "planning", "rendering", "awaiting_chatgpt"].includes(st))) body += kResult(d);
+  if (st === "rendering" || running(rj)) body = `<div class="muted" style="margin:0 0 10px">RENDERING THE FILM · <span class="mono">${Math.round(((rj && rj.overall) || 0) * 100)}%</span></div>${kSteps(rj)}${kJobDetail(rj)}` + (rj && rj.status === "failed" ? kFail(rj, "Rendering stopped") : "");
+  if (rj && rj.status === "failed") body = kFail(rj, "Rendering stopped") + kResult(d);
+  if (["completed", "completed_with_qc_failures"].includes(st) && rj && rj.status === "completed") body = kFinal(d) + kResult(d, true);
+  view.innerHTML = `<section class="kflow"><div class="dash-h"><div><div class="muted">Kathaya · <span class="mono">${esc(p.id)}</span> · ${esc(p.input.format === "short" ? "Shorts" : "Long-form")}</div><h1>${esc(title)}</h1></div>
+    <div class="row"><span class="pill ${st === "completed" ? "completed" : st === "blocked" || st === "completed_with_qc_failures" ? "failed" : st === "needs_assets" ? "queued" : "running"}">${esc(st.replace(/_/g, " "))}</span><a class="btn sm" href="#/">New film</a></div></div>${body}</section>`;
+}
+function kFail(job, title) {
+  const e = job.error || {};
+  return `<div class="err" role="alert"><b>${esc(title)}${e.stage ? " in " + esc(KSTEP[e.stage] || e.stage) : ""}: ${esc(e.message || "")}</b>${(e.reasons || []).length ? "<ul>" + e.reasons.map(r => `<li>${esc(r)}</li>`).join("") + "</ul>" : ""}${e.hint ? `<div class="hint">${esc(e.hint)}</div>` : ""}
+    <div class="row" style="margin-top:12px"><button class="btn sm" data-k="replan">Try again</button></div></div>`;
+}
+function kResult(d, done) {
+  const rep = d.report, plan = d.plan, c = rep.counts, st = d.project.state;
+  const head = `<div class="card" style="margin-top:16px"><div class="row sp"><div><b>${c.available}</b> assets available · <b class="${c.new_required ? "warn" : "ok"}">${c.new_required}</b> new required${c.capability_errors ? ` · <b class="bad">${c.capability_errors}</b> renderer limit(s)` : ""}</div>
+    ${st === "ready" ? `<button class="btn primary bigbtn" data-k="render">Generate film</button>` : done ? `<button class="btn" data-k="render">Render again</button>` : ""}</div>
+    ${(rep.notes || []).length ? `<div class="note" style="margin-top:12px">${rep.notes.map(esc).join("<br>")}</div>` : ""}</div>`;
+  const reqs = (d.requests || []).filter(r => !["ready"].includes(r.state) && !(r.state === "approved" && st === "ready")).map(r => requestCard(r, d)).join("");
+  const errs = (rep.capability_errors || []).length ? `<div class="err" style="margin-top:16px"><b>The renderer cannot do what the story needs here</b><ul>${rep.capability_errors.map(e => `<li>${esc(e.message)}${e.supported && e.supported.length ? ` <span class="dim">(supported: ${esc(e.supported.slice(0, 10).join(", "))})</span>` : ""}</li>`).join("")}</ul>
+    <div class="hint">Nothing was substituted. Change the story, ask the director again, or paste a plan from ChatGPT that avoids this.</div><div class="row" style="margin-top:10px"><button class="btn sm" data-k="replan">Ask the director again</button></div></div>` : "";
+  const sb = plan ? `<details class="adv" ${st === "ready" ? "open" : ""}><summary>The plan the system designed · ${plan.visuals.length} visuals</summary><div style="overflow:auto;max-height:420px;margin-top:10px"><table class="sb"><tr><th>#</th><th>time</th><th>intent</th><th>action</th><th>camera</th><th>environment</th><th>emotion</th><th>narration</th></tr>
+    ${plan.visuals.map(v => `<tr><td class="t">${esc(v.id)}</td><td class="t">${v.start.toFixed(1)}–${v.end.toFixed(1)}</td><td>${esc(v.visual_intent.replace(/_/g, " ").toLowerCase())}</td><td>${esc((v.action || {}).capability || "")}</td><td>${esc((v.camera.shot_engine || v.camera.shot) + " · " + (v.camera.movement_engine || v.camera.movement))}</td>
+      <td>${esc(v.environment.subject)} <span class="dim">${esc(v.environment.time_of_day)}</span> <span class="chip" style="padding:1px 8px">${esc(v.environment.status)}</span></td><td>${esc(v.emotion)}</td><td>${esc(v.narration_text || "")}</td></tr>`).join("")}</table></div></details>` : "";
+  return head + errs + reqs + sb;
+}
+function requestCard(r, d) {
+  const bj = d.build_job, building = bj && bj.status === "running" && (d.project.jobs || {}).build, refs = r.references || [];
+  const cat = S.k.catalog;
+  const cards = refs.map(c => `<div class="ref"><img loading="lazy" alt="" src="${c.local_thumb ? `/api/k/reference/${esc(r.id)}/${esc(c.local_thumb.split("/").pop())}` : ""}"><div class="b"><b>${esc(c.title.replace(/^File:/, ""))}</b>${esc(c.author || "unknown author")}<br><span class="lic ${c.production_ok ? "ok" : "no"}">${esc(c.licence)} · ${c.production_ok ? "usable" + (c.share_alike ? " (share-alike)" : "") : "not usable"}</span>
+    <br><a href="${esc(c.page_url)}" target="_blank" rel="noopener">source ↗</a>${c.production_ok ? `<div style="margin-top:8px"><button class="btn sm primary" data-k="approve" data-rid="${esc(r.id)}" data-i="${c.index}">Approve reference</button></div>` : `<div class="dim" style="margin-top:6px">${esc(c.licence_reason)}</div>`}</div></div>`).join("");
+  return `<div class="assetcard"><h3>New asset required</h3><div style="font-family:var(--serif);font-size:22px;margin:6px 0">${esc(r.subject)}</div><div class="muted">Reason: ${esc(r.reason)}</div>
+    <div class="row" style="margin-top:8px">${(r.required_by || []).length ? `<span class="chip">needed by ${esc(r.required_by.join(", "))}</span>` : ""}<span class="chip">${esc(r.asset_kind === "real_landmark" ? "real landmark" : r.type)}</span><span class="chip">${esc(r.status)}</span></div>
+    ${building && r.state === "approved" ? `<div style="margin-top:14px">${kSteps(bj)}</div>` : r.state === "approved" ? `<div class="note">Approved. Creating the Kathaya asset…</div>` : refs.length ? `<div class="refs">${cards}</div><small class="dim" style="display:block;margin-top:10px">A web image is only a reference. Approving it makes Kathaya build its own stylised asset from it and keep it in the library (with attribution) for every future film.</small>`
+      : `<div class="row" style="margin-top:14px"><button class="btn primary" data-k="refs" data-rid="${esc(r.id)}">Find references</button><small class="muted">searches: ${esc((r.reference_queries || []).join(" · "))}</small></div>`}
+    ${r.type === "environment" ? `<details class="adv"><summary>Use an existing asset instead</summary><div class="row" style="margin-top:10px"><select id="sub-${esc(r.id)}" style="max-width:320px">${cat ? cat.assets.filter(a => a.type === "environment").map(a => `<option value="${esc(a.id)}">${esc(a.name)} (${esc(a.id)})</option>`).join("") : ""}</select><button class="btn sm" data-k="substitute" data-rid="${esc(r.id)}">Use this instead</button></div>
+      <small class="dim">This is your explicit choice: the film will show that asset instead of ${esc(r.subject)}, and the plan records it as a substitution.</small></details>` : ""}</div>`;
+}
+function chatgptPanel() {
+  if (!S.k.chatPrompt) { api(`/k/project/${S.k.id}/chatgpt_prompt`).then(r => { S.k.chatPrompt = r.prompt; renderProject(); }).catch(() => { }); return '<div class="muted"><span class="spin"></span>Preparing the prompt…</div>'; }
+  return `<div class="card" style="margin-top:16px"><h2>ChatGPT is the creative director</h2><p class="muted" style="margin:8px 0 12px">Copy this prompt into ChatGPT, then paste its JSON reply below. The reply is validated exactly like the local director's plan.</p>
+    <div class="row" style="margin-bottom:8px"><button class="btn sm" data-k="copyprompt">Copy prompt</button><a class="btn sm ghost" href="https://chatgpt.com/" target="_blank" rel="noopener">Open ChatGPT ↗</a></div><textarea readonly rows="10" style="font-family:var(--mono);font-size:12px;min-height:200px">${esc(S.k.chatPrompt)}</textarea>
+    <label class="f" style="margin-top:14px">ChatGPT's reply<textarea id="kreply" rows="8" placeholder="Paste the JSON reply here"></textarea></label><div class="row" style="margin-top:12px"><button class="btn primary" data-k="applyreply">Use this plan</button></div><div id="kreply-err"></div></div>`;
+}
+function kFinal(d) {
+  const rj = d.render_job, id = (d.project.jobs || {}).render, sm = d.project.render;
+  return `<div class="final" style="margin-bottom:8px"><div><div class="player"><video controls playsinline preload="metadata" poster="/api/production/${esc(id)}/poster" src="/api/production/${esc(id)}/video"></video></div>
+    <div class="row" style="justify-content:center;margin-top:12px"><a class="btn sm" href="/api/production/${esc(id)}/download">Download MP4</a></div></div><div id="kfinal-stats"><div class="muted"><span class="spin"></span>Loading the QC report…</div></div></div>`;
+}
+async function kLoadFinal() {
+  const d = S.k.data, id = (d.project.jobs || {}).render, box = $("#kfinal-stats"); if (!box || box.dataset.loaded === id) return; box.dataset.loaded = id;
+  try {
+    const m = await api("/production/" + id), sm = m.summary, k = (sm.kathaya || {}).qc || { checks: [] }, v = sm.video, q = sm.qc;
+    box.innerHTML = `<div class="grid g3">${stat("Duration", v.duration.toFixed(1) + " s", v.width + "×" + v.height + " · " + v.fps + " fps")}${stat("Visuals", sm.kathaya ? sm.kathaya.visuals : sm.shots, sm.shots + " shots")}${stat("Render time", mmss(sm.timings.total), "Blender " + mmss(sm.timings.blender))}</div>
+      <div class="sect"><h3>Technical QC · ${k.checks.filter(c => c.ok).length}/${k.checks.length}</h3><div class="qc-list">${k.checks.map(c => `<div class="${c.ok ? "" : "bad-row"}"><span class="${c.ok ? "y" : "x"}">${c.ok ? "✓" : "✗"}</span><span>${esc(c.name)}</span></div>`).join("")}</div></div>
+      <div class="sect"><h3>Renderer QC · ${q.passed_checks.length}/${q.n_checks}${q.failed_checks.length ? ` · <span class="bad">${q.failed_checks.length} failed</span>` : ""}</h3>${q.failed_checks.length ? `<div class="err" style="margin:0"><ul>${q.failed_checks.map(x => `<li>${esc(x.replace(/_/g, " "))}</li>`).join("")}</ul></div>` : '<small class="muted">every measured gate passed</small>'}</div>
+      ${((sm.kathaya || {}).camera_adjustments || []).length ? `<div class="note">Camera intents the geometry could not honour as asked: ${sm.kathaya.camera_adjustments.map(a => esc(a.beat + ": " + a.why)).join("; ")}</div>` : ""}
+      <div class="sect"><h3>Files</h3><div class="files">${Object.entries(sm.files).filter(([k2]) => ["video", "plan", "qc_report", "summary"].includes(k2)).map(([k2, p]) => `<div><span class="muted">${esc(k2.replace(/_/g, " "))}</span><code>${esc(p)}</code></div>`).join("")}<div><span class="muted">project</span><code>output/kathaya/projects/${esc(d.project.id)}</code></div></div></div>`;
+  } catch (e) { box.innerHTML = errBox(e); }
+}
+view.addEventListener("click", async e => {
+  const b = e.target.closest("[data-k], #kgo"); if (!b) return;
+  if (b.id === "kgo") return kGenerate();
+  const k = b.dataset.k, pid = S.k.id;
+  try {
+    if (k === "render") { b.disabled = true; await api(`/k/project/${pid}/render`, {}); await kPoll(); }
+    if (k === "replan") { b.disabled = true; await api(`/k/project/${pid}/plan`, {}); await kPoll(); }
+    if (k === "refs") { b.disabled = true; b.innerHTML = '<span class="spin"></span>Searching…'; await api(`/k/project/${pid}/request/${b.dataset.rid}/references`, {}); await kPoll(); }
+    if (k === "approve") { b.disabled = true; await api(`/k/project/${pid}/request/${b.dataset.rid}/approve`, { reference_index: Number(b.dataset.i) }); await kPoll(); }
+    if (k === "substitute") { const sel = $("#sub-" + b.dataset.rid); if (!confirm("Use " + sel.value + " instead of creating the requested asset? This is recorded in the plan.")) return; await api(`/k/project/${pid}/request/${b.dataset.rid}/substitute`, { asset_id: sel.value }); await kPoll(); }
+    if (k === "copyprompt") toast((await copyText(S.k.chatPrompt)) ? "prompt copied" : "copy failed");
+    if (k === "applyreply") { $("#kreply-err").innerHTML = ""; try { await api(`/k/project/${pid}/chatgpt_reply`, { reply: $("#kreply").value }); await kPoll(); } catch (er) { $("#kreply-err").innerHTML = errBox(er); } }
+  } catch (er) { toast((er.error && er.error.message) || "failed"); b.disabled = false; }
+});
+function renderProject() {
+  renderProjectBase();
+  const d = S.k.data;
+  if (d.project.state.startsWith("completed")) kLoadFinal();
+  if (!S.k.catalog && (d.requests || []).length) api("/k/catalog").then(c => { S.k.catalog = c; }).catch(() => { });
+  const run = j => j && ["pending", "running", "queued"].includes(j.status);
+  const active = ["created", "planning", "rendering"].includes(d.project.state) || run(d.plan_job) || run(d.render_job) || run(d.build_job);
+  if (active && !S.k.poll) S.k.poll = setInterval(kPoll, 1200);
+  if (!active && S.k.poll) { clearInterval(S.k.poll); S.k.poll = null; }                 // idle: no re-render while the user types / decides
+}
 
 ping(); route();

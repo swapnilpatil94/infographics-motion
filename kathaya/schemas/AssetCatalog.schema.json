@@ -1,0 +1,87 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "title": "AssetCatalog",
+ "type": "object",
+ "required": [
+  "schema",
+  "assets"
+ ],
+ "properties": {
+  "schema": {
+   "const": "kathaya.asset_catalog/1"
+  },
+  "assets": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "required": [
+     "id",
+     "type",
+     "tags",
+     "source",
+     "license",
+     "status"
+    ],
+    "properties": {
+     "id": {
+      "type": "string"
+     },
+     "type": {
+      "enum": [
+       "environment",
+       "character",
+       "prop",
+       "effect"
+      ]
+     },
+     "tags": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "subjects": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "source": {
+      "type": "string"
+     },
+     "license": {
+      "type": "string"
+     },
+     "local_path": {
+      "type": [
+       "string",
+       "null"
+      ]
+     },
+     "status": {
+      "enum": [
+       "production_ready",
+       "draft",
+       "debug_placeholder"
+      ]
+     },
+     "supports": {
+      "type": "object"
+     },
+     "anchors": {
+      "type": "object"
+     },
+     "capabilities": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "binding": {
+      "type": "object"
+     }
+    }
+   }
+  }
+ }
+}

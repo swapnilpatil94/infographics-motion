@@ -1,0 +1,60 @@
+{
+ "id": "env_lib_gateway_of_india_mumbai",
+ "type": "environment",
+ "name": "Gateway of India Mumbai",
+ "tags": [
+  "gateway",
+  "generated",
+  "india",
+  "landmark",
+  "mumbai",
+  "of",
+  "reference-derived"
+ ],
+ "subjects": [
+  "gateway of india mumbai"
+ ],
+ "landmark": "Gateway of India Mumbai",
+ "source": "Kathaya asset builder from an approved reference",
+ "license": "CC BY-SA 4.0",
+ "local_path": "assets/library/kathaya/env_lib_gateway_of_india_mumbai",
+ "status": "production_ready",
+ "supports": {
+  "time_of_day": [
+   "day"
+  ],
+  "default_time": "day",
+  "kind": "real_landmark"
+ },
+ "anchors": {},
+ "capabilities": [
+  "stand",
+  "walk"
+ ],
+ "binding": {
+  "location": "lib_gateway_of_india_mumbai",
+  "family": "photo_backdrop",
+  "backdrop": "assets/library/kathaya/env_lib_gateway_of_india_mumbai/backdrop.png",
+  "floor": "#41433f"
+ },
+ "derived_from": {
+  "request": "REQ_ENV_GATEWAY_OF_INDIA_MUMBAI",
+  "project": "k_20260920-222528_11f9",
+  "title": "File:Panoramic view of Taj Palace Hotel and Taj Tower with the iconic Gateway of India in the background.jpg",
+  "page_url": "https://commons.wikimedia.org/wiki/File:Panoramic_view_of_Taj_Palace_Hotel_and_Taj_Tower_with_the_iconic_Gateway_of_India_in_the_background.jpg",
+  "licence": "CC BY-SA 4.0",
+  "licence_key": "cc-by-sa-4.0",
+  "author": "iMahesh",
+  "attribution": "iMahesh, CC BY-SA 4.0, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Panoramic_view_of_Taj_Palace_Hotel_and_Taj_Tower_with_the_iconic_Gateway_of_India_in_the_background.jpg)",
+  "share_alike": true,
+  "reference_file": "assets/references/REQ_ENV_GATEWAY_OF_INDIA_MUMBAI/approved_31b86e39d0cc.jpg",
+  "reference_sha256": "066e3eae9b45b0bcb87c9b488575bd1ead80ab2a524c3622b46be9affd7b8f41",
+  "approved_by": "user"
+ },
+ "builder": {
+  "version": "photo-backdrop-1",
+  "built_at": "2026-09-20T22:25:36",
+  "fidelity": "stylised single-plane backdrop from one reference photograph; no 3D reconstruction; the parallax is that of a flat layer"
+ },
+ "backdrop_sha256": "d1bde1716e8ffb03dea5e9745b99242c80a94bb9981bae37e9eb7bfcb0591e73"
+}

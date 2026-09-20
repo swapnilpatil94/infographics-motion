@@ -1,0 +1,262 @@
+{
+ "project": "k_20260920-232916_4331",
+ "story": "एक लड़के के फोन पर अचानक एक मैसेज आया —\n'आपने 25 लाख रुपये की लॉटरी जीती है।'\nवह हैरान रह गया।\nमैसेज में लिखा था कि इनाम लेने के लिए सिर्फ 12,500 रुपये की फीस भरनी होगी।\nउसने पैसे भेज दिए।\nकुछ मिनट बाद नंबर बंद हो गया।\nतभी उसे समझ आया —\nलॉटरी जीती ही नहीं थी।\nउसका लालच ही उसका सबसे बड़ा जाल बन गया था।",
+ "plan_job": "p_20260920-232916_fc08",
+ "plan_status": "completed",
+ "plan_stages": {
+  "narration": [
+   "completed",
+   0.11
+  ],
+  "timeline": [
+   "completed",
+   0.0
+  ],
+  "visual_design": [
+   "completed",
+   0.03
+  ],
+  "asset_check": [
+   "completed",
+   0.0
+  ]
+ },
+ "state": "completed",
+ "timeline": {
+  "source": "tts",
+  "duration": 23.797,
+  "segments": 9,
+  "warnings": [],
+  "audio": true
+ },
+ "counts": {
+  "available": 2,
+  "new_required": 0,
+  "capability_errors": 0
+ },
+ "requests": [],
+ "capability_errors": [],
+ "plan_seconds": 2.0,
+ "render_job": "p_20260920-232918_9323",
+ "render_status": "completed",
+ "render_seconds": 241.1,
+ "total_seconds": 243.2,
+ "summary": {
+  "video": {
+   "width": 1080,
+   "height": 1920,
+   "fps": 30.0,
+   "frames": 803,
+   "duration": 26.797,
+   "size_mb": 38.3
+  },
+  "shots": 11,
+  "scenes": [
+   {
+    "loc": "bedroom",
+    "time": "night",
+    "t0": 0.0,
+    "t1": 26.797
+   }
+  ],
+  "timings": {
+   "total": 239.1,
+   "blender": 4.9,
+   "asset_preparation": 0.1,
+   "audio": 0.1,
+   "compositing": 203.6,
+   "qc": 5.5,
+   "scene_direction": 20.3,
+   "narration": 0.0,
+   "export": 0.0
+  },
+  "cache": {
+   "frames": 634,
+   "reused": 634,
+   "to_render": 0,
+   "rendered": 0,
+   "reuse_pct": 100.0,
+   "mix_cache_hit": true,
+   "narration_cached": false,
+   "freed_mb": 560.4
+  },
+  "engine_qc": {
+   "passed": true,
+   "n": 30,
+   "failed": []
+  },
+  "kathaya": {
+   "qc": {
+    "technical_passed": true,
+    "technical_failed": [],
+    "engine_passed": true,
+    "engine_failed": [],
+    "n_technical": 15,
+    "n_engine": 30,
+    "checks": [
+     {
+      "id": "missing_assets",
+      "name": "no missing or unsupported assets",
+      "ok": true,
+      "evidence": []
+     },
+     {
+      "id": "missing_characters",
+      "name": "every cast member has a character asset",
+      "ok": true,
+      "evidence": []
+     },
+     {
+      "id": "valid_capabilities",
+      "name": "every action / camera / effect / transition is a renderer capability",
+      "ok": true,
+      "evidence": []
+     },
+     {
+      "id": "broken_references",
+      "name": "every reference (narration, environment, prop, character) resolves",
+      "ok": true,
+      "evidence": []
+     },
+     {
+      "id": "narration_coverage",
+      "name": "every narration segment is shown and the visuals tile the timeline",
+      "ok": true,
+      "evidence": {
+       "uncovered": [],
+       "contiguous": true
+      }
+     },
+     {
+      "id": "visual_narration_sync",
+      "name": "each visual begins when its narration begins (<= 0.15 s)",
+      "ok": true,
+      "evidence": {}
+     },
+     {
+      "id": "render_completion",
+      "name": "the film was rendered and decodes cleanly",
+      "ok": true,
+      "evidence": {
+       "bytes": 38285859
+      }
+     },
+     {
+      "id": "frame_generation",
+      "name": "the frame count matches the plan (and no rendered frame is missing)",
+      "ok": true,
+      "evidence": {
+       "frames": 803,
+       "expected": 804
+      }
+     },
+     {
+      "id": "output_dimensions",
+      "name": "the output is 1080x1920",
+      "ok": true,
+      "evidence": [
+       1080,
+       1920
+      ]
+     },
+     {
+      "id": "fps",
+      "name": "the frame rate is 30",
+      "ok": true,
+      "evidence": 30.0
+     },
+     {
+      "id": "audio_present",
+      "name": "the final file has an audio track",
+      "ok": true,
+      "evidence": 26.797007
+     },
+     {
+      "id": "audio_duration_match",
+      "name": "audio duration matches the video",
+      "ok": true,
+      "evidence": {
+       "audio": 26.797007,
+       "video": 26.766667
+      }
+     },
+     {
+      "id": "black_or_dead_frames",
+      "name": "no black or frozen frames",
+      "ok": true,
+      "evidence": {
+       "black": [],
+       "frozen_run_ends": []
+      }
+     },
+     {
+      "id": "duplicate_frames",
+      "name": "no duplicate consecutive shots / slideshow",
+      "ok": true,
+      "evidence": []
+     },
+     {
+      "id": "narration_synchronization",
+      "name": "narration is aligned and every segment is audible",
+      "ok": true,
+      "evidence": {
+       "bad_segments": [],
+       "words_per_second": [
+        3.35,
+        3.0,
+        3.28,
+        2.58,
+        2.92,
+        3.48,
+        3.96,
+        3.76,
+        3.36
+       ]
+      }
+     }
+    ]
+   },
+   "keys": {
+    "plan_hash": "af43e942f141",
+    "timeline_hash": "2e1159a07230",
+    "audio": "output/kathaya/projects/k_20260920-232916_4331/narration/paced.wav",
+    "renderer_version": "kathaya-re643cce30a",
+    "catalog_hash": "d104a9c5b805",
+    "visual_hashes": {
+     "V01": "112fda697366",
+     "V02": "8f887a79bda1",
+     "V03": "ea0b159e6437",
+     "V04": "e716fca67527",
+     "V05": "70dd73e6a11f",
+     "V06": "0bac1bcb0e78",
+     "V07": "95ddb055d9f9",
+     "V08": "cabb59330101",
+     "V09": "e35dc9ada9fa",
+     "V10": "13a595e21c0d",
+     "V11": "54d296e09583"
+    },
+    "asset_hashes": {
+     "char_young_man": "a824a984c019",
+     "env_bedroom": "d12ebe42cd2d"
+    }
+   },
+   "title": "लालच का जाल",
+   "narration_source": "tts",
+   "visuals": 11,
+   "camera_adjustments": []
+  },
+  "files": {
+   "video": "output/studio/productions/p_20260920-232918_9323/final.mp4",
+   "plan": "output/studio/productions/p_20260920-232918_9323/plan.json",
+   "story_graph": "output/studio/productions/p_20260920-232918_9323/story_graph.json",
+   "qc_report": "output/studio/productions/p_20260920-232918_9323/qc_report.json",
+   "audio_report": "output/studio/productions/p_20260920-232918_9323/audio_report.json",
+   "manifest": "output/studio/productions/p_20260920-232918_9323/manifest.json",
+   "contact_sheet": "output/studio/productions/p_20260920-232918_9323/contact_sheet.png",
+   "poster": "output/studio/productions/p_20260920-232918_9323/poster.jpg",
+   "events": "output/studio/productions/p_20260920-232918_9323/events.jsonl",
+   "summary": "output/studio/productions/p_20260920-232918_9323/summary.json",
+   "absolute_dir": "/Users/swapnil/infographics animations/output/studio/productions/p_20260920-232918_9323"
+  }
+ }
+}

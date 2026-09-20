@@ -1,0 +1,21 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "title": "CapabilityManifest",
+ "type": "object",
+ "required": [
+  "schema",
+  "renderer_version",
+  "characters",
+  "camera",
+  "effects",
+  "props",
+  "environments",
+  "transitions",
+  "limits"
+ ],
+ "properties": {
+  "schema": {
+   "const": "kathaya.capability_manifest/1"
+  }
+ }
+}

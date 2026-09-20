@@ -56,7 +56,7 @@ class Events(unittest.TestCase):
         rep.skip("narration", "provided by you")
         s = rep.state.snapshot()
         self.assertEqual(next(x for x in s["stages"] if x["id"] == "narration")["status"], "skipped")
-        self.assertAlmostEqual(rep.state.overall, EVT.WEIGHTS["narration"] / sum(EVT.WEIGHTS.values()), places=3)
+        self.assertAlmostEqual(rep.state.overall, EVT.WEIGHTS["narration"] / sum(EVT.WEIGHTS[k] for k in EVT.ORDER), places=3)
 
     def test_failure_and_cancel_are_recorded_with_the_stage(self):
         rep = EVT.Reporter()

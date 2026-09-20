@@ -1,0 +1,82 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "title": "AssetRequest",
+ "type": "object",
+ "required": [
+  "schema",
+  "id",
+  "type",
+  "subject",
+  "status",
+  "reason",
+  "reference_queries",
+  "human_approval_required"
+ ],
+ "properties": {
+  "schema": {
+   "const": "kathaya.asset_request/1"
+  },
+  "id": {
+   "type": "string"
+  },
+  "type": {
+   "enum": [
+    "environment",
+    "character",
+    "prop",
+    "effect"
+   ]
+  },
+  "asset_kind": {
+   "enum": [
+    "generic",
+    "real_landmark"
+   ]
+  },
+  "subject": {
+   "type": "string"
+  },
+  "status": {
+   "enum": [
+    "MISSING",
+    "UNSUPPORTED"
+   ]
+  },
+  "reason": {
+   "type": "string"
+  },
+  "required_by": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   }
+  },
+  "required_conditions": {
+   "type": "object"
+  },
+  "reference_queries": {
+   "type": "array",
+   "minItems": 1,
+   "items": {
+    "type": "string"
+   }
+  },
+  "reference_count": {
+   "type": "integer",
+   "minimum": 1
+  },
+  "human_approval_required": {
+   "const": true
+  },
+  "state": {
+   "enum": [
+    "open",
+    "references_found",
+    "approved",
+    "building",
+    "ready",
+    "rejected"
+   ]
+  }
+ }
+}

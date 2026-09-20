@@ -1,0 +1,297 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "title": "VisualScenePlan",
+ "type": "object",
+ "required": [
+  "schema",
+  "format",
+  "cast",
+  "visuals"
+ ],
+ "properties": {
+  "schema": {
+   "const": "kathaya.visual_scene_plan/1"
+  },
+  "format": {
+   "enum": [
+    "short",
+    "long"
+   ]
+  },
+  "title": {
+   "type": "string"
+  },
+  "corrections": {
+   "type": "array"
+  },
+  "cast": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "required": [
+     "id",
+     "role"
+    ],
+    "properties": {
+     "id": {
+      "type": "string"
+     },
+     "role": {
+      "enum": [
+       "protagonist",
+       "partner",
+       "extra"
+      ]
+     },
+     "archetype": {
+      "type": [
+       "string",
+       "null"
+      ]
+     },
+     "gender": {
+      "type": [
+       "string",
+       "null"
+      ]
+     },
+     "name": {
+      "type": "string"
+     },
+     "description": {
+      "type": "string"
+     },
+     "asset_id": {
+      "type": [
+       "string",
+       "null"
+      ]
+     },
+     "status": {
+      "enum": [
+       "AVAILABLE",
+       "UNSUPPORTED",
+       "MISSING",
+       "SUBSTITUTED"
+      ]
+     }
+    }
+   }
+  },
+  "visuals": {
+   "type": "array",
+   "minItems": 1,
+   "items": {
+    "type": "object",
+    "required": [
+     "id",
+     "narration_id",
+     "start",
+     "end",
+     "visual_intent",
+     "environment",
+     "camera"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "pattern": "^V\\d{2,}$"
+     },
+     "narration_id": {
+      "type": "string",
+      "pattern": "^N\\d{2,}$"
+     },
+     "start": {
+      "type": "number",
+      "minimum": 0
+     },
+     "end": {
+      "type": "number",
+      "minimum": 0
+     },
+     "visual_intent": {
+      "enum": [
+       "ESTABLISH_LOCATION",
+       "INTRODUCE_CHARACTER",
+       "SHOW_ACTION",
+       "SHOW_OBJECT",
+       "REVEAL_INFORMATION",
+       "BUILD_TENSION",
+       "FORESHADOW",
+       "CONTRAST",
+       "EMOTIONAL_REACTION",
+       "EXPLAIN_PROCESS",
+       "MONTAGE",
+       "TIME_PASSAGE",
+       "MEMORY",
+       "REALIZATION",
+       "CLIMAX",
+       "CONSEQUENCE",
+       "TRANSITION"
+      ]
+     },
+     "environment": {
+      "type": "object",
+      "required": [
+       "type",
+       "subject",
+       "status"
+      ],
+      "properties": {
+       "type": {
+        "enum": [
+         "generic",
+         "real_landmark"
+        ]
+       },
+       "subject": {
+        "type": "string",
+        "minLength": 1
+       },
+       "asset_id": {
+        "type": [
+         "string",
+         "null"
+        ]
+       },
+       "time_of_day": {
+        "enum": [
+         "day",
+         "dusk",
+         "night"
+        ]
+       },
+       "tags": {
+        "type": "array",
+        "items": {
+         "type": "string"
+        }
+       },
+       "status": {
+        "enum": [
+         "AVAILABLE",
+         "UNSUPPORTED",
+         "MISSING",
+         "SUBSTITUTED"
+        ]
+       },
+       "reference_queries": {
+        "type": "array",
+        "items": {
+         "type": "string"
+        }
+       }
+      }
+     },
+     "characters": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "props": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "required": [
+        "name"
+       ],
+       "properties": {
+        "name": {
+         "type": "string"
+        },
+        "asset_id": {
+         "type": [
+          "string",
+          "null"
+         ]
+        },
+        "status": {
+         "enum": [
+          "AVAILABLE",
+          "UNSUPPORTED",
+          "MISSING",
+          "SUBSTITUTED"
+         ]
+        }
+       }
+      }
+     },
+     "action": {
+      "type": [
+       "object",
+       "null"
+      ],
+      "properties": {
+       "capability": {
+        "type": "string"
+       },
+       "actor": {
+        "type": [
+         "string",
+         "null"
+        ]
+       },
+       "params": {
+        "type": "object"
+       }
+      }
+     },
+     "emotion": {
+      "type": "string"
+     },
+     "camera": {
+      "type": "object",
+      "required": [
+       "shot",
+       "movement"
+      ],
+      "properties": {
+       "shot": {
+        "type": "string"
+       },
+       "movement": {
+        "type": "string"
+       },
+       "subject": {
+        "type": [
+         "string",
+         "null"
+        ]
+       }
+      }
+     },
+     "effects": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "transition": {
+      "type": "string"
+     },
+     "screen": {
+      "type": [
+       "object",
+       "null"
+      ],
+      "properties": {
+       "sender": {
+        "type": "string"
+       },
+       "text": {
+        "type": "string"
+       }
+      }
+     },
+     "narration_text": {
+      "type": "string"
+     },
+     "rationale": {
+      "type": "string"
+     }
+    }
+   }
+  }
+ }
+}

@@ -32,3 +32,7 @@ narration/skeleton/vvb/
 
 assets/raw/rgs/*
 !assets/raw/rgs/*.txt
+
+# Kathaya: reference originals downloaded by the asset builder are provenance copies (re-downloadable); the built library assets are tracked
+assets/references/*/approved_*.jpg
+assets/references/*/[0-9a-f]*.jpg

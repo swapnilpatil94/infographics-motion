@@ -15,10 +15,15 @@ from contextlib import contextmanager
 
 STAGES = [("story_analysis", "Story analysis"), ("story_graph", "Story graph"), ("script", "Script"), ("narration", "Narration"), ("scene_direction", "Scene direction"),
           ("asset_preparation", "Asset preparation"), ("blender_render", "Blender rendering"), ("audio", "Audio"), ("compositing", "Compositing"), ("qc", "QC"), ("export", "Export")]
-NAMES = dict(STAGES)
+KSTAGES = [("narration", "Narration"), ("timeline", "Narration timeline"), ("visual_design", "Designing visuals"), ("asset_check", "Checking assets"), ("asset_build", "Creating assets"), ("compile", "Scene plan"),
+           ("scene_direction", "Scene direction"), ("asset_preparation", "Asset preparation"), ("blender_render", "Blender rendering"), ("audio", "Audio"), ("compositing", "Compositing"), ("qc", "QC"), ("export", "Export")]
+NAMES = dict(STAGES + KSTAGES)
 ORDER = [k for k, _ in STAGES]
-WEIGHTS = dict(story_analysis=.01, story_graph=.01, script=.01, narration=.05, scene_direction=.08, asset_preparation=.03, blender_render=.20, audio=.03, compositing=.45, qc=.10, export=.02)
-RERENDER = ("asset_preparation", "blender_render", "audio", "compositing", "qc", "export")          # stages that run again in a QC auto-fix pass
+FLOWS = dict(legacy=ORDER, kplan=["narration", "timeline", "visual_design", "asset_check"], kbuild=["asset_build"], krender=["compile", "scene_direction", "asset_preparation", "blender_render", "audio", "compositing", "qc", "export"])
+WEIGHTS = dict(story_analysis=.01, story_graph=.01, script=.01, narration=.05, scene_direction=.08, asset_preparation=.03, blender_render=.20, audio=.03, compositing=.45, qc=.10, export=.02,
+               timeline=.05, visual_design=.70, asset_check=.05, asset_build=1.0, compile=.02)
+RERENDER = ("asset_preparation", "blender_render", "audio", "compositing", "qc", "export")
+ALL_STAGES = [k for k, _ in STAGES] + [k for k, _ in KSTAGES if k not in dict(STAGES)]          # stages that run again in a QC auto-fix pass
 TERMINAL = ("completed", "failed", "cancelled")
 
 
@@ -29,7 +34,9 @@ class State:
         self.status = "pending"
         self.overall = 0.0
         self.pass_no = 0
-        self.stages = {k: dict(status="pending", fraction=0.0, seconds=0.0, started=None, message=None, detail={}) for k in ORDER}
+        self.flow = "legacy"
+        self.order = list(ORDER)
+        self.stages = {k: dict(status="pending", fraction=0.0, seconds=0.0, started=None, message=None, detail={}) for k in ALL_STAGES}
         self.active = None
         self.last = {}
         self.error = None
@@ -46,6 +53,8 @@ class State:
         if self.t_start is None:
             self.t_start = ev["ts"]
         if st == "job":
+            if kind == "started" and ev.get("flow") in FLOWS:
+                self.flow, self.order = ev["flow"], list(FLOWS[ev["flow"]])
             if kind in ("started", "queued"):
                 self.status = "running" if kind == "started" else "queued"
             elif kind in TERMINAL:
@@ -95,7 +104,7 @@ class State:
     def _overall(self):
         if self.status == "completed":
             return 1.0
-        names = ORDER if self.pass_no == 0 else list(RERENDER)
+        names = self.order if self.pass_no == 0 else [k for k in RERENDER if k in self.order]
         tot = sum(WEIGHTS[k] for k in names)
         done = 0.0
         for k in names:
@@ -107,8 +116,8 @@ class State:
 
     def snapshot(self):
         return dict(status=self.status, overall=self.overall, pass_no=self.pass_no, seq=self.seq, active=self.active, last=self.last, error=self.error, result=self.result, cache=self.cache, passes=self.passes,
-                    started=self.t_start, ended=self.t_end,
-                    stages=[dict(id=k, name=NAMES[k], **{f: v for f, v in self.stages[k].items() if f != "detail"}, detail=self.stages[k]["detail"]) for k in ORDER])
+                    started=self.t_start, ended=self.t_end, flow=self.flow,
+                    stages=[dict(id=k, name=NAMES[k], **{f: v for f, v in self.stages[k].items() if f != "detail"}, detail=self.stages[k]["detail"]) for k in self.order])
 
 
 def fold(events):

@@ -173,7 +173,7 @@
    "n_snaps": 0,
    "ghost_actors": [],
    "geometry_bad_shots": [],
-   "plan_seconds": 0.2,
+   "plan_seconds": 0.1,
    "sheet": "output/production/matrix/sheet_s05_atm_night_stranger.png"
   },
   {

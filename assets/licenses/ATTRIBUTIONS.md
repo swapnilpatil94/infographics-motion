@@ -1,0 +1,5 @@
+# Attributions
+
+Assets created by the Kathaya asset builder from approved reference images. Attribution is kept for every asset whose licence requires it.
+- **Bombay Stock Exchange Mumbai** (`env_lib_bombay_stock_exchange_mumbai`): DesiBoy101, CC BY 4.0, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Oriental_Building_and_BSE_as_seen_from_M._G._Road,_Mumbai.jpg) - source: https://commons.wikimedia.org/wiki/File:Oriental_Building_and_BSE_as_seen_from_M._G._Road,_Mumbai.jpg - licence: CC BY 4.0; the asset is a stylised derivative.
+- **Gateway of India Mumbai** (`env_lib_gateway_of_india_mumbai`): iMahesh, CC BY-SA 4.0, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Panoramic_view_of_Taj_Palace_Hotel_and_Taj_Tower_with_the_iconic_Gateway_of_India_in_the_background.jpg) - source: https://commons.wikimedia.org/wiki/File:Panoramic_view_of_Taj_Palace_Hotel_and_Taj_Tower_with_the_iconic_Gateway_of_India_in_the_background.jpg - licence: CC BY-SA 4.0; the asset is a stylised derivative (share-alike).

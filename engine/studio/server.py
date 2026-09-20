@@ -33,7 +33,8 @@ from fastapi.staticfiles import StaticFiles                                     
 
 from engine.shorts.raster import ROOT                                                    # noqa: E402
 from engine.skeleton import events as EVT                                                # noqa: E402
-from engine.studio import core as C, jobs as J, movie as M                               # noqa: E402
+from engine.studio import core as C, jobs as J, movie as M, kserver                       # noqa: E402
+from kathaya import pipeline as KP                                                       # noqa: E402
 
 WEB = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web")
 FILES = {"contact_sheet.png", "qc_report.json", "audio_report.json", "manifest.json", "story_graph.json", "plan.json", "summary.json", "events.jsonl", "poster.jpg", "critique/report.json"}
@@ -303,6 +304,13 @@ def create_app(test_mode=False, max_running=1):
             r.headers["Cache-Control"] = "no-cache"
         return r
 
+    kserver.MGR["m"] = MGR["m"]
+
+    @app.exception_handler(KP.ProjectError)
+    async def _project_error(request, exc):
+        return JSONResponse(status_code=exc.status, content=dict(error=exc.to_dict()))
+
+    app.include_router(kserver.router, prefix="/api/k")
     app.include_router(router, prefix="/api")
     app.include_router(router)
     app.mount("/static", StaticFiles(directory=WEB), name="static")

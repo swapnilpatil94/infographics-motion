@@ -31,7 +31,11 @@ def parse(story_md, narration_json, use_llm=False):
 
 def build(graph, nar, **k):
     """scene director + the user's optional director options (none = the plan the CLI builds)"""
-    return DO.apply(SD.build_plan(graph, nar, **k), graph.get("director"), graph.get("dna_patch"))
+    plan = DO.apply(SD.build_plan(graph, nar, **k), graph.get("director"), graph.get("dna_patch"))
+    if graph.get("narration_segments"):                                                   # Kathaya plans: captions / QC follow the real narration segments, the shots follow the visuals
+        plan["narration"]["segments"] = graph["narration_segments"]
+    plan.update(graph.get("plan_overrides") or {})
+    return plan
 
 
 def plan_for(graph, nar, seed=11, fixes=None):

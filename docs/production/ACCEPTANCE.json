@@ -1,5 +1,5 @@
 {
- "started": "2026-09-20 18:03:28",
+ "started": "2026-09-20 22:45:17",
  "stories": {
   "A": {
    "story": "a_whatsapp_investment",
@@ -66,7 +66,7 @@
      "fixes_applied": []
     }
    ],
-   "seconds": 436.8,
+   "seconds": 419.7,
    "audio": {
     "duration": 45.471,
     "expected": 45.471,
@@ -180,7 +180,7 @@
      "fixes_applied": []
     }
    ],
-   "seconds": 500.7,
+   "seconds": 434.6,
    "audio": {
     "duration": 49.623,
     "expected": 49.623,
@@ -308,7 +308,7 @@
      "fixes_applied": []
     }
    ],
-   "seconds": 628.0,
+   "seconds": 565.8,
    "audio": {
     "duration": 53.371,
     "expected": 53.371,
@@ -369,7 +369,7 @@
   "identical_frames": 2004,
   "pixel_identical": true,
   "qc_passed": true,
-  "rerender_seconds": 391.7,
+  "rerender_seconds": 369.5,
   "frame_cache": {
    "frames": 1182,
    "reused": 1182,
@@ -522,10 +522,10 @@
   "passed": true,
   "gates": "52/52",
   "failed": [],
-  "seconds": 438.0
+  "seconds": 387.6
  },
  "unit_tests": {
-  "ran": 222,
+  "ran": 264,
   "failures": 0,
   "errors": 0,
   "passed": true
@@ -540,5 +540,5 @@
   "unit_tests": true,
   "ACCEPTED": true
  },
- "total_seconds": 2549.2
+ "total_seconds": 2311.7
 }

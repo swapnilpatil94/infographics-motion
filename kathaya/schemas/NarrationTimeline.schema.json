@@ -1,0 +1,109 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "title": "NarrationTimeline",
+ "type": "object",
+ "required": [
+  "schema",
+  "source",
+  "duration",
+  "narration"
+ ],
+ "properties": {
+  "schema": {
+   "const": "kathaya.narration_timeline/1"
+  },
+  "language": {
+   "type": "string"
+  },
+  "format": {
+   "enum": [
+    "short",
+    "long"
+   ]
+  },
+  "source": {
+   "enum": [
+    "timing_json",
+    "audio_and_text",
+    "tts",
+    "estimated"
+   ],
+   "description": "where the times come from"
+  },
+  "audio": {
+   "type": [
+    "string",
+    "null"
+   ]
+  },
+  "duration": {
+   "type": "number",
+   "minimum": 0
+  },
+  "warnings": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   }
+  },
+  "narration": {
+   "type": "array",
+   "minItems": 1,
+   "items": {
+    "type": "object",
+    "required": [
+     "id",
+     "start",
+     "end",
+     "text"
+    ],
+    "additionalProperties": true,
+    "properties": {
+     "id": {
+      "type": "string",
+      "pattern": "^N\\d{2,}$"
+     },
+     "start": {
+      "type": "number",
+      "minimum": 0
+     },
+     "end": {
+      "type": "number",
+      "minimum": 0
+     },
+     "text": {
+      "type": "string",
+      "minLength": 1
+     },
+     "spoken": {
+      "type": "string"
+     },
+     "words": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "required": [
+        "word",
+        "start",
+        "end"
+       ],
+       "properties": {
+        "word": {
+         "type": "string"
+        },
+        "start": {
+         "type": "number",
+         "minimum": 0
+        },
+        "end": {
+         "type": "number",
+         "minimum": 0
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ }
+}

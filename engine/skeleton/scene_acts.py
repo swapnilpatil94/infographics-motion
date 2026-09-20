@@ -60,6 +60,7 @@ def emotion_atom(b):
 
 
 def compile_beat(d, i, b, t0, t1, chars):
+    n_before = len(d.acts)
     act = b["act"]
     sc = d.scenes[d.scene_of[i]]
     lay = sc["lay"]
@@ -258,12 +259,24 @@ def compile_beat(d, i, b, t0, t1, chars):
         extra_shot = dict(procedural=dict(type="money_flow", data={"amount": data.get("amount", 100000), "from_label": data.get("from_label", "आपकी बचत"), "to": data.get("to", ["खाता 1", "खाता 2", "खाता 3"])}))
     else:                                                                       # any act without a dedicated compile: neutral, watched beat
         A(action="idle", t=t0, dur=L)
+    if b.get("ambient_gaze") and treat == "skeleton" and L >= 1.0 and not any(a["action"] == "look_at" for a in d.acts[n_before:]):
+        tgt = ("PHONE", "CAMERA", "WINDOW", "DOOR", "LAMP")[i % 5]                     # basic acting: a person's eyes are never frozen - a target-driven glance in every shot that has no gaze of its own (Kathaya plans)
+        A(action="look_at", t=t0 + 0.3, dur=min(1.4, max(0.4, L - 0.6)), target=tgt)
     # ------------------------------------------------------------------ shot(s)
-    two = L > 4.4 and treat == "skeleton" and act not in ("RESOLVE",)
+    co = b.get("camera")                                                        # an explicit camera from the visual scene plan (Kathaya): executed as given, never rotated or split
+    two = L > 4.4 and treat == "skeleton" and act not in ("RESOLVE",) and not co
     spans = [(t0, t0 + 0.5 * L + 0.2), (t0 + 0.5 * L + 0.2, t1)] if two else [(t0, t1)]
+    for x in b.get("effects") or []:                                            # requested effects ("rays@phone"): the renderer's own Grease Pencil effects
+        e_, an_ = x.split("@")
+        gp.append(dict(effect=e_, anchor=an_, start=0.1, duration=min(1.2, max(0.3, L - 0.2)), intensity=0.8, relationship="requested by the visual plan"))
+    adj = getattr(d, "camera_adjustments", None)
+    if adj is None:
+        adj = d.camera_adjustments = []
     for k, (s0, s1) in enumerate(spans):
-        tg, sz, mv = d.pick_cam(act, i) if treat == "skeleton" else (None, None, None)
+        tg, sz, mv = ((co["target"], co["size"], co["move"]) if co else d.pick_cam(act, i)) if treat == "skeleton" else (None, None, None)
         if tg == "A.reach" and not (d.pose.get("A") == "sit" and sc["family"] in HAS_FREE_PHONE):
+            if co:
+                adj.append(dict(beat=b["id"], asked=[tg, sz, mv], used=["A.head", "medium", "push"], why="the phone is not on a table to reach for (standing / no free phone in this set)"))
             tg, sz, mv = "A.head", "medium", "push"                                 # standing: the phone is in the pocket / hand, not on a table to reach for
         if treat != "skeleton":
             cam = None
@@ -272,12 +285,14 @@ def compile_beat(d, i, b, t0, t1, chars):
                 tg = P + tg[1:]
             cam = _resolve_cam(tg, sz, mv, P, dict(dir=-1) if mv == "reveal" and lay.get("D_from", lay["visitor_from"]) > 0 else dict(dir=1) if mv in ("reveal", "truck") else None)
             if cam and not partner_in and ("+" + P in cam["target"] or cam["target"].startswith(P + ".")):
+                if co:
+                    adj.append(dict(beat=b["id"], asked=[co["target"], co["size"], co["move"]], used=["A.head", "medium", "isolate"], why="no partner is on the set in this scene"))
                 cam = _cam("A.head", "medium", "isolate")                       # no partner in this scene: never frame an empty spot
         lt = _lighting(sc, b["emotion"], act, False)
         if sc["time"] == "night" and act not in ("INSERT_SCREEN", "VISUALIZE_FLOW"):
             lt["phone"] = 1.0
         sh = dict(id=f"S{len(d.shots) + 1:02d}", key=b["id"] + ("" if not two else f".{'ab'[k]}"), treatment=treat, t0=round(s0, 3), t1=round(s1, 3), beats=[b["id"]], segs=[b["id"]], purpose=f"{act} ({sc['loc']}, {sc['time']})",
-                  act=act, gp=gp if k == 0 else [], transition_in="fade" if (len(d.shots) == 0) else ("dip" if (i > 0 and d.scene_of[i] != d.scene_of[i - 1]) else "cut"), sfx=[], phase="-", location=sc["loc"], lighting=lt, audio_mood=mood_key,
+                  act=act, gp=gp if k == 0 else [], transition_in=(b.get("transition") if b.get("transition") in ("cut", "fade", "dip") and k == 0 else "cut") if b.get("transition") else ("fade" if (len(d.shots) == 0) else ("dip" if (i > 0 and d.scene_of[i] != d.scene_of[i - 1]) else "cut")), sfx=[], phase="-", location=sc["loc"], lighting=lt, audio_mood=mood_key,
                   environment=sc["env"], **extra_shot)
         if cam:
             sh["camera"] = cam

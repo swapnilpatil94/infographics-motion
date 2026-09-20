@@ -1,4 +1,7 @@
-"""STORY SEMANTICS: (script segments + optional story notes) -> a validated STORY GRAPH the scene director compiles.
+"""LEGACY (not used by the Kathaya pipeline; kept for the Advanced / Developer tools and the accepted films): STORY SEMANTICS - (script segments + optional story notes) -> a validated STORY GRAPH by keyword rules.
+The Kathaya pipeline replaces this with a creative director + a resolved VisualScenePlan (see kathaya/).
+
+(script segments + optional story notes) -> a validated STORY GRAPH the scene director compiles.
 
     analyze(segments, notes=None)  ->  dict(title, story_id, slug, cast, scenes, beats[{id, text, act, loc, time, emotion, gaze, props, partner, data}], provenance)
     raises StoryNotSupported(reasons) when the request is outside what the factory can stage - it never invents a story.
