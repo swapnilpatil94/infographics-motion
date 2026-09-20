@@ -1,6 +1,6 @@
 # Production acceptance
 
-`python3 studio.py --production-acceptance` — started 2026-09-20 15:50:19, total 2646.0 s
+`python3 studio.py --production-acceptance` — started 2026-09-20 18:03:28, total 2549.2 s
 
 ## Verdict
 
@@ -32,7 +32,7 @@ materially different: `{'distinct_act_sequences': True, 'distinct_scene_sets': T
  "identical_frames": 2004,
  "pixel_identical": true,
  "qc_passed": true,
- "rerender_seconds": 361.8,
+ "rerender_seconds": 391.7,
  "frame_cache": {
   "frames": 1182,
   "reused": 1182,
@@ -205,7 +205,7 @@ materially different: `{'distinct_act_sequences': True, 'distinct_scene_sets': T
  "passed": true,
  "gates": "52/52",
  "failed": [],
- "seconds": 545.6
+ "seconds": 438.0
 }
 ```
 
@@ -213,7 +213,7 @@ materially different: `{'distinct_act_sequences': True, 'distinct_scene_sets': T
 
 ```json
 {
- "ran": 189,
+ "ran": 222,
  "failures": 0,
  "errors": 0,
  "passed": true

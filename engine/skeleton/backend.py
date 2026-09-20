@@ -69,15 +69,8 @@ def characters(graph):
 
 def character_override(plan, cid, dna_patch):
     """patch a character's DNA fields (skin, hair, wardrobe...) -> new plan; only that character's frames re-render"""
-    from engine.skeleton import dna2
-    p = copy.deepcopy(plan)
-    dna = p["characters"][cid]["dna"]
-    for k, v in dna_patch.items():
-        dna[k] = {**dna[k], **v} if isinstance(dna.get(k), dict) and isinstance(v, dict) else v
-    bad = dna2.validate(dna)
-    if bad:
-        raise ValueError(f"invalid DNA: {bad}")
-    return p
+    from engine.skeleton import director_opts as DO
+    return DO.patch_dna(copy.deepcopy(plan), cid, dna_patch)
 
 
 def assets():

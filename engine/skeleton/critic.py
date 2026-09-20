@@ -21,7 +21,7 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 from engine.shorts.layers import C0, H, W
-from engine.skeleton import short
+from engine.skeleton import events as EVT, short
 from engine.environments import bedroom_wide as BW
 
 SAFE_X = (46.0, W - 46.0)
@@ -344,6 +344,7 @@ def improve(plan, story, nar, out_dir, rounds=3, log=print, samples=10, seed=11,
     for r in range(rounds + 1):
         plan = (builder or AD.build_plan)(story, nar, seed=seed, tts=nar["tts"], name=story["slug"], fixes=fixes)
         times = _stills_times(plan)
+        EVT.current().progress("scene_direction", fraction=0.15 + 0.8 * r / (rounds + 1), force=True, message=f"critic round {r + 1}/{rounds + 1}: rendering {len(times)} preview stills and measuring framing", current_operation="critic: preview stills (Blender) + measured framing")
         rd = os.path.join(cdir, f"round_{r}")
         R = short.render_stills(plan, rd, times, log, samples=samples)
         actors, cam = R["actors"], R["cam"]

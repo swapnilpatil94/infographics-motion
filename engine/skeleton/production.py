@@ -11,7 +11,7 @@ import os
 import time
 
 from engine.shorts.raster import ROOT
-from engine.skeleton import critic as CR, narration_io as NI, qc_v4, scene_director as SD, short, story_semantics as SS, topic_build as TB
+from engine.skeleton import critic as CR, director_opts as DO, events as EVT, narration_io as NI, qc_v4, scene_director as SD, short, story_semantics as SS, topic_build as TB
 
 MAX_QC_ROUNDS = 3
 
@@ -29,15 +29,30 @@ def parse(story_md, narration_json, use_llm=False):
     return graph, nar
 
 
+def build(graph, nar, **k):
+    """scene director + the user's optional director options (none = the plan the CLI builds)"""
+    return DO.apply(SD.build_plan(graph, nar, **k), graph.get("director"), graph.get("dna_patch"))
+
+
 def plan_for(graph, nar, seed=11, fixes=None):
-    plan = SD.build_plan(graph, nar, seed=seed, name=graph["slug"], tts=nar.get("tts", "provided"), fixes=fixes if fixes is not None else graph.get("fixes"))
+    plan = build(graph, nar, seed=seed, name=graph["slug"], tts=nar.get("tts", "provided"), fixes=fixes if fixes is not None else graph.get("fixes"))
     TB.bake_cast(plan)
     return plan
 
 
-def make(story_md, narration_json, out_dir=None, seed=11, samples=10, critique_rounds=2, use_llm=False, use_vlm=False, log=print, qc_rounds=MAX_QC_ROUNDS):
+def make(story_md, narration_json, out_dir=None, seed=11, samples=10, critique_rounds=2, use_llm=False, use_vlm=False, log=print, qc_rounds=MAX_QC_ROUNDS, graph=None):
+    """graph: an already approved story graph (the Studio UI's reviewed / edited graph); its beat ids must match the narration segment ids"""
     t_all = time.time()
-    graph, nar = parse(story_md, narration_json, use_llm)
+    EV = EVT.current()
+    EV.start("scene_direction", message="casting, blocking, camera and lighting for every shot")
+    if graph is not None:
+        nar = NI.load(narration_json)
+        miss = [b["id"] for b in graph["beats"] if b["id"] not in {s["id"] for s in nar["segments"]}]
+        if miss:
+            raise SS.StoryNotSupported(f"the approved story has beats {miss} that the narration does not cover")
+        graph.setdefault("fixes", {})
+    else:
+        graph, nar = parse(story_md, narration_json, use_llm)
     out_dir = out_dir or os.path.join(ROOT, "output/production", graph["slug"])
     os.makedirs(out_dir, exist_ok=True)
     json.dump(graph, open(os.path.join(out_dir, "story_graph.json"), "w"), ensure_ascii=False, indent=1)
@@ -45,9 +60,11 @@ def make(story_md, narration_json, out_dir=None, seed=11, samples=10, critique_r
     fixes = dict(graph.get("fixes", {}))
     plan = plan_for(graph, nar, seed, fixes)
     log(f"[production] plan v{plan['version']}: {len(plan['shots'])} shots, {plan['duration']}s, acts={plan['acts']}")
-    crit = CR.improve(plan, graph, nar, out_dir, rounds=critique_rounds, log=log, samples=max(4, samples // 2), seed=seed, use_vlm=use_vlm, builder=SD.build_plan) if critique_rounds else dict(plan=plan, fixes=fixes, summary=None)
+    crit = CR.improve(plan, graph, nar, out_dir, rounds=critique_rounds, log=log, samples=max(4, samples // 2), seed=seed, use_vlm=use_vlm, builder=build) if critique_rounds else dict(plan=plan, fixes=fixes, summary=None)
     plan, fixes = crit["plan"], crit["fixes"]
     graph["fixes"] = fixes
+    EV.complete("scene_direction", message=f"{len(plan['shots'])} shots, {len(plan['scenes'])} scenes, {len(plan['cast_in_short'])} characters", shots=len(plan["shots"]), scenes=len(plan["scenes"]), characters=len(plan["cast_in_short"]),
+                critic_after=(crit["summary"] or {}).get("after"))
     history = []
     for r in range(qc_rounds + 1):
         TB.bake_cast(plan)
@@ -62,10 +79,12 @@ def make(story_md, narration_json, out_dir=None, seed=11, samples=10, critique_r
         if audio_cfg:
             fixes["_audio"] = audio_cfg
         history[-1]["fixes_applied"] = done
+        EV.emit("qc_fix", "qc", message=f"{len(done)} automatic fix(es) after QC round {r}", fixes=done, failed_checks=fails)
         if not [d for d in done if not d.startswith("framing: handled")]:
             log("[production] no automatic fix available for the failed gates")
             break
         plan = plan_for(graph, nar, seed, fixes)
+        EV.new_pass(r + 1, done)
     graph["fixes"] = fixes
     json.dump(graph, open(os.path.join(out_dir, "story_graph.json"), "w"), ensure_ascii=False, indent=1)
     man = json.load(open(os.path.join(out_dir, "manifest.json")))

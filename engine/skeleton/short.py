@@ -27,7 +27,7 @@ from engine.shorts.lighting import Light
 from engine.shorts.performance import ease
 from engine.shorts.raster import ROOT
 from engine.shorts.scene import Scene
-from engine.skeleton import blender_job, dna2, motion as M, parts_art as PA, parts_art2 as PA2, rig_def as R
+from engine.skeleton import blender_job, dna2, events as EVT, motion as M, parts_art as PA, parts_art2 as PA2, rig_def as R
 from engine.environments import bedroom_wide as BW
 
 FPS = 30
@@ -366,7 +366,24 @@ def render_actors(plan, actors, cam, workdir, log=print, samples=10, only_frames
     todo = [f for f in fr if f not in have]
     job = dict(width=W, height=H, fps=plan["fps"], start=0, end=n - 1, out=out, prefix="a", samples=samples, characters=chars, gaze_mode=plan.get("gaze_mode", "pupil"), camera=camj,
                render_frames=todo or fr[:1], probe_frames=fr[::max(1, len(fr) // 40)], save_blend=os.path.join(workdir, "skeleton_scene.blend"))
-    rep = blender_job.run(job, workdir, log)
+    EV = EVT.current() if only_frames is None else EVT._NULL                        # full film renders report stages; critic previews do not
+    if only_frames is None:
+        EV.complete("asset_preparation", message=f"{len(have)} of {len(fr)} frames already in the frame cache", frames=len(fr), cache_reused=len(have), to_render=len(todo))
+        t_r = time.time()
+        EV.start("blender_render", message="building the rig scene (Blender)", frames=len(fr), total_frames=len(fr), cache_reused=len(have), to_render=len(todo), total_shots=len(plan["shots"]))
+
+        def _prog(done, total, nxt, fps, phase):
+            if not todo:                                                            # nothing to render: Blender only re-solves the rig (needed for the QC report)
+                EV.progress("blender_render", frame=len(fr), total_frames=len(fr), rendered=0, cache_reused=len(have), to_render=0, total_shots=len(plan["shots"]), shot=len(plan["shots"]), current_operation="all frames cached - re-solving the rig for QC")
+                return
+            EV.progress("blender_render", fraction=(done / total) if total else 1.0, frame=min(len(fr), len(have) + done), total_frames=len(fr), rendered=done, to_render=total, cache_reused=len(have), fps=fps,
+                        eta_seconds=round((total - done) / fps, 1) if (fps and phase == "rendering") else None, shot=EVT.shot_index(plan, nxt) + 1, total_shots=len(plan["shots"]), current_frame_index=nxt,
+                        current_operation="rendering rig frames (Blender)" if phase == "rendering" else "building the rig scene, keyframes and lights (Blender)")
+        rep = blender_job.run(job, workdir, log, progress=_prog)
+        EV.complete("blender_render", message=f"{len(todo)} frames rendered, {len(have)} reused from the frame cache", frames=len(fr), total_frames=len(fr), rendered=len(todo), cache_reused=len(have),
+                    blender_seconds=round(time.time() - t_r, 1), shot=len(plan["shots"]), total_shots=len(plan["shots"]))
+    else:
+        rep = blender_job.run(job, workdir, log)
     for f in todo:                                                                 # freshly rendered frames enter the cache
         src = os.path.join(out, f"a{f:05d}.png")
         if os.path.exists(src):
@@ -705,9 +722,13 @@ def sfx_list(plan, actors):
 # ------------------------------------------------------------------------------------------------------------------ top level
 def build_everything(plan, workdir, log=print, samples=10, skip_blender=False, only_frames=None):
     t0 = time.time()
+    EV = EVT.current() if only_frames is None else EVT._NULL
+    EV.start("asset_preparation", message="baking character rigs, art parts, camera and frame-cache keys")
     actors = build_actors(plan, log)
     cam = build_camera(plan, actors)
     if skip_blender and os.path.isdir(os.path.join(workdir, "actor_frames")):
+        EV.skip("asset_preparation", "reusing the frames of the previous render (skip_blender)")
+        EV.skip("blender_render", "reusing the frames of the previous render (skip_blender)")
         frames_dir, rep = os.path.join(workdir, "actor_frames"), json.load(open(os.path.join(workdir, "actor_frames", "report.json")))
     else:
         frames_dir, rep = render_actors(plan, actors, cam, workdir, log, samples, only_frames)
@@ -788,7 +809,7 @@ def render_stills(plan, out_dir, times, log=print, samples=10, with_captions=Tru
     for tt in times:
         f = int(round(tt * plan["fps"]))
         img = _title_card(film.frame_at(tt, f), plan, tt)
-        cb = caption_at(plan, film, tt, caps) if with_captions else None
+        cb = caption_at(plan, film, tt, caps) if (with_captions and plan.get("captions", True)) else None
         if cb:
             img = captions.overlay(img, cb[0], cb[3])
         p = os.path.join(out_dir, f"still_{tt:07.2f}.png")
@@ -821,7 +842,9 @@ def render_film(plan, out_dir, log=print, skip_blender=False, samples=10, stills
             outs.append(p)
         return outs
     # ---- audio
+    EV = EVT.current()
     t = time.time()
+    EV.start("audio", message="per-scene ambience, mood music, foley from the actions, ducking, master limiter")
     audio_path = plan["narration"].get("audio")
     if audio_path:
         audio_path = audio_path if os.path.isabs(audio_path) else os.path.join(ROOT, audio_path)
@@ -838,6 +861,8 @@ def render_film(plan, out_dir, log=print, skip_blender=False, samples=10, stills
     else:
         wav = AP.mix(plan["duration"], narr, sfx_list(plan, actors), [tuple(m) for m in plan["mood_track"]], out_dir=work)
     stages["audio"] = round(time.time() - t, 1)
+    EV.complete("audio", message="mix cached (identical audio settings)" if (arep or {}).get("cache_hit") else "mix synthesised", cache_hit=bool((arep or {}).get("cache_hit")), foley_events=((arep or {}).get("layers") or {}).get("foley_events"),
+                sfx_events=len(plan.get("sfx") or []), peak=(arep or {}).get("peak"))
     # ---- frames -> ffmpeg
     fps = plan["fps"]
     n = int(round(plan["duration"] * fps))
@@ -849,6 +874,8 @@ def render_film(plan, out_dir, log=print, skip_blender=False, samples=10, stills
     proc = subprocess.Popen(cmd, stdin=subprocess.PIPE)
     stats, ci, prev = [], 0, None
     t = time.time()
+    EV.start("compositing", message="compositing layers, lighting, captions and encoding", total_frames=n, total_shots=len(plan["shots"]))
+    show_caps = plan.get("captions", True)
     for f in range(n):
         tt = f / fps
         img = film.frame_at(tt, f)
@@ -858,7 +885,7 @@ def render_film(plan, out_dir, log=print, skip_blender=False, samples=10, stills
         while ci < len(caps) and caps[ci][1] < tt:
             ci += 1
         shot_i = film.index_at(tt)
-        if plan["shots"][shot_i]["treatment"] != "procedural" or True:
+        if show_caps:
             for c in caps[max(0, ci - 1):ci + 2]:
                 if c[0] <= tt <= c[1] and not (plan.get("title_card") and tt >= plan["title_card"]["t0"]):
                     op = max(0.0, min(1.0, (tt - c[0]) / 0.08, (c[1] - tt) / 0.08))
@@ -874,12 +901,20 @@ def render_film(plan, out_dir, log=print, skip_blender=False, samples=10, stills
         proc.stdin.write((np.clip(img, 0, 1) * 255).astype(np.uint8).tobytes())
         if f % 200 == 0:
             log(f"[short] frame {f}/{n}  {time.time() - t:.0f}s")
+        if f % 8 == 0:
+            el = time.time() - t
+            fps_c = (f + 1) / el if el > 0.5 else None
+            EV.progress("compositing", fraction=(f + 1) / n, frame=f + 1, total_frames=n, shot=shot_i + 1, total_shots=len(plan["shots"]), fps=round(fps_c, 2) if fps_c else None,
+                        eta_seconds=round((n - f - 1) / fps_c, 1) if fps_c else None, current_operation="compositing and encoding frames")
     proc.stdin.close()
     proc.wait()
     stages["composite+encode"] = round(time.time() - t, 1)
+    EV.complete("compositing", message=f"{n} frames composited and encoded", total_frames=n, frame=n, fps=round(n / max(stages["composite+encode"], 1e-6), 2))
     json.dump([dict(s, bbox=list(s["bbox"]) if s["bbox"] else None) for s in stats], open(os.path.join(work, "frame_stats.json"), "w"), default=_jd)
     FQC.contact_sheet(film, plan, os.path.join(out_dir, "contact_sheet.png"), cols=5, w=240)
     json.dump(plan, open(os.path.join(out_dir, "plan.json"), "w"), ensure_ascii=False, indent=1)
+    EV.start("qc", message="measured quality gates (geometry, contact, motion, framing, audio, decode)")
+    t_qc = time.time()
     if qc == "auto":
         qc = "v4" if plan.get("version", 1) >= 4 else "v3" if plan.get("version", 1) >= 3 else ("v2" if plan.get("version", 1) >= 2 else "v1")
     if qc == "v4":
@@ -895,6 +930,9 @@ def render_film(plan, out_dir, log=print, skip_blender=False, samples=10, stills
         qc = SQC.run(plan, actors, cam, rep, film, out_mp4, stats, frames_dir, log)
     else:
         qc = dict(file=os.path.basename(out_mp4), passed=True, n_checks=0, checks={}, evidence={"note": "test video: no QC gate"})
+    stages["qc"] = round(time.time() - t_qc, 1)
+    _bad = [k for k, v in qc["checks"].items() if not v]
+    EV.complete("qc", message=f"{qc['n_checks'] - len(_bad)}/{qc['n_checks']} gates passed" if qc["n_checks"] else "no gates", passed=qc["passed"], n_checks=qc["n_checks"], failed_checks=_bad, qc_seconds=stages["qc"])
     json.dump(qc, open(os.path.join(out_dir, "qc_report.json"), "w"), ensure_ascii=False, indent=1, default=_jd)
     man = dict(title=plan["title"], kind=plan["kind"], version=plan["version"], story_id=plan["story_id"], seed=plan["seed"], render_seconds=round(time.time() - t_all, 1), stages=stages,
                blender=dict(version=rep["blender"], frames_rendered=rep.get("rendered_frames"), objects=rep["objects"], bones=rep["bones"], ik_constraints=rep["ik_constraints"], actions=rep["actions"],

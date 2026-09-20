@@ -42,10 +42,19 @@ def load(path):
     return dict(segments=segs, audio=audio, tts=(d.get("tts") if isinstance(d, dict) else "provided") or "provided", tempo=(d.get("tempo") if isinstance(d, dict) else 1.0) or 1.0)
 
 
+def cache_key(beats):
+    return hashlib.sha1(json.dumps(beats, ensure_ascii=False).encode()).hexdigest()[:12]
+
+
+def is_cached(beats):
+    d = os.path.join(ROOT, "narration/production", cache_key(beats))
+    return os.path.exists(os.path.join(d, "raw.wav")) and os.path.exists(os.path.join(d, "raw.wav.segments.json"))
+
+
 def synthesize(beats, out_dir, tempo=1.08, lo=44.0, hi=60.0, log=print):
     """beats: [(id, text)] -> path of the segments JSON (written to out_dir/segments.json)"""
     from engine.skeleton import pace
-    h = hashlib.sha1(json.dumps(beats, ensure_ascii=False).encode()).hexdigest()[:12]
+    h = cache_key(beats)
     d = os.path.join(ROOT, "narration/production", h)
     os.makedirs(d, exist_ok=True)
     bj = os.path.join(d, "beats.json")

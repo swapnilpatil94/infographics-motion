@@ -108,6 +108,8 @@ def main():
     parser.add_argument("--production", metavar="STORY_MD", help="PRODUCTION: story.md + --narration-json SEGMENTS_JSON -> finished cinematic Short (parse -> plan -> render -> audio -> QC + auto-fix)")
     parser.add_argument("--narration-json", metavar="SEGMENTS_JSON", help="With --production: narration segments JSON (id,text,start,end[,words] + audio path)")
     parser.add_argument("--production-acceptance", action="store_true", help="ONE command: 3 different stories end to end + determinism + caching + failure modes + 24-situation matrix + original-film regression + unit tests")
+    parser.add_argument("--ui", action="store_true", help="STUDIO UI: start Kathaaya Studio (web UI + production API) at http://127.0.0.1:8765 - create movies from one screen")
+    parser.add_argument("--port", type=int, default=8765, help="With --ui: port of the studio server")
     parser.add_argument("--skeleton-short", action="store_true", help="SKELETON PROOF: build + render the full-body 2D skeleton short (narration -> plan -> Blender rig -> film)")
     parser.add_argument("--skeleton-short-v2", action="store_true", help="FACTORY V2: render the 'एक गलत कॉल' Short (CharacterDNA v2, 3/4 views, hand poses, gaze targets, hand-over, lighting)")
     parser.add_argument("--skeleton-short-v3", action="store_true", help="CHARACTER ART + ACTING LOCK: the V3 Short (hand library, prop grips, acted entrance, sequences)")
@@ -127,6 +129,8 @@ def main():
                 f"build.from_plan({args.from_plan!r})")
         subprocess.run([os.path.join(ROOT, ".venv/bin/python"), "-c", code], cwd=ROOT, check=True, env=dict(os.environ, PYTHONPATH=ROOT, PYTHONUNBUFFERED="1"))
         return
+    if args.ui:
+        sys.exit(subprocess.run([os.path.join(ROOT, ".venv/bin/python"), "-u", "-m", "engine.studio.server", "--port", str(args.port)], cwd=ROOT, env=dict(os.environ, PYTHONPATH=ROOT, PYTHONUNBUFFERED="1")).returncode)
     if args.production_acceptance:
         sys.exit(subprocess.run([os.path.join(ROOT, ".venv/bin/python"), "-u", "-m", "engine.skeleton.acceptance"], cwd=ROOT, env=dict(os.environ, PYTHONPATH=ROOT, PYTHONUNBUFFERED="1")).returncode)
     if args.production:

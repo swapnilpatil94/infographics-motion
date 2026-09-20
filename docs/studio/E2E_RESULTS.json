@@ -1,0 +1,650 @@
+{
+ "failed_render_blender_missing": {
+  "production": "p_20260920-174914_c77d",
+  "status": "failed",
+  "error": {
+   "stage": "scene_direction",
+   "type": "FileNotFoundError",
+   "message": "[Errno 2] No such file or directory: '/nonexistent/Blender'",
+   "reasons": [],
+   "hint": "Blender could not run. Check that Blender is installed at /Applications/Blender.app (or set BLENDER); the Blender log is in the production's work/blender_stdout_live.txt."
+  },
+  "stages": {
+   "story_analysis": "completed",
+   "story_graph": "completed",
+   "script": "skipped",
+   "narration": "skipped",
+   "scene_direction": "failed",
+   "asset_preparation": "pending",
+   "blender_render": "pending",
+   "audio": "pending",
+   "compositing": "pending",
+   "qc": "pending",
+   "export": "pending"
+  }
+ },
+ "cancel_real_blender": {
+  "production": "p_20260920-174915_b6c6",
+  "status": "cancelled",
+  "cancelled_stage": [
+   "blender_render"
+  ],
+  "seconds_to_cancel": 0.12,
+  "blender_processes_before": 2,
+  "blender_processes_after": 1,
+  "has_video": false,
+  "last_events": [
+   [
+    "progress",
+    "blender_render"
+   ],
+   [
+    "cancelled",
+    "blender_render"
+   ],
+   [
+    "cancelled",
+    "job"
+   ]
+  ],
+  "frame_copies_cleaned": true,
+  "rendered_when_cancelled": 18,
+  "processes_naming_this_production_after": 0,
+  "note": "the first run's process count also included the next scenario's Blender; checked separately: 0 processes name the cancelled production after the cancel (pgrep -f <production id>)"
+ },
+ "accepted_b_lottery_fee": {
+  "production": "p_20260920-175240_58a3",
+  "status": "completed",
+  "qc": "31/31",
+  "qc_failed": [],
+  "autofix": [],
+  "duration": 49.623,
+  "shots": 19,
+  "cache": {
+   "frames": 1272,
+   "reused": 1272,
+   "to_render": 0,
+   "rendered": 0,
+   "reuse_pct": 100.0,
+   "mix_cache_hit": true,
+   "narration_cached": false,
+   "freed_mb": 1193.1
+  },
+  "timings": {
+   "total": 428.8,
+   "blender": 20.5,
+   "asset_preparation": 0.1,
+   "audio": 0.1,
+   "compositing": 331.2,
+   "qc": 10.8,
+   "scene_direction": 58.4,
+   "narration": 0.0,
+   "export": 0.0
+  },
+  "events": 283,
+  "progress_events": 240,
+  "overall_monotone": true,
+  "stages": {
+   "story_analysis": [
+    "completed",
+    0.0
+   ],
+   "story_graph": [
+    "completed",
+    0.0
+   ],
+   "script": [
+    "skipped",
+    0.0
+   ],
+   "narration": [
+    "skipped",
+    0.0
+   ],
+   "scene_direction": [
+    "completed",
+    58.35
+   ],
+   "asset_preparation": [
+    "completed",
+    0.15
+   ],
+   "blender_render": [
+    "completed",
+    20.52
+   ],
+   "audio": [
+    "completed",
+    0.05
+   ],
+   "compositing": [
+    "completed",
+    331.18
+   ],
+   "qc": [
+    "completed",
+    10.8
+   ],
+   "export": [
+    "completed",
+    2.4
+   ]
+  },
+  "file": "output/studio/productions/p_20260920-175240_58a3/final.mp4",
+  "requested": {
+   "format": "9:16",
+   "duration": null,
+   "voice": "provided"
+  },
+  "captions": true,
+  "director": {}
+ },
+ "accepted_c_atm_helper": {
+  "production": "p_20260920-175950_e253",
+  "status": "completed",
+  "qc": "31/31",
+  "qc_failed": [],
+  "autofix": [],
+  "duration": 53.367,
+  "shots": 21,
+  "cache": {
+   "frames": 1601,
+   "reused": 1601,
+   "to_render": 0,
+   "rendered": 0,
+   "reuse_pct": 100.0,
+   "mix_cache_hit": true,
+   "narration_cached": false,
+   "freed_mb": 1603.9
+  },
+  "timings": {
+   "total": 578.9,
+   "blender": 56.5,
+   "asset_preparation": 0.6,
+   "audio": 0.1,
+   "compositing": 366.8,
+   "qc": 13.5,
+   "scene_direction": 132.3,
+   "narration": 0.0,
+   "export": 0.0
+  },
+  "events": 386,
+  "progress_events": 342,
+  "overall_monotone": true,
+  "stages": {
+   "story_analysis": [
+    "completed",
+    0.0
+   ],
+   "story_graph": [
+    "completed",
+    0.0
+   ],
+   "script": [
+    "skipped",
+    0.0
+   ],
+   "narration": [
+    "skipped",
+    0.0
+   ],
+   "scene_direction": [
+    "completed",
+    132.31
+   ],
+   "asset_preparation": [
+    "completed",
+    0.56
+   ],
+   "blender_render": [
+    "completed",
+    56.5
+   ],
+   "audio": [
+    "completed",
+    0.05
+   ],
+   "compositing": [
+    "completed",
+    366.84
+   ],
+   "qc": [
+    "completed",
+    13.53
+   ],
+   "export": [
+    "completed",
+    2.83
+   ]
+  },
+  "file": "output/studio/productions/p_20260920-175950_e253/final.mp4",
+  "requested": {
+   "format": "9:16",
+   "duration": null,
+   "voice": "provided"
+  },
+  "captions": true,
+  "director": {}
+ },
+ "script_mode": {
+  "production": "p_20260920-180947_33c5",
+  "status": "completed",
+  "qc": "31/31",
+  "qc_failed": [],
+  "autofix": [],
+  "duration": 49.623,
+  "shots": 19,
+  "cache": {
+   "frames": 1272,
+   "reused": 0,
+   "to_render": 1272,
+   "rendered": 1272,
+   "reuse_pct": 0.0,
+   "mix_cache_hit": false,
+   "narration_cached": true,
+   "freed_mb": 1169.8
+  },
+  "timings": {
+   "total": 749.2,
+   "blender": 243.3,
+   "asset_preparation": 0.2,
+   "audio": 12.1,
+   "compositing": 369.9,
+   "qc": 11.9,
+   "scene_direction": 71.3,
+   "narration": 0.3,
+   "export": 0.0
+  },
+  "events": 834,
+  "progress_events": 789,
+  "overall_monotone": true,
+  "stages": {
+   "story_analysis": [
+    "completed",
+    0.0
+   ],
+   "story_graph": [
+    "completed",
+    0.0
+   ],
+   "script": [
+    "completed",
+    0.0
+   ],
+   "narration": [
+    "completed",
+    0.27
+   ],
+   "scene_direction": [
+    "completed",
+    71.27
+   ],
+   "asset_preparation": [
+    "completed",
+    0.18
+   ],
+   "blender_render": [
+    "completed",
+    243.3
+   ],
+   "audio": [
+    "completed",
+    12.13
+   ],
+   "compositing": [
+    "completed",
+    369.88
+   ],
+   "qc": [
+    "completed",
+    11.86
+   ],
+   "export": [
+    "completed",
+    34.66
+   ]
+  },
+  "file": "output/studio/productions/p_20260920-180947_33c5/final.mp4",
+  "requested": {
+   "format": "16:9",
+   "duration": null,
+   "voice": "chatterbox_hindi"
+  },
+  "captions": true,
+  "director": {},
+  "narration_cache_hit": true,
+  "files_16x9": true
+ },
+ "create_mode": {
+  "production": "p_20260920-182217_671f",
+  "status": "completed",
+  "qc": "30/31",
+  "qc_failed": [
+   "ik_reachable_(no_unreachable_targets;_clamped_frames_<=3%)"
+  ],
+  "autofix": [],
+  "duration": 52.7,
+  "shots": 19,
+  "cache": {
+   "frames": 1380,
+   "reused": 0,
+   "to_render": 1380,
+   "rendered": 1380,
+   "reuse_pct": 0.0,
+   "mix_cache_hit": false,
+   "narration_cached": false,
+   "freed_mb": 1344.9
+  },
+  "timings": {
+   "total": 1026.4,
+   "blender": 250.8,
+   "asset_preparation": 0.3,
+   "audio": 14.4,
+   "compositing": 404.0,
+   "qc": 10.7,
+   "scene_direction": 75.8,
+   "narration": 262.2,
+   "export": 0.0
+  },
+  "events": 1126,
+  "progress_events": 1078,
+  "overall_monotone": true,
+  "stages": {
+   "story_analysis": [
+    "completed",
+    0.0
+   ],
+   "story_graph": [
+    "completed",
+    0.0
+   ],
+   "script": [
+    "completed",
+    0.0
+   ],
+   "narration": [
+    "completed",
+    262.22
+   ],
+   "scene_direction": [
+    "completed",
+    75.84
+   ],
+   "asset_preparation": [
+    "completed",
+    0.27
+   ],
+   "blender_render": [
+    "completed",
+    250.82
+   ],
+   "audio": [
+    "completed",
+    14.39
+   ],
+   "compositing": [
+    "completed",
+    404.01
+   ],
+   "qc": [
+    "completed",
+    10.72
+   ],
+   "export": [
+    "completed",
+    2.69
+   ]
+  },
+  "file": "output/studio/productions/p_20260920-182217_671f/final.mp4",
+  "requested": {
+   "format": "9:16",
+   "duration": 55,
+   "voice": "chatterbox_hindi"
+  },
+  "captions": true,
+  "director": {},
+  "narration": {
+   "id": "narration",
+   "name": "Narration",
+   "status": "completed",
+   "fraction": 1.0,
+   "seconds": 262.22,
+   "started": null,
+   "message": "19 lines, 49.7 s of speech, tempo 0.941",
+   "detail": {
+    "message": "19 lines, 49.7 s of speech, tempo 0.941",
+    "elapsed_seconds": 262.22,
+    "cached": false,
+    "lines": 19,
+    "duration": 49.70774565582523,
+    "tempo": 0.941
+   }
+  },
+  "topic_title": "तुरंत लोन का फंदा",
+  "cast": {
+   "protagonist": {
+    "gender": "female",
+    "archetype": "young woman",
+    "name": "नेहा"
+   },
+   "principal": {
+    "role": "mother",
+    "archetype": "parent",
+    "gender": "feminine"
+   },
+   "extras": []
+  },
+  "ik_clamped_frames": {
+   "A": 115,
+   "D": 0
+  }
+ },
+ "director_options_calm_nocaptions_music50": {
+  "production": "p_20260920-183924_2029",
+  "status": "completed",
+  "qc": "30/30",
+  "qc_failed": [],
+  "autofix": [],
+  "duration": 45.466,
+  "shots": 19,
+  "cache": {
+   "frames": 1182,
+   "reused": 508,
+   "to_render": 674,
+   "rendered": 674,
+   "reuse_pct": 43.0,
+   "mix_cache_hit": false,
+   "narration_cached": false,
+   "freed_mb": 1089.3
+  },
+  "timings": {
+   "total": 563.6,
+   "blender": 135.1,
+   "asset_preparation": 0.1,
+   "audio": 12.2,
+   "compositing": 335.6,
+   "qc": 9.6,
+   "scene_direction": 63.2,
+   "narration": 0.0,
+   "export": 0.0
+  },
+  "events": 549,
+  "progress_events": 507,
+  "overall_monotone": true,
+  "stages": {
+   "story_analysis": [
+    "completed",
+    0.0
+   ],
+   "story_graph": [
+    "completed",
+    0.0
+   ],
+   "script": [
+    "skipped",
+    0.0
+   ],
+   "narration": [
+    "skipped",
+    0.0
+   ],
+   "scene_direction": [
+    "completed",
+    63.24
+   ],
+   "asset_preparation": [
+    "completed",
+    0.14
+   ],
+   "blender_render": [
+    "completed",
+    135.06
+   ],
+   "audio": [
+    "completed",
+    12.22
+   ],
+   "compositing": [
+    "completed",
+    335.58
+   ],
+   "qc": [
+    "completed",
+    9.56
+   ],
+   "export": [
+    "completed",
+    2.28
+   ]
+  },
+  "file": "output/studio/productions/p_20260920-183924_2029/final.mp4",
+  "requested": {
+   "format": "9:16",
+   "duration": null,
+   "voice": "provided"
+  },
+  "captions": false,
+  "director": {
+   "pacing": "calm",
+   "captions": false,
+   "audio": {
+    "music": 0.5
+   }
+  }
+ },
+ "create_mode_variation_retry": {
+  "production": "p_20260920-184105_ce33",
+  "status": "completed",
+  "qc": "30/31",
+  "qc_failed": [
+   "ik_reachable_(no_unreachable_targets;_clamped_frames_<=3%)"
+  ],
+  "autofix": [],
+  "duration": 52.666,
+  "shots": 19,
+  "cache": {
+   "frames": 1376,
+   "reused": 0,
+   "to_render": 1376,
+   "rendered": 1376,
+   "reuse_pct": 0.0,
+   "mix_cache_hit": false,
+   "narration_cached": false,
+   "freed_mb": 1251.6
+  },
+  "timings": {
+   "total": 932.3,
+   "blender": 224.1,
+   "asset_preparation": 0.3,
+   "audio": 11.7,
+   "compositing": 391.8,
+   "qc": 10.9,
+   "scene_direction": 72.7,
+   "narration": 213.0,
+   "export": 0.0
+  },
+  "events": 1013,
+  "progress_events": 964,
+  "overall_monotone": true,
+  "stages": {
+   "story_analysis": [
+    "completed",
+    0.0
+   ],
+   "story_graph": [
+    "completed",
+    0.0
+   ],
+   "script": [
+    "completed",
+    0.0
+   ],
+   "narration": [
+    "completed",
+    213.02
+   ],
+   "scene_direction": [
+    "completed",
+    72.7
+   ],
+   "asset_preparation": [
+    "completed",
+    0.27
+   ],
+   "blender_render": [
+    "completed",
+    224.08
+   ],
+   "audio": [
+    "completed",
+    11.68
+   ],
+   "compositing": [
+    "completed",
+    391.77
+   ],
+   "qc": [
+    "completed",
+    10.89
+   ],
+   "export": [
+    "completed",
+    2.47
+   ]
+  },
+  "file": "output/studio/productions/p_20260920-184105_ce33/final.mp4",
+  "requested": {
+   "format": "9:16",
+   "duration": 55,
+   "voice": "chatterbox_hindi"
+  },
+  "captions": true,
+  "director": {},
+  "variation": 1,
+  "previous": {
+   "production": "p_20260920-182217_671f",
+   "qc": "30/31",
+   "qc_failed": [
+    "ik_reachable_(no_unreachable_targets;_clamped_frames_<=3%)"
+   ]
+  },
+  "topic_title": "तुरंत लोन का फंदा",
+  "cast": {
+   "protagonist": {
+    "gender": "male",
+    "archetype": "young man",
+    "name": "अर्जुन"
+   },
+   "principal": {
+    "role": "mother",
+    "archetype": "parent",
+    "gender": "feminine"
+   },
+   "extras": []
+  },
+  "ik_clamped_frames": {
+   "A": 109,
+   "D": 0
+  }
+ }
+}

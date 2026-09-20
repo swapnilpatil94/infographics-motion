@@ -4,6 +4,8 @@ Architecture is unchanged: **deterministic plan → 26-bone rig (4 IK chains) in
 
 ## Generate a new movie
 
+**From a browser (no JSON, no commands):** `python3 studio.py --ui` → http://127.0.0.1:8765 — see `docs/studio/STUDIO_UI.md`. The UI drives exactly the pipeline below.
+
 ```bash
 # 1. write the story notes (optional, 6 lines) and the narration segments JSON (Chatterbox, or any voice with start/end per segment)
 #    stories/<name>/story.md          # title + `protagonist: कमला जी, female, older woman` / `other: अजनबी, stranger` / `sender:` / `amount:` notes
