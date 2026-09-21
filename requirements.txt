@@ -1,0 +1,33 @@
+# Versions actually installed in the tested environment (Python 3.12.0, macOS, Apple M4 Pro). Also needed outside pip: Blender 5.2 LTS, ffmpeg >= 8, Ollama (+ qwen3:14b).
+# core / render
+numpy==1.26.4
+scipy==1.15.3
+opencv-python==4.14.0.94
+Pillow==12.3.0
+shapely==2.1.2
+svgelements==1.9.6
+resvg_py==0.5.0
+lxml==5.4.0
+PyYAML==6.0.3
+jsonschema==4.26.0
+requests==2.34.2
+# studio server / API
+fastapi==0.115.14
+uvicorn==0.41.0
+python-multipart==0.0.22
+aiofiles==24.1.0
+sse-starlette==3.4.1
+httpx==0.28.1
+pydantic==2.13.3
+ollama==0.6.2
+# narration: Chatterbox Multilingual TTS + word alignment (run through ~/mythic-video-studio, see README section 1)
+chatterbox-tts==0.1.7
+torch==2.6.0
+torchaudio==2.6.0
+librosa==0.11.0
+soundfile==0.13.1
+whisperx==3.8.2
+faster-whisper==1.2.1
+openai-whisper==20250625
+# tests
+pytest==9.0.3
