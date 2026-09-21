@@ -7,7 +7,7 @@ import json
 
 from engine.skeleton import acts as AC
 from kathaya.assets import catalog as CAT
-from kathaya.renderer import manifest as MF
+from kathaya.renderer import look as LK, manifest as MF
 
 DEFAULT_SUBJECT = dict(reveal="environment", wide="environment", wide2="environment", full="protagonist_full", medium="protagonist_head", close="protagonist_head", two="two_shot", two_reach="protagonist_reach")
 GENDER = {"male": "masculine", "female": "feminine", "either": "either"}
@@ -97,6 +97,6 @@ def compile_plan(vplan, timeline, catalog, report, plan_hash):
     graph = dict(title=vplan.get("title") or "कहानी", story_id=sid, slug=sid, cast=cast_g, scenes=scenes, beats=beats, provenance=[dict(step="kathaya_visual_scene_plan", plan_hash=plan_hash)], words=sum(len(s["text"].split()) for s in ns),
                  notes={}, schema="kathaya.story_graph/1", fixes={},
                  narration_segments=ns,
-                 plan_overrides=dict(transitions_render=True, duration_range=[0.0, 7200.0], kathaya=dict(plan_hash=plan_hash, renderer_version=MF.renderer_version(), catalog_hash=catalog.get("catalog_hash"), format=vplan["format"])))
+                 plan_overrides=dict(transitions_render=True, look=LK.design(ns), duration_range=[0.0, 7200.0], kathaya=dict(plan_hash=plan_hash, renderer_version=MF.renderer_version(), catalog_hash=catalog.get("catalog_hash"), format=vplan["format"])))
     nar = dict(segments=segs, audio=timeline.get("audio"), tts=timeline["source"], tempo=1.0)
     return dict(graph=graph, narration=nar)

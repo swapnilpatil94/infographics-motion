@@ -1,7 +1,7 @@
 {
- "project": "k_20260920-232916_4331",
+ "project": "k_20260921-103239_03b0",
  "story": "एक लड़के के फोन पर अचानक एक मैसेज आया —\n'आपने 25 लाख रुपये की लॉटरी जीती है।'\nवह हैरान रह गया।\nमैसेज में लिखा था कि इनाम लेने के लिए सिर्फ 12,500 रुपये की फीस भरनी होगी।\nउसने पैसे भेज दिए।\nकुछ मिनट बाद नंबर बंद हो गया।\nतभी उसे समझ आया —\nलॉटरी जीती ही नहीं थी।\nउसका लालच ही उसका सबसे बड़ा जाल बन गया था।",
- "plan_job": "p_20260920-232916_fc08",
+ "plan_job": "p_20260921-103239_9676",
  "plan_status": "completed",
  "plan_stages": {
   "narration": [
@@ -37,10 +37,10 @@
  "requests": [],
  "capability_errors": [],
  "plan_seconds": 2.0,
- "render_job": "p_20260920-232918_9323",
+ "render_job": "p_20260921-103241_a0d2",
  "render_status": "completed",
- "render_seconds": 241.1,
- "total_seconds": 243.2,
+ "render_seconds": 267.4,
+ "total_seconds": 269.4,
  "summary": {
   "video": {
    "width": 1080,
@@ -48,7 +48,7 @@
    "fps": 30.0,
    "frames": 803,
    "duration": 26.797,
-   "size_mb": 38.3
+   "size_mb": 37.1
   },
   "shots": 11,
   "scenes": [
@@ -60,13 +60,13 @@
    }
   ],
   "timings": {
-   "total": 239.1,
+   "total": 265.0,
    "blender": 4.9,
-   "asset_preparation": 0.1,
+   "asset_preparation": 0.0,
    "audio": 0.1,
-   "compositing": 203.6,
-   "qc": 5.5,
-   "scene_direction": 20.3,
+   "compositing": 229.8,
+   "qc": 5.2,
+   "scene_direction": 20.6,
    "narration": 0.0,
    "export": 0.0
   },
@@ -138,7 +138,7 @@
       "name": "the film was rendered and decodes cleanly",
       "ok": true,
       "evidence": {
-       "bytes": 38285859
+       "bytes": 37071722
       }
      },
      {
@@ -219,8 +219,8 @@
    "keys": {
     "plan_hash": "af43e942f141",
     "timeline_hash": "2e1159a07230",
-    "audio": "output/kathaya/projects/k_20260920-232916_4331/narration/paced.wav",
-    "renderer_version": "kathaya-re643cce30a",
+    "audio": "output/kathaya/projects/k_20260921-103239_03b0/narration/paced.wav",
+    "renderer_version": "kathaya-r402b8d14b9",
     "catalog_hash": "d104a9c5b805",
     "visual_hashes": {
      "V01": "112fda697366",
@@ -246,17 +246,17 @@
    "camera_adjustments": []
   },
   "files": {
-   "video": "output/studio/productions/p_20260920-232918_9323/final.mp4",
-   "plan": "output/studio/productions/p_20260920-232918_9323/plan.json",
-   "story_graph": "output/studio/productions/p_20260920-232918_9323/story_graph.json",
-   "qc_report": "output/studio/productions/p_20260920-232918_9323/qc_report.json",
-   "audio_report": "output/studio/productions/p_20260920-232918_9323/audio_report.json",
-   "manifest": "output/studio/productions/p_20260920-232918_9323/manifest.json",
-   "contact_sheet": "output/studio/productions/p_20260920-232918_9323/contact_sheet.png",
-   "poster": "output/studio/productions/p_20260920-232918_9323/poster.jpg",
-   "events": "output/studio/productions/p_20260920-232918_9323/events.jsonl",
-   "summary": "output/studio/productions/p_20260920-232918_9323/summary.json",
-   "absolute_dir": "/Users/swapnil/infographics animations/output/studio/productions/p_20260920-232918_9323"
+   "video": "output/studio/productions/p_20260921-103241_a0d2/final.mp4",
+   "plan": "output/studio/productions/p_20260921-103241_a0d2/plan.json",
+   "story_graph": "output/studio/productions/p_20260921-103241_a0d2/story_graph.json",
+   "qc_report": "output/studio/productions/p_20260921-103241_a0d2/qc_report.json",
+   "audio_report": "output/studio/productions/p_20260921-103241_a0d2/audio_report.json",
+   "manifest": "output/studio/productions/p_20260921-103241_a0d2/manifest.json",
+   "contact_sheet": "output/studio/productions/p_20260921-103241_a0d2/contact_sheet.png",
+   "poster": "output/studio/productions/p_20260921-103241_a0d2/poster.jpg",
+   "events": "output/studio/productions/p_20260921-103241_a0d2/events.jsonl",
+   "summary": "output/studio/productions/p_20260921-103241_a0d2/summary.json",
+   "absolute_dir": "/Users/swapnil/infographics animations/output/studio/productions/p_20260921-103241_a0d2"
   }
  }
 }

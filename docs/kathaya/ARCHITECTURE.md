@@ -23,6 +23,7 @@ Narration (text | audio | timing JSON)
 | what the renderer can do | `kathaya/renderer/manifest.py` | GENERATED from the renderer's registries (acts, sizes, moves, effects, props, lighting) |
 | assets | `kathaya/assets/` | `catalog.py`, `resolver.py`, `references.py`, `builder.py`, `library_env.py`; licences via `engine/licensing/policy.py`; `assets/licenses/ATTRIBUTIONS.md` |
 | physical rendering | `engine/skeleton/`, `engine/blender/`, `engine/environments/`, `engine/shorts/` | the existing renderer; the only changes are additive hooks (explicit camera / transition / effects on a beat, fade/dip rendering, `photo_backdrop` family) |
+| finishing look | `kathaya/renderer/look.py` | word-highlight captions, amount callouts synced to the spoken word, punch-ins + flash + hit sounds, opening push, hold-shot drift, colour grade; only for plans carrying `plan["look"]` |
 | QC | `kathaya/qc/technical.py` + `engine/skeleton/qc_v4.py` (unchanged, still in force) | |
 | cache / determinism | `kathaya/cache/keys.py` + the renderer's content-addressed frame / audio / TTS caches | plan hash, visual hashes, asset hashes, catalog hash, renderer version |
 | orchestration | `kathaya/pipeline.py` (project folder + state machine), `engine/studio/worker.py` (kplan / kbuild / krender jobs), `engine/studio/kserver.py` (API) | |
@@ -51,6 +52,12 @@ The plan is written one visual at a time. The LLM decides everything creative; t
 * `ACCEPTANCE_RESULT.json` - the lottery story through the API exactly as the UI sends it: Chatterbox TTS timeline -> local LLM director -> resolver (2 assets available, 0 new required, 0 capability errors) -> 9:16 1080x1920 30 fps film (26.8 s), technical QC 15/15, engine QC 30/30. Contact sheet: `screens/acceptance_contact_sheet.png`; the money counter ends on the narrated amount: `screens/acceptance_money_counter_12500.png`.
 * `ASSET_FLOW_RESULT.json` + `screens/04-06` - a landmark the catalog does not have (BSE, Gateway of India) -> MISSING + AssetRequest -> Wikimedia Commons references (licence-classified) -> user approval -> asset built -> registered -> rendered.
 * Legacy deterministic renderer: `python3 studio.py --production-acceptance` -> ACCEPTED (`docs/production/ACCEPTANCE.json`; only the timings differ from the previous accepted run).
+
+## Visual critique of the first accepted film, and what was changed (measured on the same story)
+
+Found by looking at the frames: captions small, plain white, mid-frame; the number that carries the story ("25 lakh") never appeared on screen; the opening 3 s was a static wide shot; the grade was flat and muddy.
+Changed (all in `kathaya/renderer/look.py`, deterministic, Kathaya plans only): 3-word captions at 92 px with the spoken word highlighted; the amounts the narration says pop up at the moment they are spoken (digits copied from the narration, never invented) with a low hit; punch-in + flash when the phone lights up and on the realisation; the film opens from a tighter frame with a whoosh; hold shots drift 5 %; contrast / colour / vignette grade.
+Tried and reverted: rewriting the director prompt to demand a close-up hook and a visible message. The local 14B model produced a worse plan (repeated REALIZE, READ_DOCUMENT for a phone message, no message insert), so the hook is delivered by the finishing layer, not by asking the model. Not solved: the character stays seated in one pose, the room never changes, the phone-alert shot still shows a face rather than the message.
 
 ## Known limits
 

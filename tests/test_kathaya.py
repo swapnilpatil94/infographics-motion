@@ -21,7 +21,7 @@ from kathaya.assets import builder as AB, catalog as CAT, references as REF, res
 from kathaya.cache import keys as KK                                                      # noqa: E402
 from kathaya.director import sequential as SEQ, visual_planner as VP                     # noqa: E402
 from kathaya.qc import technical as KQ                                                    # noqa: E402
-from kathaya.renderer import compile as CP, manifest as MF                                # noqa: E402
+from kathaya.renderer import compile as CP, look as LK, manifest as MF                                # noqa: E402
 from kathaya.story import hindi, narration as NAR                                         # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -374,6 +374,57 @@ class Compiler(unittest.TestCase):
         a = [short._transition_alpha(tr, t, 30) for t in (0.0, 0.25, 0.5, 5.0, 9.9, 10.0, 10.3)]
         self.assertEqual((a[0], a[3], a[5]), (0.0, 1.0, 0.0))
         self.assertTrue(0 < a[1] < 1 and a[2] == 1.0 and 0 < a[4] < 1 and a[6] == 1.0)
+
+
+class Look(unittest.TestCase):
+    SEGS = [dict(id="N01", start=0.0, end=2.0, text="आपने 25 लाख रुपये की लॉटरी जीती है।",
+                 words=[dict(word=w, start=0.2 * i, end=0.2 * i + 0.18) for i, w in enumerate("आपने पच्चीस लाख रुपये की लॉटरी जीती है।".split())]),
+            dict(id="N02", start=2.0, end=4.0, text="फीस 12,500 रुपये है, 3 दिन में।", words=[dict(word=w, start=2 + 0.2 * i, end=2 + 0.2 * i + 0.18) for i, w in enumerate("फीस बारह हज़ार पाँच सौ रुपये है, तीन दिन में।".split())])]
+
+    def test_callouts_are_the_amounts_the_narration_says_at_the_moment_it_says_them(self):
+        c = LK.callouts(self.SEGS)
+        self.assertEqual([x["text"] for x in c], ["₹25 लाख", "₹12,500"])
+        self.assertAlmostEqual(c[0]["t0"], 0.2, places=2)                                # 'पच्चीस' is the second word
+        self.assertAlmostEqual(c[1]["t0"], 2.2, places=2)                                # 'बारह' is the second word of N02
+        self.assertTrue(all(any(t in seg["text"] for seg in self.SEGS) for t in ("25 लाख", "12,500")))     # nothing invented: the digits come from the narration
+        self.assertNotIn("3", "".join(x["text"] for x in c))                              # '3 दिन' is not an amount
+
+    def test_a_number_that_cannot_be_located_in_the_word_times_gets_no_callout(self):
+        segs = [dict(id="N01", start=0, end=2, text="उसने 500 रुपये दिए", words=[dict(word="उसने", start=0, end=.3), dict(word="दिए", start=.3, end=.6)])]
+        self.assertEqual(LK.callouts(segs), [])
+
+    def test_captions_are_word_highlighted_big_and_inside_the_safe_zone(self):
+        from engine.shorts import captions
+        plan = dict(look=LK.design(self.SEGS), narration=dict(segments=self.SEGS), shots=[dict(act="PHONE_ALERT", t0=1.0)])
+        look = LK.Look(plan)
+        for tt in (0.35, 0.8, 1.3, 2.5, 3.1):
+            img, bbox, text = look.apply(np.zeros((1920, 1080, 3), np.float32) + 0.2, tt)
+            self.assertIsNotNone(bbox, tt)
+            self.assertTrue(captions.in_safe_zone(bbox), (tt, bbox))
+            self.assertLessEqual(len(text.split()), LK.MAX_WORDS)
+        a0, _, _, _ = LK._caption_layer([dict(word="पच्चीस"), dict(word="लाख")], 0)
+        a1, _, _, _ = LK._caption_layer([dict(word="पच्चीस"), dict(word="लाख")], 1)
+        self.assertFalse(np.array_equal(a0, a1))                                          # the highlighted word changes the picture
+
+    def test_only_amounts_are_coloured_as_amounts(self):
+        w = lambda *t: [dict(word=x) for x in t]
+        self.assertEqual(LK.amount_words(w("एक", "लड़के", "के")), set())                     # 'one' as an ordinary word
+        self.assertEqual(LK.amount_words(w("आपने", "पच्चीस", "लाख")), {1, 2})
+        self.assertEqual(LK.amount_words(w("पाँच", "सौ", "रुपये")), {0, 1})
+
+    def test_look_is_deterministic_and_only_for_kathaya_plans(self):
+        plan = dict(look=LK.design(self.SEGS), narration=dict(segments=self.SEGS), shots=[])
+        base = np.zeros((1920, 1080, 3), np.float32) + 0.3
+        a, b = LK.Look(plan).apply(base.copy(), 0.5)[0], LK.Look(plan).apply(base.copy(), 0.5)[0]
+        self.assertTrue(np.array_equal(a, b))
+        g, nar = PR.parse(os.path.join(ROOT, "stories/production/a_whatsapp_investment/story.md"), os.path.join(ROOT, "stories/production/a_whatsapp_investment/segments.json"))
+        self.assertNotIn("look", PR.plan_for(g, nar, 11, {}))
+
+    def test_compiled_plans_carry_the_look(self):
+        tl, res = stub_plan()
+        out = CP.compile_plan(res["plan"], tl, CAT.load(), res["report"], res["plan_hash"])
+        self.assertIn("look", out["graph"]["plan_overrides"])
+        self.assertEqual(out["graph"]["plan_overrides"]["look"]["version"], LK.VERSION)
 
 
 class Keys(unittest.TestCase):

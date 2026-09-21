@@ -35,6 +35,9 @@ def build(graph, nar, **k):
     if graph.get("narration_segments"):                                                   # Kathaya plans: captions / QC follow the real narration segments, the shots follow the visuals
         plan["narration"]["segments"] = graph["narration_segments"]
     plan.update(graph.get("plan_overrides") or {})
+    if plan.get("look"):                                                                  # Kathaya finishing layer: its punches get their sounds
+        from kathaya.renderer import look as LK
+        plan["sfx"] = sorted(list(plan.get("sfx") or []) + LK.sfx(plan), key=lambda s: s["t"])
     return plan
 
 

@@ -889,6 +889,10 @@ def render_film(plan, out_dir, log=print, skip_blender=False, samples=10, stills
     t = time.time()
     EV.start("compositing", message="compositing layers, lighting, captions and encoding", total_frames=n, total_shots=len(plan["shots"]))
     show_caps = plan.get("captions", True)
+    look = None
+    if plan.get("look"):                                                            # Kathaya plans only: the finishing layer (grade, punch, callouts, word-highlight captions)
+        from kathaya.renderer import look as LK
+        look = LK.Look(plan)
     trans = [(sh["t0"], sh["transition_in"]) for sh in plan["shots"] if sh.get("transition_in") in ("fade", "dip")] if plan.get("transitions_render") else []
     for f in range(n):
         tt = f / fps
@@ -899,7 +903,9 @@ def render_film(plan, out_dir, log=print, skip_blender=False, samples=10, stills
         while ci < len(caps) and caps[ci][1] < tt:
             ci += 1
         shot_i = film.index_at(tt)
-        if show_caps:
+        if look:
+            img, bbox, text = look.apply(img, tt, hide_caption=not show_caps or bool(plan.get("title_card") and tt >= plan["title_card"]["t0"]))
+        elif show_caps:
             for c in caps[max(0, ci - 1):ci + 2]:
                 if c[0] <= tt <= c[1] and not (plan.get("title_card") and tt >= plan["title_card"]["t0"]):
                     op = max(0.0, min(1.0, (tt - c[0]) / 0.08, (c[1] - tt) / 0.08))
