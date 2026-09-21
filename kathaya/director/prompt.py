@@ -38,13 +38,21 @@ def output_schema(manifest_c, catalog_c):
             "rationale": {"type": "string"}}}}}}
 
 
-def build(timeline, manifest_c, catalog_c, fmt="short", repair=None):
+DIRECTION_NOTE = ("USER'S SCENE DIRECTION (written by the person who owns the film). Follow it wherever it names a place, a time of day, a character, an action, an emotion or a camera, and keep its order. "
+                  "Where it is silent, decide yourself. Places / times must still come from the catalog (a place it does not have is reported, never approximated). Never invent facts the narration does not say.")
+
+
+def direction_block(direction):
+    return f"\n\n{DIRECTION_NOTE}\n<<<\n{direction.strip()}\n>>>" if (direction or "").strip() else ""
+
+
+def build(timeline, manifest_c, catalog_c, fmt="short", repair=None, direction=""):
     nar = [dict(id=s["id"], start=s["start"], end=s["end"], text=s["text"]) for s in timeline["narration"]]
     body = dict(format=fmt, narration_timeline=nar, actions=manifest_c["actions"], emotions=manifest_c["emotions"], shots=manifest_c["shots"], movements=manifest_c["movements"], camera_subjects=manifest_c["camera_subjects"],
                 valid_framings=manifest_c["valid_framings"], unsupported_camera_moves=manifest_c["unsupported_camera"], effects=manifest_c["effects"], transitions=manifest_c["transitions"], intents=schemas.INTENTS,
                 catalog=dict(environments=catalog_c["environments"], archetypes=manifest_c["archetypes"], characters=catalog_c["characters"], props=catalog_c["props"]))
     fmt_note = ("SHORTS (9:16): a hook in the first seconds, quick reactions, a clear climax and a closing beat." if fmt == "short" else "LONG-FORM: the same rules; more room for establishing shots, montage and slower pacing.")
-    text = RULES + f"\n\nFORMAT: {fmt_note}\n\nINPUT (JSON)\n" + json.dumps(body, ensure_ascii=False) + "\n\nOUTPUT: one JSON object: {\"title\": str, \"cast\": [...], \"visuals\": [...]} as specified. `visuals` are in narration order; several visuals of one narration segment share its `narration_id` (split its time with `share`, e.g. 0.6 / 0.4)."
+    text = RULES + direction_block(direction) + f"\n\nFORMAT: {fmt_note}\n\nINPUT (JSON)\n" + json.dumps(body, ensure_ascii=False) + "\n\nOUTPUT: one JSON object: {\"title\": str, \"cast\": [...], \"visuals\": [...]} as specified. `visuals` are in narration order; several visuals of one narration segment share its `narration_id` (split its time with `share`, e.g. 0.6 / 0.4)."
     if repair:
         text += "\n\nYOUR PREVIOUS ANSWER WAS REJECTED FOR THESE REASONS (fix exactly these, keep everything else):\n" + "\n".join("- " + r for r in repair[:14])
     return text

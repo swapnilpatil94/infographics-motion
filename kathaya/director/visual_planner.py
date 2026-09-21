@@ -21,6 +21,32 @@ class PlanError(Exception):
         self.errors = errors
 
 
+SYNC_SLACK = 0.15                                                                  # a visual may begin up to this long before / after its narration (the `visual_narration_sync` QC tolerance)
+
+
+def _lengthen_short_visuals(visuals, corrections):
+    """A spoken fragment ("याद रखिए", 0.6 s) is shorter than the renderer's minimum shot. Instead of rejecting a whole plan, borrow the missing time from the neighbours - at most SYNC_SLACK on each side, never below their own
+    minimum - so every narration segment keeps its visual. Recorded in `corrections`. What cannot be fixed this way is left for the caller to report."""
+    for i, v in enumerate(visuals):
+        if v["end"] - v["start"] >= MIN_VISUAL + 0.005:
+            continue
+        need = MIN_VISUAL + 0.02 - (v["end"] - v["start"])                                 # a hair over the minimum: the renderer's own rhythm QC rejects 0.8999 s
+        was = (v["start"], v["end"])
+        prev = visuals[i - 1] if i else None
+        nxt = visuals[i + 1] if i + 1 < len(visuals) else None
+        back = min(need, SYNC_SLACK, max(0.0, prev["end"] - prev["start"] - MIN_VISUAL)) if prev else 0.0
+        fwd = min(need - back, SYNC_SLACK, max(0.0, nxt["end"] - nxt["start"] - MIN_VISUAL)) if nxt else 0.0
+        if back + fwd <= 1e-6:
+            continue
+        v["start"] = round(v["start"] - back, 3)
+        v["end"] = round(v["end"] + fwd, 3)
+        if prev:
+            prev["end"] = v["start"]
+        if nxt:
+            nxt["start"] = v["end"]
+        corrections.append(dict(visual=v["id"], field="timing", was=[round(x, 3) for x in was], now=[v["start"], v["end"]], why=f"the narration fragment is shorter than the renderer's {MIN_VISUAL} s minimum shot; borrowed {back + fwd:.2f} s from the neighbouring visuals"))
+
+
 def finalize(raw, timeline, fmt="short"):
     errs = []
     if not isinstance(raw, dict) or not raw.get("visuals") or not raw.get("cast"):
@@ -118,12 +144,13 @@ def finalize(raw, timeline, fmt="short"):
                 act["params"] = dict(act.get("params") or {}, amount=new)
     for i, v in enumerate(visuals):
         v["end"] = round(visuals[i + 1]["start"] if i + 1 < len(visuals) else timeline["duration"], 3)
+    _lengthen_short_visuals(visuals, corrections)
     for v in visuals:
         d = v["end"] - v["start"]
-        if d < MIN_VISUAL:
-            errs.append(f"{v['id']} (narration {v['narration_id']}) lasts {d:.1f} s; the renderer's minimum is {MIN_VISUAL} s: use fewer visuals for this short segment")
-        if d > MAX_VISUAL:
-            errs.append(f"{v['id']} (narration {v['narration_id']}) lasts {d:.1f} s; the maximum is {MAX_VISUAL} s: split this segment into 2-3 visuals with different framing")
+        if d < MIN_VISUAL - 1e-3:                                                  # (times are rounded to 1 ms: 0.9 s must not fail as 0.8999 s)
+            errs.append(f"{v['id']} (narration {v['narration_id']}) lasts {d:.2f} s; the renderer's minimum is {MIN_VISUAL} s: use fewer visuals for this short segment")
+        if d > MAX_VISUAL + 1e-3:
+            errs.append(f"{v['id']} (narration {v['narration_id']}) lasts {d:.2f} s; the maximum is {MAX_VISUAL} s: split this segment into 2-3 visuals with different framing")
     if fmt == "short" and visuals and visuals[0]["end"] - visuals[0]["start"] > HOOK_MAX:
         errs.append(f"the first visual lasts {visuals[0]['end'] - visuals[0]['start']:.1f} s; a hook must not exceed {HOOK_MAX} s")
     if errs:
@@ -155,13 +182,13 @@ def plan_hash(plan):
     return hashlib.sha1(json.dumps(plan, sort_keys=True, ensure_ascii=False).encode()).hexdigest()[:12]
 
 
-def design(timeline, manifest, catalog, provider, fmt="short", rounds=3, log=print, progress=None):
+def design(timeline, manifest, catalog, provider, fmt="short", rounds=3, log=print, progress=None, direction=""):
     """-> dict(plan, report, attempts). `provider(prompt, schema) -> raw JSON`."""
     from kathaya.assets import catalog as CAT
     from kathaya.renderer import manifest as MF
     if getattr(provider, "sequential", False):
         from kathaya.director import sequential
-        raw = sequential.design(timeline, manifest, catalog, provider, fmt, log, progress)
+        raw = sequential.design(timeline, manifest, catalog, provider, fmt, log, progress, direction)
         try:
             plan = finalize(raw, timeline, fmt)
         except PlanError as pe:
@@ -174,7 +201,7 @@ def design(timeline, manifest, catalog, provider, fmt="short", rounds=3, log=pri
     attempts, repair = [], None
     plan = report = None
     for r in range(rounds + 1):
-        prompt = PR.build(timeline, mc, cc, fmt, repair)
+        prompt = PR.build(timeline, mc, cc, fmt, repair, direction)
         try:
             raw = provider(prompt, schema)
         except Exception as e:                                                                    # noqa: BLE001 - provider failures are reported, never hidden

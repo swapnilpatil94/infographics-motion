@@ -19,7 +19,7 @@ from engine.environments import locations as LOC                                
 from kathaya import pipeline as KP, schemas                                               # noqa: E402
 from kathaya.assets import builder as AB, catalog as CAT, references as REF, resolver as RES   # noqa: E402
 from kathaya.cache import keys as KK                                                      # noqa: E402
-from kathaya.director import sequential as SEQ, visual_planner as VP                     # noqa: E402
+from kathaya.director import prompt as PR_, sequential as SEQ, visual_planner as VP                     # noqa: E402
 from kathaya.qc import technical as KQ                                                    # noqa: E402
 from kathaya.renderer import compile as CP, look as LK, manifest as MF                                # noqa: E402
 from kathaya.story import hindi, narration as NAR                                         # noqa: E402
@@ -425,6 +425,56 @@ class Look(unittest.TestCase):
         out = CP.compile_plan(res["plan"], tl, CAT.load(), res["report"], res["plan_hash"])
         self.assertIn("look", out["graph"]["plan_overrides"])
         self.assertEqual(out["graph"]["plan_overrides"]["look"]["version"], LK.VERSION)
+
+
+class Rhythm(unittest.TestCase):
+    def test_a_visual_of_exactly_the_minimum_length_is_valid_despite_float_rounding(self):
+        tl = dict(schema="kathaya.narration_timeline/1", source="timing_json", audio=None, duration=3.0, narration=[dict(id="N01", start=0.0, end=2.0, text="एक दो तीन चार"), dict(id="N02", start=2.1, end=2.5, text="पाँच छह")])
+        tl["narration"][1]["start"] = 35.2 - 33.1                                          # 2.1000000000000014: the visual N01 lasts 2.1, N02 lasts 0.9
+        res = VP.design(tl, MF.build(), CAT.load(), StubLLM(), "long")
+        self.assertIsNotNone(res["plan"], res.get("unresolved"))
+
+
+    def test_a_short_spoken_fragment_borrows_time_from_its_neighbours_instead_of_failing_the_plan(self):
+        segs = [dict(id="N01", start=0.0, end=3.0, text="रात के ग्यारह बजे थे और वह अकेला था"), dict(id="N02", start=3.3, end=3.9, text="याद रखिए"), dict(id="N03", start=4.2, end=8.0, text="ओटीपी किसी को मत बताइए और सावधान रहिए")]
+        tl = dict(schema="kathaya.narration_timeline/1", source="timing_json", audio=None, duration=8.0, narration=segs)      # N02's visual runs 3.3 -> 4.2 = 0.9 ... make it 0.75
+        tl["narration"][2]["start"] = 4.05
+        res = VP.design(tl, MF.build(), CAT.load(), StubLLM(), "long")
+        self.assertIsNotNone(res["plan"], res.get("unresolved"))
+        vs = res["plan"]["visuals"]
+        self.assertTrue(all(v["end"] - v["start"] >= VP.MIN_VISUAL - 1e-3 for v in vs), [(v["id"], v["end"] - v["start"]) for v in vs])
+        self.assertTrue(any(c["field"] == "timing" for c in res["plan"].get("corrections", [])))
+        self.assertEqual({v["narration_id"] for v in vs}, {"N01", "N02", "N03"})                # nothing dropped
+        self.assertTrue(all(abs(v["start"] - s["start"]) <= VP.SYNC_SLACK + 1e-3 for v in vs[1:] for s in segs if s["id"] == v["narration_id"]))
+
+    def test_a_fragment_that_cannot_be_lengthened_is_reported_not_hidden(self):
+        segs = [dict(id="N01", start=0.0, end=1.0, text="एक दो तीन"), dict(id="N02", start=1.0, end=1.4, text="चार पाँच"), dict(id="N03", start=1.4, end=2.4, text="छह सात आठ")]
+        tl = dict(schema="kathaya.narration_timeline/1", source="timing_json", audio=None, duration=2.4, narration=segs)
+        res = VP.design(tl, MF.build(), CAT.load(), StubLLM(), "long")
+        self.assertIsNone(res["plan"])
+        self.assertTrue(any("minimum" in e for e in res["unresolved"]))
+
+
+class Direction(unittest.TestCase):
+    D = "Scene 1: bank, day - the clerk explains."
+
+    def test_direction_reaches_the_whole_plan_prompt_and_every_step_of_the_sequential_director(self):
+        tl = timeline()
+        p = PR_.build(tl, MF.compact(MF.build()), CAT.compact(CAT.load()), "short", direction=self.D)
+        self.assertIn(self.D, p)
+        self.assertNotIn("SCENE DIRECTION", PR_.build(tl, MF.compact(MF.build()), CAT.compact(CAT.load()), "short"))
+        seen = []
+
+        class Spy(StubLLM):
+            def __call__(self, prompt, schema):
+                seen.append(prompt)
+                return super().__call__(prompt, schema)
+        SEQ.design(tl, MF.build(), CAT.load(), Spy(), "short", log=lambda *a: None, direction=self.D)
+        self.assertTrue(seen and all(self.D in q for q in seen))
+
+    def test_direction_is_stored_on_the_project(self):
+        proj = KP.create("एक लड़का बैंक गया।", direction="  " + self.D + " ")
+        self.assertEqual(proj["input"]["direction"], self.D)
 
 
 class Keys(unittest.TestCase):

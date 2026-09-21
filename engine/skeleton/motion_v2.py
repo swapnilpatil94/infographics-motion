@@ -396,6 +396,8 @@ def a_hold_phone(perf, t, dur, st, pos="chest", hand="R", **kw):
     sh = perf.shoulder(t)
     d = dur / st["speed"]
     k = P["k"]
+    if pos == "ear":
+        perf.ear_phone = True                                                            # a phone at the ear folds the elbow further than the default joint guard allows (see short._clamp_reach)
     C, tilt = {"ear": ((sh[0] + 30 * k, sh[1] + 122 * k), 6.0), "face": ((sh[0] + 92 * k, sh[1] + 30 * k), -14.0)}.get(pos, ((sh[0] + 92 * k, sh[1] - 70 * k), -20.0))
     tgt, rot = _phone_wrist(perf, C, tilt, t + d)
     set_pose(perf, t, hand, "hold_phone")

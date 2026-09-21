@@ -221,6 +221,9 @@ def _vignette():
 def grade(img, name="night_punch"):
     """cinematic finish: gentle S-curve contrast, richer colour, cool shadows / warm highlights, vignette. Skips near-white pages (infographic cards) so paper stays paper"""
     x = img.astype(np.float32)
+    mean = float(x[::16, ::16].mean())
+    if mean < 0.30:                                                                 # a night / dark scene stays readable: lift the shadows in proportion to how dark the frame is
+        x = np.power(np.clip(x, 0.0, 1.0), 1.0 - 0.40 * min(1.0, (0.30 - mean) / 0.20))
     luma = (x[:, :, 0] * 0.299 + x[:, :, 1] * 0.587 + x[:, :, 2] * 0.114)[:, :, None]
     x = luma + (x - luma) * 1.22
     x = x + (x - 0.42) * 0.16 * (1.0 - np.abs(luma - 0.42) * 0.9)

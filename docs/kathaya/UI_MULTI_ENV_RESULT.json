@@ -1,0 +1,112 @@
+{
+ "how": "through the Studio web UI on port 8792 (driven in the in-app browser): story + scene direction pasted, creative director = ChatGPT (copy/paste), reply pasted, Generate film clicked",
+ "project": "k_20260921-120856_b731",
+ "provider": "chatgpt",
+ "narration": {
+  "source": "tts",
+  "duration": 41.717,
+  "segments": 19
+ },
+ "plan": {
+  "title": "ओटीपी के बाद",
+  "visuals": 25,
+  "cast": [
+   [
+    "C01",
+    "protagonist",
+    "young man"
+   ],
+   [
+    "C02",
+    "partner",
+    "bank employee"
+   ]
+  ],
+  "environments": [
+   "env_atm",
+   "env_bank",
+   "env_bedroom",
+   "env_police"
+  ],
+  "corrections": [
+   {
+    "visual": "V22",
+    "field": "timing",
+    "was": [
+     35.224,
+     36.108
+    ],
+    "now": [
+     35.188,
+     36.108
+    ],
+    "why": "the narration fragment is shorter than the renderer's 0.9 s minimum shot; borrowed 0.04 s from the neighbouring visuals"
+   }
+  ],
+  "counts": {
+   "available": 11,
+   "new_required": 0,
+   "capability_errors": 0
+  }
+ },
+ "film": {
+  "width": 1080,
+  "height": 1920,
+  "fps": 30.0,
+  "frames": 1341,
+  "duration": 44.717,
+  "size_mb": 74.5
+ },
+ "timings": {
+  "total": 628.6,
+  "blender": 182.7,
+  "asset_preparation": 0.2,
+  "audio": 8.4,
+  "compositing": 352.9,
+  "qc": 9.2,
+  "scene_direction": 66.0,
+  "narration": 0.0,
+  "export": 0.0
+ },
+ "engine_qc": {
+  "passed": true,
+  "failed": [],
+  "n": 30
+ },
+ "technical_qc": {
+  "passed": true,
+  "failed": [],
+  "n": 15
+ },
+ "camera_adjustments": [
+  {
+   "beat": "V02",
+   "asked": [
+    "A.reach",
+    "two_reach",
+    "reveal"
+   ],
+   "used": [
+    "A.head",
+    "medium",
+    "push"
+   ],
+   "why": "the phone is not on a table to reach for (standing / no free phone in this set)"
+  },
+  {
+   "beat": "V12",
+   "asked": [
+    "A.reach",
+    "two_reach",
+    "drift"
+   ],
+   "used": [
+    "A.head",
+    "medium",
+    "push"
+   ],
+   "why": "the phone is not on a table to reach for (standing / no free phone in this set)"
+  }
+ ],
+ "file": "output/studio/productions/p_20260921-123045_c7f8/final.mp4"
+}

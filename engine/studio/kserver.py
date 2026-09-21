@@ -1,6 +1,6 @@
 """KATHAYA API (mounted under /api/k): the simple flow.  story / narration -> plan -> [approve NEW assets only] -> film.
 
-    POST /api/k/project                      {text, format: short|long, style, audio_upload?, timing_json?, provider: ollama|chatgpt, narration_mode}  -> {project_id, job_id}   (starts the plan job)
+    POST /api/k/project                      {text, format: short|long, style, audio_upload?, timing_json?, provider: ollama|chatgpt, narration_mode, direction?}  -> {project_id, job_id}   (starts the plan job)
     GET  /api/k/project/{id}                 project state + timeline summary + plan + report + asset requests (+ the plan job status)
     POST /api/k/project/{id}/plan            (re)plan
     POST /api/k/project/{id}/render          start the film (only when the plan is ready)  -> {job_id}
@@ -74,7 +74,7 @@ def create(body: dict):
             raise KP.ProjectError("narration_invalid", "The timing JSON is not valid JSON.", reasons=[str(e)])
     else:
         timing = None
-    proj = KP.create(body.get("text", ""), body.get("format", "short"), body.get("style", "kathaya_default"), audio, timing, body.get("narration_mode", "auto"), body.get("provider", "ollama"))
+    proj = KP.create(body.get("text", ""), body.get("format", "short"), body.get("style", "kathaya_default"), audio, timing, body.get("narration_mode", "auto"), body.get("provider", "ollama"), body.get("direction", ""))
     jid = _start_plan(proj["id"])
     return dict(project_id=proj["id"], job_id=jid)
 

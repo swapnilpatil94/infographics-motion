@@ -59,6 +59,15 @@ Found by looking at the frames: captions small, plain white, mid-frame; the numb
 Changed (all in `kathaya/renderer/look.py`, deterministic, Kathaya plans only): 3-word captions at 92 px with the spoken word highlighted; the amounts the narration says pop up at the moment they are spoken (digits copied from the narration, never invented) with a low hit; punch-in + flash when the phone lights up and on the realisation; the film opens from a tighter frame with a whoosh; hold shots drift 5 %; contrast / colour / vignette grade.
 Tried and reverted: rewriting the director prompt to demand a close-up hook and a visible message. The local 14B model produced a worse plan (repeated REALIZE, READ_DOCUMENT for a phone message, no message insert), so the hook is delivered by the finishing layer, not by asking the model. Not solved: the character stays seated in one pose, the room never changes, the phone-alert shot still shows a face rather than the message.
 
+## Multi-environment UI run (OTP scam, 4 places) - what the QC found and what was fixed
+
+Run through the web UI (story + scene direction pasted, ChatGPT route). First render: `completed_with_qc_failures` - real findings, each fixed at its cause:
+* `PHONE_CALL` clamped the right wrist for 302 frames (a phone at the ear needs the wrist ~0.11 arm-lengths from the shoulder; the rig's elbow guard is 0.32) and drew the phone over the mouth -> the guard is relaxed only for an actor who makes a call (`short._clamp_reach`, `motion_v2.a_hold_phone`).
+* `CLOSE_UP` was a frozen frame (renderer's no_slideshow gate) -> idle motion, Kathaya plans only.
+* A 0.9 s shot failed the renderer's `< 0.9 s` rhythm rule by float rounding, and a genuine 0.88 s spoken fragment failed the whole plan after ~15 min of LLM work -> `_lengthen_short_visuals` borrows up to 0.15 s from neighbours (recorded in `corrections`); an unfixable fragment is still reported.
+* The random `seeds` shirt pattern rendered as dark stains -> plain, Kathaya plans only. Dark scenes were unreadable -> the grade lifts shadows in proportion to darkness.
+Second render: technical QC 15/15, renderer QC 30/30, `completed`.
+
 ## Known limits
 
 * The renderer is natively 9:16; long-form is the 9:16 master plus a 16:9 pillarbox export, not a re-framed 16:9 render.

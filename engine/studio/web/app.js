@@ -25,7 +25,7 @@ function errBox(e) {
   const x = (e && e.error) || e || {};
   return `<div class="err" role="alert"><b>${esc(x.message || "Something went wrong")}</b>${(x.reasons || []).length ? "<ul>" + x.reasons.map(r => `<li>${esc(r)}</li>`).join("") + "</ul>" : ""}${x.hint ? `<div class="hint">${esc(x.hint)}</div>` : ""}<div class="dim mono" style="margin-top:8px">${esc(x.code || "")}</div></div>`;
 }
-S.k = { fmt: "short", provider: "ollama", mode: "auto", audio: null, audioName: "", timing: "", text: sessionStorage.getItem("ks.ktext") || "", poll: null, id: null, data: null, sub: {}, chatPrompt: null, catalog: null, busy: {} };
+S.k = { fmt: "short", provider: "ollama", mode: "auto", audio: null, audioName: "", timing: "", text: sessionStorage.getItem("ks.ktext") || "", direction: sessionStorage.getItem("ks.kdir") || "", poll: null, id: null, data: null, sub: {}, chatPrompt: null, catalog: null, busy: {} };
 function saveForm() { try { sessionStorage.setItem("ks.form", JSON.stringify(S.form)); } catch (e) { /* quota */ } }
 function setPath(o, path, v) { const k = path.split("."); let t = o; for (let i = 0; i < k.length - 1; i++) t = t[k[i]] = t[k[i]] || {}; t[k[k.length - 1]] = v; }
 function getPath(o, path) { return path.split(".").reduce((a, k) => (a == null ? a : a[k]), o); }
@@ -527,6 +527,7 @@ function viewHome(err) {
   const k = S.k;
   view.innerHTML = `<section class="kflow"><div class="khero"><h1 class="kmark">Kath<em>aa</em>ya</h1><p>Paste a story. Kathaya designs the film, checks what it needs, and renders it. You only step in when a new asset is required.</p></div>
     <div class="card kcard"><label class="f">Story / narration<textarea id="ktext" placeholder="कहानी या narration यहाँ paste करें — Hindi, Hinglish या English">${esc(k.text)}</textarea></label>
+      <label class="f" style="margin-top:14px">Scene direction · optional<textarea id="kdir" style="min-height:110px" placeholder="Where and when each part happens, who is on screen, camera or mood - in your own words. Example:&#10;Scene 1: bedroom, night - he gets the call.&#10;Scene 2: ATM, night - he checks the balance, shock.&#10;Scene 3: bank, next morning - the clerk explains.">${esc(k.direction)}</textarea><small class="dim">Kathaya follows it where it can and tells you where the renderer cannot (a place it does not have becomes an asset request, never a guess).</small></label>
       <div class="grid g2" style="margin-top:16px;align-items:end"><label class="f">Narration audio · optional<input type="file" id="kaudio" accept=".wav,.mp3,.m4a,.flac">${k.audioName ? `<small class="ok">${esc(k.audioName)} uploaded - its timing drives the film</small>` : `<small class="dim">Without audio the narrator (Chatterbox Hindi) voices the story.</small>`}</label>
         <div class="grid" style="gap:10px"><div class="muted" style="font-size:12px;text-transform:uppercase;letter-spacing:.08em">Format</div><div class="radio">${[["short", "Shorts"], ["long", "Long-form"]].map(([v, l]) => `<label class="${k.fmt === v ? "on" : ""}"><input type="radio" name="kfmt" value="${v}" ${k.fmt === v ? "checked" : ""}>${l}</label>`).join("")}</div></div></div>
       <div class="grid g2" style="margin-top:16px"><label class="f">Style<select id="kstyle"><option value="kathaya_default">Kathaya default</option></select></label><span></span></div>
@@ -538,7 +539,7 @@ function viewHome(err) {
       <div id="kerr">${err ? errBox(err) : ""}</div>
       <div class="row" style="justify-content:center;margin-top:24px"><button class="btn primary bigbtn" id="kgo">Generate</button></div></div></section>`;
 }
-view.addEventListener("input", e => { if (e.target.id === "ktext") { S.k.text = e.target.value; try { sessionStorage.setItem("ks.ktext", S.k.text); } catch (er) { /* quota */ } } });
+view.addEventListener("input", e => { if (e.target.id === "kdir") { S.k.direction = e.target.value; try { sessionStorage.setItem("ks.kdir", S.k.direction); } catch (er) { /* quota */ } } if (e.target.id === "ktext") { S.k.text = e.target.value; try { sessionStorage.setItem("ks.ktext", S.k.text); } catch (er) { /* quota */ } } });
 view.addEventListener("change", async e => {
   const t = e.target;
   if (t.name === "kfmt") { S.k.fmt = t.value; $$(".radio label").forEach(l => l.classList.toggle("on", l.querySelector("input").checked)); }
@@ -549,7 +550,7 @@ view.addEventListener("change", async e => {
 });
 async function kGenerate() {
   const b = $("#kgo"); b.disabled = true; b.innerHTML = '<span class="spin"></span>Starting…';
-  try { const r = await api("/k/project", { text: S.k.text, format: S.k.fmt, style: "kathaya_default", audio_upload: S.k.audio, timing_json: S.k.timing || null, provider: S.k.provider, narration_mode: S.k.mode }); location.hash = "#/k/" + r.project_id; }
+  try { const r = await api("/k/project", { text: S.k.text, format: S.k.fmt, style: "kathaya_default", audio_upload: S.k.audio, timing_json: S.k.timing || null, provider: S.k.provider, narration_mode: S.k.mode, direction: S.k.direction }); location.hash = "#/k/" + r.project_id; }
   catch (e) { $("#kerr").innerHTML = errBox(e); b.disabled = false; b.textContent = "Generate"; }
 }
 const KSTEP = { narration: "Analyzing story", timeline: "Building narration timeline", visual_design: "Designing visuals", asset_check: "Checking assets", asset_build: "Creating Kathaya asset", compile: "Preparing the scene plan", scene_direction: "Scene direction", asset_preparation: "Asset preparation",

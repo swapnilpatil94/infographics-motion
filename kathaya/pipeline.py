@@ -59,14 +59,14 @@ def _write(pid, name, obj):
     json.dump(obj, open(f, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 
 
-def create(text, fmt="short", style="kathaya_default", audio=None, timing=None, narration_mode="auto", provider="ollama"):
+def create(text, fmt="short", style="kathaya_default", audio=None, timing=None, narration_mode="auto", provider="ollama", direction=""):
     if fmt not in ("short", "long"):
         raise ProjectError("invalid_options", f"format must be short or long, got {fmt!r}")
     if style != "kathaya_default":
         raise ProjectError("invalid_options", f"unknown style '{style}'", hint="Available: kathaya_default")
     if not (text or "").strip() and not timing:
         raise ProjectError("empty_input", "Paste the story / narration first.")
-    proj = dict(id="k_" + time.strftime("%Y%m%d-%H%M%S") + "_" + uuid.uuid4().hex[:4], created=time.time(), state="created", input=dict(text=text or "", format=fmt, style=style, audio=audio, timing=timing, narration_mode=narration_mode, provider=provider),
+    proj = dict(id="k_" + time.strftime("%Y%m%d-%H%M%S") + "_" + uuid.uuid4().hex[:4], created=time.time(), state="created", input=dict(text=text or "", format=fmt, style=style, audio=audio, timing=timing, narration_mode=narration_mode, provider=provider, direction=(direction or "").strip()),
                 jobs={}, history=[])
     return save(proj)
 
@@ -111,7 +111,7 @@ def design(pid, timeline=None, log=print, progress=None):
     proj = load(pid)
     tl = timeline or _read(pid, "timeline.json")
     m, cat = MF.build(), CAT.load()
-    res = VP.design(tl, m, cat, _director(proj, pid), proj["input"]["format"], log=log, progress=progress)
+    res = VP.design(tl, m, cat, _director(proj, pid), proj["input"]["format"], log=log, progress=progress, direction=proj["input"].get("direction", ""))
     if res.get("raw"):
         _write(pid, "director_raw.json", res["raw"])
     if res["plan"] is None:
@@ -160,7 +160,7 @@ def substitute(pid, request_id, asset_id):
 def chatgpt_prompt(pid):
     proj = load(pid)
     tl = _read(pid, "timeline.json") or build_timeline(pid)
-    return PR.build(tl, MF.compact(MF.build()), CAT.compact(CAT.load()), proj["input"]["format"])
+    return PR.build(tl, MF.compact(MF.build()), CAT.compact(CAT.load()), proj["input"]["format"], direction=proj["input"].get("direction", ""))
 
 
 def apply_chatgpt_reply(pid, reply):

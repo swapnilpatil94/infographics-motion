@@ -1,0 +1,797 @@
+{
+ "title": "ओटीपी के बाद",
+ "cast": [
+  {
+   "id": "C01",
+   "role": "protagonist",
+   "archetype": "young man",
+   "gender": "male",
+   "name": "रोहन",
+   "description": "a young man",
+   "asset_id": "char_young_man"
+  },
+  {
+   "id": "C02",
+   "role": "partner",
+   "archetype": "bank employee",
+   "gender": "either",
+   "name": "बैंक कर्मचारी",
+   "description": "a bank employee",
+   "asset_id": "char_bank_employee"
+  }
+ ],
+ "visuals": [
+  {
+   "narration_id": "N01",
+   "visual_intent": "ESTABLISH_LOCATION",
+   "environment": {
+    "type": "generic",
+    "subject": "bedroom",
+    "asset_id": "env_bedroom",
+    "time_of_day": "night"
+   },
+   "characters": [
+    "C01"
+   ],
+   "props": [],
+   "action": {
+    "capability": "ESTABLISH",
+    "actor": "C01",
+    "params": {}
+   },
+   "emotion": "neutral",
+   "camera": {
+    "shot": "wide",
+    "movement": "push",
+    "subject": "environment"
+   },
+   "effects": [],
+   "transition": "cut",
+   "rationale": "hook: night, alone, the room closing in"
+  },
+  {
+   "narration_id": "N02",
+   "visual_intent": "SHOW_ACTION",
+   "environment": {
+    "type": "generic",
+    "subject": "bedroom",
+    "asset_id": "env_bedroom",
+    "time_of_day": "night"
+   },
+   "characters": [
+    "C01"
+   ],
+   "props": [
+    {
+     "name": "phone"
+    }
+   ],
+   "action": {
+    "capability": "PHONE_ALERT",
+    "actor": "C01",
+    "params": {}
+   },
+   "emotion": "confusion",
+   "camera": {
+    "shot": "two_reach",
+    "movement": "reveal",
+    "subject": "protagonist_reach"
+   },
+   "effects": [],
+   "transition": "cut",
+   "rationale": "the unknown call lights the phone"
+  },
+  {
+   "narration_id": "N03",
+   "visual_intent": "SHOW_ACTION",
+   "environment": {
+    "type": "generic",
+    "subject": "bedroom",
+    "asset_id": "env_bedroom",
+    "time_of_day": "night"
+   },
+   "characters": [
+    "C01"
+   ],
+   "props": [
+    {
+     "name": "phone"
+    }
+   ],
+   "action": {
+    "capability": "REACH_PHONE",
+    "actor": "C01",
+    "params": {}
+   },
+   "emotion": "suspicion",
+   "camera": {
+    "shot": "full",
+    "movement": "hold",
+    "subject": "protagonist_full"
+   },
+   "effects": [],
+   "transition": "cut",
+   "rationale": "he reaches for it"
+  },
+  {
+   "narration_id": "N04",
+   "visual_intent": "BUILD_TENSION",
+   "environment": {
+    "type": "generic",
+    "subject": "bedroom",
+    "asset_id": "env_bedroom",
+    "time_of_day": "night"
+   },
+   "characters": [
+    "C01"
+   ],
+   "props": [
+    {
+     "name": "phone"
+    }
+   ],
+   "action": {
+    "capability": "PICK_UP",
+    "actor": "C01",
+    "params": {}
+   },
+   "emotion": "suspicion",
+   "camera": {
+    "shot": "close",
+    "movement": "push",
+    "subject": "protagonist_phone"
+   },
+   "effects": [],
+   "transition": "cut",
+   "rationale": "the phone at his ear: the voice begins"
+  },
+  {
+   "narration_id": "N05",
+   "visual_intent": "SHOW_ACTION",
+   "environment": {
+    "type": "generic",
+    "subject": "bedroom",
+    "asset_id": "env_bedroom",
+    "time_of_day": "night"
+   },
+   "characters": [
+    "C01"
+   ],
+   "props": [
+    {
+     "name": "phone"
+    }
+   ],
+   "action": {
+    "capability": "PHONE_CALL",
+    "actor": "C01",
+    "params": {}
+   },
+   "emotion": "confusion",
+   "camera": {
+    "shot": "medium",
+    "movement": "isolate",
+    "subject": "protagonist_head"
+   },
+   "effects": [],
+   "transition": "cut",
+   "rationale": "listening to the caller",
+   "share": 0.5
+  },
+  {
+   "narration_id": "N05",
+   "visual_intent": "EMOTIONAL_REACTION",
+   "environment": {
+    "type": "generic",
+    "subject": "bedroom",
+    "asset_id": "env_bedroom",
+    "time_of_day": "night"
+   },
+   "characters": [
+    "C01"
+   ],
+   "props": [],
+   "action": {
+    "capability": "EYES_CHANGE",
+    "actor": "C01",
+    "params": {}
+   },
+   "emotion": "fear",
+   "camera": {
+    "shot": "close",
+    "movement": "push",
+    "subject": "protagonist_head"
+   },
+   "effects": [],
+   "transition": "cut",
+   "rationale": "'account will close now': fear",
+   "share": 0.5
+  },
+  {
+   "narration_id": "N06",
+   "visual_intent": "BUILD_TENSION",
+   "environment": {
+    "type": "generic",
+    "subject": "bedroom",
+    "asset_id": "env_bedroom",
+    "time_of_day": "night"
+   },
+   "characters": [
+    "C01"
+   ],
+   "props": [
+    {
+     "name": "phone"
+    }
+   ],
+   "action": {
+    "capability": "STAND_UP",
+    "actor": "C01",
+    "params": {}
+   },
+   "emotion": "fear",
+   "camera": {
+    "shot": "full",
+    "movement": "pull",
+    "subject": "protagonist_full"
+   },
+   "effects": [],
+   "transition": "cut",
+   "rationale": "panic: he stands up and gives the OTP"
+  },
+  {
+   "narration_id": "N07",
+   "visual_intent": "REVEAL_INFORMATION",
+   "environment": {
+    "type": "generic",
+    "subject": "bedroom",
+    "asset_id": "env_bedroom",
+    "time_of_day": "night"
+   },
+   "characters": [
+    "C01"
+   ],
+   "props": [
+    {
+     "name": "phone"
+    }
+   ],
+   "action": {
+    "capability": "LOOK_AT_PHONE",
+    "actor": "C01",
+    "params": {}
+   },
+   "emotion": "fear",
+   "camera": {
+    "shot": "close",
+    "movement": "push",
+    "subject": "protagonist_phone"
+   },
+   "effects": [],
+   "transition": "cut",
+   "rationale": "the phone buzzes again"
+  },
+  {
+   "narration_id": "N08",
+   "visual_intent": "REVEAL_INFORMATION",
+   "environment": {
+    "type": "generic",
+    "subject": "bedroom",
+    "asset_id": "env_bedroom",
+    "time_of_day": "night"
+   },
+   "characters": [
+    "C01"
+   ],
+   "props": [],
+   "action": {
+    "capability": "INSERT_SCREEN",
+    "actor": "C01",
+    "params": {}
+   },
+   "emotion": "realization",
+   "camera": {
+    "shot": "medium",
+    "movement": "hold",
+    "subject": null
+   },
+   "effects": [],
+   "transition": "cut",
+   "rationale": "the debit alert, full screen",
+   "share": 0.5,
+   "screen": {
+    "sender": "BK-ALERT",
+    "text": "खाते से 48,000 रुपये कट गए।"
+   }
+  },
+  {
+   "narration_id": "N08",
+   "visual_intent": "EXPLAIN_PROCESS",
+   "environment": {
+    "type": "generic",
+    "subject": "bedroom",
+    "asset_id": "env_bedroom",
+    "time_of_day": "night"
+   },
+   "characters": [
+    "C01"
+   ],
+   "props": [],
+   "action": {
+    "capability": "VISUALIZE_FLOW",
+    "actor": "C01",
+    "params": {
+     "amount": 48000,
+     "from_label": "रोहन का खाता",
+     "to": [
+      "अनजान खाता"
+     ]
+    }
+   },
+   "emotion": "realization",
+   "camera": {
+    "shot": "close",
+    "movement": "hold",
+    "subject": null
+   },
+   "effects": [],
+   "transition": "cut",
+   "rationale": "the money leaving his account",
+   "share": 0.5
+  },
+  {
+   "narration_id": "N09",
+   "visual_intent": "TIME_PASSAGE",
+   "environment": {
+    "type": "generic",
+    "subject": "ATM booth",
+    "asset_id": "env_atm",
+    "time_of_day": "night"
+   },
+   "characters": [
+    "C01"
+   ],
+   "props": [],
+   "action": {
+    "capability": "ARRIVE",
+    "actor": "C01",
+    "params": {}
+   },
+   "emotion": "fear",
+   "camera": {
+    "shot": "full",
+    "movement": "track",
+    "subject": "protagonist_full"
+   },
+   "effects": [],
+   "transition": "fade",
+   "rationale": "he runs to the ATM"
+  },
+  {
+   "narration_id": "N10",
+   "visual_intent": "SHOW_ACTION",
+   "environment": {
+    "type": "generic",
+    "subject": "ATM booth",
+    "asset_id": "env_atm",
+    "time_of_day": "night"
+   },
+   "characters": [
+    "C01"
+   ],
+   "props": [
+    {
+     "name": "atm"
+    },
+    {
+     "name": "card"
+    }
+   ],
+   "action": {
+    "capability": "USE_ATM",
+    "actor": "C01",
+    "params": {}
+   },
+   "emotion": "fear",
+   "camera": {
+    "shot": "two_reach",
+    "movement": "drift",
+    "subject": "protagonist_reach"
+   },
+   "effects": [],
+   "transition": "cut",
+   "rationale": "checking the balance"
+  },
+  {
+   "narration_id": "N11",
+   "visual_intent": "REALIZATION",
+   "environment": {
+    "type": "generic",
+    "subject": "ATM booth",
+    "asset_id": "env_atm",
+    "time_of_day": "night"
+   },
+   "characters": [
+    "C01"
+   ],
+   "props": [],
+   "action": {
+    "capability": "REALIZE",
+    "actor": "C01",
+    "params": {}
+   },
+   "emotion": "sadness",
+   "camera": {
+    "shot": "close",
+    "movement": "push",
+    "subject": "protagonist_head"
+   },
+   "effects": [],
+   "transition": "cut",
+   "rationale": "the money is really gone"
+  },
+  {
+   "narration_id": "N12",
+   "visual_intent": "TIME_PASSAGE",
+   "environment": {
+    "type": "generic",
+    "subject": "bank branch",
+    "asset_id": "env_bank",
+    "time_of_day": "day"
+   },
+   "characters": [
+    "C01"
+   ],
+   "props": [],
+   "action": {
+    "capability": "ARRIVE",
+    "actor": "C01",
+    "params": {}
+   },
+   "emotion": "neutral",
+   "camera": {
+    "shot": "full",
+    "movement": "track",
+    "subject": "protagonist_full"
+   },
+   "effects": [],
+   "transition": "fade",
+   "rationale": "next morning, the bank"
+  },
+  {
+   "narration_id": "N13",
+   "visual_intent": "INTRODUCE_CHARACTER",
+   "environment": {
+    "type": "generic",
+    "subject": "bank branch",
+    "asset_id": "env_bank",
+    "time_of_day": "day"
+   },
+   "characters": [
+    "C01",
+    "C02"
+   ],
+   "props": [],
+   "action": {
+    "capability": "MEET",
+    "actor": "C01",
+    "params": {}
+   },
+   "emotion": "neutral",
+   "camera": {
+    "shot": "reveal",
+    "movement": "pull",
+    "subject": "two_shot"
+   },
+   "effects": [],
+   "transition": "cut",
+   "rationale": "the bank employee is waiting"
+  },
+  {
+   "narration_id": "N14",
+   "visual_intent": "SHOW_ACTION",
+   "environment": {
+    "type": "generic",
+    "subject": "bank branch",
+    "asset_id": "env_bank",
+    "time_of_day": "day"
+   },
+   "characters": [
+    "C01",
+    "C02"
+   ],
+   "props": [],
+   "action": {
+    "capability": "CONVERSE",
+    "actor": "C01",
+    "params": {}
+   },
+   "emotion": "hope",
+   "camera": {
+    "shot": "two",
+    "movement": "drift",
+    "subject": "two_shot"
+   },
+   "effects": [],
+   "transition": "cut",
+   "rationale": "the employee explains",
+   "share": 0.55
+  },
+  {
+   "narration_id": "N14",
+   "visual_intent": "REALIZATION",
+   "environment": {
+    "type": "generic",
+    "subject": "bank branch",
+    "asset_id": "env_bank",
+    "time_of_day": "day"
+   },
+   "characters": [
+    "C01"
+   ],
+   "props": [],
+   "action": {
+    "capability": "REALIZE",
+    "actor": "C01",
+    "params": {}
+   },
+   "emotion": "realization",
+   "camera": {
+    "shot": "close",
+    "movement": "hold",
+    "subject": "protagonist_head"
+   },
+   "effects": [],
+   "transition": "cut",
+   "rationale": "he understands: banks never ask for an OTP",
+   "share": 0.45
+  },
+  {
+   "narration_id": "N15",
+   "visual_intent": "TIME_PASSAGE",
+   "environment": {
+    "type": "generic",
+    "subject": "cyber cell / police station",
+    "asset_id": "env_police",
+    "time_of_day": "day"
+   },
+   "characters": [
+    "C01"
+   ],
+   "props": [],
+   "action": {
+    "capability": "ARRIVE",
+    "actor": "C01",
+    "params": {}
+   },
+   "emotion": "neutral",
+   "camera": {
+    "shot": "full",
+    "movement": "track",
+    "subject": "protagonist_full"
+   },
+   "effects": [],
+   "transition": "fade",
+   "rationale": "the cyber cell",
+   "share": 0.45
+  },
+  {
+   "narration_id": "N15",
+   "visual_intent": "SHOW_ACTION",
+   "environment": {
+    "type": "generic",
+    "subject": "cyber cell / police station",
+    "asset_id": "env_police",
+    "time_of_day": "day"
+   },
+   "characters": [
+    "C01"
+   ],
+   "props": [
+    {
+     "name": "document"
+    },
+    {
+     "name": "pen"
+    }
+   ],
+   "action": {
+    "capability": "READ_DOCUMENT",
+    "actor": "C01",
+    "params": {}
+   },
+   "emotion": "suspicion",
+   "camera": {
+    "shot": "medium",
+    "movement": "push",
+    "subject": "protagonist_head"
+   },
+   "effects": [],
+   "transition": "cut",
+   "rationale": "he fills the complaint form",
+   "share": 0.55
+  },
+  {
+   "narration_id": "N16",
+   "visual_intent": "CONSEQUENCE",
+   "environment": {
+    "type": "generic",
+    "subject": "cyber cell / police station",
+    "asset_id": "env_police",
+    "time_of_day": "day"
+   },
+   "characters": [
+    "C01"
+   ],
+   "props": [],
+   "action": {
+    "capability": "VISUALIZE_FLOW",
+    "actor": "C01",
+    "params": {
+     "amount": 20000,
+     "from_label": "रुका हुआ पैसा",
+     "to": [
+      "रोहन का खाता"
+     ]
+    }
+   },
+   "emotion": "relief",
+   "camera": {
+    "shot": "medium",
+    "movement": "hold",
+    "subject": null
+   },
+   "effects": [],
+   "transition": "cut",
+   "rationale": "20,000 comes back because he complained in time",
+   "share": 0.55
+  },
+  {
+   "narration_id": "N16",
+   "visual_intent": "SHOW_ACTION",
+   "environment": {
+    "type": "generic",
+    "subject": "cyber cell / police station",
+    "asset_id": "env_police",
+    "time_of_day": "day"
+   },
+   "characters": [
+    "C01"
+   ],
+   "props": [],
+   "action": {
+    "capability": "OBSERVE",
+    "actor": "C01",
+    "params": {}
+   },
+   "emotion": "relief",
+   "camera": {
+    "shot": "full",
+    "movement": "hold",
+    "subject": "protagonist_full"
+   },
+   "effects": [],
+   "transition": "cut",
+   "rationale": "relief: he lets out a breath",
+   "share": 0.45
+  },
+  {
+   "narration_id": "N17",
+   "visual_intent": "SHOW_ACTION",
+   "environment": {
+    "type": "generic",
+    "subject": "cyber cell / police station",
+    "asset_id": "env_police",
+    "time_of_day": "day"
+   },
+   "characters": [
+    "C01"
+   ],
+   "props": [],
+   "action": {
+    "capability": "EYES_CHANGE",
+    "actor": "C01",
+    "params": {}
+   },
+   "emotion": "realization",
+   "camera": {
+    "shot": "medium",
+    "movement": "drift",
+    "subject": "protagonist_head"
+   },
+   "effects": [],
+   "transition": "cut",
+   "rationale": "'remember': he turns to us"
+  },
+  {
+   "narration_id": "N18",
+   "visual_intent": "CLIMAX",
+   "environment": {
+    "type": "generic",
+    "subject": "cyber cell / police station",
+    "asset_id": "env_police",
+    "time_of_day": "day"
+   },
+   "characters": [
+    "C01"
+   ],
+   "props": [],
+   "action": {
+    "capability": "CLOSE_UP",
+    "actor": "C01",
+    "params": {}
+   },
+   "emotion": "realization",
+   "camera": {
+    "shot": "close",
+    "movement": "isolate",
+    "subject": "protagonist_head"
+   },
+   "effects": [],
+   "transition": "cut",
+   "rationale": "the message to the viewer: never share the OTP"
+  },
+  {
+   "narration_id": "N19",
+   "visual_intent": "REVEAL_INFORMATION",
+   "environment": {
+    "type": "generic",
+    "subject": "cyber cell / police station",
+    "asset_id": "env_police",
+    "time_of_day": "day"
+   },
+   "characters": [
+    "C01"
+   ],
+   "props": [],
+   "action": {
+    "capability": "INSERT_SCREEN",
+    "actor": "C01",
+    "params": {}
+   },
+   "emotion": "hope",
+   "camera": {
+    "shot": "medium",
+    "movement": "hold",
+    "subject": null
+   },
+   "effects": [],
+   "transition": "cut",
+   "rationale": "the helpline card",
+   "share": 0.45,
+   "screen": {
+    "sender": "साइबर हेल्पलाइन",
+    "text": "ठगी हो तो तुरंत कॉल कीजिए: 1930"
+   }
+  },
+  {
+   "narration_id": "N19",
+   "visual_intent": "CONSEQUENCE",
+   "environment": {
+    "type": "generic",
+    "subject": "cyber cell / police station",
+    "asset_id": "env_police",
+    "time_of_day": "day"
+   },
+   "characters": [
+    "C01"
+   ],
+   "props": [],
+   "action": {
+    "capability": "RESOLVE",
+    "actor": "C01",
+    "params": {}
+   },
+   "emotion": "relief",
+   "camera": {
+    "shot": "wide",
+    "movement": "pull",
+    "subject": "environment"
+   },
+   "effects": [],
+   "transition": "cut",
+   "rationale": "calm wide shot, warm light returns",
+   "share": 0.55
+  }
+ ]
+}

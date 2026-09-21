@@ -38,6 +38,10 @@ def build(graph, nar, **k):
     if plan.get("look"):                                                                  # Kathaya finishing layer: its punches get their sounds
         from kathaya.renderer import look as LK
         plan["sfx"] = sorted(list(plan.get("sfx") or []) + LK.sfx(plan), key=lambda s: s["t"])
+        for c in (plan.get("characters") or {}).values():                                 # the "seeds" shirt pattern renders as dark stains: plain instead
+            w = (c.get("dna") or {}).get("wardrobe")
+            if w and w.get("pattern") == "seeds":
+                w["pattern"] = "plain"
     return plan
 
 

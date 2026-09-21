@@ -62,15 +62,17 @@ def _advance(have, seen, a):
     seen.append(a)
 
 
-def design(timeline, manifest, catalog, llm, fmt="short", log=print, progress=None):
+def design(timeline, manifest, catalog, llm, fmt="short", log=print, progress=None, direction=""):
     from kathaya.assets import catalog as CAT
     from kathaya.assets import resolver as RES
+    from kathaya.director import prompt as PRM
     from kathaya.renderer import manifest as MF
     mc, cc = MF.compact(manifest), CAT.compact(catalog)
     nar = [dict(id=s["id"], start=s["start"], end=s["end"], duration=round(s["end"] - s["start"], 2), text=s["text"]) for s in timeline["narration"]]
     fmt_note = ("SHORTS 9:16: a hook, quick reactions, one clear climax, a closing beat." if fmt == "short" else "LONG-FORM: more room for establishing shots and slower pacing.")
+    dirtxt = PRM.direction_block(direction)
     # ---- step 0: the cast
-    prompt = f"{HEAD}\n\nFORMAT: {fmt_note}\n\nSTEP 1 of the design: decide the CAST and a short Hindi title for the whole narration.\nRules: exactly one protagonist; at most one partner and at most two extras. Count ONLY people who are seen on screen doing something in the narration ('वह', 'उसने', 'लड़का' = the protagonist). A person who only sends a message, is only mentioned, or is never seen (a scammer, an unknown caller) is NOT in the cast; a narration with one person has a cast of exactly one. " \
+    prompt = f"{HEAD}{dirtxt}\n\nFORMAT: {fmt_note}\n\nSTEP 1 of the design: decide the CAST and a short Hindi title for the whole narration.\nRules: exactly one protagonist; at most one partner and at most two extras. Count ONLY people who are seen on screen doing something in the narration ('वह', 'उसने', 'लड़का' = the protagonist). A person who only sends a message, is only mentioned, or is never seen (a scammer, an unknown caller) is NOT in the cast; a narration with one person has a cast of exactly one. " \
              f"Choose each `archetype` from the catalog archetypes; if nobody fits, use OTHER and describe the person in `description`.\n\nNARRATION (JSON)\n{json.dumps(nar, ensure_ascii=False)}\n\nCATALOG ARCHETYPES: {json.dumps(mc['archetypes'])}"
     c0 = llm(prompt, _schema_cast(mc["archetypes"]))
     cast = [dict(id=str(c["id"]), role=c["role"], archetype=None if c["archetype"] == "OTHER" else c["archetype"], gender=c.get("gender"), name=c.get("name", ""), description=c.get("description", "")) for c in c0["cast"]]
@@ -108,7 +110,7 @@ def design(timeline, manifest, catalog, llm, fmt="short", log=print, progress=No
             moves = [m for m in proven if m not in recent_mv[-1:]] or proven
             cont = [True] if j + 1 < n_min else ([False] if j + 1 >= n_max else [False, True])
             sofar = [dict(narration=v["narration_id"], action=v["action"]["capability"], environment=v["environment"].get("asset_id") or v["environment"]["subject"], framing=v["_framing"]) for v in visuals[-6:]]
-            prompt = (f"{HEAD}\n\nFORMAT: {fmt_note}\n\nSTEP 3: design ONE visual for narration segment {s['id']} (visual {j + 1} of this segment; the segment lasts {s['duration']} s"
+            prompt = (f"{HEAD}{dirtxt}\n\nFORMAT: {fmt_note}\n\nSTEP 3: design ONE visual for narration segment {s['id']} (visual {j + 1} of this segment; the segment lasts {s['duration']} s"
                       + (", so it needs more than one visual" if n_min > 1 else "") + ").\n\nFULL NARRATION (JSON, for context)\n" + json.dumps(nar, ensure_ascii=False) +
                       f"\n\nCAST: {json.dumps(cast, ensure_ascii=False)}\nVISUALS SO FAR (last few): {json.dumps(sofar, ensure_ascii=False)}\n\nTHIS SEGMENT: {json.dumps(s, ensure_ascii=False)}\n\n"
                       f"CATALOG ENVIRONMENTS: {json.dumps(cc['environments'], ensure_ascii=False)}\nCATALOG PROPS: {json.dumps([p['name'] for p in cc['props']])}\n\n"

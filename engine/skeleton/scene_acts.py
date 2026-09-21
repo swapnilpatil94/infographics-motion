@@ -243,6 +243,8 @@ def compile_beat(d, i, b, t0, t1, chars):
     elif act == "CLOSE_UP":
         A(action="face", t=t0 + 0.05, dur=0.5, name="determination")
         A(action="look_at", t=t0 + 0.1, dur=max(0.4, L - 0.1), target="CAMERA")
+        if b.get("ambient_gaze"):                                                      # Kathaya plans: a held close-up still breathes and drifts (never a frozen frame)
+            A(action="idle", t=t0, dur=L)
     elif act == "RESOLVE":
         A(action="relief", t=t0 + 0.2, dur=L + TAIL - 0.4, emotion="relieved", intensity=0.6)
         if partner_in:

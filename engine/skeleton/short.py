@@ -180,7 +180,7 @@ def _clamp_reach(a, fps):
     """No hand target may lie farther from ITS shoulder than the straight arm (eases with overshoot - out_back in point / reach - used to push targets 10-50 px past the reach; Blender's IK then missed by that
     much: measured 15-55 px in the asset audit's situation clips). Shoulder = perf.shoulder + the per-side offset (verified against Blender to < 1 px by the prop matrix)."""
     reach = 0.985 * (a.P["upper_arm"] + a.P["forearm"])
-    near = 0.32 * (a.P["upper_arm"] + a.P["forearm"])
+    near = (0.10 if getattr(a.perf, "ear_phone", False) else 0.32) * (a.P["upper_arm"] + a.P["forearm"])           # (0.10: the wrist of a hand holding a phone to the ear is ~0.11 arm-lengths from the shoulder)
     n = len(a.channels["root_x"])
     hit = 0
     for side in ("L", "R"):

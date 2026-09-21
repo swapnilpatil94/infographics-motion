@@ -82,7 +82,7 @@ Kathaya acceptance (needs a running Studio server):
 ```bash
 .venv/bin/python -m engine.studio.server --port 8791 --test-mode &
 .venv/bin/python tools/kathaya_acceptance.py --port 8791      # lottery story -> 9:16 Short + QC; writes docs/kathaya/ACCEPTANCE_RESULT.json
-.venv/bin/python -W ignore -m unittest discover -s tests       # 270 tests
+.venv/bin/python -W ignore -m unittest discover -s tests       # 275 tests
 ```
 
 Outputs: `output/kathaya/projects/<id>/` (timeline, visual plan, report, asset requests), `output/studio/productions/<job>/final.mp4` (+ poster, contact sheet, QC and audio reports, event log). Everything under `output/` is git-ignored and re-creatable.
@@ -137,6 +137,21 @@ Upload a WAV/MP3 **together with the text** (the text is required: the visuals f
 ```
 
 `narration` (or the legacy key `segments`, or a bare list) with `text`, `start`, `end` per segment; `words` optional (used for caption highlighting and to time the amount pop-ups; without it they are spread by word length). Times are seconds; the film's length follows the last `end`.
+
+### 4.3b Optional scene direction (home page, under the story)
+
+Free text, in your own words: where and when each part happens, who is on screen, the action, the camera or the mood. It goes into the director's prompt (both the local LLM and the ChatGPT copy/paste prompt) with the rule *follow it where it names a place, time, character, action, emotion or camera; where it is silent decide yourself; a place the catalog lacks is reported, never approximated*. The resolver still enforces what the renderer can do, so direction can steer but never force an impossible shot.
+
+```
+Scene 1 - bedroom, night. Rohan (a young man) sits on his bed. The phone rings; he picks it up, worried. Slow push-ins, close shots on his face.
+Scene 2 - show the phone screen full-screen with the debit alert (sender BK-ALERT): the money leaving his account.
+Scene 3 - ATM, night. He rushes to the ATM and checks the balance; shock.
+Scene 4 - bank, next morning (daylight). A bank employee explains to him, two-shot; he understands.
+Scene 5 - cyber cell / police station, day. He files the complaint (the form in his hands).
+Finish on a calm wide shot with the warm light returning.
+```
+
+A complete worked example (story, scene direction, and the ChatGPT-format director reply) is in `stories/kathaya/otp_scam_four_places/`. Its result - 44.7 s, four environments (bedroom night -> ATM night -> bank day -> police day), two characters, technical QC 15/15 and renderer QC 30/30, driven entirely through the UI - is recorded in `docs/kathaya/UI_MULTI_ENV_RESULT.json`.
 
 ### 4.4 Timing sources, in the order they are used
 
@@ -247,9 +262,11 @@ More: `docs/kathaya/ARCHITECTURE.md` (boundaries, principles, director reliabili
 * Tested on one Mac only. Hindi only. Blender renders on CPU.
 * The renderer is natively **9:16**. "Long-form" uses the same architecture but is the 9:16 master plus a 16:9 pillarbox export, not a re-framed 16:9 render.
 * Variety is bounded by the renderer's vocabulary: 12 environments, 15 archetypes, 36 acts. The protagonist stays on set, usually in one pose family per act; a whole story in one room looks like one room.
+* On the four-place OTP story the local 14B director followed the requested places and times, but chose actions loosely (a money-flow infographic before the amount is spoken; narration lines shown as phone messages). The film in `docs/kathaya/UI_MULTI_ENV_RESULT.json` therefore used the ChatGPT copy / paste route with a director reply written by hand (`stories/kathaya/otp_scam_four_places/`). Cold local planning of that story took ~15 min (19 segments).
 * The local 14B director is fragile: a small prompt change can change the whole plan (a stricter "hook" prompt made the plan worse and was reverted). ChatGPT-as-director is copy / paste only, tested with scripted replies; there is no OpenAI API provider.
 * Audio + text timing is silence-snapped, not forced alignment.
 * Library environments from references are stylised **single-plane backdrops**, not 3D.
+* Some camera asks cannot be honoured by the geometry (for example a reach framing when the phone is not on a table); the renderer substitutes the nearest framing and the UI lists it under "Camera intents the geometry could not honour".
 * Tilt / orbit / over-the-shoulder camera moves do not exist; asking for them is an error, not an approximation.
 * "Viral" is not measured: the finishing look follows Shorts conventions but retention has not been tested.
 
