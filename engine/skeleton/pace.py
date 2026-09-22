@@ -88,15 +88,16 @@ def _atempo(src, dst, tempo):
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", src, "-af", ",".join(f), "-ar", str(SR), "-ac", "1", dst], check=True)
 
 
-def build(wav_in, segments_json, beats, wav_out, seg_out, tempo=1.16, gap_cap=0.14, beat_gap=0.10, lead=0.22, tail=0.35):
-    """Full pipeline; returns the paced narration dict (also written to seg_out)."""
+def build(wav_in, segments_json, beats, wav_out, seg_out, tempo=1.16, gap_cap=0.14, beat_gap=0.10, lead=0.22, tail=0.35, beat_gaps=None):
+    """Full pipeline; returns the paced narration dict (also written to seg_out).
+    `beat_gaps`: optional list, one value per beat, overriding `beat_gap` for the pause AFTER that beat (a scene-ending line gets a longer beat than a comma-clause: constant pauses are what make a voice-over sound like a machine reading a list)."""
     words = flatten_words(segments_json)
     bw = assign_beats(words, beats)
     raw = AP.read_audio(wav_in)
     # ---- rebuild the timeline explicitly so word times are exact
     pieces, cursor = [np.zeros(int(lead * SR), np.float32)], lead
     segs = []
-    for bid, text, ws in bw:
+    for bi, (bid, text, ws) in enumerate(bw):
         a = max(0.0, ws[0]["start"] - 0.06)
         b = min(len(raw) / SR, ws[-1]["end"] + 0.10)
         new_words, pos, first_cursor = [], a, cursor
@@ -114,8 +115,9 @@ def build(wav_in, segments_json, beats, wav_out, seg_out, tempo=1.16, gap_cap=0.
         pieces.append(seg)
         cursor += len(seg) / SR
         segs.append(dict(beat_id=bid, text=text, start_seconds=new_words[0]["start"], end_seconds=new_words[-1]["end"], words=new_words))
-        pieces.append(np.zeros(int(beat_gap * SR), np.float32))
-        cursor += beat_gap
+        g = beat_gaps[bi] if beat_gaps else beat_gap
+        pieces.append(np.zeros(int(g * SR), np.float32))
+        cursor += g
     pieces.append(np.zeros(int(tail * SR), np.float32))
     audio = np.concatenate(pieces)
     tmp = wav_out + ".pre.wav"

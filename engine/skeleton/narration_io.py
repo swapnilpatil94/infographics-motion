@@ -51,8 +51,8 @@ def is_cached(beats):
     return os.path.exists(os.path.join(d, "raw.wav")) and os.path.exists(os.path.join(d, "raw.wav.segments.json"))
 
 
-def synthesize(beats, out_dir, tempo=1.08, lo=44.0, hi=60.0, log=print):
-    """beats: [(id, text)] -> path of the segments JSON (written to out_dir/segments.json)"""
+def synthesize(beats, out_dir, tempo=1.08, lo=44.0, hi=60.0, log=print, beat_gaps=None):
+    """beats: [(id, text)] -> path of the segments JSON (written to out_dir/segments.json). `beat_gaps`: optional per-beat pause overrides (see pace.build)."""
     from engine.skeleton import pace
     h = cache_key(beats)
     d = os.path.join(ROOT, "narration/production", h)
@@ -66,7 +66,7 @@ def synthesize(beats, out_dir, tempo=1.08, lo=44.0, hi=60.0, log=print):
     os.makedirs(out_dir, exist_ok=True)
     pw, pj = os.path.join(out_dir, "paced.wav"), os.path.join(out_dir, "paced.json")
     for _ in range(8):                                                       # re-tempo (pitch-preserving) until the film lands in the duration window; no new TTS
-        p = pace.build(raw, seg, beats, pw, pj, tempo=tempo)
+        p = pace.build(raw, seg, beats, pw, pj, tempo=tempo, beat_gaps=beat_gaps)
         dur = p["segments"][-1]["end_seconds"] + 3.0
         if lo <= dur <= hi:
             break

@@ -4,8 +4,10 @@
  "provider": "chatgpt",
  "narration": {
   "source": "tts",
-  "duration": 41.717,
-  "segments": 19
+  "duration": 36.064,
+  "segments": 19,
+  "words": 108,
+  "wpm": 179.7
  },
  "plan": {
   "title": "ओटीपी के बाद",
@@ -30,17 +32,43 @@
   ],
   "corrections": [
    {
+    "visual": "V03",
+    "field": "timing",
+    "was": [
+     3.826,
+     4.696
+    ],
+    "now": [
+     3.776,
+     4.696
+    ],
+    "why": "the narration fragment is shorter than the renderer's 0.9 s minimum shot; borrowed 0.05 s from the neighbouring visuals"
+   },
+   {
+    "visual": "V12",
+    "field": "timing",
+    "was": [
+     17.293,
+     18.187
+    ],
+    "now": [
+     17.267,
+     18.187
+    ],
+    "why": "the narration fragment is shorter than the renderer's 0.9 s minimum shot; borrowed 0.03 s from the neighbouring visuals"
+   },
+   {
     "visual": "V22",
     "field": "timing",
     "was": [
-     35.224,
-     36.108
+     30.553,
+     31.29
     ],
     "now": [
-     35.188,
-     36.108
+     30.413,
+     31.333
     ],
-    "why": "the narration fragment is shorter than the renderer's 0.9 s minimum shot; borrowed 0.04 s from the neighbouring visuals"
+    "why": "the narration fragment is shorter than the renderer's 0.9 s minimum shot; borrowed 0.18 s from the neighbouring visuals"
    }
   ],
   "counts": {
@@ -53,9 +81,9 @@
   "width": 1080,
   "height": 1920,
   "fps": 30.0,
-  "frames": 1341,
-  "duration": 44.717,
-  "size_mb": 74.5
+  "frames": 1171,
+  "duration": 39.064,
+  "size_mb": 66.1
  },
  "timings": {
   "total": 628.6,
@@ -108,5 +136,6 @@
    "why": "the phone is not on a table to reach for (standing / no free phone in this set)"
   }
  ],
- "file": "output/studio/productions/p_20260921-123045_c7f8/final.mp4"
+ "file": "output/studio/productions/p_20260922-143350_8641/final.mp4",
+ "pacing_note": "second pass: tempo raised to hit ~188 wpm (this codebase's own documented Shorts target), punctuation-aware pauses (fragment 0.10s / sentence-end 0.22s / exclamation 0.30s, before atempo) replacing one fixed 0.26s gap"
 }

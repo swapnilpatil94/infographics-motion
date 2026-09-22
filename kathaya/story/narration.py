@@ -142,8 +142,23 @@ def estimated(text, fmt="short"):
     return _timeline(segs, "estimated", segs[-1]["end"], None, fmt, ["times are ESTIMATED from word counts (no audio yet)"], hindi.language_of(text))
 
 
+TEMPO_TARGET = dict(short=1.20, long=1.08)                                        # short: ~188 wpm (this file's pace module documents ~190 wpm as the Shorts retention target); long: a more measured ~168 wpm
+_SENTENCE_END, _EXCLAIM = "।.?", "!"
+
+
+def _beat_gap(p):
+    """the pause AFTER narration line `p`: a full stop / question earns a real beat, an exclamation an extra beat of impact, a dash-split clause or a fragment (from segment_text joining short tails) stays tight -
+    a narrator does not pause the same length after every line regardless of what it just said."""
+    p = p.rstrip()
+    if p.endswith(_EXCLAIM):
+        return 0.30
+    if p and p[-1] in _SENTENCE_END:
+        return 0.22
+    return 0.10
+
+
 def from_tts(text, out_dir, fmt="short", log=print):
-    """Chatterbox Hindi narration (content-hash cached) with real word times. Natural pace: no re-tempo window."""
+    """Chatterbox Hindi narration (content-hash cached) with real word times, sped up (pitch-preserving) to a Shorts-retention pace, with punctuation-aware pauses between lines instead of one fixed gap."""
     from engine.skeleton import narration_io as NI
     parts = segment_text(text)
     lang = hindi.language_of(text)
@@ -153,7 +168,8 @@ def from_tts(text, out_dir, fmt="short", log=print):
     bad = [t for _, t in beats if re.search(r"[A-Za-z0-9]", t)]
     if bad:
         raise ValueError(f"the narrator cannot read Latin letters or digits that remain after normalisation: {bad[0][:60]!r}")
-    path = NI.synthesize(beats, out_dir, tempo=1.0, lo=0.0, hi=1e9, log=log)
+    gaps = [_beat_gap(p) for p in parts]
+    path = NI.synthesize(beats, out_dir, tempo=TEMPO_TARGET.get(fmt, 1.15), lo=0.0, hi=1e9, log=log, beat_gaps=gaps)
     seg = json.load(open(path, encoding="utf-8"))
     segs = []
     for i, (s, p) in enumerate(zip(seg["segments"], parts)):

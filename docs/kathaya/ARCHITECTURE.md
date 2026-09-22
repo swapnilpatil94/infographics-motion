@@ -68,6 +68,18 @@ Run through the web UI (story + scene direction pasted, ChatGPT route). First re
 * The random `seeds` shirt pattern rendered as dark stains -> plain, Kathaya plans only. Dark scenes were unreadable -> the grade lifts shadows in proportion to darkness.
 Second render: technical QC 15/15, renderer QC 30/30, `completed`.
 
+## Narration pace and rhythm (this session)
+
+The first two Kathaya films (lottery, first OTP-scam cut) were paced at ~155 words/minute with one fixed 0.26 s pause between every narration line, regardless of whether it ended a sentence or was mid-clause. That reads as slow and mechanical, not like a narrator. Fixed in `kathaya/story/narration.py::from_tts` (+ `engine/skeleton/pace.py::build`, additive - a new optional `beat_gaps` argument, `None` keeps every existing caller unchanged):
+* tempo raised to hit ~188 wpm for Shorts (~168 for Long-form) - `pace.py`'s own docstring already documented ~190 wpm as the Shorts retention target; Kathaya just wasn't reaching for it (it called `tempo=1.0`, i.e. no speed-up at all, on top of the sibling TTS adapter's own 0.90x slow-down).
+* the pause after each line now depends on how the line ends: a fragment / dash-clause gets ~0.09 s (raw, before speed-up), a full stop ~0.18 s, an exclamation ~0.25 s - instead of one constant gap for every line.
+Re-measured on the OTP story: 41.7 s / 156 wpm / one fixed 0.26 s gap -> 36.1 s / 180 wpm / gaps varying 0.22-0.32 s by punctuation. `docs/kathaya/UI_MULTI_ENV_RESULT.json` and the sent audio samples are the evidence; this is an engineering fix (measured pace, varied pause length), not a claim about how the voice itself sounds - only a person listening can judge that.
+
+## Two more issues found and fixed while re-rendering the multi-environment OTP film
+
+* `visual_narration_sync` failed by ~0.3 ms on a borrowed-time visual: the correction rounds `start`/`end` to 3 decimals while the QC check compares against the unrounded narration time, so borrowing exactly up to the 0.15 s tolerance could round-trip just over it. Fixed by capping the borrow at 0.14 s (`kathaya/director/visual_planner.py::_BORROW_CAP`), the same class of fix as the earlier `MIN_VISUAL` float-boundary bug.
+* `hand_object_contact` failed for a `READ_DOCUMENT` beat: `props4.perform()` computed the `hold` and `use` hand targets ONCE at the start of the whole multi-phase gesture (REACH/CONTACT/GRAB/HOLD/USE/RELEASE), then used them a second or more later - if the shoulder had moved since (settling from a walk-in, breathing), the later phases aimed at a stale point. A broader-built character's proportions (reseeded because the plan hash changed with the new timing) exposed it. Fixed by recomputing `hold`/`use` at their own phase's start time instead of the gesture's start time (`engine/skeleton/props4.py::perform`) - a real, pre-existing bug, not something the pacing change introduced (it only changed which random body proportions got drawn).
+
 ## Known limits
 
 * The renderer is natively 9:16; long-form is the 9:16 master plus a 16:9 pillarbox export, not a re-framed 16:9 render.

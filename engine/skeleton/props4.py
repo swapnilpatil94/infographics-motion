@@ -87,8 +87,6 @@ def perform(perf, anchors, prop, t0, hand="R", mirror=False, stand_rest=True, sc
     side = hand
     rest = M._arm_rest(perf, side, t)
     contact = _rel(perf, t, side, d["contact"])
-    hold = _rel(perf, t, side, d["hold"])
-    use = _rel(perf, t, side, d["use"])
     open_pose = "open"
 
     def solve(pt, H, anchor=d["anchor"], pose=d["pose"]):
@@ -119,11 +117,13 @@ def perform(perf, anchors, prop, t0, hand="R", mirror=False, stand_rest=True, sc
     recs.append(dict(phase="GRAB", t=t, target=contact, contact_err_px=round(err, 2), reachable=ok, pose=d["pose"], H=d["H"]))
     t += DURS["GRAB"]
     # HOLD: carry to the hold position (a fixed prop - laptop, keyboard, ATM - stays: hold == contact)
+    hold = _rel(perf, t, side, d["hold"])                                             # recomputed at ITS OWN start time, not t0: the shoulder may have moved (breathing / settling from a walk-in) since REACH began
     w, rot, err, ok = solve(hold, d["H"])
     go(t, t + DURS["HOLD"], w, rot)
     recs.append(dict(phase="HOLD", t=t, target=hold, contact_err_px=round(err, 2), reachable=ok, pose=d["pose"], H=d["H"]))
     t += DURS["HOLD"]
     # USE: prop-specific target (+ a small oscillation for typing / keypad taps)
+    use = _rel(perf, t, side, d["use"])                                               # same: recomputed at its own start time
     H_use = d["H"] + (-25.0 if prop == "CUP" else 15.0 if prop in ("DOOR", "BAG") else 0.0)
     w, rot, err, ok = solve(use, H_use)
     go(t, t + DURS["USE"], w, rot)

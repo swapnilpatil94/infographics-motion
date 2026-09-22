@@ -22,6 +22,8 @@ class PlanError(Exception):
 
 
 SYNC_SLACK = 0.15                                                                  # a visual may begin up to this long before / after its narration (the `visual_narration_sync` QC tolerance)
+_BORROW_CAP = 0.14                                                                 # < SYNC_SLACK: a visual's `start`/`end` get rounded to 3dp while the QC check compares against the unrounded narration time,
+                                                                                    # so borrowing exactly up to the tolerance can round-trip 0.1-0.3 ms over it; this margin keeps every borrow safely inside
 
 
 def _lengthen_short_visuals(visuals, corrections):
@@ -34,8 +36,8 @@ def _lengthen_short_visuals(visuals, corrections):
         was = (v["start"], v["end"])
         prev = visuals[i - 1] if i else None
         nxt = visuals[i + 1] if i + 1 < len(visuals) else None
-        back = min(need, SYNC_SLACK, max(0.0, prev["end"] - prev["start"] - MIN_VISUAL)) if prev else 0.0
-        fwd = min(need - back, SYNC_SLACK, max(0.0, nxt["end"] - nxt["start"] - MIN_VISUAL)) if nxt else 0.0
+        back = min(need, _BORROW_CAP, max(0.0, prev["end"] - prev["start"] - MIN_VISUAL)) if prev else 0.0
+        fwd = min(need - back, _BORROW_CAP, max(0.0, nxt["end"] - nxt["start"] - MIN_VISUAL)) if nxt else 0.0
         if back + fwd <= 1e-6:
             continue
         v["start"] = round(v["start"] - back, 3)
