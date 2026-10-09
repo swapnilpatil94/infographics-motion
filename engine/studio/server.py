@@ -140,7 +140,7 @@ def script_to_audio(body: dict):
                             hint="Hindi, Hinglish, English terms, numerals, and normal punctuation are supported.")
     beats = [dict(id=f"n{i+1:03d}", text=line) for i, line in enumerate(lines)]
     try:
-        v = production_voice.synthesize(beats, seed=42)
+        v = production_voice.synthesize(beats, seed=42, allow_partial_alignment=True)
     except Exception as e:
         raise C.StudioError("tts_failed", "Chatterbox narration failed.", reasons=[str(e)[-1000:]],
                             hint="Check TTS_PYTHON, MYTHIC_STUDIO_DIR, TTS_REFERENCE_AUDIO and the TTS/alignment logs.")
@@ -154,7 +154,7 @@ def script_to_audio(body: dict):
     sf.write(os.path.join(out, "narration.wav"), v["samples"], production_voice.audio.SR, subtype="PCM_16")
     segments = dict(audio="narration.wav", voice=v["voice"], duration_seconds=round(v["duration"], 3),
                     segments=[dict(id=b["id"], text=b["text"], start=round(b["start"], 3), end=round(b["end"], 3),
-                                   words=[dict(word=w["word"], start=round(w["start"], 3), end=round(w["end"], 3)) for w in b["words"]])
+                                   alignment_estimated=bool(b.get("alignment_estimated", False)), words=[dict(word=w["word"], start=round(w["start"], 3), end=round(w["end"], 3)) for w in b["words"]])
                               for b in v["beats"]])
     with open(os.path.join(out, "narration.segments.json"), "w", encoding="utf-8") as f:
         json.dump(segments, f, ensure_ascii=False, indent=2)
