@@ -133,8 +133,10 @@ def script_to_audio(body: dict):
     for i, line in enumerate(lines, 1):
         if not any(ch.isalpha() for ch in line):
             bad.append(f"line {i}: add narration text (letters are required)")
-        if any(ord(ch) < 32 and ch not in "\\t" for ch in line):
+        if any(ord(ch) < 32 and ch != "\\t" for ch in line):
             bad.append(f"line {i}: contains an unsupported control character")
+        if any(unicodedata.category(ch) in ("So", "Cs") for ch in line):
+            bad.append(f"line {i}: contains an emoji or unsupported symbol")
     if bad:
         raise C.StudioError("script_not_supported", "Some lines do not contain valid narration text.", reasons=bad[:12],
                             hint="Hindi, Hinglish, English terms, numerals, and normal punctuation are supported.")
