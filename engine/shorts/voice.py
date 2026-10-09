@@ -75,13 +75,13 @@ def _env():
     return env
 
 
-def _key(beats, seed, style, pronunciation_mode):
+def _key(beats, seed, style, pronunciation_mode, group_lines=False):
     try:
         reference_version = str(os.path.getmtime(REFERENCE)) + ":" + str(os.path.getsize(REFERENCE))
     except OSError:
         reference_version = "missing"
     blob = json.dumps([[b["id"], b["text"], b.get("tts_text", b["text"])] for b in beats], ensure_ascii=False)
-    blob += REFERENCE + reference_version + str(seed) + style + pronunciation_mode
+    blob += REFERENCE + reference_version + str(seed) + style + pronunciation_mode + str(group_lines)
     blob += json.dumps(STORYTELLING_PRESETS.get(style, STORYTELLING_PRESETS["storytelling"]), sort_keys=True)
     return hashlib.sha256(blob.encode()).hexdigest()[:16]
 
@@ -93,7 +93,7 @@ def _read_wav_any(path):
     return np.frombuffer(raw, np.float32).copy()
 
 
-def synthesize(beats, seed=42, log=print, allow_partial_alignment=False, style="storytelling", pronunciation_mode="hindi_mixed"):
+def synthesize(beats, seed=42, log=print, allow_partial_alignment=False, style="storytelling", pronunciation_mode="hindi_mixed", group_lines=False):
     """beats: [{id, text}] -> dict(samples, voice, beats=[{id,text,start,end,words:[{word,start,end}]}], duration).
 
     allow_partial_alignment is for standalone script-to-audio export only: when WhisperX
@@ -106,13 +106,13 @@ def synthesize(beats, seed=42, log=print, allow_partial_alignment=False, style="
         raise ValueError(f"unknown pronunciation mode: {pronunciation_mode}")
     beats = [dict(b, tts_text=_tts_text(b["text"], pronunciation_mode)) for b in beats]
     settings = STORYTELLING_PRESETS[style]
-    key = _key(beats, seed, style, pronunciation_mode)
+    key = _key(beats, seed, style, pronunciation_mode, group_lines)
     d = os.path.join(VOICE_DIR, key)
     os.makedirs(d, exist_ok=True)
     wav, align = os.path.join(d, "narration.wav"), os.path.join(d, "align.json")
     if available():
         if not (os.path.exists(wav) and os.path.exists(align)):
-            job = dict(output_path=wav, reference_audio=REFERENCE, seed=seed, **settings,
+            job = dict(output_path=wav, reference_audio=REFERENCE, seed=seed, group_lines=group_lines, **settings,
                        narration_style=style,
                        segments=[dict(beat_id=b["id"], text=b["tts_text"], display_text=b["text"]) for b in beats])
             json.dump(job, open(os.path.join(d, "job.json"), "w"), ensure_ascii=False)
@@ -168,7 +168,7 @@ def synthesize(beats, seed=42, log=print, allow_partial_alignment=False, style="
                             words=words, alignment_estimated=estimated))
         return dict(samples=data, voice=f"Chatterbox Hindi · {style} · WhisperX alignment", beats=out,
                     duration=len(data) / audio.SR, placeholder=False, narration_style=style,
-                    pronunciation_mode=pronunciation_mode)
+                    pronunciation_mode=pronunciation_mode, group_lines=group_lines)
     # ---- fallback: system voice, proportional word timing (flagged placeholder)
     log("[voice] WARNING: Chatterbox stack unavailable - using macOS `say` placeholder with estimated word timing")
     t, clips, out = 0.0, [], []
