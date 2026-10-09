@@ -34,11 +34,11 @@ from fastapi.staticfiles import StaticFiles                                     
 from engine.shorts.raster import ROOT                                                    # noqa: E402
 from engine.skeleton import events as EVT                                                # noqa: E402
 from engine.studio import core as C, jobs as J, movie as M, kserver                       # noqa: E402
-from kathaya import pipeline as KP
-import re
-import uuid
-import soundfile as sf
-from engine.shorts import voice as production_voice                                                       # noqa: E402
+from kathaya import pipeline as KP                                                       # noqa: E402
+from engine.shorts import voice as production_voice                                     # noqa: E402
+import re                                                                                # noqa: E402
+import uuid                                                                              # noqa: E402
+import soundfile as sf                                                                   # noqa: E402
 
 WEB = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web")
 FILES = {"contact_sheet.png", "qc_report.json", "audio_report.json", "manifest.json", "story_graph.json", "plan.json", "summary.json", "events.jsonl", "poster.jpg", "critique/report.json"}
@@ -111,7 +111,6 @@ async def upload(request: Request, kind: str = "audio", name: str = "upload.bin"
     fn = f"u_{int(time.time())}_{os.path.basename(name).replace(' ', '_')}"
     open(os.path.join(C.UPLOADS, fn), "wb").write(data)
     return dict(upload_id=fn, bytes=len(data))
-
 
 
 # ------------------------------------------------------------------------------------------------ script-only Chatterbox audio export
@@ -187,6 +186,9 @@ def script_audio_download(job_id: str):
 @router.get("/audio/{job_id}/segments")
 def script_audio_segments(job_id: str):
     return FileResponse(_audio_output_path(job_id, "narration.segments.json"), media_type="application/json", filename="narration.segments.json")
+
+
+
 
 
 # ------------------------------------------------------------------------------------------------ productions
