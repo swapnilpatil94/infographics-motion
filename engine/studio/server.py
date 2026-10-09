@@ -38,6 +38,7 @@ from kathaya import pipeline as KP                                              
 from engine.shorts import voice as production_voice                                     # noqa: E402
 import re                                                                                # noqa: E402
 import uuid                                                                              # noqa: E402
+import unicodedata                                                                        # noqa: E402
 import soundfile as sf                                                                   # noqa: E402
 
 WEB = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web")
