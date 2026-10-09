@@ -681,7 +681,7 @@ function viewAudio() {
     ${AUD.job ? `<div class="card" style="margin-top:16px"><div class="row sp"><div><h2>Audio ready</h2><p class="muted">${esc(AUD.job.voice)} · ${Number(AUD.job.duration).toFixed(1)} seconds · ${AUD.job.segments} segments</p></div><span class="pill completed">Complete</span></div>
       <audio controls preload="metadata" style="width:100%;margin-top:12px" src="/api/audio/${esc(AUD.job.id)}/wav"></audio>
       <div class="row" style="justify-content:center;gap:10px;margin-top:14px;flex-wrap:wrap"><a class="btn primary" href="/api/audio/${esc(AUD.job.id)}/download">Download WAV</a><a class="btn" href="/api/audio/${esc(AUD.job.id)}/segments">Download word timings JSON</a><button class="btn ghost" id="audio-new">New script</button></div>
-      <div class="muted" style="margin-top:12px;font-size:12px">Saved under `output/audio/${esc(AUD.job.id)}/` (git-ignored).</div>
+      <div class="muted" style="margin-top:12px;font-size:12px">Saved under <code>output/audio/${esc(AUD.job.id)}/</code> (git-ignored).</div>
     </div>` : ""}
   </section>`;
   const ta = $("#audio-script");
