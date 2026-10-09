@@ -70,3 +70,11 @@ def test_script_audio_rejects_unsupported_symbols():
     r = client.post("/api/audio", json={"text": "हैलो 🚀 दुनिया"})
     assert r.status_code == 422
     assert r.json()["error"]["code"] == "script_not_supported"
+
+
+def test_hindi_pronunciation_hints_preserve_original_script():
+    from engine.shorts.voice import _tts_text
+    original = "AI से लिखा? OpenAI का Watermark।"
+    spoken = _tts_text(original, "hindi_mixed")
+    assert spoken == "एआई से लिखा? ओपनएआई का वॉटरमार्क।"
+    assert _tts_text(original, "original") == original
