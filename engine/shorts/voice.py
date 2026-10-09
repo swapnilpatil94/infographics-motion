@@ -14,6 +14,7 @@ Fallback (flagged in the result): macOS `say` with proportional word timing.
 import hashlib
 import json
 import os
+import re
 import subprocess
 import sys
 
@@ -25,6 +26,40 @@ from engine.shorts.raster import ROOT
 MYTHIC = os.environ.get("MYTHIC_STUDIO_DIR", os.path.expanduser("~/mythic-video-studio"))
 PY312 = os.environ.get("TTS_PYTHON", os.path.expanduser("~/.pyenv/versions/3.12.0/bin/python"))
 REFERENCE = os.environ.get("TTS_REFERENCE_AUDIO", os.path.join(MYTHIC, "assets/reference-voices/hindi-male-narrator.wav"))
+
+# Chatterbox controls: higher exaggeration adds expression; cfg_weight around 0.3 can help pacing.
+STORYTELLING_PRESETS = {
+    "storytelling": dict(exaggeration=0.68, cfg_weight=0.30, temperature=0.65, tempo=0.84, silence_pad_seconds=0.16),
+    "conversational": dict(exaggeration=0.52, cfg_weight=0.38, temperature=0.68, tempo=0.88, silence_pad_seconds=0.14),
+    "dramatic": dict(exaggeration=0.78, cfg_weight=0.25, temperature=0.60, tempo=0.80, silence_pad_seconds=0.22),
+}
+
+# Optional spoken forms for frequent English/technical terms in Hindi narration.
+# Original script remains unchanged. Mappings preserve one whitespace token per token.
+_HINDI_SPOKEN_FORMS = {
+    "AI": "एआई", "Detector": "डिटेक्टर", "Assignment": "असाइनमेंट", "email": "ईमेल",
+    "report": "रिपोर्ट", "text": "टेक्स्ट", "copy-paste": "कॉपी-पेस्ट", "Words": "वर्ड्स",
+    "file": "फ़ाइल", "End": "एंड", "system": "सिस्टम", "Model": "मॉडल", "step": "स्टेप",
+    "word": "वर्ड", "options": "ऑप्शन्स", "score": "स्कोर", "secret": "सीक्रेट", "key": "की",
+    "groups": "ग्रुप्स", "group": "ग्रुप", "pattern": "पैटर्न", "quality": "क्वालिटी",
+    "Benchmarks": "बेंचमार्क्स", "Pause": "पॉज़", "Guess": "गेस", "Maths": "मैथ्स",
+    "choice": "चॉइस", "flexibility": "फ्लेक्सिबिलिटी", "percent": "परसेंट", "number": "नंबर",
+    "detection": "डिटेक्शन", "synonyms": "सिनोनिम्स", "OpenAI": "ओपनएआई", "Watermark": "वॉटरमार्क",
+    "public": "पब्लिक", "approved": "अप्रूव्ड", "researchers": "रिसर्चर्स", "Photo": "फ़ोटो",
+    "twist": "ट्विस्ट",
+}
+_SPOKEN_FORM_RE = re.compile(r"(?<!\w)(" + "|".join(re.escape(k) for k in sorted(_HINDI_SPOKEN_FORMS, key=len, reverse=True)) + r")(?!\w)", re.IGNORECASE)
+
+
+def _tts_text(text, pronunciation_mode):
+    if pronunciation_mode != "hindi_mixed":
+        return text
+    def replace(match):
+        token = match.group(0)
+        replacement = next((v for k, v in _HINDI_SPOKEN_FORMS.items() if k.casefold() == token.casefold()), None)
+        return replacement if replacement is not None else token
+    return _SPOKEN_FORM_RE.sub(replace, text)
+
 VOICE_DIR = os.path.join(ROOT, "output", "voice")
 
 
@@ -40,8 +75,14 @@ def _env():
     return env
 
 
-def _key(beats, seed):
-    blob = json.dumps([[b["id"], b["text"]] for b in beats], ensure_ascii=False) + REFERENCE + str(seed)
+def _key(beats, seed, style, pronunciation_mode):
+    try:
+        reference_version = str(os.path.getmtime(REFERENCE)) + ":" + str(os.path.getsize(REFERENCE))
+    except OSError:
+        reference_version = "missing"
+    blob = json.dumps([[b["id"], b["text"], b.get("tts_text", b["text"])] for b in beats], ensure_ascii=False)
+    blob += REFERENCE + reference_version + str(seed) + style + pronunciation_mode
+    blob += json.dumps(STORYTELLING_PRESETS.get(style, STORYTELLING_PRESETS["storytelling"]), sort_keys=True)
     return hashlib.sha256(blob.encode()).hexdigest()[:16]
 
 
@@ -52,21 +93,28 @@ def _read_wav_any(path):
     return np.frombuffer(raw, np.float32).copy()
 
 
-def synthesize(beats, seed=42, log=print, allow_partial_alignment=False):
+def synthesize(beats, seed=42, log=print, allow_partial_alignment=False, style="storytelling", pronunciation_mode="hindi_mixed"):
     """beats: [{id, text}] -> dict(samples, voice, beats=[{id,text,start,end,words:[{word,start,end}]}], duration).
 
     allow_partial_alignment is for standalone script-to-audio export only: when WhisperX
     omits a beat, preserve the generated audio and provide clearly flagged estimated
     timestamps for that beat instead of failing the entire WAV export.
     """
-    key = _key(beats, seed)
+    if style not in STORYTELLING_PRESETS:
+        raise ValueError(f"unknown narration style: {style}")
+    if pronunciation_mode not in ("hindi_mixed", "original"):
+        raise ValueError(f"unknown pronunciation mode: {pronunciation_mode}")
+    beats = [dict(b, tts_text=_tts_text(b["text"], pronunciation_mode)) for b in beats]
+    settings = STORYTELLING_PRESETS[style]
+    key = _key(beats, seed, style, pronunciation_mode)
     d = os.path.join(VOICE_DIR, key)
     os.makedirs(d, exist_ok=True)
     wav, align = os.path.join(d, "narration.wav"), os.path.join(d, "align.json")
     if available():
         if not (os.path.exists(wav) and os.path.exists(align)):
-            job = dict(output_path=wav, reference_audio=REFERENCE, seed=seed,
-                       segments=[dict(beat_id=b["id"], text=b["text"]) for b in beats])
+            job = dict(output_path=wav, reference_audio=REFERENCE, seed=seed, **settings,
+                       narration_style=style,
+                       segments=[dict(beat_id=b["id"], text=b["tts_text"], display_text=b["text"]) for b in beats])
             json.dump(job, open(os.path.join(d, "job.json"), "w"), ensure_ascii=False)
             log(f"[voice] Chatterbox Hindi TTS for {len(beats)} beats (cached at {key} afterwards)")
             subprocess.run([PY312, os.path.join(MYTHIC, "tools/chatterbox_tts.py"), os.path.join(d, "job.json")],
@@ -86,7 +134,11 @@ def synthesize(beats, seed=42, log=print, allow_partial_alignment=False):
         weights = [max(len((b.get("text") or "").split()), 1) for b in beats]
         total_weight = sum(weights) or 1
         for i, b in enumerate(beats):
-            words = [dict(word=w["word"], start=float(w["start"]), end=float(w["end"])) for w in al.get(b["id"], [])]
+            aligned = al.get(b["id"], [])
+            display_words = b["text"].split()
+            can_map_display = len(aligned) == len(display_words)
+            words = [dict(word=(display_words[j] if can_map_display else w["word"]),
+                          start=float(w["start"]), end=float(w["end"])) for j, w in enumerate(aligned)]
             estimated = False
             if not words:
                 if not allow_partial_alignment:
@@ -114,8 +166,9 @@ def synthesize(beats, seed=42, log=print, allow_partial_alignment=False):
                 log(f"[voice] WARNING: estimated word timings for {b['id']} (WhisperX returned no words)")
             out.append(dict(id=b["id"], text=b["text"], start=words[0]["start"], end=words[-1]["end"],
                             words=words, alignment_estimated=estimated))
-        return dict(samples=data, voice="chatterbox-hi (voice-cloned reference) + whisperx alignment", beats=out,
-                    duration=len(data) / audio.SR, placeholder=False)
+        return dict(samples=data, voice=f"Chatterbox Hindi · {style} · WhisperX alignment", beats=out,
+                    duration=len(data) / audio.SR, placeholder=False, narration_style=style,
+                    pronunciation_mode=pronunciation_mode)
     # ---- fallback: system voice, proportional word timing (flagged placeholder)
     log("[voice] WARNING: Chatterbox stack unavailable - using macOS `say` placeholder with estimated word timing")
     t, clips, out = 0.0, [], []
