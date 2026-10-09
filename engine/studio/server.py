@@ -34,7 +34,11 @@ from fastapi.staticfiles import StaticFiles                                     
 from engine.shorts.raster import ROOT                                                    # noqa: E402
 from engine.skeleton import events as EVT                                                # noqa: E402
 from engine.studio import core as C, jobs as J, movie as M, kserver                       # noqa: E402
-from kathaya import pipeline as KP                                                       # noqa: E402
+from kathaya import pipeline as KP
+import re
+import uuid
+import soundfile as sf
+from engine.shorts import voice as production_voice                                                       # noqa: E402
 
 WEB = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web")
 FILES = {"contact_sheet.png", "qc_report.json", "audio_report.json", "manifest.json", "story_graph.json", "plan.json", "summary.json", "events.jsonl", "poster.jpg", "critique/report.json"}
@@ -107,6 +111,82 @@ async def upload(request: Request, kind: str = "audio", name: str = "upload.bin"
     fn = f"u_{int(time.time())}_{os.path.basename(name).replace(' ', '_')}"
     open(os.path.join(C.UPLOADS, fn), "wb").write(data)
     return dict(upload_id=fn, bytes=len(data))
+
+
+
+# ------------------------------------------------------------------------------------------------ script-only Chatterbox audio export
+@router.post("/audio")
+def script_to_audio(body: dict):
+    """Synthesize pasted narration with the exact production voice adapter."""
+    text = str(body.get("text") or "").strip()
+    if not text:
+        raise C.StudioError("empty_script", "Paste a script before generating audio.")
+    if len(text) > 30000:
+        raise C.StudioError("script_too_long", "The script is over 30,000 characters. Split it into smaller parts.")
+    lines = [re.sub(r"^\s*(?:\d+[.)]|[-*•])\s*", "", x.strip()) for x in text.splitlines()]
+    lines = [x for x in lines if x and not x.startswith("#")]
+    if not lines:
+        raise C.StudioError("empty_script", "The script has no narration lines.")
+    bad = []
+    allowed = re.compile(r"^[ऀ-ॿ\s,।?!\.\-'’‘“”\":;…₹0-9]+$")
+    for i, line in enumerate(lines, 1):
+        if not re.search(r"[ऀ-ॿ]", line):
+            bad.append(f"line {i}: add Hindi/Devanagari narration text")
+        latin = len(re.findall(r"[A-Za-z]", line))
+        dev = len(re.findall(r"[ऀ-ॿ]", line))
+        if latin > dev:
+            bad.append(f"line {i}: mostly Latin-script English; write acronyms phonetically in Devanagari (OTP → ओटीपी)")
+        if not allowed.fullmatch(line):
+            bad.append(f"line {i}: contains symbols outside the production Hindi TTS input rules")
+    if bad:
+        raise C.StudioError("script_not_supported", "The script does not match the current production Hindi TTS input rules.", reasons=bad[:12],
+                            hint="Use Hindi in Devanagari. Write English terms phonetically (OTP → ओटीपी).")
+    beats = [dict(id=f"n{i+1:03d}", text=line) for i, line in enumerate(lines)]
+    try:
+        v = production_voice.synthesize(beats, seed=42)
+    except Exception as e:
+        raise C.StudioError("tts_failed", "Chatterbox narration failed.", reasons=[str(e)[-1000:]],
+                            hint="Check TTS_PYTHON, MYTHIC_STUDIO_DIR, TTS_REFERENCE_AUDIO and the TTS/alignment logs.")
+    if v.get("placeholder"):
+        raise C.StudioError("chatterbox_unavailable", "Chatterbox production assets are not configured; no placeholder audio was exported.",
+                            reasons=[v.get("voice", "placeholder fallback")],
+                            hint="Configure the same production Chatterbox environment and reference WAV.")
+    job_id = uuid.uuid4().hex[:12]
+    out = os.path.join(ROOT, "output", "audio", job_id)
+    os.makedirs(out, exist_ok=False)
+    sf.write(os.path.join(out, "narration.wav"), v["samples"], production_voice.audio.SR, subtype="PCM_16")
+    segments = dict(audio="narration.wav", voice=v["voice"], duration_seconds=round(v["duration"], 3),
+                    segments=[dict(id=b["id"], text=b["text"], start=round(b["start"], 3), end=round(b["end"], 3),
+                                   words=[dict(word=w["word"], start=round(w["start"], 3), end=round(w["end"], 3)) for w in b["words"]])
+                              for b in v["beats"]])
+    with open(os.path.join(out, "narration.segments.json"), "w", encoding="utf-8") as f:
+        json.dump(segments, f, ensure_ascii=False, indent=2)
+    return dict(id=job_id, voice=v["voice"], duration=v["duration"], segments=len(v["beats"]))
+
+
+def _audio_output_path(job_id: str, filename: str) -> str:
+    if not re.fullmatch(r"[a-f0-9]{12}", job_id):
+        raise C.StudioError("not_found", "No such audio job.", status=404)
+    root_dir = os.path.abspath(os.path.join(ROOT, "output", "audio", job_id))
+    path = os.path.abspath(os.path.join(root_dir, filename))
+    if not path.startswith(root_dir + os.sep) or not os.path.isfile(path):
+        raise C.StudioError("not_found", "The requested audio file does not exist.", status=404)
+    return path
+
+
+@router.get("/audio/{job_id}/wav")
+def script_audio_preview(job_id: str):
+    return FileResponse(_audio_output_path(job_id, "narration.wav"), media_type="audio/wav")
+
+
+@router.get("/audio/{job_id}/download")
+def script_audio_download(job_id: str):
+    return FileResponse(_audio_output_path(job_id, "narration.wav"), media_type="audio/wav", filename="narration.wav")
+
+
+@router.get("/audio/{job_id}/segments")
+def script_audio_segments(job_id: str):
+    return FileResponse(_audio_output_path(job_id, "narration.segments.json"), media_type="application/json", filename="narration.segments.json")
 
 
 # ------------------------------------------------------------------------------------------------ productions
