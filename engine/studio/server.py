@@ -138,9 +138,14 @@ def script_to_audio(body: dict):
     if bad:
         raise C.StudioError("script_not_supported", "Some lines do not contain valid narration text.", reasons=bad[:12],
                             hint="Hindi, Hinglish, English terms, numerals, and normal punctuation are supported.")
+    style = str(body.get("style") or "storytelling")
+    pronunciation_mode = "hindi_mixed" if body.get("hindi_pronunciation", True) else "original"
+    if style not in production_voice.STORYTELLING_PRESETS:
+        raise C.StudioError("invalid_narration_style", "Choose Storytelling, Conversational, or Dramatic narration.")
     beats = [dict(id=f"n{i+1:03d}", text=line) for i, line in enumerate(lines)]
     try:
-        v = production_voice.synthesize(beats, seed=42, allow_partial_alignment=True)
+        v = production_voice.synthesize(beats, seed=42, allow_partial_alignment=True,
+                                        style=style, pronunciation_mode=pronunciation_mode)
     except Exception as e:
         raise C.StudioError("tts_failed", "Chatterbox narration failed.", reasons=[str(e)[-1000:]],
                             hint="Check TTS_PYTHON, MYTHIC_STUDIO_DIR, TTS_REFERENCE_AUDIO and the TTS/alignment logs.")
