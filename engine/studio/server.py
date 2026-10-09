@@ -126,20 +126,18 @@ def script_to_audio(body: dict):
     lines = [x for x in lines if x and not x.startswith("#")]
     if not lines:
         raise C.StudioError("empty_script", "The script has no narration lines.")
+    # Accept natural Hindi/Hinglish narration, including Latin-script English terms,
+    # numbers, percentages, arrows and normal punctuation. Do not enforce Devanagari-only:
+    # real scripts commonly contain terms such as AI, detector, benchmark, and OpenAI.
     bad = []
-    allowed = re.compile(r"^[ऀ-ॿ\s,।?!\.\-'’‘“”\":;…₹0-9]+$")
     for i, line in enumerate(lines, 1):
-        if not re.search(r"[ऀ-ॿ]", line):
-            bad.append(f"line {i}: add Hindi/Devanagari narration text")
-        latin = len(re.findall(r"[A-Za-z]", line))
-        dev = len(re.findall(r"[ऀ-ॿ]", line))
-        if latin > dev:
-            bad.append(f"line {i}: mostly Latin-script English; write acronyms phonetically in Devanagari (OTP → ओटीपी)")
-        if not allowed.fullmatch(line):
-            bad.append(f"line {i}: contains symbols outside the production Hindi TTS input rules")
+        if not any(ch.isalpha() for ch in line):
+            bad.append(f"line {i}: add narration text (letters are required)")
+        if any(ord(ch) < 32 and ch not in "\\t" for ch in line):
+            bad.append(f"line {i}: contains an unsupported control character")
     if bad:
-        raise C.StudioError("script_not_supported", "The script does not match the current production Hindi TTS input rules.", reasons=bad[:12],
-                            hint="Use Hindi in Devanagari. Write English terms phonetically (OTP → ओटीपी).")
+        raise C.StudioError("script_not_supported", "Some lines do not contain valid narration text.", reasons=bad[:12],
+                            hint="Hindi, Hinglish, English terms, numerals, and normal punctuation are supported.")
     beats = [dict(id=f"n{i+1:03d}", text=line) for i, line in enumerate(lines)]
     try:
         v = production_voice.synthesize(beats, seed=42)
