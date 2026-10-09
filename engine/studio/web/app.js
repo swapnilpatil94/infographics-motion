@@ -667,14 +667,30 @@ function renderProject() {
   if (!active && S.k.poll) { clearInterval(S.k.poll); S.k.poll = null; }                 // idle: no re-render while the user types / decides
 }
 
-const AUD = { text: sessionStorage.getItem("ks.audioText") || "", job: null, busy: false, error: null };
+const AUD = { text: sessionStorage.getItem("ks.audioText") || "", style: "storytelling", hindiPronunciation: true, job: null, busy: false, error: null };
 function viewAudio() {
   view.innerHTML = `<section class="kflow">
     <div class="khero"><h1>Script → Audio</h1><p>Paste Hindi in Devanagari. This reuses the same Chatterbox + WhisperX narration adapter as production and does not render a film.</p></div>
     <div class="card kcard">
       <label class="f">Script / narration<textarea id="audio-script" rows="12" placeholder="रात के दस बजे। कमरे में अकेला आरव।&#10;तभी फ़ोन बज उठा।&#10;आरव ने स्क्रीन की तरफ़ देखा।">${esc(AUD.text)}</textarea></label>
       <div class="row sp" style="margin-top:10px;align-items:center"><small class="muted"><span id="audio-count">${AUD.text.trim() ? AUD.text.trim().split(/\s+/).length : 0}</span> words · one narration beat per line</small><button class="btn sm ghost" id="audio-clear">Clear script</button></div>
-      <div class="note" style="margin-top:16px">Uses production settings: <code>MYTHIC_STUDIO_DIR</code>, <code>TTS_PYTHON</code>, <code>TTS_REFERENCE_AUDIO</code>. Placeholder macOS speech is not exported as Chatterbox.</div>
+      <div class="grid two" style="margin-top:16px;gap:12px">
+        <label class="f">Narration delivery
+          <select id="audio-style">
+            <option value="storytelling" ${AUD.style === "storytelling" ? "selected" : ""}>Storytelling · engaging, natural pace</option>
+            <option value="conversational" ${AUD.style === "conversational" ? "selected" : ""}>Conversational · calmer, less dramatic</option>
+            <option value="dramatic" ${AUD.style === "dramatic" ? "selected" : ""}>Dramatic · stronger suspense</option>
+          </select>
+        </label>
+        <label class="f">Pronunciation
+          <select id="audio-pronunciation">
+            <option value="hindi_mixed" ${AUD.hindiPronunciation ? "selected" : ""}>Hindi-first for common English terms</option>
+            <option value="original" ${!AUD.hindiPronunciation ? "selected" : ""}>Keep exact script pronunciation</option>
+          </select>
+        </label>
+      </div>
+      <div class="note" style="margin-top:16px">Storytelling uses expressive Chatterbox settings and a slower finishing tempo. Hindi-first pronunciation changes only the spoken form of common English terms; your script and exported captions remain in their original wording.</div>
+      <div class="note" style="margin-top:8px">Uses production settings: <code>MYTHIC_STUDIO_DIR</code>, <code>TTS_PYTHON</code>, <code>TTS_REFERENCE_AUDIO</code>. Placeholder macOS speech is not exported as Chatterbox.</div>
       <div id="audio-error" style="margin-top:12px">${AUD.error ? errBox(AUD.error) : ""}</div>
       <div class="row" style="justify-content:center;margin-top:20px"><button class="btn primary bigbtn" id="audio-generate" ${AUD.busy ? "disabled" : ""}>${AUD.busy ? '<span class="spin"></span>Generating…' : "Generate WAV"}</button></div>
     </div>
@@ -688,14 +704,18 @@ function viewAudio() {
   if (ta) ta.addEventListener("input", () => {
     AUD.text = ta.value;
     try { sessionStorage.setItem("ks.audioText", AUD.text); } catch (_) {}
-    const c = $("#audio-count"); if (c) c.textContent = AUD.text.trim() ? AUD.text.trim().split(/\s+/).length : 0;
+    const count = $("#audio-count"); if (count) count.textContent = AUD.text.trim() ? AUD.text.trim().split(/\s+/).length : 0;
   });
+  const style = $("#audio-style");
+  if (style) style.addEventListener("change", () => { AUD.style = style.value; });
+  const pronunciation = $("#audio-pronunciation");
+  if (pronunciation) pronunciation.addEventListener("change", () => { AUD.hindiPronunciation = pronunciation.value === "hindi_mixed"; });
 }
 async function generateScriptAudio() {
   if (!AUD.text.trim()) { AUD.error = {error:{code:"empty_script",message:"Paste a script first."}}; return viewAudio(); }
   if (AUD.busy) return;
   AUD.busy = true; AUD.error = null; viewAudio();
-  try { AUD.job = await api("/audio", { text: AUD.text }); AUD.busy = false; viewAudio(); }
+  try { AUD.job = await api("/audio", { text: AUD.text, style: AUD.style, hindi_pronunciation: AUD.hindiPronunciation }); AUD.busy = false; viewAudio(); }
   catch (e) { AUD.error = e; AUD.busy = false; viewAudio(); }
 }
 
