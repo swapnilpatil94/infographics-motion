@@ -34,7 +34,7 @@ const lvl = () => ["simple", "director", "expert"].indexOf(S.level);
 
 // ------------------------------------------------------------------------------------------------ router
 window.addEventListener("hashchange", route);
-async function route() {
+async async function route() {
   stopWatch();
   const h = location.hash.replace(/^#/, "") || "/";
   $$("[data-nav]").forEach(a => a.classList.toggle("on", (a.dataset.nav === "create" && (h === "/" || h.startsWith("/review"))) || (a.dataset.nav === "productions" && h.startsWith("/productions")) || (a.dataset.nav === "guide" && h.startsWith("/guide"))));
