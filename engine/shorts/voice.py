@@ -52,8 +52,13 @@ def _read_wav_any(path):
     return np.frombuffer(raw, np.float32).copy()
 
 
-def synthesize(beats, seed=42, log=print):
-    """beats: [{id, text}] -> dict(samples, voice, beats=[{id,text,start,end,words:[{word,start,end}]}], duration)."""
+def synthesize(beats, seed=42, log=print, allow_partial_alignment=False):
+    """beats: [{id, text}] -> dict(samples, voice, beats=[{id,text,start,end,words:[{word,start,end}]}], duration).
+
+    allow_partial_alignment is for standalone script-to-audio export only: when WhisperX
+    omits a beat, preserve the generated audio and provide clearly flagged estimated
+    timestamps for that beat instead of failing the entire WAV export.
+    """
     key = _key(beats, seed)
     d = os.path.join(VOICE_DIR, key)
     os.makedirs(d, exist_ok=True)
@@ -72,11 +77,43 @@ def synthesize(beats, seed=42, log=print):
         data = _read_wav_any(wav)
         al = {b["beat_id"]: b["words"] for b in json.load(open(align))["beats"]}
         out = []
-        for b in beats:
+        missing = [i for i, b in enumerate(beats) if not al.get(b["id"])]
+        if missing and not allow_partial_alignment:
+            raise RuntimeError(f"alignment returned no words for beat {beats[missing[0]]['id']}")
+        # Estimate only missing beat timings. Keep WhisperX's exact timings for every
+        # aligned beat. First try the gap between aligned neighbors; if no usable gap
+        # exists, estimate a window by the beat's share of the full audio duration.
+        weights = [max(len((b.get("text") or "").split()), 1) for b in beats]
+        total_weight = sum(weights) or 1
+        for i, b in enumerate(beats):
             words = [dict(word=w["word"], start=float(w["start"]), end=float(w["end"])) for w in al.get(b["id"], [])]
+            estimated = False
             if not words:
-                raise RuntimeError(f"alignment returned no words for beat {b['id']}")
-            out.append(dict(id=b["id"], text=b["text"], start=words[0]["start"], end=words[-1]["end"], words=words))
+                if not allow_partial_alignment:
+                    raise RuntimeError(f"alignment returned no words for beat {b['id']}")
+                prev_end = next((float(w["end"]) for j in range(i - 1, -1, -1)
+                                 for w in reversed(al.get(beats[j]["id"], []))), None)
+                next_start = next((float(w["start"]) for j in range(i + 1, len(beats))
+                                   for w in al.get(beats[j]["id"], [])), None)
+                if prev_end is not None and next_start is not None and next_start > prev_end + 0.08:
+                    t0, t1 = prev_end, next_start
+                else:
+                    before = sum(weights[:i])
+                    t0 = len(data) / audio.SR * before / total_weight
+                    t1 = len(data) / audio.SR * (before + weights[i]) / total_weight
+                tokens = (b.get("text") or "").split() or [b.get("text") or "…"]
+                char_weights = [max(len(token), 1) for token in tokens]
+                char_total = sum(char_weights) or 1
+                cursor = t0
+                words = []
+                for token, weight in zip(tokens, char_weights):
+                    nxt = cursor + (t1 - t0) * weight / char_total
+                    words.append(dict(word=token, start=cursor, end=nxt))
+                    cursor = nxt
+                estimated = True
+                log(f"[voice] WARNING: estimated word timings for {b['id']} (WhisperX returned no words)")
+            out.append(dict(id=b["id"], text=b["text"], start=words[0]["start"], end=words[-1]["end"],
+                            words=words, alignment_estimated=estimated))
         return dict(samples=data, voice="chatterbox-hi (voice-cloned reference) + whisperx alignment", beats=out,
                     duration=len(data) / audio.SR, placeholder=False)
     # ---- fallback: system voice, proportional word timing (flagged placeholder)
