@@ -41,3 +41,21 @@ def test_script_audio_calls_production_voice_and_writes_downloads(tmp_path):
         data = client.get(f"/api/audio/{result['id']}/segments")
         assert data.status_code == 200
         assert data.json()["segments"][0]["text"] == "यह एक परीक्षण है।"
+
+
+def test_script_audio_refuses_placeholder_fallback(tmp_path):
+    import engine.studio.server as server
+    fake = {"samples": np.zeros(22050, dtype=np.float32), "voice": "macOS say (Lekha) PLACEHOLDER",
+            "duration": 1.0, "beats": [], "placeholder": True}
+    with patch.object(server.production_voice, "synthesize", return_value=fake), patch.object(server, "ROOT", str(tmp_path)):
+        client = TestClient(create_app(test_mode=True))
+        r = client.post("/api/audio", json={"text": "यह एक परीक्षण है।"})
+        assert r.status_code == 422
+        assert r.json()["error"]["code"] == "chatterbox_unavailable"
+
+
+def test_script_audio_rejects_unsupported_symbols():
+    client = TestClient(create_app(test_mode=True))
+    r = client.post("/api/audio", json={"text": "हैलो 🚀 दुनिया"})
+    assert r.status_code == 422
+    assert r.json()["error"]["code"] == "script_not_supported"
