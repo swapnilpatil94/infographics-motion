@@ -148,7 +148,7 @@ def script_to_audio(body: dict):
     beats = [dict(id=f"n{i+1:03d}", text=line) for i, line in enumerate(lines)]
     try:
         v = production_voice.synthesize(beats, seed=42, allow_partial_alignment=True,
-                                        style=style, pronunciation_mode=pronunciation_mode)
+                                        style=style, pronunciation_mode=pronunciation_mode, group_lines=True)
     except Exception as e:
         raise C.StudioError("tts_failed", "Chatterbox narration failed.", reasons=[str(e)[-1000:]],
                             hint="Check TTS_PYTHON, MYTHIC_STUDIO_DIR, TTS_REFERENCE_AUDIO and the TTS/alignment logs.")
