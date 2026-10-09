@@ -12,11 +12,22 @@ def test_script_audio_rejects_empty_script():
     assert r.json()["error"]["code"] == "empty_script"
 
 
-def test_script_audio_rejects_mostly_latin_english():
-    client = TestClient(create_app(test_mode=True))
-    r = client.post("/api/audio", json={"text": "This is an English script."})
-    assert r.status_code == 422
-    assert r.json()["error"]["code"] == "script_not_supported"
+def test_script_audio_accepts_hinglish_and_english_terms(tmp_path):
+    import engine.studio.server as server
+    fake = {
+        "samples": np.zeros(22050, dtype=np.float32),
+        "voice": "chatterbox-hi + whisperx alignment",
+        "duration": 1.0,
+        "beats": [{"id": "n001", "text": "Detector ये निशान देखेगा।", "start": 0.0, "end": 0.9,
+                   "words": [{"word": "Detector", "start": 0.0, "end": 0.4},
+                             {"word": "ये", "start": 0.4, "end": 0.6},
+                             {"word": "निशान", "start": 0.6, "end": 0.9}]}],
+        "placeholder": False,
+    }
+    with patch.object(server.production_voice, "synthesize", return_value=fake), patch.object(server, "ROOT", str(tmp_path)):
+        client = TestClient(create_app(test_mode=True))
+        r = client.post("/api/audio", json={"text": "Detector ये निशान देखेगा।"})
+        assert r.status_code == 200, r.text
 
 
 def test_script_audio_calls_production_voice_and_writes_downloads(tmp_path):
