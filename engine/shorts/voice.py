@@ -63,6 +63,24 @@ def _tts_text(text, pronunciation_mode):
         return replacement if replacement is not None else token
     return _SPOKEN_FORM_RE.sub(replace, text)
 
+
+# First-pass narration director. Explicit beat["delivery"] values override inference.
+def _infer_delivery(text, index=0):
+    s = (text or "").casefold().strip()
+    if index == 0:
+        return "hook"
+    if any(term in s for term in ("अब twist", "अब ट्विस्ट", "twist", "लेकिन", "मगर", "unexpected", "turns out", "असल में", "निकला", "निकली")):
+        return "twist"
+    if "?" in s or any(term in s for term in ("guess", "गेस", "सोचो", "ध्यान दो", "क्यों", "रहस्य", "secret", "सीक्रेट", "छुप", "छिप", "pattern", "पैटर्न", "यही निशान")):
+        return "reveal"
+    return "explanation"
+
+
+def _prepare_beats(beats, pronunciation_mode):
+    return [dict(b, tts_text=_tts_text(b["text"], pronunciation_mode),
+                 delivery=b.get("delivery") or _infer_delivery(b["text"], i))
+            for i, b in enumerate(beats)]
+
 VOICE_DIR = os.path.join(ROOT, "output", "voice")
 
 
@@ -83,7 +101,7 @@ def _key(beats, seed, style, pronunciation_mode, group_lines=False):
         reference_version = str(os.path.getmtime(REFERENCE)) + ":" + str(os.path.getsize(REFERENCE))
     except OSError:
         reference_version = "missing"
-    blob = json.dumps([[b["id"], b["text"], b.get("tts_text", b["text"])] for b in beats], ensure_ascii=False)
+    blob = json.dumps([[b["id"], b["text"], b.get("tts_text", b["text"]), b.get("delivery", "explanation")] for b in beats], ensure_ascii=False)
     blob += REFERENCE + reference_version + str(seed) + style + pronunciation_mode + str(group_lines)
     blob += json.dumps(STORYTELLING_PRESETS.get(style, STORYTELLING_PRESETS["storytelling"]), sort_keys=True)
     return hashlib.sha256(blob.encode()).hexdigest()[:16]
@@ -107,7 +125,7 @@ def synthesize(beats, seed=42, log=print, allow_partial_alignment=False, style="
         raise ValueError(f"unknown narration style: {style}")
     if pronunciation_mode not in ("hindi_mixed", "original"):
         raise ValueError(f"unknown pronunciation mode: {pronunciation_mode}")
-    beats = [dict(b, tts_text=_tts_text(b["text"], pronunciation_mode)) for b in beats]
+    beats = _prepare_beats(beats, pronunciation_mode)
     settings = STORYTELLING_PRESETS[style]
     key = _key(beats, seed, style, pronunciation_mode, group_lines)
     d = os.path.join(VOICE_DIR, key)
@@ -117,7 +135,7 @@ def synthesize(beats, seed=42, log=print, allow_partial_alignment=False, style="
         if not (os.path.exists(wav) and os.path.exists(align)):
             job = dict(output_path=wav, reference_audio=REFERENCE, seed=seed, group_lines=group_lines, **settings,
                        narration_style=style,
-                       segments=[dict(beat_id=b["id"], text=b["tts_text"], display_text=b["text"]) for b in beats])
+                       segments=[dict(beat_id=b["id"], text=b["tts_text"], display_text=b["text"], delivery=b["delivery"]) for b in beats])
             json.dump(job, open(os.path.join(d, "job.json"), "w"), ensure_ascii=False)
             log(f"[voice] Chatterbox Hindi TTS for {len(beats)} beats (cached at {key} afterwards)")
             subprocess.run([PY312, os.path.join(MYTHIC, "tools/chatterbox_tts.py"), os.path.join(d, "job.json")],
