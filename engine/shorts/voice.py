@@ -32,9 +32,9 @@ REFERENCE = os.environ.get("TTS_REFERENCE_AUDIO", os.path.join(MYTHIC, "assets/r
 # less sampling variance, and a little more room between connected takes.
 # These are starting presets; the best values still depend on the reference voice.
 STORYTELLING_PRESETS = {
-    "storytelling": dict(exaggeration=0.60, cfg_weight=0.35, temperature=0.55, tempo=0.90, silence_pad_seconds=0.18),
-    "conversational": dict(exaggeration=0.48, cfg_weight=0.42, temperature=0.55, tempo=0.92, silence_pad_seconds=0.16),
-    "dramatic": dict(exaggeration=0.72, cfg_weight=0.28, temperature=0.55, tempo=0.86, silence_pad_seconds=0.22),
+    "storytelling": dict(exaggeration=0.60, cfg_weight=0.35, temperature=0.55, tempo=0.96, silence_pad_seconds=0.18),
+    "conversational": dict(exaggeration=0.52, cfg_weight=0.38, temperature=0.50, tempo=0.98, silence_pad_seconds=0.16),
+    "dramatic": dict(exaggeration=0.66, cfg_weight=0.32, temperature=0.50, tempo=0.92, silence_pad_seconds=0.20),
 }
 
 # Optional spoken forms for frequent English/technical terms in Hindi narration.
@@ -64,22 +64,10 @@ def _tts_text(text, pronunciation_mode):
     return _SPOKEN_FORM_RE.sub(replace, text)
 
 
-# First-pass narration director. Explicit beat["delivery"] values override inference.
-def _infer_delivery(text, index=0):
-    s = (text or "").casefold().strip()
-    if index == 0:
-        return "hook"
-    if any(term in s for term in ("अब twist", "अब ट्विस्ट", "twist", "लेकिन", "मगर", "unexpected", "turns out", "असल में", "निकला", "निकली")):
-        return "twist"
-    if "?" in s or any(term in s for term in ("guess", "गेस", "सोचो", "ध्यान दो", "क्यों", "रहस्य", "secret", "सीक्रेट", "छुप", "छिप", "pattern", "पैटर्न", "यही निशान")):
-        return "reveal"
-    return "explanation"
-
-
 def _prepare_beats(beats, pronunciation_mode):
-    return [dict(b, tts_text=_tts_text(b["text"], pronunciation_mode),
-                 delivery=b.get("delivery") or _infer_delivery(b["text"], i))
-            for i, b in enumerate(beats)]
+    """Normalize pronunciation for TTS; keep one consistent voice/delivery across the script."""
+    return [dict(b, tts_text=_tts_text(b["text"], pronunciation_mode)) for b in beats]
+
 
 VOICE_DIR = os.path.join(ROOT, "output", "voice")
 
@@ -101,7 +89,7 @@ def _key(beats, seed, style, pronunciation_mode, group_lines=False):
         reference_version = str(os.path.getmtime(REFERENCE)) + ":" + str(os.path.getsize(REFERENCE))
     except OSError:
         reference_version = "missing"
-    blob = json.dumps([[b["id"], b["text"], b.get("tts_text", b["text"]), b.get("delivery", "explanation")] for b in beats], ensure_ascii=False)
+    blob = json.dumps([[b["id"], b["text"], b.get("tts_text", b["text"])] for b in beats], ensure_ascii=False)
     blob += REFERENCE + reference_version + str(seed) + style + pronunciation_mode + str(group_lines)
     blob += json.dumps(STORYTELLING_PRESETS.get(style, STORYTELLING_PRESETS["storytelling"]), sort_keys=True)
     return hashlib.sha256(blob.encode()).hexdigest()[:16]
@@ -135,7 +123,7 @@ def synthesize(beats, seed=42, log=print, allow_partial_alignment=False, style="
         if not (os.path.exists(wav) and os.path.exists(align)):
             job = dict(output_path=wav, reference_audio=REFERENCE, seed=seed, group_lines=group_lines, **settings,
                        narration_style=style,
-                       segments=[dict(beat_id=b["id"], text=b["tts_text"], display_text=b["text"], delivery=b["delivery"]) for b in beats])
+                       segments=[dict(beat_id=b["id"], text=b["tts_text"], display_text=b["text"]) for b in beats])
             json.dump(job, open(os.path.join(d, "job.json"), "w"), ensure_ascii=False)
             log(f"[voice] Chatterbox Hindi TTS for {len(beats)} beats (cached at {key} afterwards)")
             subprocess.run([PY312, os.path.join(MYTHIC, "tools/chatterbox_tts.py"), os.path.join(d, "job.json")],
