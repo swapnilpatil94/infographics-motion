@@ -96,7 +96,17 @@ class Narration(unittest.TestCase):
         self.assertEqual(hindi.spoken("₹500"), "पाँच सौ रुपये")
         tl = timeline()
         self.assertIn("12,500", tl["narration"][3]["text"])
-        self.assertNotRegex(tl["narration"][3]["spoken"], r"\d")
+        self.assertNotRegex(tl["narration"][3]["spoken"], r"\\d")
+
+    def test_mixed_hinglish_is_preserved_for_display_and_normalized_for_tts(self):
+        text = "इस text में एक निशान छुपा है। Detector को दिखेगा। AI से लिखा?"
+        tl = NAR.estimated(text)
+        self.assertEqual(tl["narration"][0]["text"], "इस text में एक निशान छुपा है।")
+        spoken = " ".join(s["spoken"] for s in tl["narration"])
+        self.assertIn("टेक्स्ट", spoken)
+        self.assertIn("डिटेक्टर", spoken)
+        self.assertIn("एआई", spoken)
+        self.assertNotRegex(spoken, r"[A-Za-z0-9]")
 
     def test_the_acceptance_story_is_split_into_its_natural_segments(self):
         segs = NAR.segment_text(STORY)
@@ -132,7 +142,7 @@ class Narration(unittest.TestCase):
     def test_tts_refuses_non_hindi_text_with_a_clear_reason(self):
         with self.assertRaises(ValueError) as cm:
             NAR.from_tts("This is an English story about a scam and money.", os.path.join(_TMP, "tts"))
-        self.assertIn("Hindi only", str(cm.exception))
+        self.assertIn("Hindi/Hinglish", str(cm.exception))
         with self.assertRaises(ValueError):
             NAR.build(text="   ", mode="estimated")
 
