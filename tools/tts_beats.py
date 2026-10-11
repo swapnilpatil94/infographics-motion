@@ -6,7 +6,7 @@ beats = json.load(open(sys.argv[1], encoding="utf-8"))
 base = sys.argv[2]
 STYLE = os.environ.get("NARRATION_STYLE", "storytelling")
 PRONUNCIATION_MODE = os.environ.get("HINDI_PRONUNCIATION", "hindi_mixed")
-GROUP_LINES = False
+GROUP_LINES = os.environ.get("TTS_GROUP_LINES", "1").strip().lower() not in ("0", "false", "no", "off")
 
 v = voice.synthesize(
     beats,
