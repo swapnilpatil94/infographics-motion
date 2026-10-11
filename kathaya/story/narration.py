@@ -162,12 +162,14 @@ def from_tts(text, out_dir, fmt="short", log=print):
     from engine.skeleton import narration_io as NI
     parts = segment_text(text)
     lang = hindi.language_of(text)
-    if lang != "hi":
-        raise ValueError(f"the narrator voice (Chatterbox Hindi) reads Hindi only; this text looks {lang}. Upload your own narration audio (and optionally a timing JSON), or write the narration in Devanagari.")
+    if lang not in ("hi", "hinglish"):
+        raise ValueError(f"the narrator voice (Chatterbox Hindi) needs Hindi/Hinglish text; this text looks {lang}. Add Hindi in Devanagari, or upload your own narration audio (and optionally a timing JSON).")
     beats = [(f"n{i + 1:02d}", hindi.spoken(p)) for i, p in enumerate(parts)]
+    # hindi.spoken() converts digits and Latin-script English terms to a TTS-only
+    # Devanagari pronunciation string. Original segment text remains unchanged for captions.
     bad = [t for _, t in beats if re.search(r"[A-Za-z0-9]", t)]
     if bad:
-        raise ValueError(f"the narrator cannot read Latin letters or digits that remain after normalisation: {bad[0][:60]!r}")
+        raise ValueError(f"internal Hinglish-to-TTS normalization left unsupported characters: {bad[0][:60]!r}")
     gaps = [_beat_gap(p) for p in parts]
     path = NI.synthesize(beats, out_dir, tempo=TEMPO_TARGET.get(fmt, 1.15), lo=0.0, hi=1e9, log=log, beat_gaps=gaps)
     seg = json.load(open(path, encoding="utf-8"))
