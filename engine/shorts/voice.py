@@ -28,10 +28,13 @@ PY312 = os.environ.get("TTS_PYTHON", os.path.expanduser("~/.pyenv/versions/3.12.
 REFERENCE = os.environ.get("TTS_REFERENCE_AUDIO", os.path.join(MYTHIC, "assets/reference-voices/hindi-male-narrator.wav"))
 
 # Chatterbox controls: higher exaggeration adds expression; cfg_weight around 0.3 can help pacing.
+# Tuned for short-form Hindi/Hinglish reels: clarity first, controlled emphasis,
+# less sampling variance, and a little more room between connected takes.
+# These are starting presets; the best values still depend on the reference voice.
 STORYTELLING_PRESETS = {
-    "storytelling": dict(exaggeration=0.68, cfg_weight=0.30, temperature=0.65, tempo=0.84, silence_pad_seconds=0.16),
-    "conversational": dict(exaggeration=0.52, cfg_weight=0.38, temperature=0.68, tempo=0.88, silence_pad_seconds=0.14),
-    "dramatic": dict(exaggeration=0.78, cfg_weight=0.25, temperature=0.60, tempo=0.80, silence_pad_seconds=0.22),
+    "storytelling": dict(exaggeration=0.60, cfg_weight=0.35, temperature=0.55, tempo=0.90, silence_pad_seconds=0.18),
+    "conversational": dict(exaggeration=0.48, cfg_weight=0.42, temperature=0.55, tempo=0.92, silence_pad_seconds=0.16),
+    "dramatic": dict(exaggeration=0.72, cfg_weight=0.28, temperature=0.55, tempo=0.86, silence_pad_seconds=0.22),
 }
 
 # Optional spoken forms for frequent English/technical terms in Hindi narration.
