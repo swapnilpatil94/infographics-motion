@@ -25,6 +25,47 @@ def number_words(n):
 _NUM = re.compile(r"(₹\s*)?(\d[\d,]*)(?:\.(\d+))?")
 
 
+# Common English terms used in Hindi/Hinglish narration. These substitutions affect
+# only the private TTS string; the original text remains untouched for captions.
+_ENGLISH_WORDS = {
+    "text": "टेक्स्ट", "detector": "डिटेक्टर", "assignment": "असाइनमेंट",
+    "email": "ईमेल", "report": "रिपोर्ट", "ai": "एआई", "words": "वर्ड्स",
+    "word": "वर्ड", "copy": "कॉपी", "paste": "पेस्ट", "file": "फाइल",
+    "end": "एंड", "system": "सिस्टम", "model": "मॉडल", "step": "स्टेप",
+    "options": "ऑप्शन्स", "option": "ऑप्शन", "score": "स्कोर",
+    "secret": "सीक्रेट", "key": "की", "groups": "ग्रुप्स", "group": "ग्रुप",
+    "pattern": "पैटर्न", "quality": "क्वालिटी", "benchmarks": "बेंचमार्क्स",
+    "benchmark": "बेंचमार्क", "pause": "पॉज़", "guess": "गेस",
+    "twist": "ट्विस्ट", "maths": "मैथ्स", "math": "मैथ",
+    "flexibility": "फ्लेक्सिबिलिटी", "inside": "इनसाइड", "outside": "आउटसाइड",
+    "not": "नॉट", "in": "इन", "the": "द", "of": "ऑफ", "and": "एंड",
+    "versus": "वर्सेस", "vs": "वर्सेस", "openai": "ओपनएआई", "watermark": "वॉटरमार्क",
+}
+_LETTER_NAMES = {
+    "a": "ए", "b": "बी", "c": "सी", "d": "डी", "e": "ई", "f": "एफ",
+    "g": "जी", "h": "एच", "i": "आई", "j": "जे", "k": "के", "l": "एल",
+    "m": "एम", "n": "एन", "o": "ओ", "p": "पी", "q": "क्यू", "r": "आर",
+    "s": "एस", "t": "टी", "u": "यू", "v": "वी", "w": "डब्ल्यू",
+    "x": "एक्स", "y": "वाई", "z": "ज़ेड",
+}
+_LATIN_WORD = re.compile(r"[A-Za-z]+")
+
+
+def _latin_to_devanagari(text):
+    """Prepare mixed-script text for Hindi-only TTS without changing display captions.
+
+    Known English terms use curated pronunciations. Unknown Latin words are spelled
+    letter-by-letter rather than passed to a Hindi-only model as unreadable Latin.
+    """
+    def replace(match):
+        token = match.group(0)
+        known = _ENGLISH_WORDS.get(token.lower())
+        if known:
+            return known
+        return " ".join(_LETTER_NAMES[c.lower()] for c in token)
+    return _LATIN_WORD.sub(replace, text)
+
+
 def spoken(text):
     """display text -> what the narrator reads: numerals as words, dashes as pauses, quote marks removed"""
     t = text.translate(_DIG)
@@ -38,6 +79,7 @@ def spoken(text):
             w += " दशमलव " + " ".join(number_words(int(c)) for c in m.group(3))
         return w + (" रुपये" if m.group(1) else "")
     t = _NUM.sub(sub, t)
+    t = _latin_to_devanagari(t)
     t = re.sub(r"\s*[—–]\s*", ", ", t)
     t = re.sub(r"[\"'“”‘’]", "", t)
     return re.sub(r"\s+", " ", t).strip(" ,")
