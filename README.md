@@ -273,3 +273,17 @@ More: `docs/kathaya/ARCHITECTURE.md` (boundaries, principles, director reliabili
 ## 11. Licences
 
 No `LICENSE` file has been added yet for the project code - add one before distributing. Art: Open Peeps (CC0). Kathaya environments/props/effects: original work drawn in code. Library environments: per `assets/licenses/ATTRIBUTIONS.md` (CC BY 4.0 / CC BY-SA 4.0 - attribution and share-alike apply to those two backdrops). `assets/licenses/registry.json` records every third-party asset with its URL and hash.
+
+
+### Standalone script-to-audio tab (new)
+
+The **Script → Audio** tab synthesizes a pasted Hindi Devanagari narration as WAV without rendering a film. It reuses the same production adapter in `engine.shorts.voice` (Chatterbox Multilingual + WhisperX forced alignment), the current machine's reference voice and the `MYTHIC_STUDIO_DIR`, `TTS_PYTHON`, and `TTS_REFERENCE_AUDIO` overrides. The API refuses the adapter's flagged macOS `say` fallback.
+
+Outputs are saved under `output/audio/<job-id>/`: `narration.wav` and `narration.segments.json` (segment and word timestamps). From the repo root on the `feat/script-to-chatterbox-audio` branch:
+
+```bash
+.venv/bin/python -m pytest tests/test_script_audio.py -q
+.venv/bin/python studio.py --ui
+```
+
+Open `http://127.0.0.1:8765`, then choose **Script → Audio** in the top navigation. Paste one narration beat per line; write English acronyms phonetically in Devanagari, e.g. OTP → ओटीपी. The sibling Chatterbox project, reference WAV and Python 3.12 environment must already be configured as for production.

@@ -62,7 +62,27 @@ def synthesize(beats, out_dir, tempo=1.08, lo=44.0, hi=60.0, log=print, beat_gap
     raw, seg = os.path.join(d, "raw.wav"), os.path.join(d, "raw.wav.segments.json")
     if not (os.path.exists(raw) and os.path.exists(seg)):
         log(f"[tts] Chatterbox Hindi for {len(beats)} lines (cache {h}) ...")
-        subprocess.run([os.path.join(ROOT, ".venv/bin/python"), os.path.join(ROOT, "tools/tts_beats.py"), bj, os.path.join(d, "raw")], check=True, cwd=ROOT, env=dict(os.environ, PYTHONPATH=ROOT))
+        # Preserve the child-process traceback. Previously CalledProcessError surfaced
+        # only the command in Studio, hiding the real TTS/alignment failure.
+        tts_log = os.path.join(d, "tts.log")
+        cmd = [os.path.join(ROOT, ".venv/bin/python"), "-u",
+               os.path.join(ROOT, "tools/tts_beats.py"), bj, os.path.join(d, "raw")]
+        with open(tts_log, "w", encoding="utf-8") as stream:
+            stream.write("COMMAND: " + " ".join(cmd) + "\\n")
+            stream.flush()
+            result = subprocess.run(cmd, cwd=ROOT, env=dict(os.environ, PYTHONPATH=ROOT),
+                                    stdout=stream, stderr=subprocess.STDOUT, text=True)
+        if result.returncode:
+            try:
+                with open(tts_log, encoding="utf-8", errors="replace") as stream:
+                    lines = stream.readlines()
+                detail = "".join(lines[-45:]).strip()
+            except OSError:
+                detail = "Could not read the TTS subprocess log."
+            raise RuntimeError(
+                f"Chatterbox narration failed (exit {result.returncode}). "
+                f"Full log: {tts_log}\\n\\nLast output:\\n{detail}"
+            )
     os.makedirs(out_dir, exist_ok=True)
     pw, pj = os.path.join(out_dir, "paced.wav"), os.path.join(out_dir, "paced.json")
     for _ in range(8):                                                       # re-tempo (pitch-preserving) until the film lands in the duration window; no new TTS

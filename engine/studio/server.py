@@ -24,6 +24,8 @@ import json
 import os
 import sys
 import time
+import subprocess
+import shutil
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
@@ -35,6 +37,11 @@ from engine.shorts.raster import ROOT                                           
 from engine.skeleton import events as EVT                                                # noqa: E402
 from engine.studio import core as C, jobs as J, movie as M, kserver                       # noqa: E402
 from kathaya import pipeline as KP                                                       # noqa: E402
+from engine.shorts import voice as production_voice                                     # noqa: E402
+import re                                                                                # noqa: E402
+import uuid                                                                              # noqa: E402
+import unicodedata                                                                        # noqa: E402
+import soundfile as sf                                                                   # noqa: E402
 
 WEB = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web")
 FILES = {"contact_sheet.png", "qc_report.json", "audio_report.json", "manifest.json", "story_graph.json", "plan.json", "summary.json", "events.jsonl", "poster.jpg", "critique/report.json"}
@@ -107,6 +114,171 @@ async def upload(request: Request, kind: str = "audio", name: str = "upload.bin"
     fn = f"u_{int(time.time())}_{os.path.basename(name).replace(' ', '_')}"
     open(os.path.join(C.UPLOADS, fn), "wb").write(data)
     return dict(upload_id=fn, bytes=len(data))
+
+
+# ------------------------------------------------------------------------------------------------ local voice reference profiles
+VOICE_REFERENCE_DIR = os.path.join(ROOT, "output", "voice", "references")
+
+
+def _voice_reference(ref_id):
+    if not re.fullmatch(r"[a-f0-9]{12}", str(ref_id or "")):
+        raise C.StudioError("voice_reference_not_found", "Choose a valid saved voice reference.", status=404)
+    folder = os.path.abspath(os.path.join(VOICE_REFERENCE_DIR, ref_id))
+    root = os.path.abspath(VOICE_REFERENCE_DIR)
+    meta_path, wav_path = os.path.join(folder, "profile.json"), os.path.join(folder, "cleaned.wav")
+    if not folder.startswith(root + os.sep) or not os.path.isfile(meta_path) or not os.path.isfile(wav_path):
+        raise C.StudioError("voice_reference_not_found", "That voice reference is not saved.", status=404)
+    with open(meta_path, encoding="utf-8") as f:
+        return json.load(f), wav_path
+
+
+@router.get("/voice-references")
+def list_voice_references():
+    os.makedirs(VOICE_REFERENCE_DIR, exist_ok=True)
+    profiles = []
+    for name in sorted(os.listdir(VOICE_REFERENCE_DIR), reverse=True):
+        path = os.path.join(VOICE_REFERENCE_DIR, name, "profile.json")
+        if os.path.isfile(path):
+            try:
+                with open(path, encoding="utf-8") as f: profiles.append(json.load(f))
+            except (OSError, ValueError): pass
+    active_path = os.path.join(ROOT, "output", "voice", "active_reference.json")
+    active_id = None
+    if os.path.isfile(active_path):
+        try:
+            with open(active_path, encoding="utf-8") as f: active_id = json.load(f).get("id")
+        except (OSError, ValueError): pass
+    return {"profiles": profiles, "active_id": active_id}
+
+
+@router.post("/voice-references")
+async def create_voice_reference(request: Request, name: str = "voice-reference.webm"):
+    allowed = {".wav", ".mp3", ".m4a", ".flac", ".ogg", ".webm", ".mp4", ".aac"}
+    ext = os.path.splitext(os.path.basename(name))[1].lower()
+    if ext not in allowed: raise C.StudioError("invalid_voice_audio", "Upload WAV, MP3, M4A, FLAC, OGG, WebM, MP4 or AAC audio.")
+    data = await request.body()
+    if not data: raise C.StudioError("empty_voice_audio", "Choose a recording or audio file first.")
+    if len(data) > 50 * 1024 * 1024: raise C.StudioError("voice_audio_too_large", "Voice recordings must be smaller than 50 MB.")
+    ffmpeg = shutil.which("ffmpeg")
+    if not ffmpeg: raise C.StudioError("ffmpeg_missing", "FFmpeg is required to clean the voice reference.")
+    os.makedirs(VOICE_REFERENCE_DIR, exist_ok=True)
+    ref_id = uuid.uuid4().hex[:12]
+    folder = os.path.join(VOICE_REFERENCE_DIR, ref_id)
+    os.makedirs(folder, exist_ok=False)
+    source_path, cleaned_path = os.path.join(folder, "original" + ext), os.path.join(folder, "cleaned.wav")
+    with open(source_path, "wb") as f: f.write(data)
+    filters = "highpass=f=70,lowpass=f=12000,afftdn=nf=-25:tn=1,loudnorm=I=-23:LRA=7:TP=-2"
+    proc = subprocess.run([ffmpeg, "-hide_banner", "-loglevel", "error", "-y", "-i", source_path, "-vn", "-af", filters,
+                          "-ac", "1", "-ar", "24000", "-c:a", "pcm_s16le", cleaned_path], capture_output=True, text=True)
+    if proc.returncode != 0 or not os.path.isfile(cleaned_path) or os.path.getsize(cleaned_path) < 2048:
+        shutil.rmtree(folder, ignore_errors=True)
+        raise C.StudioError("voice_cleanup_failed", "Could not clean this recording.", reasons=[(proc.stderr or "FFmpeg produced no usable WAV.")[-700:]],
+                            hint="Try a WAV/MP3/M4A file or record again close to the microphone.")
+    try: duration = round(float(sf.info(cleaned_path).duration), 2)
+    except Exception: duration = None
+    label = os.path.splitext(os.path.basename(name))[0].replace("_", " ").strip() or "Voice reference"
+    meta = {"id": ref_id, "name": label[:80], "duration_seconds": duration, "filename": "cleaned.wav",
+            "cleanup": "FFmpeg denoise, speech-band filter and loudness normalization"}
+    with open(os.path.join(folder, "profile.json"), "w", encoding="utf-8") as f: json.dump(meta, f, ensure_ascii=False, indent=2)
+    return meta
+
+
+@router.post("/voice-references/{ref_id}/activate")
+def activate_voice_reference(ref_id: str):
+    meta, wav_path = _voice_reference(ref_id)
+    os.makedirs(os.path.join(ROOT, "output", "voice"), exist_ok=True)
+    with open(os.path.join(ROOT, "output", "voice", "active_reference.json"), "w", encoding="utf-8") as f:
+        json.dump({"id": ref_id, "path": wav_path, "name": meta["name"]}, f, ensure_ascii=False, indent=2)
+    return {"active_id": ref_id, "name": meta["name"]}
+
+
+@router.get("/voice-references/{ref_id}/wav")
+def voice_reference_preview(ref_id: str):
+    meta, wav_path = _voice_reference(ref_id)
+    return FileResponse(wav_path, media_type="audio/wav", filename=f"{meta['name']}.wav")
+
+
+# ------------------------------------------------------------------------------------------------ script-only Chatterbox audio export
+@router.post("/audio")
+def script_to_audio(body: dict):
+    """Synthesize pasted narration with the exact production voice adapter."""
+    text = str(body.get("text") or "").strip()
+    if not text:
+        raise C.StudioError("empty_script", "Paste a script before generating audio.")
+    if len(text) > 30000:
+        raise C.StudioError("script_too_long", "The script is over 30,000 characters. Split it into smaller parts.")
+    lines = [re.sub(r"^\s*(?:\d+[.)]|[-*•])\s*", "", x.strip()) for x in text.splitlines()]
+    lines = [x for x in lines if x and not x.startswith("#")]
+    if not lines:
+        raise C.StudioError("empty_script", "The script has no narration lines.")
+    # Accept natural Hindi/Hinglish narration, including Latin-script English terms,
+    # numbers, percentages, arrows and normal punctuation. Do not enforce Devanagari-only:
+    # real scripts commonly contain terms such as AI, detector, benchmark, and OpenAI.
+    bad = []
+    for i, line in enumerate(lines, 1):
+        if not any(ch.isalpha() for ch in line):
+            bad.append(f"line {i}: add narration text (letters are required)")
+        if any(ord(ch) < 32 and ch != "\\t" for ch in line):
+            bad.append(f"line {i}: contains an unsupported control character")
+        if any(unicodedata.category(ch) in ("So", "Cs") for ch in line):
+            bad.append(f"line {i}: contains an emoji or unsupported symbol")
+    if bad:
+        raise C.StudioError("script_not_supported", "Some lines do not contain valid narration text.", reasons=bad[:12],
+                            hint="Hindi, Hinglish, English terms, numerals, and normal punctuation are supported.")
+    style = str(body.get("style") or "storytelling")
+    pronunciation_mode = "hindi_mixed" if body.get("hindi_pronunciation", True) else "original"
+    if style not in production_voice.STORYTELLING_PRESETS:
+        raise C.StudioError("invalid_narration_style", "Choose Storytelling, Conversational, or Dramatic narration.")
+    beats = [dict(id=f"n{i+1:03d}", text=line) for i, line in enumerate(lines)]
+    try:
+        v = production_voice.synthesize(beats, seed=42, allow_partial_alignment=True,
+                                        style=style, pronunciation_mode=pronunciation_mode, group_lines=True)
+    except Exception as e:
+        raise C.StudioError("tts_failed", "Chatterbox narration failed.", reasons=[str(e)[-1000:]],
+                            hint="Check TTS_PYTHON, MYTHIC_STUDIO_DIR, TTS_REFERENCE_AUDIO and the TTS/alignment logs.")
+    if v.get("placeholder"):
+        raise C.StudioError("chatterbox_unavailable", "Chatterbox production assets are not configured; no placeholder audio was exported.",
+                            reasons=[v.get("voice", "placeholder fallback")],
+                            hint="Configure the same production Chatterbox environment and reference WAV.")
+    job_id = uuid.uuid4().hex[:12]
+    out = os.path.join(ROOT, "output", "audio", job_id)
+    os.makedirs(out, exist_ok=False)
+    sf.write(os.path.join(out, "narration.wav"), v["samples"], production_voice.audio.SR, subtype="PCM_16")
+    segments = dict(audio="narration.wav", voice=v["voice"], duration_seconds=round(v["duration"], 3),
+                    segments=[dict(id=b["id"], text=b["text"], start=round(b["start"], 3), end=round(b["end"], 3),
+                                   alignment_estimated=bool(b.get("alignment_estimated", False)), words=[dict(word=w["word"], start=round(w["start"], 3), end=round(w["end"], 3)) for w in b["words"]])
+                              for b in v["beats"]])
+    with open(os.path.join(out, "narration.segments.json"), "w", encoding="utf-8") as f:
+        json.dump(segments, f, ensure_ascii=False, indent=2)
+    return dict(id=job_id, voice=v["voice"], duration=v["duration"], segments=len(v["beats"]))
+
+
+def _audio_output_path(job_id: str, filename: str) -> str:
+    if not re.fullmatch(r"[a-f0-9]{12}", job_id):
+        raise C.StudioError("not_found", "No such audio job.", status=404)
+    root_dir = os.path.abspath(os.path.join(ROOT, "output", "audio", job_id))
+    path = os.path.abspath(os.path.join(root_dir, filename))
+    if not path.startswith(root_dir + os.sep) or not os.path.isfile(path):
+        raise C.StudioError("not_found", "The requested audio file does not exist.", status=404)
+    return path
+
+
+@router.get("/audio/{job_id}/wav")
+def script_audio_preview(job_id: str):
+    return FileResponse(_audio_output_path(job_id, "narration.wav"), media_type="audio/wav")
+
+
+@router.get("/audio/{job_id}/download")
+def script_audio_download(job_id: str):
+    return FileResponse(_audio_output_path(job_id, "narration.wav"), media_type="audio/wav", filename="narration.wav")
+
+
+@router.get("/audio/{job_id}/segments")
+def script_audio_segments(job_id: str):
+    return FileResponse(_audio_output_path(job_id, "narration.segments.json"), media_type="application/json", filename="narration.segments.json")
+
+
+
 
 
 # ------------------------------------------------------------------------------------------------ productions

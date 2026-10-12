@@ -42,8 +42,10 @@ async function route() {
   if (!S.opts) { try { S.opts = await api("/options"); } catch (e) { view.innerHTML = errBox(e); return; } }
   let m;
   document.body.classList.toggle("dev", /^\/(dev|review|guide|production\/)/.test(h));
-  $$("[data-nav]").forEach(a => a.classList.toggle("on", (a.dataset.nav === "home" && (h === "/" || h.startsWith("/k/"))) || (a.dataset.nav === "productions" && h.startsWith("/productions")) || (a.dataset.nav === "dev" && /^\/(dev|review|guide)/.test(h))));
+  $$("[data-nav]").forEach(a => a.classList.toggle("on", (a.dataset.nav === "home" && (h === "/" || h.startsWith("/k/"))) || (a.dataset.nav === "productions" && h.startsWith("/productions")) || (a.dataset.nav === "voice" && h === "/voice") || (a.dataset.nav === "dev" && /^\/(dev|review|guide)/.test(h))));
   if ((m = h.match(/^\/k\/(k_[\w-]+)$/))) return viewProject(m[1]);
+  if (h === "/audio") return viewAudio();
+  if (h === "/voice") return viewVoice();
   if (h === "/" || h === "") return viewHome();
   if ((m = h.match(/^\/review\/(d_[0-9a-f]+)$/))) return viewReview(m[1]);
   if ((m = h.match(/^\/production\/([\w-]+)$/))) return viewProduction(m[1]);
@@ -666,4 +668,63 @@ function renderProject() {
   if (!active && S.k.poll) { clearInterval(S.k.poll); S.k.poll = null; }                 // idle: no re-render while the user types / decides
 }
 
+const AUD = { text: sessionStorage.getItem("ks.audioText") || "", style: "storytelling", hindiPronunciation: true, job: null, busy: false, error: null };
+function viewAudio() {
+  view.innerHTML = `<section class="kflow">
+    <div class="khero"><h1>Script → Audio</h1><p>Paste Hindi in Devanagari. This reuses the same Chatterbox + WhisperX narration adapter as production and does not render a film.</p></div>
+    <div class="card kcard">
+      <label class="f">Script / narration<textarea id="audio-script" rows="12" placeholder="रात के दस बजे। कमरे में अकेला आरव।&#10;तभी फ़ोन बज उठा।&#10;आरव ने स्क्रीन की तरफ़ देखा।">${esc(AUD.text)}</textarea></label>
+      <div class="row sp" style="margin-top:10px;align-items:center"><small class="muted"><span id="audio-count">${AUD.text.trim() ? AUD.text.trim().split(/\s+/).length : 0}</span> words · one narration beat per line</small><button class="btn sm ghost" id="audio-clear">Clear script</button></div>
+      <div class="grid two" style="margin-top:16px;gap:12px">
+        <label class="f">Narration delivery
+          <select id="audio-style">
+            <option value="storytelling" ${AUD.style === "storytelling" ? "selected" : ""}>Storytelling · engaging, natural pace</option>
+            <option value="conversational" ${AUD.style === "conversational" ? "selected" : ""}>Conversational · calmer, less dramatic</option>
+            <option value="dramatic" ${AUD.style === "dramatic" ? "selected" : ""}>Dramatic · stronger suspense</option>
+          </select>
+        </label>
+        <label class="f">Pronunciation
+          <select id="audio-pronunciation">
+            <option value="hindi_mixed" ${AUD.hindiPronunciation ? "selected" : ""}>Hindi-first for common English terms</option>
+            <option value="original" ${!AUD.hindiPronunciation ? "selected" : ""}>Keep exact script pronunciation</option>
+          </select>
+        </label>
+      </div>
+      <div class="note" style="margin-top:16px">Storytelling uses expressive Chatterbox settings and a slower finishing tempo. Hindi-first pronunciation changes only the spoken form of common English terms; your script and exported captions remain in their original wording.</div>
+      <div class="note" style="margin-top:8px">Uses production settings: <code>MYTHIC_STUDIO_DIR</code>, <code>TTS_PYTHON</code>, <code>TTS_REFERENCE_AUDIO</code>. Placeholder macOS speech is not exported as Chatterbox.</div>
+      <div id="audio-error" style="margin-top:12px">${AUD.error ? errBox(AUD.error) : ""}</div>
+      <div class="row" style="justify-content:center;margin-top:20px"><button class="btn primary bigbtn" id="audio-generate" ${AUD.busy ? "disabled" : ""}>${AUD.busy ? '<span class="spin"></span>Generating…' : "Generate WAV"}</button></div>
+    </div>
+    ${AUD.job ? `<div class="card" style="margin-top:16px"><div class="row sp"><div><h2>Audio ready</h2><p class="muted">${esc(AUD.job.voice)} · ${Number(AUD.job.duration).toFixed(1)} seconds · ${AUD.job.segments} segments</p></div><span class="pill completed">Complete</span></div>
+      <audio controls preload="metadata" style="width:100%;margin-top:12px" src="/api/audio/${esc(AUD.job.id)}/wav"></audio>
+      <div class="row" style="justify-content:center;gap:10px;margin-top:14px;flex-wrap:wrap"><a class="btn primary" href="/api/audio/${esc(AUD.job.id)}/download">Download WAV</a><a class="btn" href="/api/audio/${esc(AUD.job.id)}/segments">Download word timings JSON</a><button class="btn ghost" id="audio-new">New script</button></div>
+      <div class="muted" style="margin-top:12px;font-size:12px">Saved under <code>output/audio/${esc(AUD.job.id)}/</code> (git-ignored).</div>
+    </div>` : ""}
+  </section>`;
+  const ta = $("#audio-script");
+  if (ta) ta.addEventListener("input", () => {
+    AUD.text = ta.value;
+    try { sessionStorage.setItem("ks.audioText", AUD.text); } catch (_) {}
+    const count = $("#audio-count"); if (count) count.textContent = AUD.text.trim() ? AUD.text.trim().split(/\s+/).length : 0;
+  });
+  const style = $("#audio-style");
+  if (style) style.addEventListener("change", () => { AUD.style = style.value; });
+  const pronunciation = $("#audio-pronunciation");
+  if (pronunciation) pronunciation.addEventListener("change", () => { AUD.hindiPronunciation = pronunciation.value === "hindi_mixed"; });
+}
+async function generateScriptAudio() {
+  if (!AUD.text.trim()) { AUD.error = {error:{code:"empty_script",message:"Paste a script first."}}; return viewAudio(); }
+  if (AUD.busy) return;
+  AUD.busy = true; AUD.error = null; viewAudio();
+  try { AUD.job = await api("/audio", { text: AUD.text, style: AUD.style, hindi_pronunciation: AUD.hindiPronunciation }); AUD.busy = false; viewAudio(); }
+  catch (e) { AUD.error = e; AUD.busy = false; viewAudio(); }
+}
+
+view.addEventListener("click", e => {
+  const b = e.target.closest("#audio-generate,#audio-clear,#audio-new");
+  if (!b) return;
+  if (b.id === "audio-generate") return generateScriptAudio();
+  if (b.id === "audio-clear") { AUD.text = ""; AUD.job = null; AUD.error = null; try { sessionStorage.removeItem("ks.audioText"); } catch (_) {} return viewAudio(); }
+  if (b.id === "audio-new") { AUD.job = null; AUD.error = null; return viewAudio(); }
+});
 ping(); route();
