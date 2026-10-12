@@ -78,3 +78,40 @@ def test_hindi_pronunciation_hints_preserve_original_script():
     spoken = _tts_text(original, "hindi_mixed")
     assert spoken == "एआई से लिखा? ओपनएआई का वॉटरमार्क।"
     assert _tts_text(original, "original") == original
+
+
+
+def test_voice_reference_list_is_available_without_profiles(tmp_path):
+    import engine.studio.server as server
+    with patch.object(server, "VOICE_REFERENCE_DIR", str(tmp_path)):
+        client = TestClient(create_app(test_mode=True))
+        r = client.get("/api/voice-references")
+        assert r.status_code == 200
+        assert r.json()["profiles"] == []
+
+
+def test_voice_reference_can_be_activated_locally(tmp_path):
+    import json
+    import os
+    import engine.studio.server as server
+    ref_id = "abcdef123456"
+    folder = tmp_path / ref_id
+    folder.mkdir()
+    (folder / "cleaned.wav").write_bytes(b"placeholder wav")
+    (folder / "profile.json").write_text(json.dumps({"id": ref_id, "name": "Test voice"}), encoding="utf-8")
+    with patch.object(server, "VOICE_REFERENCE_DIR", str(tmp_path)), patch.object(server, "ROOT", str(tmp_path / "root")):
+        client = TestClient(create_app(test_mode=True))
+        r = client.post(f"/api/voice-references/{ref_id}/activate")
+        assert r.status_code == 200, r.text
+        active = json.loads((tmp_path / "root/output/voice/active_reference.json").read_text(encoding="utf-8"))
+        assert active["id"] == ref_id
+        assert active["name"] == "Test voice"
+
+
+def test_voice_reference_activation_rejects_unknown_profile(tmp_path):
+    import engine.studio.server as server
+    with patch.object(server, "VOICE_REFERENCE_DIR", str(tmp_path)):
+        client = TestClient(create_app(test_mode=True))
+        r = client.post("/api/voice-references/000000000000/activate")
+        assert r.status_code == 404
+        assert r.json()["error"]["code"] == "voice_reference_not_found"
