@@ -24,6 +24,8 @@ import json
 import os
 import sys
 import time
+import subprocess
+import shutil
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
@@ -112,6 +114,88 @@ async def upload(request: Request, kind: str = "audio", name: str = "upload.bin"
     fn = f"u_{int(time.time())}_{os.path.basename(name).replace(' ', '_')}"
     open(os.path.join(C.UPLOADS, fn), "wb").write(data)
     return dict(upload_id=fn, bytes=len(data))
+
+
+# ------------------------------------------------------------------------------------------------ local voice reference profiles
+VOICE_REFERENCE_DIR = os.path.join(ROOT, "output", "voice", "references")
+
+
+def _voice_reference(ref_id):
+    if not re.fullmatch(r"[a-f0-9]{12}", str(ref_id or "")):
+        raise C.StudioError("voice_reference_not_found", "Choose a valid saved voice reference.", status=404)
+    folder = os.path.abspath(os.path.join(VOICE_REFERENCE_DIR, ref_id))
+    root = os.path.abspath(VOICE_REFERENCE_DIR)
+    meta_path, wav_path = os.path.join(folder, "profile.json"), os.path.join(folder, "cleaned.wav")
+    if not folder.startswith(root + os.sep) or not os.path.isfile(meta_path) or not os.path.isfile(wav_path):
+        raise C.StudioError("voice_reference_not_found", "That voice reference is not saved.", status=404)
+    with open(meta_path, encoding="utf-8") as f:
+        return json.load(f), wav_path
+
+
+@router.get("/voice-references")
+def list_voice_references():
+    os.makedirs(VOICE_REFERENCE_DIR, exist_ok=True)
+    profiles = []
+    for name in sorted(os.listdir(VOICE_REFERENCE_DIR), reverse=True):
+        path = os.path.join(VOICE_REFERENCE_DIR, name, "profile.json")
+        if os.path.isfile(path):
+            try:
+                with open(path, encoding="utf-8") as f: profiles.append(json.load(f))
+            except (OSError, ValueError): pass
+    active_path = os.path.join(ROOT, "output", "voice", "active_reference.json")
+    active_id = None
+    if os.path.isfile(active_path):
+        try:
+            with open(active_path, encoding="utf-8") as f: active_id = json.load(f).get("id")
+        except (OSError, ValueError): pass
+    return {"profiles": profiles, "active_id": active_id}
+
+
+@router.post("/voice-references")
+async def create_voice_reference(request: Request, name: str = "voice-reference.webm"):
+    allowed = {".wav", ".mp3", ".m4a", ".flac", ".ogg", ".webm", ".mp4", ".aac"}
+    ext = os.path.splitext(os.path.basename(name))[1].lower()
+    if ext not in allowed: raise C.StudioError("invalid_voice_audio", "Upload WAV, MP3, M4A, FLAC, OGG, WebM, MP4 or AAC audio.")
+    data = await request.body()
+    if not data: raise C.StudioError("empty_voice_audio", "Choose a recording or audio file first.")
+    if len(data) > 50 * 1024 * 1024: raise C.StudioError("voice_audio_too_large", "Voice recordings must be smaller than 50 MB.")
+    ffmpeg = shutil.which("ffmpeg")
+    if not ffmpeg: raise C.StudioError("ffmpeg_missing", "FFmpeg is required to clean the voice reference.")
+    os.makedirs(VOICE_REFERENCE_DIR, exist_ok=True)
+    ref_id = uuid.uuid4().hex[:12]
+    folder = os.path.join(VOICE_REFERENCE_DIR, ref_id)
+    os.makedirs(folder, exist_ok=False)
+    source_path, cleaned_path = os.path.join(folder, "original" + ext), os.path.join(folder, "cleaned.wav")
+    with open(source_path, "wb") as f: f.write(data)
+    filters = "highpass=f=70,lowpass=f=12000,afftdn=nf=-25:tn=1,loudnorm=I=-23:LRA=7:TP=-2"
+    proc = subprocess.run([ffmpeg, "-hide_banner", "-loglevel", "error", "-y", "-i", source_path, "-vn", "-af", filters,
+                          "-ac", "1", "-ar", "24000", "-c:a", "pcm_s16le", cleaned_path], capture_output=True, text=True)
+    if proc.returncode != 0 or not os.path.isfile(cleaned_path) or os.path.getsize(cleaned_path) < 2048:
+        shutil.rmtree(folder, ignore_errors=True)
+        raise C.StudioError("voice_cleanup_failed", "Could not clean this recording.", reasons=[(proc.stderr or "FFmpeg produced no usable WAV.")[-700:]],
+                            hint="Try a WAV/MP3/M4A file or record again close to the microphone.")
+    try: duration = round(float(sf.info(cleaned_path).duration), 2)
+    except Exception: duration = None
+    label = os.path.splitext(os.path.basename(name))[0].replace("_", " ").strip() or "Voice reference"
+    meta = {"id": ref_id, "name": label[:80], "duration_seconds": duration, "filename": "cleaned.wav",
+            "cleanup": "FFmpeg denoise, speech-band filter and loudness normalization"}
+    with open(os.path.join(folder, "profile.json"), "w", encoding="utf-8") as f: json.dump(meta, f, ensure_ascii=False, indent=2)
+    return meta
+
+
+@router.post("/voice-references/{ref_id}/activate")
+def activate_voice_reference(ref_id: str):
+    meta, wav_path = _voice_reference(ref_id)
+    os.makedirs(os.path.join(ROOT, "output", "voice"), exist_ok=True)
+    with open(os.path.join(ROOT, "output", "voice", "active_reference.json"), "w", encoding="utf-8") as f:
+        json.dump({"id": ref_id, "path": wav_path, "name": meta["name"]}, f, ensure_ascii=False, indent=2)
+    return {"active_id": ref_id, "name": meta["name"]}
+
+
+@router.get("/voice-references/{ref_id}/wav")
+def voice_reference_preview(ref_id: str):
+    meta, wav_path = _voice_reference(ref_id)
+    return FileResponse(wav_path, media_type="audio/wav", filename=f"{meta['name']}.wav")
 
 
 # ------------------------------------------------------------------------------------------------ script-only Chatterbox audio export
