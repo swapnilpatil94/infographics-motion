@@ -32,9 +32,9 @@ REFERENCE = os.environ.get("TTS_REFERENCE_AUDIO", os.path.join(MYTHIC, "assets/r
 # less sampling variance, and a little more room between connected takes.
 # These are starting presets; the best values still depend on the reference voice.
 STORYTELLING_PRESETS = {
-    "storytelling": dict(exaggeration=0.60, cfg_weight=0.35, temperature=0.55, tempo=0.96, silence_pad_seconds=0.18),
-    "conversational": dict(exaggeration=0.52, cfg_weight=0.38, temperature=0.50, tempo=0.98, silence_pad_seconds=0.16),
-    "dramatic": dict(exaggeration=0.66, cfg_weight=0.32, temperature=0.50, tempo=0.92, silence_pad_seconds=0.20),
+    "storytelling": dict(exaggeration=0.60, cfg_weight=0.35, temperature=0.55, tempo=0.96, silence_pad_seconds=0.12),
+    "conversational": dict(exaggeration=0.52, cfg_weight=0.38, temperature=0.50, tempo=0.98, silence_pad_seconds=0.10),
+    "dramatic": dict(exaggeration=0.66, cfg_weight=0.32, temperature=0.50, tempo=0.92, silence_pad_seconds=0.15),
 }
 
 # Optional spoken forms for frequent English/technical terms in Hindi narration.
@@ -97,14 +97,14 @@ def _env():
     return env
 
 
-def _key(beats, seed, style, pronunciation_mode, group_lines=False, reference_audio=None):
+def _key(beats, seed, style, pronunciation_mode, group_lines=False, reference_audio=None, group_max_lines=5, group_max_words=45):
     reference_audio = reference_audio or _active_reference()
     try:
         reference_version = str(os.path.getmtime(reference_audio)) + ":" + str(os.path.getsize(reference_audio))
     except OSError:
         reference_version = "missing"
     blob = json.dumps([[b["id"], b["text"], b.get("tts_text", b["text"])] for b in beats], ensure_ascii=False)
-    blob += reference_audio + reference_version + str(seed) + style + pronunciation_mode + str(group_lines)
+    blob += reference_audio + reference_version + str(seed) + style + pronunciation_mode + str(group_lines) + str(group_max_lines) + str(group_max_words)
     blob += json.dumps(STORYTELLING_PRESETS.get(style, STORYTELLING_PRESETS["storytelling"]), sort_keys=True)
     return hashlib.sha256(blob.encode()).hexdigest()[:16]
 
@@ -116,7 +116,7 @@ def _read_wav_any(path):
     return np.frombuffer(raw, np.float32).copy()
 
 
-def synthesize(beats, seed=42, log=print, allow_partial_alignment=False, style="storytelling", pronunciation_mode="hindi_mixed", group_lines=False, reference_audio=None):
+def synthesize(beats, seed=42, log=print, allow_partial_alignment=False, style="storytelling", pronunciation_mode="hindi_mixed", group_lines=False, reference_audio=None, group_max_lines=5, group_max_words=45):
     """beats: [{id, text}] -> dict(samples, voice, beats=[{id,text,start,end,words:[{word,start,end}]}], duration).
 
     allow_partial_alignment is for standalone script-to-audio export only: when WhisperX
@@ -130,17 +130,17 @@ def synthesize(beats, seed=42, log=print, allow_partial_alignment=False, style="
     beats = _prepare_beats(beats, pronunciation_mode)
     reference_audio = os.path.abspath(reference_audio or _active_reference())
     settings = STORYTELLING_PRESETS[style]
-    key = _key(beats, seed, style, pronunciation_mode, group_lines, reference_audio)
+    key = _key(beats, seed, style, pronunciation_mode, group_lines, reference_audio, group_max_lines, group_max_words)
     d = os.path.join(VOICE_DIR, key)
     os.makedirs(d, exist_ok=True)
     wav, align = os.path.join(d, "narration.wav"), os.path.join(d, "align.json")
     model_info_path = os.path.join(d, "model_info.json")
     log(f"[voice] backend_check chatterbox_available={available(reference_audio)} python={PY312} mythic_studio={MYTHIC}")
     log(f"[voice] reference_audio={reference_audio} exists={os.path.exists(reference_audio)} style={style} pronunciation_mode={pronunciation_mode}")
-    log(f"[voice] settings={json.dumps(settings, sort_keys=True)} group_lines={group_lines} cache_key={key} cache_dir={d}")
+    log(f"[voice] settings={json.dumps(settings, sort_keys=True)} group_lines={group_lines} group_max_lines={group_max_lines} group_max_words={group_max_words} cache_key={key} cache_dir={d}")
     if available(reference_audio):
         if not (os.path.exists(wav) and os.path.exists(align)):
-            job = dict(output_path=wav, reference_audio=reference_audio, seed=seed, group_lines=group_lines, **settings,
+            job = dict(output_path=wav, reference_audio=reference_audio, seed=seed, group_lines=group_lines, group_max_lines=group_max_lines, group_max_words=group_max_words, **settings,
                        narration_style=style,
                        segments=[dict(beat_id=b["id"], text=b["tts_text"], display_text=b["text"]) for b in beats])
             json.dump(job, open(os.path.join(d, "job.json"), "w"), ensure_ascii=False)
@@ -209,7 +209,7 @@ def synthesize(beats, seed=42, log=print, allow_partial_alignment=False, style="
                             words=words, alignment_estimated=estimated))
         return dict(samples=data, voice=f"Chatterbox Hindi · {style} · WhisperX alignment", beats=out,
                     duration=len(data) / audio.SR, placeholder=False, narration_style=style,
-                    pronunciation_mode=pronunciation_mode, group_lines=group_lines)
+                    pronunciation_mode=pronunciation_mode, group_lines=group_lines, group_max_lines=group_max_lines, group_max_words=group_max_words)
     # ---- fallback: system voice, proportional word timing (flagged placeholder)
     log("[voice] WARNING: Chatterbox stack unavailable - using macOS `say` placeholder with estimated word timing")
     t, clips, out = 0.0, [], []
