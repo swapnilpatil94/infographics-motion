@@ -119,18 +119,35 @@ def synthesize(beats, seed=42, log=print, allow_partial_alignment=False, style="
     d = os.path.join(VOICE_DIR, key)
     os.makedirs(d, exist_ok=True)
     wav, align = os.path.join(d, "narration.wav"), os.path.join(d, "align.json")
+    model_info_path = os.path.join(d, "model_info.json")
+    log(f"[voice] backend_check chatterbox_available={available()} python={PY312} mythic_studio={MYTHIC}")
+    log(f"[voice] reference_audio={REFERENCE} exists={os.path.exists(REFERENCE)} style={style} pronunciation_mode={pronunciation_mode}")
+    log(f"[voice] settings={json.dumps(settings, sort_keys=True)} group_lines={group_lines} cache_key={key} cache_dir={d}")
     if available():
         if not (os.path.exists(wav) and os.path.exists(align)):
             job = dict(output_path=wav, reference_audio=REFERENCE, seed=seed, group_lines=group_lines, **settings,
                        narration_style=style,
                        segments=[dict(beat_id=b["id"], text=b["tts_text"], display_text=b["text"]) for b in beats])
             json.dump(job, open(os.path.join(d, "job.json"), "w"), ensure_ascii=False)
-            log(f"[voice] Chatterbox Hindi TTS for {len(beats)} beats (cached at {key} afterwards)")
+            log(f"[voice] backend=Chatterbox multilingual TTS; generating {len(beats)} beats")
+            log(f"[voice] detailed TTS log: {os.path.join(d, 'tts.log')}")
             subprocess.run([PY312, os.path.join(MYTHIC, "tools/chatterbox_tts.py"), os.path.join(d, "job.json")],
                            env=_env(), check=True, stderr=open(os.path.join(d, "tts.log"), "w"))
+            if os.path.exists(model_info_path):
+                info = json.load(open(model_info_path, encoding="utf-8"))
+                log(f"[voice] LOADED MODEL: {info.get('model_family')} | package={info.get('package_version')} | selector={info.get('selector_used')} | language_id={info.get('language_id')} | device={info.get('device')}")
+                log(f"[voice] dedicated_hindi_checkpoint={info.get('dedicated_hindi_checkpoint')} | model_info={model_info_path}")
             log("[voice] forced alignment (whisperx)")
             subprocess.run([PY312, os.path.join(MYTHIC, "tools/whisper_align.py"), wav, wav + ".segments.json", align],
                            env=_env(), check=True, stderr=open(os.path.join(d, "align.log"), "w"))
+        else:
+            log(f"[voice] CACHE HIT: reusing existing WAV/alignment; no model was loaded this run")
+            if os.path.exists(model_info_path):
+                info = json.load(open(model_info_path, encoding="utf-8"))
+                log(f"[voice] CACHED MODEL: {info.get('model_family')} | package={info.get('package_version')} | selector={info.get('selector_used')} | language_id={info.get('language_id')} | device={info.get('device')}")
+                log(f"[voice] dedicated_hindi_checkpoint={info.get('dedicated_hindi_checkpoint')} | model_info={model_info_path}")
+            else:
+                log(f"[voice] WARNING: this cached narration has no model_info.json; model identity cannot be confirmed from this cache entry")
         data = _read_wav_any(wav)
         al = {b["beat_id"]: b["words"] for b in json.load(open(align))["beats"]}
         out = []
