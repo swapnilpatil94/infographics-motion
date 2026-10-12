@@ -42,7 +42,7 @@ async function route() {
   if (!S.opts) { try { S.opts = await api("/options"); } catch (e) { view.innerHTML = errBox(e); return; } }
   let m;
   document.body.classList.toggle("dev", /^\/(dev|review|guide|production\/)/.test(h));
-  $$("[data-nav]").forEach(a => a.classList.toggle("on", (a.dataset.nav === "home" && (h === "/" || h.startsWith("/k/"))) || (a.dataset.nav === "productions" && h.startsWith("/productions")) || (a.dataset.nav === "dev" && /^\/(dev|review|guide)/.test(h))));
+  $$("[data-nav]").forEach(a => a.classList.toggle("on", (a.dataset.nav === "home" && (h === "/" || h.startsWith("/k/"))) || (a.dataset.nav === "productions" && h.startsWith("/productions")) || (a.dataset.nav === "voice" && h === "/voice") || (a.dataset.nav === "dev" && /^\/(dev|review|guide)/.test(h))));
   if ((m = h.match(/^\/k\/(k_[\w-]+)$/))) return viewProject(m[1]);
   if (h === "/audio") return viewAudio();\n  if (h === "/voice") return viewVoice();
   if (h === "/" || h === "") return viewHome();
