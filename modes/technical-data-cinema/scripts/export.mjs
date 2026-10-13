@@ -15,12 +15,13 @@ function fail(message) { console.error(message); process.exit(2); }
 
 const htmlArg = arg("--html"), outArg = arg("--out");
 const audioArg = arg("--audio"), scriptArg = arg("--voice-script");
-if (!htmlArg || !outArg) fail("Usage: node scripts/export.mjs --html output/<story>/index.html --out output/<story>/final.mp4 [--audio narration.wav | --voice-script narration.md] [--studio-url http://127.0.0.1:8765] [--fps 30]");
-if (audioArg && scriptArg) fail("Choose only one of --audio or --voice-script.");
 if (has("--help")) {
-  console.log("Use --audio <existing.wav> to mux approved narration, or --voice-script <script.md> to generate it with the existing Chatterbox Studio API.");
+  console.log("Usage: npm run export -- --html <scene.html> --out <final.mp4> [--audio narration.wav | --voice-script narration.md] [--studio-url http://127.0.0.1:8765] [--fps 30]");
+  console.log("Use --audio to mux approved narration, or --voice-script to generate it with the existing Chatterbox Studio API.");
   process.exit(0);
 }
+if (!htmlArg || !outArg) fail("Usage: node scripts/export.mjs --html output/<story>/index.html --out output/<story>/final.mp4 [--audio narration.wav | --voice-script narration.md] [--studio-url http://127.0.0.1:8765] [--fps 30]");
+if (audioArg && scriptArg) fail("Choose only one of --audio or --voice-script.");
 const htmlPath = path.resolve(process.cwd(), htmlArg);
 const outPath = path.resolve(process.cwd(), outArg);
 await fs.access(htmlPath);
