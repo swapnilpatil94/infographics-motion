@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Visual Director Benchmark — Viral Traffic</title>
+<style>
+:root{color-scheme:dark;--bg:#070b12;--ice:#a8d7e8;--amber:#f4b65e;--red:#e54842;--cream:#f2eee5}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:Inter,ui-sans-serif,system-ui,sans-serif}
+#stage{position:relative;width:540px;height:960px;overflow:hidden;background:radial-gradient(ellipse at 50% 42%,#132334 0%,#080c13 58%,#05070c 100%)}
+canvas{position:absolute;inset:0;width:540px;height:960px;display:block}
+#grain{position:absolute;inset:0;pointer-events:none;opacity:.12;background-image:radial-gradient(#fff 0.5px,transparent .6px);background-size:5px 5px;mask-image:linear-gradient(transparent,#000 15%,#000 90%,transparent)}
+#head{position:absolute;left:36px;right:36px;top:52px;z-index:2}
+.kicker{font-size:12px;letter-spacing:.24em;color:var(--ice);font-weight:700;text-transform:uppercase}
+h1{font-size:37px;line-height:1.03;letter-spacing:-.045em;color:var(--cream);margin:13px 0 0;font-weight:760;max-width:450px}
+#sub{margin-top:14px;color:#a7b6c5;font-size:15px;line-height:1.35;max-width:390px}
+#foot{position:absolute;left:36px;right:36px;bottom:58px;z-index:2}
+#label{color:var(--amber);font-size:12px;font-weight:750;letter-spacing:.2em;text-transform:uppercase}
+#desc{color:var(--cream);font-size:19px;line-height:1.22;margin-top:9px;max-width:430px;font-weight:650}
+#meter{height:2px;background:#243443;margin-top:20px;overflow:hidden}
+#progress{height:100%;width:0;background:var(--amber)}
+#stage[data-phase="2"] #label{color:var(--red)}
+#stage[data-phase="3"] #label{color:var(--ice)}
+</style>
+</head>
+<body>
+<div id="stage" data-phase="0">
+<canvas id="c" width="540" height="960"></canvas><div id="grain"></div>
+<header id="head"><div class="kicker">SYSTEMS EXPLAINED / VISUAL TEST</div><h1 id="title">A stadium becomes a system.</h1><div id="sub">Millions of viewers aren't just a number. They're load moving through infrastructure.</div></header>
+<footer id="foot"><div id="label">01 / THE CROWD</div><div id="desc">Every glowing point represents a viewer.</div><div id="meter"><div id="progress"></div></div></footer>
+</div>
+<script type="module">
+import * as THREE from "three";
+const W=540,H=960,DURATION=16;
+const stage=document.querySelector("#stage"),title=document.querySelector("#title"),sub=document.querySelector("#sub"),label=document.querySelector("#label"),desc=document.querySelector("#desc"),progress=document.querySelector("#progress");
+const scene=new THREE.Scene();scene.background=new THREE.Color("#070b12");scene.fog=new THREE.FogExp2("#070b12",.026);
+const camera=new THREE.PerspectiveCamera(42,W/H,.1,180);camera.position.set(0,19,35);
+const renderer=new THREE.WebGLRenderer({canvas:document.querySelector("#c"),antialias:true,alpha:false,powerPreference:"high-performance"});
+renderer.setPixelRatio(1);renderer.setSize(W,H,false);renderer.setClearColor("#070b12",1);
+const ambient=new THREE.HemisphereLight(0x9bbbd4,0x101722,2.0);scene.add(ambient);
+const key=new THREE.PointLight(0x6ac9ee,90,65);key.position.set(-10,12,2);scene.add(key);
+const warm=new THREE.PointLight(0xffa947,75,60);warm.position.set(10,8,-8);scene.add(warm);
+const group=new THREE.Group();scene.add(group);
+const crowdPositions=[],crowdColors=[],crowdSizes=[];
+const rings=34,seats=180;
+for(let r=0;r<rings;r++){const radiusX=6.5+r*.29,radiusZ=4.4+r*.22,y=.45+r*.105;
+ for(let i=0;i<seats;i++){const a=i/seats*Math.PI*2;const x=Math.cos(a)*radiusX,z=Math.sin(a)*radiusZ;
+  crowdPositions.push(x,y,z);const bright=((r*17+i*13)%11)/10;crowdColors.push(.46+.3*bright,.64+.26*bright,.75+.2*bright);crowdSizes.push(.045+((r+i)%4)*.009);
+ }}
+const crowdGeo=new THREE.BufferGeometry();crowdGeo.setAttribute("position",new THREE.Float32BufferAttribute(crowdPositions,3));crowdGeo.setAttribute("color",new THREE.Float32BufferAttribute(crowdColors,3));
+const crowdMat=new THREE.PointsMaterial({size:.105,vertexColors:true,transparent:true,opacity:.0,depthWrite:false,sizeAttenuation:true});
+const crowd=new THREE.Points(crowdGeo,crowdMat);group.add(crowd);
+const outlinePts=[];for(let i=0;i<=240;i++){const a=i/240*Math.PI*2;outlinePts.push(new THREE.Vector3(Math.cos(a)*16.1,.1,Math.sin(a)*11.7));}
+const outlineGeo=new THREE.BufferGeometry().setFromPoints(outlinePts);
+const outline=new THREE.Line(outlineGeo,new THREE.LineBasicMaterial({color:"#42647b",transparent:true,opacity:.0}));group.add(outline);
+const pitch=new THREE.Mesh(new THREE.PlaneGeometry(5,2.4),new THREE.MeshBasicMaterial({color:"#132f30",transparent:true,opacity:0,side:THREE.DoubleSide}));
+pitch.rotation.x=-Math.PI/2;pitch.position.set(0,.05,0);group.add(pitch);
+const pitchLine=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-1.9,.09,0),new THREE.Vector3(1.9,.09,0)]),new THREE.LineBasicMaterial({color:"#9bd4c1",transparent:true,opacity:0}));group.add(pitchLine);
+const nodes=[new THREE.Vector3(-9,4,-12),new THREE.Vector3(0,5,-15),new THREE.Vector3(9,4,-12),new THREE.Vector3(-8,3,12),new THREE.Vector3(8,3,12)];
+const nodeMeshes=[];
+for(let i=0;i<nodes.length;i++){const m=new THREE.Mesh(new THREE.IcosahedronGeometry(.7,1),new THREE.MeshBasicMaterial({color:"#8eddf4",wireframe:true,transparent:true,opacity:0}));m.position.copy(nodes[i]);scene.add(m);nodeMeshes.push(m);}
+const routes=[];
+for(let i=0;i<nodes.length;i++){const pts=[new THREE.Vector3(0,1,0),new THREE.Vector3(nodes[i].x*.52,3,nodes[i].z*.52),nodes[i]];
+ const geo=new THREE.BufferGeometry().setFromPoints(pts);const line=new THREE.Line(geo,new THREE.LineBasicMaterial({color:"#7ccfe8",transparent:true,opacity:0}));scene.add(line);routes.push(line);}
+const packetData=[];
+for(let i=0;i<150;i++){packetData.push({route:i%nodes.length,offset:(i*37%150)/150});}
+const packetGeo=new THREE.BufferGeometry();const packetPositions=new Float32Array(packetData.length*3);packetGeo.setAttribute("position",new THREE.BufferAttribute(packetPositions,3));
+const packetMat=new THREE.PointsMaterial({color:"#f4b65e",size:.17,transparent:true,opacity:0,depthWrite:false});const packets=new THREE.Points(packetGeo,packetMat);scene.add(packets);
+const queuePositions=[];for(let i=0;i<140;i++){const col=i%14,row=Math.floor(i/14);queuePositions.push(5.4+col*.32,1+row*.28,1.5+((col%3)*.18));}
+const queueGeo=new THREE.BufferGeometry();queueGeo.setAttribute("position",new THREE.Float32BufferAttribute(queuePositions,3));
+const queueMat=new THREE.PointsMaterial({color:"#e54842",size:.19,transparent:true,opacity:0,depthWrite:false});const queue=new THREE.Points(queueGeo,queueMat);scene.add(queue);
+const floorGeo=new THREE.BufferGeometry();const floorPoints=[];for(let i=-12;i<=12;i++){floorPoints.push(new THREE.Vector3(i*.9,-.1,-16),new THREE.Vector3(i*.9,-.1,16),new THREE.Vector3(-11,-.1,i*1.3),new THREE.Vector3(11,-.1,i*1.3));}
+floorGeo.setFromPoints(floorPoints);const floor=new THREE.Points(floorGeo,new THREE.PointsMaterial({color:"#233b4c",size:.045,transparent:true,opacity:.15}));scene.add(floor);
+const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
+const smooth=v=>{v=clamp(v);return v*v*(3-2*v)};
+const mix=(a,b,t)=>a+(b-a)*t;
+const routeCurves=nodes.map(n=>new THREE.QuadraticBezierCurve3(new THREE.Vector3(0,1,0),new THREE.Vector3(n.x*.6,3,n.z*.6),n));
+function renderAt(seconds){
+ const t=clamp(Number(seconds)||0,0,DURATION),p0=smooth(t/2.4),p1=smooth((t-3.4)/1.6),p2=smooth((t-7.4)/1.3),p3=smooth((t-11.2)/1.8),p4=smooth((t-13.1)/1.7);
+ crowdMat.opacity=.12+.88*p0;outline.material.opacity=.2+.8*p0;pitch.material.opacity=.4*p0;pitchLine.material.opacity=.8*p0;
+ for(let i=0;i<nodes.length;i++){nodeMeshes[i].material.opacity=.82*p1;nodeMeshes[i].rotation.y=t*.16+i*.3;routes[i].material.opacity=.75*p1*(1-.15*p2)+.5*p3;}
+ packetMat.opacity=.92*p1*(1-p4*.55);queueMat.opacity=.95*p2*(1-p3*.88);
+ const arr=packetGeo.attributes.position.array;
+ for(let i=0;i<packetData.length;i++){const d=packetData[i],phase=(t*.32+d.offset)%1,pt=routeCurves[d.route].getPoint(phase);arr[i*3]=pt.x;arr[i*3+1]=pt.y;arr[i*3+2]=pt.z;}
+ packetGeo.attributes.position.needsUpdate=true;
+ crowdGeo.attributes.position.needsUpdate=true;
+ const overload=clamp((t-7.8)/3.4)*(1-clamp((t-12)/1.5));
+ queue.position.y=Math.sin(t*2)*.08;
+ for(let i=0;i<nodes.length;i++){nodeMeshes[i].material.color.set(t>7.8&&t<12?"#e54842":"#8eddf4");}
+ const camA=smooth(t/4),camB=smooth((t-6.5)/3),camC=smooth((t-11.5)/3);
+ camera.position.set(mix(0,7,camB)+Math.sin(t*.12)*.6,mix(19,10,camB)-2*camC,mix(35,29,camB)-3*camC);
+ camera.lookAt(mix(0,1.5,camB),mix(1,2,camB),mix(0,-2,camB));
+ group.rotation.y=mix(-.08,.1,camA)+.035*Math.sin(t*.2);
+ stage.dataset.phase=t<3.5?"0":t<7.5?"1":t<12.7?"2":"3";
+ if(t<3.5){title.textContent="A stadium becomes a system.";sub.textContent="Millions of viewers aren't just a number. They're load moving through infrastructure.";label.textContent="01 / THE CROWD";desc.textContent="Every glowing point represents a viewer."}
+ else if(t<7.5){title.textContent="Every viewer creates demand.";sub.textContent="Requests move from the live source toward delivery infrastructure.";label.textContent="02 / DISTRIBUTION";desc.textContent="The network spreads work across delivery nodes."}
+ else if(t<12.7){title.textContent="Demand outruns capacity.";sub.textContent="A traffic spike concentrates work, and queues begin to build.";label.textContent="03 / THE BOTTLENECK";desc.textContent="When load piles up, latency climbs."}
+ else{title.textContent="Design for the spike.";sub.textContent="Distribute delivery, prepare capacity, and control retries.";label.textContent="04 / THE INTERVENTION";desc.textContent="The goal is stable flow—not just more servers."}
+ progress.style.width=(t/DURATION*100)+"%";
+ renderer.render(scene,camera);
+}
+window.getDuration=()=>DURATION;window.renderAt=renderAt;
+if(new URLSearchParams(location.search).get("render")==="1"){document.body.style.margin="0";document.body.style.width=W+"px";document.body.style.height=H+"px";}
+renderAt(0);
+</script>
+</body>
+</html>
