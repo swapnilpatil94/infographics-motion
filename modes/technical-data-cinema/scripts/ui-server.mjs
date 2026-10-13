@@ -75,7 +75,7 @@ async function ensureStudio(job) {
     } catch { return false; }
   };
   if (await ready()) {
-    log(job, `Reusing Chatterbox Studio at ${studioUrl}.`);
+    log(job, `Reusing the existing Chatterbox API at ${studioUrl}.`);
     return;
   }
   if (!managedStudio || managedStudio.exitCode !== null) {
