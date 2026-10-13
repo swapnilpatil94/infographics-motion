@@ -43,6 +43,7 @@ jobs:
           node --check scripts/export.mjs
           node --check scripts/ui-server.mjs
           node --check scripts/doctor.mjs
+          python3 -m py_compile ../../engine/studio/server.py
       - name: Render deterministic smoke test
         run: npm run test:smoke
       - name: Upload smoke-test MP4
