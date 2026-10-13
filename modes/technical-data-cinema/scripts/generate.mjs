@@ -27,7 +27,12 @@ if (!outPath.startsWith(outputRoot)) {
   console.error("Refusing to write outside modes/technical-data-cinema/output/. Use --out under that directory.");
   process.exit(2);
 }
-console.log(`Generating with ${model}; context=${process.env.OLLAMA_NUM_CTX || "8192"} tokens`);
+const context = Number(process.env.OLLAMA_NUM_CTX || 8192);
+if (!Number.isInteger(context) || context < 2048 || context > 32768) {
+  console.error("OLLAMA_NUM_CTX must be an integer between 2048 and 32768.");
+  process.exit(2);
+}
+console.log(`Generating with ${model}; context=${context} tokens`);
 console.log(`Story: ${storyPath}\nOutput: ${outPath}`);
 let response;
 try {
@@ -40,7 +45,7 @@ try {
         { role: "system", content: system },
         { role: "user", content: `Create the visual explainer for this story brief.\n\n--- STORY BRIEF START ---\n${story}\n--- STORY BRIEF END ---\n\nReturn only complete HTML.\n` }
       ],
-      options: { temperature: 0.25, num_ctx: Number(process.env.OLLAMA_NUM_CTX || 12288) }
+      options: { temperature: 0.25, num_ctx: context }
     }),
     signal: AbortSignal.timeout(Number(process.env.OLLAMA_TIMEOUT_MS || 600000))
   });
@@ -55,13 +60,19 @@ if (!response.ok) {
 const payload = await response.json();
 let html = payload?.message?.content?.trim();
 if (!html) { console.error("Ollama returned no message content."); process.exit(1); }
-html = html.replace(/^\uFEFF/, "").replace(/^```(?:html)?\s*/i, "").replace(/\s*```\s*$/, "");
+html = html.replace(/^\uFEFF/, "").replace(/^\`\`\`(?:html)?\s*/i, "").replace(/\s*\`\`\`\s*$/, "");
 if (!/^<!doctype html>/i.test(html)) {
   console.error("Model output did not start with <!doctype html>; refusing to save incomplete HTML.");
   process.exit(1);
 }
-if (!/window\.renderAt\s*=/.test(html) || !/window\.getDuration\s*=/.test(html)) {
-  console.error("Generated HTML is missing window.renderAt(seconds) / window.getDuration() contract.");
+const missing = [];
+if (!/window\.renderAt\s*=/.test(html)) missing.push("window.renderAt(seconds)");
+if (!/window\.getDuration\s*=/.test(html)) missing.push("window.getDuration()");
+if (!/URLSearchParams\s*\(\s*(?:window\.)?location\.search\s*\)/.test(html) || !/get\s*\(\s*["']render["']\s*\)/.test(html)) {
+  missing.push("?render=1 render-only mode");
+}
+if (missing.length) {
+  console.error(`Generated HTML failed export validation: missing ${missing.join(", ")}.\nNo file was written. Try again with --model qwen2.5-coder:7b for a targeted repair, or revise the prompt.`);
   process.exit(1);
 }
 await fs.mkdir(path.dirname(outPath), { recursive: true });
@@ -72,4 +83,4 @@ catch (error) {
   process.exit(1);
 }
 console.log(`Saved ${Buffer.byteLength(html)} bytes to ${outPath}`);
-console.log("Next: preview the HTML, approve Chatterbox narration, then run scripts/render.mjs.");
+console.log("Next: preview the HTML, then export with --voice-script to generate narration using the existing Chatterbox studio adapter.");
