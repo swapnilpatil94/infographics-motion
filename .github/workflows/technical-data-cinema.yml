@@ -38,7 +38,6 @@ jobs:
       - name: Syntax check
         run: |
           node --check scripts/generate.mjs
-          node --check scripts/bundle-scene.mjs
           node --check scripts/test-three-bundle.mjs
           node --check scripts/ollama-session.mjs
           node --check scripts/render.mjs
