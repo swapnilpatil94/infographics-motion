@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Yantralok · Technical Data Cinema</title>
+<style>
+:root{color-scheme:dark;--bg:#101311;--panel:#181d19;--line:#303a31;--text:#f2f0e8;--muted:#a8b1a7;--red:#d85c48;--gold:#d8b66a;--green:#8bbf94}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 80% -10%,#27372b 0,transparent 45%),var(--bg);color:var(--text);font:15px/1.5 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header{max-width:1180px;margin:auto;padding:34px 24px 20px;display:flex;justify-content:space-between;gap:20px;align-items:flex-start} .eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-weight:700}h1{font-size:clamp(28px,4vw,42px);line-height:1.06;margin:8px 0 10px;letter-spacing:-.04em}header p{margin:0;color:var(--muted);max-width:680px}.pill{border:1px solid var(--line);border-radius:999px;padding:7px 11px;color:var(--muted);font-size:12px;white-space:nowrap}
+main{max-width:1180px;margin:auto;padding:0 24px 40px;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(320px,.95fr);gap:18px}.panel{background:linear-gradient(145deg,#1b211c,#151915);border:1px solid var(--line);border-radius:16px;padding:22px;min-width:0}.panel h2{font-size:16px;margin:0 0 5px}.sub{font-size:13px;color:var(--muted);margin:0 0 18px}.field{display:grid;gap:6px;margin:15px 0}.field label,.legend{font-size:12px;font-weight:700;letter-spacing:.03em;color:#d9dfd6}.field input,.field textarea,.field select{width:100%;background:#0f130f;color:var(--text);border:1px solid #3a443b;border-radius:9px;padding:11px 12px;font:inherit;outline:none}.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--gold)}textarea{resize:vertical;min-height:130px}.story{min-height:220px}.script{min-height:190px}.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.mode{display:flex;gap:7px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:11px 9px;cursor:pointer;background:#121612;font-size:12px}.mode:has(input:checked){border-color:var(--gold);background:#24251b}.mode input{accent-color:var(--gold);margin-top:3px}.hidden{display:none!important}.actions{display:flex;gap:10px;align-items:center;margin-top:20px}.primary{background:var(--gold);color:#161811;border:0;border-radius:10px;padding:12px 18px;font-weight:800;font-size:14px;cursor:pointer}.primary:disabled{opacity:.45;cursor:wait}.hint{font-size:12px;color:var(--muted)}.status{display:inline-flex;gap:7px;align-items:center;font-size:12px;color:var(--muted)}.dot{width:7px;height:7px;border-radius:50%;background:#788477}.dot.running{background:var(--gold);box-shadow:0 0 0 4px #d8b66a22}.dot.completed{background:var(--green)}.dot.failed{background:var(--red)}.log{height:350px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;background:#0b0e0b;border:1px solid #2b332b;border-radius:10px;padding:13px;color:#c8d0c6;font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace}.result{display:grid;gap:10px;margin-top:15px}.result a{display:block;border:1px solid var(--line);border-radius:9px;padding:10px 12px;color:var(--gold);text-decoration:none}.result a:hover{border-color:var(--gold)}.warning{padding:10px 12px;background:#30271a;border-radius:8px;color:#e3c990;font-size:12px;margin-top:14px}.foot{max-width:1180px;margin:0 auto;padding:0 24px 30px;color:#818a80;font-size:11px}
+@media(max-width:850px){header{display:block}header .pill{display:inline-block;margin-top:14px}main{grid-template-columns:1fr;padding:0 14px 28px}header{padding:24px 14px 18px}.panel{padding:17px}.log{height:260px}}@media(max-width:440px){.two{grid-template-columns:1fr}.modes{grid-template-columns:1fr}.mode{align-items:center}}
+</style>
+</head>
+<body>
+<header><div><div class="eyebrow">YANTRALOK · LOCAL PRODUCTION</div><h1>Technical Data Cinema</h1><p>Turn a story into a custom animated explainer, add your tuned Hindi/Hinglish Chatterbox narration, and export a vertical MP4. Heavy stages run one at a time.</p></div><div class="pill">Local-first · 1080 × 1920</div></header>
+<main>
+<section class="panel">
+<h2>01 / Build your film</h2><p class="sub">Enter the explanation brief and the narration you want spoken. Visuals are generated for this story, not from a fixed template.</p>
+<form id="form">
+<div class="field"><label for="title">VIDEO TITLE</label><input id="title" value="Why a viral moment can break a backend" required maxlength="120"></div>
+<div class="field"><label for="slug">OUTPUT FOLDER NAME</label><input id="slug" value="viral-traffic-explainer" maxlength="64" pattern="[A-Za-z0-9 _-]+" required><span class="hint">A new folder is used; existing scene files are not overwritten.</span></div>
+<div class="field"><label for="story">STORY / VISUAL BRIEF</label><textarea id="story" class="story" required>Core question: Why can a product that worked for thousands of users fail when a post suddenly goes viral?
+
+Narrative beats:
+1. A clip spreads quickly; show audience growth as a meaningful crowd, not decorative dots.
+2. One tap fans out into feed, media and recommendation requests.
+3. Requests converge on finite backend capacity; queue depth and latency rise.
+4. Show why reactive autoscaling arrives after demand has already spiked.
+5. Demonstrate prescaling and caching as interventions.
+6. Show retries spread out with backoff instead of creating a second spike.
+7. End with the lesson: prepare capacity, reduce work per request and control retries.
+
+Use illustrative values only when clearly labelled. Every particle or object must explain something.</textarea></div>
+<div class="field"><label for="model">OLLAMA MODEL</label><select id="model" required><option value="qwen3-coder:30b">qwen3-coder:30b (default)</option><option value="qwen2.5-coder:7b">qwen2.5-coder:7b (lighter)</option></select><span class="hint" id="modelHint">Checking locally installed models…</span></div>
+<div class="field"><label>VIDEO OUTPUT</label><div class="two"><div><label class="hint" for="fps">Frame rate</label><select id="fps"><option value="30">30 fps · standard</option><option value="24">24 fps · cinematic</option><option value="25">25 fps</option><option value="60">60 fps · heavier</option></select></div><div><label class="hint" for="style">Narration style</label><select id="style"><option value="storytelling">Storytelling</option><option value="conversational">Conversational</option><option value="dramatic">Dramatic</option></select></div></div></div>
+<div class="field"><label>VOICE OPTION</label><div class="modes">
+<label class="mode"><input type="radio" name="voiceMode" value="generate" checked><span><b>Chatterbox voice</b><br><span class="hint">Generate from script</span></span></label>
+<label class="mode"><input type="radio" name="voiceMode" value="wav"><span><b>Existing WAV</b><br><span class="hint">Use approved audio</span></span></label>
+<label class="mode"><input type="radio" name="voiceMode" value="silent"><span><b>Silent video</b><br><span class="hint">No narration</span></span></label>
+</div></div>
+<div id="voiceScriptWrap" class="field"><label for="voiceScript">HINDI / HINGLISH NARRATION SCRIPT</label><textarea id="voiceScript" class="script">[HOOK] सोचिए, एक वीडियो अचानक वायरल हो जाता है। कुछ ही मिनटों में लाखों लोग उसे देखने पहुँच जाते हैं।
+
+[CURIOUS] लेकिन हर tap सिर्फ एक request नहीं बनाता। Feed, video, recommendations—एक ही user action पीछे कई systems को काम पर लगा सकता है।
+
+[SUSPENSE] Requests तेज़ी से बढ़ रही हैं, लेकिन servers उतनी तेज़ी से नहीं बढ़ सकते। Queue लंबी होती है, और response धीमा पड़ने लगता है।
+
+[EXPLAIN] Autoscaling मदद करता है, पर अक्सर demand बढ़ने के बाद। यानी problem शुरू हो चुकी होती है, तब extra capacity पहुँचती है।
+
+[REVEAL] इसलिए बड़े traffic event से पहले capacity prepare करना ज़रूरी है।
+
+[EXPLAIN] Caching हर request को backend तक जाने से रोक सकती है। और retries को backoff के साथ फैलाने से दूसरी traffic spike नहीं बनती।
+
+[REVEAL] असली lesson? सिर्फ़ ज़्यादा servers नहीं। सही समय पर capacity, कम unnecessary work, और controlled retries—यही system को viral moment में भी stable रखते हैं।</textarea><span class="hint">Performance cues carry forward until the next cue, matching your existing Chatterbox branch.</span>
+<div class="two"><div><label class="hint" for="performance">Performance</label><select id="performance"><option value="directed">Directed cues</option><option value="uniform">Uniform delivery</option></select></div><div><label class="hint" for="intensity">Expression intensity (0–100)</label><input id="intensity" type="number" min="0" max="100" value="65"></div></div>
+</div>
+<div id="wavWrap" class="field hidden"><label for="wavPath">ABSOLUTE PATH TO WAV FILE</label><input id="wavPath" placeholder="/Users/you/Music/narration.wav"><span class="hint">The WAV is read from this Mac. Use a local absolute path.</span></div>
+<div class="warning">Memory-safe sequence: Ollama generates the scene and unloads its model first. Chatterbox starts only after generation finishes. Do not run another heavy model alongside this job.</div>
+<div class="actions"><button id="run" class="primary" type="submit">Generate & export video</button><span class="hint" id="formHint">One production job at a time</span></div>
+</form>
+</section>
+<section class="panel">
+<h2>02 / Production console</h2><p class="sub">Live stage logs, errors and links to the finished scene, voice and MP4.</p>
+<div class="status"><span id="dot" class="dot"></span><span id="statusText">Ready for a new production</span></div>
+<div id="logs" class="log" aria-live="polite" style="margin-top:14px">Waiting for you to start a job…</div>
+<div id="results" class="result"></div>
+<div class="warning">Before publishing, preview the full MP4 and listen for pronunciation, pacing, clipped words and sync. Rendering can use substantial disk space.</div>
+</section>
+</main>
+<div class="foot">Yantralok · Local-only interface · Ollama + your existing Chatterbox Studio + Playwright + FFmpeg</div>
+<script>
+const $=id=>document.getElementById(id);
+let pollTimer=null, currentJob=null, knownLogs=0;
+function selectedMode(){return document.querySelector('input[name="voiceMode"]:checked').value}
+function toggleVoice(){const mode=selectedMode();$('voiceScriptWrap').classList.toggle('hidden',mode!=='generate');$('wavWrap').classList.toggle('hidden',mode!=='wav');$('style').disabled=mode!=='generate'}
+document.querySelectorAll('input[name="voiceMode"]').forEach(x=>x.addEventListener('change',toggleVoice));toggleVoice();
+$('title').addEventListener('input',()=>{if(!$('slug').dataset.edited)$('slug').value=$('title').value.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,64)});
+$('slug').addEventListener('input',()=>{$('slug').dataset.edited='1'});
+async function loadModels(){try{const r=await fetch('/api/models');const d=await r.json();if(d.models&&d.models.length){const sel=$('model'),previous=sel.value;sel.innerHTML='';d.models.forEach(m=>{const o=document.createElement('option');o.value=m;o.textContent=m;sel.append(o)});sel.value=d.models.includes(previous)?previous:d.models.find(m=>/qwen3-coder:30b/.test(m))||d.models.find(m=>/qwen2\.5-coder:7b/.test(m))||d.models[0];$('modelHint').textContent='Installed locally · no model will be downloaded automatically.'}else{$('modelHint').textContent='Ollama is not currently responding. The job runner can start it; select a model already installed on this Mac.'}}catch{$('modelHint').textContent='Could not query Ollama yet. Make sure the selected model is installed.'}}
+function status(s){$('statusText').textContent=s;$('dot').className='dot '+s}
+function link(label,url){const a=document.createElement('a');a.href=url;a.textContent=label;a.target='_blank';a.rel='noopener';return a}
+async function poll(){if(!currentJob)return;try{const r=await fetch('/api/jobs/'+currentJob);const j=await r.json();if(!r.ok)throw new Error(j.error||'Could not read job status');const logs=$('logs');if(j.logs.length!==knownLogs){logs.textContent=j.logs.join('\n');logs.scrollTop=logs.scrollHeight;knownLogs=j.logs.length}
+if(j.status==='running'||j.status==='queued'){status(j.status==='queued'?'Queued':'Production running…');pollTimer=setTimeout(poll,900);return}
+$('run').disabled=false;
+if(j.status==='completed'){status('Completed successfully');$('formHint').textContent='Ready for another story';$('results').replaceChildren();if(j.files.video)$('results').append(link('▶ Open final MP4',j.files.video));if(j.files.scene)$('results').append(link('Open generated HTML scene',j.files.scene));if(j.files.audio)$('results').append(link('Open generated Chatterbox WAV',j.files.audio))}
+else{status('Failed');$('formHint').textContent=j.error||'See the console for details';}
+}catch(e){status('Status check failed');$('logs').textContent+='\n'+e.message;$('run').disabled=false}}
+$('form').addEventListener('submit',async e=>{e.preventDefault();if(currentJob&&$('run').disabled)return;
+const payload={title:$('title').value,slug:$('slug').value,story:$('story').value,model:$('model').value,fps:$('fps').value,voiceMode:selectedMode(),voiceScript:$('voiceScript').value,wavPath:$('wavPath').value,style:$('style').value,performance:$('performance').value,intensity:$('intensity').value};
+if(payload.voiceMode==='generate'&&(!payload.voiceScript.trim())){alert('Add the narration script.');return}
+$('run').disabled=true;$('results').replaceChildren();$('logs').textContent='Submitting production…';knownLogs=0;$('formHint').textContent='Do not close this tab while the job runs';status('Submitting…');
+try{const r=await fetch('/api/run',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)});const d=await r.json();if(!r.ok)throw new Error(d.error||'Could not start job');currentJob=d.id;poll()}catch(err){$('run').disabled=false;status('Could not start');$('logs').textContent=err.message}});
+loadModels();
+</script>
+</body></html>
