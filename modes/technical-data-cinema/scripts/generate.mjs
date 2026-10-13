@@ -4,6 +4,7 @@ import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 import { build } from "esbuild";
+import { buildFallbackScene } from "./fallback-scene.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "..");
@@ -66,12 +67,10 @@ async function askOllama(messages, stage, selectedModel = model, responseFormat 
       signal: AbortSignal.timeout(timeoutMs)
     });
   } catch (error) {
-    console.error(`Could not reach Ollama during ${stage} at ${ollamaUrl}: ${error.message}`);
-    process.exit(1);
+    throw new Error("Could not reach Ollama during " + stage + " at " + ollamaUrl + ": " + error.message, { cause: error });
   }
   if (!response.ok) {
-    console.error(`Ollama ${stage} returned HTTP ${response.status}: ${await response.text()}`);
-    process.exit(1);
+    throw new Error("Ollama " + stage + " returned HTTP " + response.status + ": " + await response.text());
   }
   const payload = await response.json();
   const content = payload?.message?.content?.trim();
@@ -124,31 +123,27 @@ try {
 }
 const planJson = JSON.stringify(visualPlan, null, 2);
 console.log(`Visual Director planned ${visualPlan.beats.length} beats; generating the animated scene...`);
-const payload = await askOllama([
-  { role: "system", content: system },
-  { role: "user", content: `Implement the supplied visual direction as one complete, deterministic, offline HTML scene. Treat the plan as mandatory creative direction; improve implementation details only when needed for clarity/performance.\n\n--- STORY BRIEF START ---\n${story}\n--- STORY BRIEF END ---\n\n--- VISUAL DIRECTOR PLAN JSON START ---\n${planJson}\n--- VISUAL DIRECTOR PLAN JSON END ---\n${repairNote ? `\nMANDATORY REPAIR REQUEST:\n${repairNote}\nPreserve the story, narration meaning, offline behavior, and export contract. Fix the specific QA failure; do not simply add a static end card.\n` : ""}\nReturn only complete HTML.\n` }
-], "scene generation");
-let html = payload;
-
-if (!html) { console.error("Ollama returned no message content."); process.exit(1); }
-html = html.replace(/^\uFEFF/, "").replace(/^\`\`\`(?:html)?\s*/i, "").replace(/\s*\`\`\`\s*$/, "");
-if (!/^<!doctype html>/i.test(html)) {
-  console.error("Model output did not start with <!doctype html>; refusing to save incomplete HTML.");
-  process.exit(1);
+let payload = "";
+let sceneFailure = "";
+try {
+  payload = await askOllama([
+    { role: "system", content: system },
+    { role: "user", content: "Implement the supplied visual direction as one complete, deterministic, offline HTML scene. Treat the plan as mandatory creative direction. Never call Math.random, including in helper functions. Every frame must be fully derived from absolute render time. Implement window.renderAt(seconds), window.getDuration(), and render-only mode.\n\n--- STORY BRIEF START ---\n" + story + "\n--- STORY BRIEF END ---\n\n--- VISUAL DIRECTOR PLAN JSON START ---\n" + planJson + "\n--- VISUAL DIRECTOR PLAN JSON END ---\n" + (repairNote ? "\nMANDATORY REPAIR REQUEST:\n" + repairNote + "\nPreserve story meaning, offline behavior and export contract. Fix the specific QA failure; do not add a static end card.\n" : "") + "\nReturn only complete HTML.\n" }
+  ], "scene generation");
+} catch (error) {
+  sceneFailure = error.message || "Ollama scene generation failed";
 }
-if (/\bMath\s*\.\s*random\s*\(/.test(html)) {
-  console.error("Generated HTML uses Math.random(), which makes exported frames nondeterministic. Remove Math.random() and derive every visual value from the render timestamp. No file was written; the pipeline can retry with a targeted repair.");
-  process.exit(1);
-}
-const missing = [];
-if (!/window\.renderAt\s*=/.test(html)) missing.push("window.renderAt(seconds)");
-if (!/window\.getDuration\s*=/.test(html)) missing.push("window.getDuration()");
-if (!/URLSearchParams\s*\(\s*(?:window\.)?location\.search\s*\)/.test(html) || !/get\s*\(\s*["']render["']\s*\)/.test(html)) {
-  missing.push("?render=1 render-only mode");
-}
-if (missing.length) {
-  console.error(`Generated HTML failed export validation: missing ${missing.join(", ")}.\nNo file was written. Try again with --model qwen2.5-coder:7b for a targeted repair, or revise the prompt.`);
-  process.exit(1);
+let html = (payload || "").replace(/^\uFEFF/, "").replace(/^\`\`\`(?:html)?\s*/i, "").replace(/\s*\`\`\`\s*$/, "");
+const validationErrors = [];
+if (!/^<!doctype html>/i.test(html)) validationErrors.push("output is not a complete HTML document");
+if (/\bMath\s*\.\s*random\s*\(/.test(html)) validationErrors.push("uses Math.random(), forbidden for deterministic rendering");
+if (!/window\.renderAt\s*=/.test(html)) validationErrors.push("missing window.renderAt(seconds)");
+if (!/window\.getDuration\s*=/.test(html)) validationErrors.push("missing window.getDuration()");
+if (!/URLSearchParams\s*\(\s*(?:window\.)?location\.search\s*\)/.test(html) || !/get\s*\(\s*["']render["']\s*\)/.test(html)) validationErrors.push("missing ?render=1 render-only mode");
+if (validationErrors.length || sceneFailure) {
+  const reason = [sceneFailure, ...validationErrors].filter(Boolean).join("; ");
+  console.warn("LLM scene failed validation: " + reason + ". Compiling a deterministic plan-driven fallback scene; export QA remains enabled.");
+  html = buildFallbackScene({ title, story, plan: visualPlan });
 }
 // Bundle the optional module script so the final scene is self-contained and offline.
 const moduleScripts = [...html.matchAll(/<script\b(?=[^>]*\btype\s*=\s*["']module["'])[^>]*>([\s\S]*?)<\/script\s*>/gi)];
