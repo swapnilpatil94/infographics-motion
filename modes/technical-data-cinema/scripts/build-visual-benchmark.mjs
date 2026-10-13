@@ -14,14 +14,14 @@ const htmlPath = path.join(outputDir, "index.html");
 const videoPath = path.join(root, "output", "visual-director-benchmark.mp4");
 await fs.mkdir(outputDir, { recursive: true });
 let html = await fs.readFile(sourcePath, "utf8");
-const scripts = [...html.matchAll(/<script\\b(?=[^>]*\\btype\\s*=\\s*["']module["'])[^>]*>([\\s\\S]*?)<\\/script\\s*>/gi)];
+const scripts = [...html.matchAll(/<script\b(?=[^>]*\btype\s*=\s*["']module["'])[^>]*>([\s\S]*?)<\/script\s*>/gi)];
 if (scripts.length !== 1) throw new Error(`Expected exactly one module script, found ${scripts.length}`);
 const bundled = await build({
   stdin: { contents: scripts[0][1], resolveDir: root, sourcefile: "visual-director-benchmark.js", loader: "js" },
   bundle: true, write: false, platform: "browser", format: "iife", target: "es2022", minify: true, legalComments: "none"
 });
-html = html.replace(scripts[0][0], `<script>\\n${bundled.outputFiles[0].text}\\n</script>`);
-if (/<(?:script|link|img|video|audio)[^>]+(?:src|href)=["']https?:\\/\\//i.test(html)) throw new Error("Benchmark HTML references a remote asset");
+html = html.replace(scripts[0][0], `<script>\n${bundled.outputFiles[0].text}\n</script>`);
+if (/<(?:script|link|img|video|audio)[^>]+(?:src|href)=["']https?:\/\//i.test(html)) throw new Error("Benchmark HTML references a remote asset");
 await fs.writeFile(htmlPath, html);
 console.log(`Bundled offline benchmark: ${htmlPath}`);
 const render = spawnSync(process.execPath, [
