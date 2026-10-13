@@ -38,6 +38,7 @@ jobs:
       - name: Syntax check
         run: |
           node --check scripts/generate.mjs
+          node --check scripts/ollama-session.mjs
           node --check scripts/render.mjs
           node --check scripts/doctor.mjs
       - name: Render deterministic smoke test
