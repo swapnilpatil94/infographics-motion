@@ -304,8 +304,8 @@ const server = http.createServer(async (req, res) => {
               try { await fs.rename(htmlPath, archivedScene); log(job, `Archived invalid generated scene as ${path.basename(archivedScene)}.`); }
               catch (archiveError) { if (archiveError.code !== "ENOENT") throw archiveError; }
               const repairNote = [
-                "AUTOMATIC FIRST-PASS VALIDATION REPAIR. The previous model output was rejected by deterministic scene validation.",
-                "Do not use Math.random() anywhere, including initialization. Do not use timers or CSS transitions for scene state.",
+                "AUTOMATIC FIRST-PASS REPAIR. Exact validation failure: " + (summarizeSceneFailure(job.logs.slice(-100).join("\n")) || "HTML failed validation") + ". Fix this specific failure first.",
+                "If Math.random() was detected, remove every call completely. Use fixed coordinates, a seeded deterministic generator initialized once, or values derived directly from absolute time. Never use random values or accumulated state in renderAt().",
                 "Every visible value must be a pure function of absolute timestamp; renderAt(seconds) must reset the full scene state and reproduce identical pixels when called repeatedly for the same timestamp.",
                 "Return a complete HTML document beginning with <!doctype html>, include window.renderAt, window.getDuration, and render-only mode via new URLSearchParams(window.location.search).get('render').",
                 "Keep the original story and narration meaning. Do not weaken or bypass any validation."
