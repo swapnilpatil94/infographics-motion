@@ -89,7 +89,7 @@ async function runSceneRepair(node, generateArgs, repairNote, cwd, job, label) {
     }
 
     let lastFailure = error;
-  let lastReason = summarizeSceneFailure(primaryLogs) || error.message;
+    let lastReason = summarizeSceneFailure(primaryLogs) || error.message;
     for (const fallbackModel of availableCandidates) {
       const fallbackArgs = [...repairArgs];
       const modelIndex = fallbackArgs.indexOf("--model");
