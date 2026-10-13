@@ -14,7 +14,7 @@ This is **not a fixed scene template**. The visual plan must decide what each en
 
 ## Requirements
 - macOS on Apple Silicon
-- Node.js 20+ and npm
+- Node.js 22+ and npm (Playwright current releases track supported Node LTS versions)
 - Ollama with a downloaded coding model
 - FFmpeg available as `ffmpeg`
 - Existing Chatterbox environment for narration
@@ -43,9 +43,9 @@ Output is written under `output/`. The generator writes only a new generated HTM
 ## Render a deterministic timeline
 Generated HTML must expose `window.renderAt(seconds)` and `window.getDuration()`. Render with:
 ```bash
-node scripts/render.mjs --html output/viral-traffic/index.html --out output/viral-traffic/final.mp4 --fps 30 --audio /absolute/path/to/approved-narration.wav
+node scripts/render.mjs --html output/pilot-why-a-viral-moment-can-break-a-backend/index.html --out output/pilot-why-a-viral-moment-can-break-a-backend/final.mp4 --fps 30 --audio /absolute/path/to/approved-narration.wav
 ```
-Chromium captures 1080×1920 frames, then FFmpeg encodes H.264/AAC. Start with a short pilot; a full high-resolution render can take time.
+Chromium captures 1080×1920 frames, checks that seeking is deterministic, and rejects browser errors or HTTP(S) requests; FFmpeg encodes H.264/AAC. Start with `npm run test:smoke` before a story render. Full 1080×1920 rendering can take time and disk space.\n\n## Reference docs\n- [Animation Playbook](docs/ANIMATION_PLAYBOOK.md)\n- [Research Report](docs/RESEARCH_REPORT.md)\n- [Packages and Setup](docs/PACKAGES_AND_SETUP.md)\n- [Scene QA Checklist](docs/SCENE_QA_CHECKLIST.md)\n\nThe included `examples/render-smoke-test.html` is only a renderer test fixture, not a creative template.
 
 ## Model/memory policy for a 24 GB Mac
 - Run one heavy model at a time; do not keep Qwen3-Coder, Chatterbox and other large models active together.
