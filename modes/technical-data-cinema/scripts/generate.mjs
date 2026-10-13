@@ -68,10 +68,10 @@ if (!/^<!doctype html>/i.test(html)) {
 }
 // Models sometimes ignore the no-randomness rule. Convert Math.random() calls to a
 // local PRNG reset from renderAt(t), so the same timestamp reproduces the same sequence.
-const randomCalls = /\\bMath\\s*\\.\\s*random\\s*\\(\\s*\\)/g;
+const randomCalls = /\bMath\s*\.\s*random\s*\(\s*\)/g;
 if (randomCalls.test(html)) {
-  const scriptTags = [...html.matchAll(/<script\\b([^>]*)>/gi)];
-  const inlineScript = scriptTags.find(match => !/\\bsrc\\s*=/.test(match[1]));
+  const scriptTags = [...html.matchAll(/<script\b([^>]*)>/gi)];
+  const inlineScript = scriptTags.find(match => !/\bsrc\s*=/.test(match[1]));
   if (!inlineScript) {
     console.error("Generated HTML uses Math.random() but has no inline script for a deterministic PRNG. No file was written.");
     process.exit(1);
@@ -89,7 +89,7 @@ function __tdcRandom() {
   const insertion = inlineScript.index + inlineScript[0].length;
   html = html.slice(0, insertion) + deterministicRandom + html.slice(insertion);
   html = html.replace(randomCalls, "__tdcRandom()");
-  const renderAt = /window\\.renderAt\\s*=\\s*function\\s*\\(\\s*seconds\\s*\\)\\s*\\{\\s*const\\s+t\\s*=\\s*Math\\.max\\(0,\\s*Math\\.min\\(DURATION,\\s*Number\\(seconds\\)\\s*\\|\\|\\s*0\\)\\)\\s*;/;
+  const renderAt = /window\.renderAt\s*=\s*function\s*\(\s*seconds\s*\)\s*\{\s*const\s+t\s*=\s*Math\.max\(0,\s*Math\.min\(DURATION,\s*Number\(seconds\)\s*\|\|\s*0\)\)\s*;/;
   if (!renderAt.test(html)) {
     console.error("Cannot seed generated randomness safely: window.renderAt does not match the expected export contract. No file was written.");
     process.exit(1);
