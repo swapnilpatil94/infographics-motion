@@ -49,7 +49,7 @@ Chromium captures 1080×1920 frames, then FFmpeg encodes H.264/AAC. Start with a
 
 ## Model/memory policy for a 24 GB Mac
 - Run one heavy model at a time; do not keep Qwen3-Coder, Chatterbox and other large models active together.
-- Begin with a conservative context length. Longer context increases memory use.
+- Start with 8192 context tokens; increase only after checking memory. Longer context increases memory use.
 - Use Qwen3-Coder 30B for high-effort scene generation, then unload it before narration/rendering if memory pressure appears.
 - Use Qwen2.5-Coder 7B for quick revisions and syntax fixes.
 - Use DeepSeek-R1 14B only as an optional reasoning reviewer.
