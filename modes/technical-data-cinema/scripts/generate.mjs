@@ -70,11 +70,11 @@ async function askOllama(messages, stage) {
 console.log("Visual Director: planning story-specific visual beats...");
 const planText = await askOllama([
   { role: "system", content: plannerPrompt },
-  { role: "user", content: `Create a concrete visual plan for this story. Adapt beat count and timing to the actual narration duration if provided.\\n\\n--- STORY BRIEF START ---\\n${story}\\n--- STORY BRIEF END ---` }
+  { role: "user", content: `Create a concrete visual plan for this story. Adapt beat count and timing to the actual narration duration if provided.\n\n--- STORY BRIEF START ---\n${story}\n--- STORY BRIEF END ---` }
 ], "visual planning");
 let visualPlan;
 try {
-  const cleanPlan = planText.replace(/^\\uFEFF/, "").replace(/^\\`\\`\\`(?:json)?\\s*/i, "").replace(/\\s*\\`\\`\\`\\s*$/, "");
+  const cleanPlan = planText.replace(/^\uFEFF/, "").replace(/^```(?:json)?\s*/i, "").replace(/\s*```\s*$/, "");
   const jsonText = cleanPlan.slice(cleanPlan.indexOf("{"), cleanPlan.lastIndexOf("}") + 1);
   visualPlan = JSON.parse(jsonText);
   if (!Array.isArray(visualPlan.beats) || visualPlan.beats.length < 4) {
@@ -88,7 +88,7 @@ const planJson = JSON.stringify(visualPlan, null, 2);
 console.log(`Visual Director planned ${visualPlan.beats.length} beats; generating the animated scene...`);
 const payload = await askOllama([
   { role: "system", content: system },
-  { role: "user", content: `Implement the supplied visual direction as one complete, deterministic, offline HTML scene. Treat the plan as mandatory creative direction; improve implementation details only when needed for clarity/performance.\\n\\n--- STORY BRIEF START ---\\n${story}\\n--- STORY BRIEF END ---\\n\\n--- VISUAL DIRECTOR PLAN JSON START ---\\n${planJson}\\n--- VISUAL DIRECTOR PLAN JSON END ---\\n${repairNote ? `\\nMANDATORY REPAIR REQUEST:\\n${repairNote}\\nPreserve the story, narration meaning, offline behavior, and export contract. Fix the specific QA failure; do not simply add a static end card.\\n` : ""}\\nReturn only complete HTML.\\n` }
+  { role: "user", content: `Implement the supplied visual direction as one complete, deterministic, offline HTML scene. Treat the plan as mandatory creative direction; improve implementation details only when needed for clarity/performance.\n\n--- STORY BRIEF START ---\n${story}\n--- STORY BRIEF END ---\n\n--- VISUAL DIRECTOR PLAN JSON START ---\n${planJson}\n--- VISUAL DIRECTOR PLAN JSON END ---\n${repairNote ? `\nMANDATORY REPAIR REQUEST:\n${repairNote}\nPreserve the story, narration meaning, offline behavior, and export contract. Fix the specific QA failure; do not simply add a static end card.\n` : ""}\nReturn only complete HTML.\n` }
 ], "scene generation");
 let html = payload;
 
