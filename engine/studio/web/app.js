@@ -738,7 +738,7 @@ view.addEventListener("click", e => {
   if (!b) return;
   if (b.id === "audio-generate") return generateScriptAudio();
   if (b.id === "audio-example") {
-    AUD.text = "[HOOK] सोचिए, सिर्फ़ एक गलत क्लिक... और आपके बैंक अकाउंट से लाखों रुपये गायब हो सकते हैं।\\n[SUSPENSE] लेकिन रुकिए। सबसे डरावनी बात अभी बाकी है।\\n[REVEAL] कई बार, पैसा निकल जाने के बाद भी आपको पता नहीं चलता कि असली गलती कहाँ हुई।\\n[EXPLAIN] स्कैमर भरोसा बनाते हैं, जल्दबाज़ी करवाते हैं, और फिर आपसे वही बटन दबवाते हैं जिसकी उन्हें ज़रूरत होती है।\\n[CALM] इसलिए अगली बार कोई भी पेमेंट करने से पहले, एक सेकंड रुकिए... और डिटेल्स दोबारा चेक कीजिए।";
+    AUD.text = "[HOOK] सोचिए, सिर्फ़ एक गलत क्लिक... और आपके बैंक अकाउंट से लाखों रुपये गायब हो सकते हैं।\n[SUSPENSE] लेकिन रुकिए। सबसे डरावनी बात अभी बाकी है।\n[REVEAL] कई बार, पैसा निकल जाने के बाद भी आपको पता नहीं चलता कि असली गलती कहाँ हुई।\n[EXPLAIN] स्कैमर भरोसा बनाते हैं, जल्दबाज़ी करवाते हैं, और फिर आपसे वही बटन दबवाते हैं जिसकी उन्हें ज़रूरत होती है।\n[CALM] इसलिए अगली बार कोई भी पेमेंट करने से पहले, एक सेकंड रुकिए... और डिटेल्स दोबारा चेक कीजिए।";
     AUD.job = null; AUD.error = null; try { sessionStorage.setItem("ks.audioText", AUD.text); } catch (_) {} return viewAudio();
   }
   if (b.id === "audio-clear") { AUD.text = ""; AUD.job = null; AUD.error = null; try { sessionStorage.removeItem("ks.audioText"); } catch (_) {} return viewAudio(); }
