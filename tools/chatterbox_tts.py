@@ -213,7 +213,7 @@ def main() -> int:
     }
     info_path = output_path.with_name("model_info.json")
     info_path.write_text(json.dumps(model_info, ensure_ascii=False, indent=2), encoding="utf-8")
-    log(f"MODEL family={model_info['model_family']} selector={selector_used} dedicated_hindi_checkpoint=false sample_rate={model_info['sample_rate']} submodels={submodels}")
+    log(f"MODEL family={model_info['model_family']} selector={selector_used} dedicated_hindi_checkpoint={model_info['dedicated_hindi_checkpoint']} sample_rate={model_info['sample_rate']} submodels={submodels}")
     log(f"MODEL_INFO path={info_path}")
     log(f"model loaded in {time.time() - t0:.1f}s")
 
