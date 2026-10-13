@@ -36,31 +36,62 @@ if (!Number.isInteger(context) || context < 2048 || context > 32768) {
 }
 console.log(`Generating with ${model}; context=${context} tokens`);
 console.log(`Story: ${storyPath}\nOutput: ${outPath}`);
-let response;
+const plannerPrompt = await fs.readFile(path.join(root, "prompts", "visual-planner.md"), "utf8");
+const timeoutMs = Number(process.env.OLLAMA_TIMEOUT_MS || 600000);
+async function askOllama(messages, stage) {
+  let response;
+  try {
+    response = await fetch(`${ollamaUrl}/api/chat`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        model, stream: false, messages,
+        options: { temperature: 0.25, num_ctx: context }
+      }),
+      signal: AbortSignal.timeout(timeoutMs)
+    });
+  } catch (error) {
+    console.error(`Could not reach Ollama during ${stage} at ${ollamaUrl}: ${error.message}`);
+    process.exit(1);
+  }
+  if (!response.ok) {
+    console.error(`Ollama ${stage} returned HTTP ${response.status}: ${await response.text()}`);
+    process.exit(1);
+  }
+  const payload = await response.json();
+  const content = payload?.message?.content?.trim();
+  if (!content) {
+    console.error(`Ollama returned no content during ${stage}.`);
+    process.exit(1);
+  }
+  return content;
+}
+
+console.log("Visual Director: planning story-specific visual beats...");
+const planText = await askOllama([
+  { role: "system", content: plannerPrompt },
+  { role: "user", content: `Create a concrete visual plan for this story. Adapt beat count and timing to the actual narration duration if provided.\\n\\n--- STORY BRIEF START ---\\n${story}\\n--- STORY BRIEF END ---` }
+], "visual planning");
+let visualPlan;
 try {
-  response = await fetch(`${ollamaUrl}/api/chat`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({
-      model, stream: false,
-      messages: [
-        { role: "system", content: system },
-        { role: "user", content: `Create the visual explainer for this story brief.\n\n--- STORY BRIEF START ---\n${story}\n--- STORY BRIEF END ---\n${repairNote ? `\nMANDATORY REPAIR REQUEST:\n${repairNote}\nPreserve the story, narration meaning, offline behavior, and export contract. Fix the specific QA failure; do not simply add a static end card.\n` : ""}\nReturn only complete HTML.\n` }
-      ],
-      options: { temperature: 0.25, num_ctx: context }
-    }),
-    signal: AbortSignal.timeout(Number(process.env.OLLAMA_TIMEOUT_MS || 600000))
-  });
+  const cleanPlan = planText.replace(/^\\uFEFF/, "").replace(/^\\`\\`\\`(?:json)?\\s*/i, "").replace(/\\s*\\`\\`\\`\\s*$/, "");
+  const jsonText = cleanPlan.slice(cleanPlan.indexOf("{"), cleanPlan.lastIndexOf("}") + 1);
+  visualPlan = JSON.parse(jsonText);
+  if (!Array.isArray(visualPlan.beats) || visualPlan.beats.length < 4) {
+    throw new Error("plan must contain at least four visual beats");
+  }
 } catch (error) {
-  console.error(`Could not reach Ollama at ${ollamaUrl}: ${error.message}`);
+  console.error(`Visual Director returned an invalid plan: ${error.message}. No HTML was written. Retry or use a more capable local coding model.`);
   process.exit(1);
 }
-if (!response.ok) {
-  console.error(`Ollama returned HTTP ${response.status}: ${await response.text()}`);
-  process.exit(1);
-}
-const payload = await response.json();
-let html = payload?.message?.content?.trim();
+const planJson = JSON.stringify(visualPlan, null, 2);
+console.log(`Visual Director planned ${visualPlan.beats.length} beats; generating the animated scene...`);
+const payload = await askOllama([
+  { role: "system", content: system },
+  { role: "user", content: `Implement the supplied visual direction as one complete, deterministic, offline HTML scene. Treat the plan as mandatory creative direction; improve implementation details only when needed for clarity/performance.\\n\\n--- STORY BRIEF START ---\\n${story}\\n--- STORY BRIEF END ---\\n\\n--- VISUAL DIRECTOR PLAN JSON START ---\\n${planJson}\\n--- VISUAL DIRECTOR PLAN JSON END ---\\n${repairNote ? `\\nMANDATORY REPAIR REQUEST:\\n${repairNote}\\nPreserve the story, narration meaning, offline behavior, and export contract. Fix the specific QA failure; do not simply add a static end card.\\n` : ""}\\nReturn only complete HTML.\\n` }
+], "scene generation");
+let html = payload;
+
 if (!html) { console.error("Ollama returned no message content."); process.exit(1); }
 html = html.replace(/^\uFEFF/, "").replace(/^\`\`\`(?:html)?\s*/i, "").replace(/\s*\`\`\`\s*$/, "");
 if (!/^<!doctype html>/i.test(html)) {
