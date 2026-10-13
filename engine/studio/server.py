@@ -474,7 +474,7 @@ async def events(pid: str, request: Request, after: int = 0):
 
 
 # ------------------------------------------------------------------------------------------------ app
-def create_app(test_mode=False, max_running=1):
+def create_app(test_mode=False, max_running=1, include_ui=True):
     app = FastAPI(title="Kathaaya Studio")
     MGR["m"] = J.Manager(max_running=max_running, test_mode=test_mode)
 
@@ -502,11 +502,12 @@ def create_app(test_mode=False, max_running=1):
     app.include_router(kserver.router, prefix="/api/k")
     app.include_router(router, prefix="/api")
     app.include_router(router)
-    app.mount("/static", StaticFiles(directory=WEB), name="static")
+    if include_ui:
+        app.mount("/static", StaticFiles(directory=WEB), name="static")
 
-    @app.get("/", response_class=HTMLResponse)
-    def index():
-        return HTMLResponse(open(os.path.join(WEB, "index.html"), encoding="utf-8").read(), headers={"Cache-Control": "no-cache"})
+        @app.get("/", response_class=HTMLResponse)
+        def index():
+            return HTMLResponse(open(os.path.join(WEB, "index.html"), encoding="utf-8").read(), headers={"Cache-Control": "no-cache"})
     return app
 
 
@@ -517,9 +518,11 @@ def main():
     ap.add_argument("--port", type=int, default=int(os.environ.get("STUDIO_PORT", 8765)))
     ap.add_argument("--host", default="127.0.0.1")
     ap.add_argument("--test-mode", action="store_true", help="enable the simulated-production hooks used by the automated tests")
+    ap.add_argument("--api-only", action="store_true", help="serve the Studio API without mounting its browser UI")
     a = ap.parse_args()
-    print(f"Kathaaya Studio  ->  http://{a.host}:{a.port}", flush=True)
-    uvicorn.run(create_app(test_mode=a.test_mode), host=a.host, port=a.port, log_level="warning")
+    mode = "API only" if a.api_only else "UI + API"
+    print(f"Kathaaya Studio ({mode}) -> http://{a.host}:{a.port}", flush=True)
+    uvicorn.run(create_app(test_mode=a.test_mode, include_ui=not a.api_only), host=a.host, port=a.port, log_level="warning")
 
 
 if __name__ == "__main__":
