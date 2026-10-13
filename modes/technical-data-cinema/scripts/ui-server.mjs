@@ -347,7 +347,30 @@ const server = http.createServer(async (req, res) => {
               }
             }
           } else if (voiceMode === "wav") {
-            await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--audio", path.resolve(wavPath), "--fps", String(fps)], root, job, "Render with existing WAV narration");
+            const wavExportArgs = ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--audio", path.resolve(wavPath), "--fps", String(fps)];
+            try {
+              await run(node, wavExportArgs, root, job, "Render with existing WAV narration");
+            } catch (error) {
+              const recent = job.logs.slice(-120).join("\n");
+              const densityFailure = recent.includes("Visual density QA failed");
+              const determinismFailure = recent.includes("Determinism check failed");
+              const endingFailure = recent.includes("Visual ending check failed");
+              const offlineFailure = recent.includes("Offline policy failed") || recent.includes("Browser errors detected");
+              if (!densityFailure && !determinismFailure && !endingFailure && !offlineFailure) throw error;
+
+              const archivedScene = path.join(dir, `index.failed-visual-qa-${Date.now()}.html`);
+              await fs.rename(htmlPath, archivedScene);
+              const repairNote = densityFailure
+                ? "VISUAL DENSITY REPAIR: the renderer found that too many sampled frames are visually sparse. Recompose the dominant subject so it is recognisable and fills the vertical frame; enlarge the main mechanism and use the central visual area. Background texture and tiny labels do not count. Keep distinct story-specific beats, deterministic rendering, the offline policy, and the exact export contract."
+                : endingFailure
+                  ? "VISUAL ENDING REPAIR: the ending freezes for more than 2.5 seconds. Keep meaningful narration-synchronized action until the final 1.5–2.5 seconds, then resolve into a concise takeaway. Do not use a long static end card. Preserve the story, deterministic renderAt contract, and offline policy."
+                  : determinismFailure
+                    ? "DETERMINISM REPAIR: renderAt(t) must reset all visible state and derive every visual property from absolute timestamp t. The same timestamp must always reproduce identical pixels. Preserve the story and offline policy."
+                    : "OFFLINE / RUNTIME REPAIR: remove external network requests and fix browser runtime errors. Bundle all required dependencies locally, preserve the story, use deterministic timestamp-driven rendering, and keep the required renderAt/getDuration export contract.";
+              log(job, `Visual QA failed (${densityFailure ? "density" : endingFailure ? "ending" : determinismFailure ? "determinism" : "offline/runtime"}); archived scene as ${path.basename(archivedScene)} and attempting one targeted visual-only repair. Existing narration WAV will be reused unchanged.`);
+              await runSceneRepair(node, generateArgs, repairNote, root, job, "Repair scene using existing narration WAV");
+              await run(node, wavExportArgs, root, job, "Render repaired scene with the same WAV narration");
+            }
           } else {
             await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--fps", String(fps)], root, job, "Silent video render");
           }
