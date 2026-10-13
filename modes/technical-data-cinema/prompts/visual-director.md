@@ -86,3 +86,12 @@ MOTION / FINISH
 
 FINAL SELF-TEST
 Before outputting HTML, imagine six screenshots at 1s, 20%, 40%, 60%, 80%, and 95% of duration. For each screenshot answer: what is the one thing the viewer should notice, does it occupy enough of the frame to read on a phone, and what has changed from the previous beat? If any answer is “a few tiny labels or dots”, redesign the scene. Make the main diagram visually dominant before adding secondary details.
+
+THREE.JS / 3D TOOLKIT
+- Three.js is installed locally and the generation pipeline bundles a single inline <script type="module"> into the final offline HTML. When 3D materially improves the explanation, you may use `import * as THREE from "three";` in exactly one module script. The bundler embeds dependencies; never use a CDN, remote import, external model, texture, font, or network request.
+- Use Three.js selectively for meaningful 3D systems: a network topology that rotates into view, a server rack that fills under load, layered data paths, a physical mechanism, or a spatial before/after transformation. Do not use 3D just to spin generic cubes.
+- Three.js is optional. Use SVG/Canvas/DOM when they explain the idea more clearly, render faster, or keep labels sharper. Prefer a hybrid composition: crisp HTML/SVG typography and diagrams over a controlled 3D scene.
+- For Three.js scenes, create the renderer and scene once; set camera, object transforms, materials, lighting, and all animated values from absolute time inside renderAt(seconds). Call renderer.render(scene, camera) synchronously. Never use requestAnimationFrame, timers, mixers advanced by delta time, Math.random(), or state accumulated from previous frames in render-only mode.
+- Use a fixed logical aspect ratio of 540×960, deterministic geometry and seeded/precomputed layouts, restrained lighting, deliberate camera framing, and large silhouettes. Keep primary text as HTML/SVG overlays rather than tiny 3D text.
+- Dispose of no scene resources during renderAt; reuse geometry/materials and update transforms only. Avoid expensive postprocessing and excessive meshes because every frame is rendered separately for export.
+- The final file must still expose window.renderAt(seconds), window.getDuration(), and render-only mode. Keep the scene functional when opened from a local file after bundling.
