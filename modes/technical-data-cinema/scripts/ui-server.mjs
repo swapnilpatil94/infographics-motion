@@ -119,6 +119,14 @@ const server = http.createServer(async (req, res) => {
           job.status = "running";
           const dir = path.join(outputRoot, slug);
           await fs.mkdir(dir, { recursive: true });
+          for (const name of ["index.html", "final.mp4", "final-silent.mp4", "final.narration.wav"]) {
+            try {
+              await fs.access(path.join(dir, name));
+              throw new Error(`Output already exists: ${path.join(dir, name)}. Change the output folder name to avoid overwriting a previous production.`);
+            } catch (error) {
+              if (error.code !== "ENOENT") throw error;
+            }
+          }
           const storyPath = path.join(dir, "story.md");
           const htmlPath = path.join(dir, "index.html");
           const narrationPath = path.join(dir, "narration.md");
@@ -129,7 +137,7 @@ const server = http.createServer(async (req, res) => {
           const generateArgs = ["scripts/ollama-session.mjs", "--", "node", "scripts/generate.mjs", "--story", storyPath, "--model", model, "--out", htmlPath];
           await run(node, generateArgs, root, job, "Ollama scene generation (model unload happens before narration)");
           if (voiceMode === "generate") {
-            await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--voice-script", narrationPath, "--fps", String(fps)], root, job, "Chatterbox narration, then video render");
+            await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--voice-script", narrationPath, "--fps", String(fps), "--style", String(body.style || "storytelling"), "--performance", String(body.performance || "directed"), "--expression-intensity", String(body.intensity ?? 65)], root, job, "Chatterbox narration, then video render");
           } else if (voiceMode === "wav") {
             await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--audio", path.resolve(wavPath), "--fps", String(fps)], root, job, "Render with existing WAV narration");
           } else {
