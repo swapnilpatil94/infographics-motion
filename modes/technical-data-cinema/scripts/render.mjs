@@ -21,6 +21,17 @@ if (!Number.isFinite(fps) || fps < 1 || fps > 60) fail("--fps must be between 1 
 if (forcedDuration !== null && (!Number.isFinite(forcedDuration) || forcedDuration <= 0 || forcedDuration > 600)) fail("--duration must be > 0 and <= 600 seconds.");
 await fs.access(htmlPath);
 if (audioPath) await fs.access(audioPath);
+let audioDuration = 0;
+if (audioPath) {
+  const probe = spawnSync("ffprobe", ["-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", audioPath], { encoding: "utf8" });
+  if (probe.error || probe.status !== 0 || !Number.isFinite(Number(probe.stdout.trim())) || Number(probe.stdout.trim()) <= 0) {
+    fail(`Could not read narration duration with ffprobe. Check that FFmpeg is installed and the audio is valid. ${probe.stderr || probe.error?.message || ""}`);
+  }
+  audioDuration = Number(probe.stdout.trim());
+  if (forcedDuration !== null && forcedDuration + 0.02 < audioDuration) {
+    fail(`--duration (${forcedDuration}s) is shorter than narration (${audioDuration.toFixed(2)}s); refusing to cut off voice.`);
+  }
+}
 const outDir = path.dirname(outPath), frameDir = path.join(outDir, "frames");
 await fs.mkdir(frameDir, { recursive: true });
 let duration, frameCount;
@@ -48,22 +59,21 @@ try {
   if (contract.renderAt !== "function" || contract.getDuration !== "function" || !Number.isFinite(contract.duration) || contract.duration <= 0) {
     fail("HTML must define window.renderAt(seconds) and window.getDuration() returning a positive duration.");
   }
-  duration = forcedDuration ?? contract.duration;
-  if (duration > 600) fail("Duration must not exceed 600 seconds.");
+  if (contract.duration > 600) fail("Scene duration must not exceed 600 seconds.");
+  duration = forcedDuration ?? Math.max(contract.duration, audioDuration);
+  if (duration > 600) fail("Final duration must not exceed 600 seconds.");
   frameCount = Math.ceil(duration * fps);
 
-  // Determinism check: the same timestamp must yield byte-identical PNG output
-  // after visiting a different timestamp. This catches state accumulated by frame loops.
   await page.evaluate(() => window.renderAt(0));
   const first = await page.screenshot({ type: "png", animations: "disabled" });
-  await page.evaluate(time => window.renderAt(time), Math.min(duration * 0.63, duration - 0.001));
+  await page.evaluate(time => window.renderAt(time), Math.min(contract.duration * 0.63, contract.duration - 0.001));
   await page.evaluate(() => window.renderAt(0));
-  const second = await page.screenshot({ type: "png", animations: "disabled" });
   const hash = buffer => crypto.createHash("sha256").update(buffer).digest("hex");
-  if (hash(first) !== hash(second)) {
+  if (hash(first) !== hash(await page.screenshot({ type: "png", animations: "disabled" }))) {
     fail("Determinism check failed: renderAt(0) produced different pixels after seeking. Derive all scene state from absolute time.");
   }
   console.log("Determinism check passed (same timestamp → identical screenshot).");
+  if (audioDuration > contract.duration) console.log(`Narration (${audioDuration.toFixed(2)}s) is longer than the scene (${contract.duration.toFixed(2)}s); holding the final scene while audio finishes.`);
   console.log(`Rendering ${frameCount} frames at ${fps} fps (1080×1920), ${duration.toFixed(2)} seconds`);
 
   for (let i = 0; i < frameCount; i++) {
