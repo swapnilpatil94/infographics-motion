@@ -88,7 +88,17 @@ async function runSceneRepair(node, generateArgs, repairNote, cwd, job, label) {
     if (modelIndex < 0 || !fallbackArgs[modelIndex + 1]) throw error;
     fallbackArgs[modelIndex + 1] = fallbackModel;
     log(job, `Primary repair model returned invalid HTML; retrying once with fallback model ${fallbackModel}. Narration WAV remains unchanged.`);
-    await run(node, fallbackArgs, cwd, job, `${label} (fallback ${fallbackModel})`);
+    try {
+      await run(node, fallbackArgs, cwd, job, `${label} (fallback ${fallbackModel})`);
+    } catch (fallbackError) {
+      const fallbackLogs = job.logs.slice(-80).join("\\n");
+      const reason = /Generated HTML uses Math\\.random/i.test(fallbackLogs)
+        ? "the fallback model still emitted Math.random(), which is not allowed in deterministic renders"
+        : /Generated HTML failed export validation|Model output did not start with|Ollama returned no message content/i.test(fallbackLogs)
+          ? "the fallback model still failed the required HTML/export contract"
+          : fallbackError.message;
+      throw new Error(`${label} could not produce a valid scene after the primary and fallback attempts: ${reason}. The existing narration WAV was not regenerated. Review the archived scene/logs, or try a stronger installed coding model; QA was not bypassed.`);
+    }
   }
 }
 
