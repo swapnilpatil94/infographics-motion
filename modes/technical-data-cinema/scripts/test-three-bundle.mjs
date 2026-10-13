@@ -6,9 +6,15 @@ import os from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { chromium } from "playwright";
-import { bundleSceneHtml } from "./bundle-scene.mjs";
+import { build } from "esbuild";
 
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
+async function bundleSceneHtml(html) {
+  const scripts = [...html.matchAll(/<script\b(?=[^>]*\btype\s*=\s*["']module["'])[^>]*>([\s\S]*?)<\/script\s*>/gi)];
+  assert.equal(scripts.length, 1, "fixture should have one module script");
+  const result = await build({stdin:{contents:scripts[0][1],resolveDir:root,sourcefile:"three-smoke.js",loader:"js"},bundle:true,write:false,platform:"browser",format:"iife",target:"es2022",minify:true,legalComments:"none"});
+  return html.replace(scripts[0][0], `<script>\n${result.outputFiles[0].text}\n</script>`);
+}
 const source = `<!doctype html>
 <html><head><meta charset="utf-8"><style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080b10}canvas{display:block;width:100vw;height:100vh}</style></head>
 <body><script type="module">
@@ -33,7 +39,7 @@ window.renderAt = seconds => { const t=Math.max(0,Math.min(2,Number(seconds)||0)
 if (new URLSearchParams(window.location.search).get("render") === "1") document.body.style.margin="0";
 window.renderAt(0);
 </script></body></html>`;
-const bundled = await bundleSceneHtml(source, root);
+const bundled = await bundleSceneHtml(source);
 assert.doesNotMatch(bundled, /<script[^>]*type=["']module["']/i, "module script should be bundled");
 assert.match(bundled, /window\.renderAt\s*=/, "renderAt export should survive bundling");
 assert.match(bundled, /window\.getDuration\s*=/, "getDuration export should survive bundling");
