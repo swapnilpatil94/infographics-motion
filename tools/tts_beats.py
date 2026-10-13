@@ -21,7 +21,7 @@ v = voice.synthesize(
 )
 # Match the exact cache key created by synthesize(), including TTS-only text.
 key_beats = voice._prepare_beats(beats, PRONUNCIATION_MODE)
-key = voice._key(key_beats, 42, STYLE, PRONUNCIATION_MODE, GROUP_LINES, group_max_lines=GROUP_MAX_LINES, group_max_words=GROUP_MAX_WORDS)
+key = voice._key(key_beats, 42, STYLE, PRONUNCIATION_MODE, GROUP_LINES, group_max_lines=GROUP_MAX_LINES, group_max_words=GROUP_MAX_WORDS) + "-flat"
 shutil.copy(os.path.join(voice.VOICE_DIR, key, "narration.wav"), base + ".wav")
 json.dump(dict(segments=[dict(beat_id=x["id"], text=x["text"], start_seconds=round(x["start"], 3), end_seconds=round(x["end"], 3),
                               words=[dict(word=w["word"], start=round(w["start"], 3), end=round(w["end"], 3)) for w in x["words"]]) for x in v["beats"]],
