@@ -1,24 +1,23 @@
 # Technical Data Cinema
 
-A second production mode for story-specific, animation-led technical explainers. It is isolated from the existing shorts pipeline and reuses the repository's existing Chatterbox workflow instead of implementing a second TTS system.
+A local-first, story-specific mode for animation-led technical explainers. It reuses the repository's existing Chatterbox Studio narration adapter and does not add a second TTS implementation.
 
 ## Workflow
-1. Approve a story brief and narration.
-2. Generate one self-contained HTML scene with a local Ollama coding model.
+1. Approve the story brief and spoken narration script.
+2. Generate one self-contained HTML scene with one local Ollama coding model.
 3. Preview and revise the story-specific animation.
-4. Generate/approve narration using the existing Chatterbox workflow.
-5. Render deterministic frames and mux the approved WAV with FFmpeg.
-6. Inspect the exported video before publishing.
+4. Export silently, add an approved WAV, or generate narration through the existing Chatterbox Studio API.
+5. Inspect the final MP4 and audio before publishing.
 
-This is **not a fixed scene template**. The visual plan must decide what each entity represents, how it moves, what causes a state change, and how the viewer infers the mechanism.
+This is **not a fixed scene template**. Visual language, motion, pacing and composition should change according to the causal story being explained.
 
 ## Requirements
 - macOS on Apple Silicon
-- Node.js 22+ and npm (Playwright current releases track supported Node LTS versions)
+- Node.js 22+ and npm
 - Ollama with a downloaded coding model
-- FFmpeg available as `ffmpeg`
-- Existing Chatterbox environment for narration
-- Chromium for Playwright rendering
+- FFmpeg available as `ffmpeg` and `ffprobe`
+- Existing Chatterbox environment and reference WAV for voice generation
+- Existing Studio server and Playwright Chromium
 
 ## Setup
 From repository root:
@@ -26,50 +25,57 @@ From repository root:
 cd modes/technical-data-cinema
 npm install
 npx playwright install chromium
-```
-Check local services:
-```bash
-ollama list
-curl http://127.0.0.1:11434/api/tags
-ffmpeg -version
+npm run doctor
 ```
 
-## Generate a story-specific HTML page
+## Generate a scene
 ```bash
 npm run generate -- --story examples/viral-traffic.md --model qwen3-coder:30b
 ```
-Output is written under `output/`. The generator writes only a new generated HTML file and never modifies application source. Use `--model qwen2.5-coder:7b` for faster iterations.
+The default context is 8192 tokens for the 24 GB Mac. Generation runs one Ollama model, then unloads it before exiting. Use `--model qwen2.5-coder:7b` for quick revisions. Models are never pulled automatically.
 
-## Automatic Ollama lifecycle
+Generated scenes must expose `window.renderAt(seconds)` and `window.getDuration()`, and must hide preview UI for `?render=1`. Invalid output is rejected before writing the HTML. Each generation writes a new file and never overwrites prior output.
 
-Use `npm run generate` (rather than invoking `scripts/generate.mjs` directly) for managed lifecycle handling. The wrapper checks the Ollama API, starts `ollama serve` only if no server is already responding, verifies the selected model is already downloaded, runs generation, unloads that model if it is resident, and stops the server only when this command started it. An existing Ollama server is left running. It never silently downloads models; if one is missing, the error tells you to run `ollama pull <model>` yourself.
+## Export options
 
-The model is unloaded after the generation command, including failed runs, so memory is available for Chatterbox. The service is not stopped if it was already running before generation.
+**Generate narration using the exact existing Chatterbox Studio adapter and then export video + voice:**
 
-## Render a deterministic timeline
-Generated HTML must expose `window.renderAt(seconds)` and `window.getDuration()`. Render with:
+First start the Studio with the already configured dedicated Hindi branch settings (run from repository root):
 ```bash
-node scripts/render.mjs --html output/pilot-why-a-viral-moment-can-break-a-backend/index.html --out output/pilot-why-a-viral-moment-can-break-a-backend/final.mp4 --fps 30 --audio /absolute/path/to/approved-narration.wav
+CHATTERBOX_MODEL_VARIANT=dedicated_hindi python3 studio.py --ui
 ```
-Chromium captures 1080×1920 frames, checks that seeking is deterministic, and rejects browser errors or HTTP(S) requests; FFmpeg encodes H.264/AAC. Start with `npm run test:smoke` before a story render. Full 1080×1920 rendering can take time and disk space.\n\n## Reference docs\n- [Animation Playbook](docs/ANIMATION_PLAYBOOK.md)\n- [Research Report](docs/RESEARCH_REPORT.md)\n- [Packages and Setup](docs/PACKAGES_AND_SETUP.md)\n- [Scene QA Checklist](docs/SCENE_QA_CHECKLIST.md)\n\nThe included `examples/render-smoke-test.html` is only a renderer test fixture, not a creative template.
+Make sure the Hindi checkpoint and voice reference are installed as documented in the repository's Chatterbox setup. If Studio is already running, restart it with the environment above if you need to change its model variant. Do not run Ollama generation and Chatterbox generation concurrently.
 
-## Model/memory policy for a 24 GB Mac
-- Run one heavy model at a time; do not keep Qwen3-Coder, Chatterbox and other large models active together.
-- Start with 8192 context tokens; increase only after checking memory. Longer context increases memory use.
-- Use Qwen3-Coder 30B for high-effort scene generation, then unload it before narration/rendering if memory pressure appears.
-- Use Qwen2.5-Coder 7B for quick revisions and syntax fixes.
-- Use DeepSeek-R1 14B only as an optional reasoning reviewer.
-- Check actual allocation using `ollama ps` and Activity Monitor. Do not close unknown system processes; quit known heavy apps you are not using.
+Then, from this folder:
+```bash
+npm run export -- --html output/<story>/index.html --out output/<story>/final.mp4 --voice-script examples/viral-traffic.md
+```
+Use a narration-only file with spoken lines (no visual directions); you can use `--style storytelling|conversational|dramatic`, `--pronunciation hindi_mixed|original`, `--performance directed|uniform`, and `--expression-intensity 0..100`. Defaults match the current Studio audio tab: storytelling, Hindi-first pronunciation, directed performance, intensity 65. Existing performance cues such as `[HOOK]`, `[SUSPENSE]`, `[REVEAL]`, and `[EXPLAIN]` are preserved.
 
-## Quality rules
-- Every particle/object has a semantic role; no decorative particle wallpaper.
-- Motion demonstrates a causal relationship or state change.
-- Graphs build progressively; values are sourced or labelled illustrative.
-- Composition and technique change when the explanatory job changes.
-- Camera motion supports comprehension and never obscures the mechanism.
-- Seeking is deterministic and repeatable.
+**Use an already approved WAV:**
+```bash
+npm run export -- --html output/<story>/index.html --out output/<story>/final.mp4 --audio /absolute/path/to/narration.wav
+```
+
+**Export silently:**
+```bash
+npm run export -- --html output/<story>/index.html --out output/<story>/silent.mp4
+```
+
+The renderer tests deterministic seeking, rejects browser errors and external requests, and encodes 1080×1920 H.264/AAC. When narration is longer than the scene, it holds the final scene while the voice finishes. A manually supplied `--duration` shorter than the voice is rejected to avoid cutting off speech. Rendered frames can use several GB; ensure enough disk space before full exports.
+
+## Memory policy
+- Heavy models run sequentially: Ollama generation completes and unloads its selected model before narration is generated.
+- Start at 8192 context tokens. Do not keep the 30B coding model loaded while using Chatterbox.
+- Use `ollama ps` and Activity Monitor to verify actual memory use.
+- The export script calls the existing Studio endpoint; it does not start another TTS runtime or alter your tuned presets.
+
+## Creative quality
+- Every particle/object has a semantic role; motion demonstrates cause and effect.
+- Graphs build progressively; sourced and illustrative values are clearly distinguished.
+- Visual technique changes when the explanatory job changes; avoid repeating one layout.
 - No CDN, remote assets, external fonts, or network dependency in generated HTML.
-- Run browser/console checks and inspect representative frames and full playback before publishing.
+- Preview the entire scene and inspect the exported MP4 before publishing.
 
-## Status
-Initial scaffold only. It has not been run on the user's Mac; Ollama generation quality, Chatterbox alignment, render speed, and final video quality remain to be validated locally.
+## Current validation status
+The renderer smoke fixture has passed CI previously. These new export and narration changes still need to be pulled and run locally; generated scene quality, Chatterbox runtime compatibility, and final audio/video sync have not been validated on the Mac yet.
