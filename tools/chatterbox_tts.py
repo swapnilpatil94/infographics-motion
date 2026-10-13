@@ -124,15 +124,26 @@ def main() -> int:
     except (TypeError, ValueError):
         selector_available = False
     requested_selector = "v3" if selector_available else None
+    model_variant = str(job.get("model_variant") or _os.environ.get("CHATTERBOX_MODEL_VARIANT", "multilingual_v3")).strip().lower()
+    if model_variant not in {"multilingual_v3", "dedicated_hindi"}:
+        log(f"unknown model_variant={model_variant!r}; use multilingual_v3 or dedicated_hindi")
+        return 2
+    hindi_checkpoint = Path(_os.environ.get(
+        "CHATTERBOX_HINDI_T3_CHECKPOINT",
+        str(REPO_ROOT / "models" / "chatterbox-hindi" / "t3_hi.safetensors"),
+    )).expanduser()
     log(f"CONFIG device={device} package=chatterbox-tts@{package_version} class={ChatterboxMultilingualTTS.__module__}.{ChatterboxMultilingualTTS.__name__}")
     log(f"CONFIG language_id=hi reference={reference_path} reference_exists={reference_path.exists()}")
-    log(f"CONFIG checkpoint_selector={requested_selector or 'not supported by installed loader; package default will be used'}")
-    log(f"CONFIG tempo={tempo} exaggeration={exaggeration} cfg_weight={cfg_weight} temperature={temperature} silence_pad_seconds={silence_pad_seconds} seed={seed} performance_mode={performance_mode} expression_intensity={expression_intensity}")
+    log(f"CONFIG model_variant={model_variant} checkpoint_selector={requested_selector or 'not supported by installed loader; package default will be used'}")
+    if model_variant == "dedicated_hindi":
+        log(f"CONFIG dedicated_hindi_checkpoint={hindi_checkpoint} exists={hindi_checkpoint.is_file()}")
+        if not hindi_checkpoint.is_file():
+            log("Dedicated Hindi checkpoint not found. Download t3_hi.safetensors or set CHATTERBOX_HINDI_T3_CHECKPOINT.")
+            return 1
 
     t0 = time.time()
-    # Prefer the package's V3 selector when available. This is the multilingual
-    # V3 family with Hindi selected at inference; it is NOT the dedicated
-    # ResembleAI/Chatterbox-Multilingual-hi checkpoint.
+    # Start with the compatible shared V3 architecture/assets. For the Hindi
+    # variant, replace only its T3 weights with the dedicated Hindi fine-tune.
     try:
         if selector_available:
             model = loader(device=device, t3_model="v3")
@@ -144,6 +155,23 @@ def main() -> int:
         log(f"V3 selector call failed ({exc}); loading installed default checkpoint")
         model = loader(device=device)
         selector_used = "installed-default-after-selector-failure"
+
+    if model_variant == "dedicated_hindi":
+        try:
+            from safetensors.torch import load_file
+            state_dict = load_file(str(hindi_checkpoint), device="cpu")
+            incompatible = model.t3.load_state_dict(state_dict, strict=True)
+            if incompatible.missing_keys or incompatible.unexpected_keys:
+                raise RuntimeError(
+                    f"checkpoint keys mismatch: missing={incompatible.missing_keys[:8]}, "
+                    f"unexpected={incompatible.unexpected_keys[:8]}"
+                )
+            selector_used = "dedicated-hindi-t3"
+            log("MODEL dedicated Hindi T3 weights loaded successfully")
+        except Exception as exc:
+            log(f"failed to load dedicated Hindi checkpoint into installed Chatterbox T3 architecture: {exc}")
+            log("No fallback will be used; fix the checkpoint/package compatibility before retrying.")
+            return 1
 
     def _class_name(value):
         cls = type(value)
@@ -159,14 +187,16 @@ def main() -> int:
             pass
     model_info = {
         "model_family": "ChatterboxMultilingualTTS",
+        "model_variant": model_variant,
         "loader_class": f"{ChatterboxMultilingualTTS.__module__}.{ChatterboxMultilingualTTS.__name__}",
         "package_version": package_version,
         "device": device,
         "language_id": "hi",
         "selector_requested": requested_selector,
         "selector_used": selector_used,
-        "dedicated_hindi_checkpoint": False,
-        "checkpoint_note": "Multilingual Chatterbox loader with Hindi language_id; not the dedicated ResembleAI/Chatterbox-Multilingual-hi checkpoint.",
+        "dedicated_hindi_checkpoint": model_variant == "dedicated_hindi",
+        "dedicated_hindi_checkpoint_path": str(hindi_checkpoint.resolve()) if model_variant == "dedicated_hindi" else None,
+        "checkpoint_note": ("Dedicated ResembleAI/Chatterbox-Multilingual-hi T3 weights loaded into the shared V3 architecture." if model_variant == "dedicated_hindi" else "Multilingual Chatterbox V3 with Hindi language_id; not the dedicated Hindi fine-tune."),
         "sample_rate": int(getattr(model, "sr", 0) or 0),
         "reference_audio": str(reference_path.resolve()),
         "reference_bytes": reference_path.stat().st_size if reference_path.exists() else None,
