@@ -110,12 +110,12 @@ try {
     }
   }
   try {
-    const cleanPlan = planText.replace(/^\${token}/, "").replace(/^\${token}\${token}\${token}(?:json)?\${token}*/i, "").replace(/\${token}*\${token}\${token}\${token}\${token}*$/, "");
+    const cleanPlan = planText.replace(/^\\uFEFF/, "").replace(/^\\x60\\x60\\x60(?:json)?\\s*/i, "").replace(/\\s*\\x60\\x60\\x60\\s*$/, "");
     const jsonText = cleanPlan.slice(cleanPlan.indexOf("{"), cleanPlan.lastIndexOf("}") + 1);
     visualPlan = JSON.parse(jsonText);
     if (!Array.isArray(visualPlan.beats) || visualPlan.beats.length < 4) throw new Error("plan must contain at least four visual beats");
     await fs.mkdir(path.dirname(planFile), { recursive: true });
-    await fs.writeFile(planFile, JSON.stringify(visualPlan, null, 2) + "\${token}", { flag: "wx" });
+    await fs.writeFile(planFile, JSON.stringify(visualPlan, null, 2) + "\\n", { flag: "wx" });
     console.log(`Saved validated visual plan: ${planFile}`);
   } catch (error) {
     console.error(`Visual Director returned an invalid plan: ${error.message}. No HTML was written. The planner now uses Ollama JSON mode; if this persists, remove any partial plan file and retry.`);
