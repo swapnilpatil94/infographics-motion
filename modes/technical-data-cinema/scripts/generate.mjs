@@ -72,18 +72,29 @@ async function askOllama(messages, stage, selectedModel = model) {
   }
   const payload = await response.json();
   const content = payload?.message?.content?.trim();
-  if (!content) {
-    console.error(`Ollama returned no content during ${stage}.`);
-    process.exit(1);
-  }
+  if (!content) throw new Error(`Ollama returned no content during ${stage}.`);
   return content;
 }
 
 console.log("Visual Director: planning story-specific visual beats...");
-const planText = await askOllama([
+const plannerMessages = [
   { role: "system", content: plannerPrompt },
   { role: "user", content: `Create a concrete visual plan for this story. Adapt beat count and timing to the actual narration duration if provided.\n\n--- STORY BRIEF START ---\n${story}\n--- STORY BRIEF END ---` }
-], "visual planning", plannerModel);
+];
+let planText;
+try {
+  planText = await askOllama(plannerMessages, "visual planning", plannerModel);
+} catch (firstError) {
+  if (!/Ollama returned no content during visual planning/i.test(firstError.message)) throw firstError;
+  console.warn(`Visual planner ${plannerModel} returned an empty response; retrying once before scene generation.`);
+  try {
+    planText = await askOllama(plannerMessages, "visual planning retry", plannerModel);
+  } catch (retryError) {
+    if (!/Ollama returned no content during visual planning retry/i.test(retryError.message) || plannerModel === model) throw retryError;
+    console.warn(`Visual planner stayed empty; falling back to the selected scene coder ${model} for planning.`);
+    planText = await askOllama(plannerMessages, "visual planning fallback", model);
+  }
+}
 let visualPlan;
 try {
   const cleanPlan = planText.replace(/^\uFEFF/, "").replace(/^```(?:json)?\s*/i, "").replace(/\s*```\s*$/, "");
