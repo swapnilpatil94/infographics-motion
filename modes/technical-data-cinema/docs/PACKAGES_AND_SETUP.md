@@ -30,6 +30,22 @@ npm run doctor
 
 If Node is older than the supported version documented by the current Playwright release, upgrade Node before installing dependencies.
 
+## Automatic Ollama startup and cleanup
+
+Run generation through the npm script so the lifecycle wrapper is used:
+
+```bash
+npm run generate -- --story examples/viral-traffic.md --model qwen3-coder:30b
+```
+
+The wrapper:
+1. Reuses a responding Ollama API, or starts `ollama serve` and waits for readiness.
+2. Checks that the requested model is already present in `/api/tags`; it never downloads a model implicitly.
+3. Runs the generator and unloads the selected model via Ollama's `keep_alive: 0` behavior if it is resident.
+4. Stops the Ollama server only if this wrapper started it. A pre-existing server is never terminated.
+
+Cleanup runs on success or failure. If generation is interrupted by a hard kill or machine shutdown, cleanup cannot be guaranteed; check `ollama ps` and unload manually if needed. Invoking `node scripts/generate.mjs` directly bypasses the lifecycle wrapper.
+
 ## Update packages safely
 
 The package currently targets Playwright 1.63.x (see the official release notes for the release current at research time). Playwright's browser binaries are tied to the Playwright package version. After upgrading Playwright, reinstall Chromium. Do not update package.json manually without refreshing the lockfile.
