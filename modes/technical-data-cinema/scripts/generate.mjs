@@ -12,10 +12,11 @@ function arg(name, fallback) { const i = args.indexOf(name); return i >= 0 ? arg
 function slugify(value) { return value.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 64) || "story"; }
 const storyArg = arg("--story");
 if (!storyArg) {
-  console.error("Usage: node scripts/generate.mjs --story <file.md> [--model qwen3-coder:30b] [--out output/<slug>/index.html]");
+  console.error("Usage: node scripts/generate.mjs --story <file.md> [--planner-model qwen3.5:9b] [--model qwen2.5-coder:7b] [--out output/<slug>/index.html]");
   process.exit(2);
 }
-const model = arg("--model", process.env.OLLAMA_MODEL || "qwen3-coder:30b");
+const model = arg("--model", process.env.OLLAMA_MODEL || "qwen2.5-coder:7b");
+const plannerModel = arg("--planner-model", process.env.OLLAMA_PLANNER_MODEL || "qwen3.5:9b");
 const repairNote = arg("--repair-note", "");
 const ollamaUrl = (process.env.OLLAMA_URL || "http://127.0.0.1:11434").replace(/\/$/, "");
 const storyPath = path.resolve(process.cwd(), storyArg);
@@ -34,18 +35,18 @@ if (!Number.isInteger(context) || context < 2048 || context > 32768) {
   console.error("OLLAMA_NUM_CTX must be an integer between 2048 and 32768.");
   process.exit(2);
 }
-console.log(`Generating with ${model}; context=${context} tokens`);
+console.log(`Visual planner: ${plannerModel}; scene coder: ${model}; context=${context} tokens`);
 console.log(`Story: ${storyPath}\nOutput: ${outPath}`);
 const plannerPrompt = await fs.readFile(path.join(root, "prompts", "visual-planner.md"), "utf8");
 const timeoutMs = Number(process.env.OLLAMA_TIMEOUT_MS || 600000);
-async function askOllama(messages, stage) {
+async function askOllama(messages, stage, selectedModel = model) {
   let response;
   try {
     response = await fetch(`${ollamaUrl}/api/chat`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
-        model, stream: false, messages,
+        model: selectedModel, stream: false, messages, keep_alive: 0,
         options: { temperature: 0.25, num_ctx: context }
       }),
       signal: AbortSignal.timeout(timeoutMs)
@@ -71,7 +72,7 @@ console.log("Visual Director: planning story-specific visual beats...");
 const planText = await askOllama([
   { role: "system", content: plannerPrompt },
   { role: "user", content: `Create a concrete visual plan for this story. Adapt beat count and timing to the actual narration duration if provided.\n\n--- STORY BRIEF START ---\n${story}\n--- STORY BRIEF END ---` }
-], "visual planning");
+], "visual planning", plannerModel);
 let visualPlan;
 try {
   const cleanPlan = planText.replace(/^\uFEFF/, "").replace(/^```(?:json)?\s*/i, "").replace(/\s*```\s*$/, "");
