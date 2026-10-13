@@ -27,8 +27,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-          cache-dependency-path: modes/technical-data-cinema/package-lock.json
       - name: Install FFmpeg
         run: |
           sudo apt-get update
