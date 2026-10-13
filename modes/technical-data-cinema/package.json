@@ -12,7 +12,8 @@
     "install:browser": "playwright install chromium",
     "test:smoke": "node scripts/render.mjs --html examples/render-smoke-test.html --out output/smoke-test.mp4 --fps 5 --duration 3",
     "ui": "node scripts/ui-server.mjs",
-    "test:three": "node scripts/test-three-bundle.mjs"
+    "test:three": "node scripts/test-three-bundle.mjs",
+    "test:visual-benchmark": "node scripts/build-visual-benchmark.mjs"
   },
   "dependencies": {
     "playwright": "^1.63.0",
