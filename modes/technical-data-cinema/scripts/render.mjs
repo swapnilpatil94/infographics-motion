@@ -73,11 +73,15 @@ try {
     fail("Determinism check failed: renderAt(0) produced different pixels after seeking. Derive all scene state from absolute time.");
   }
   console.log("Determinism check passed (same timestamp → identical screenshot).");
-  if (audioDuration > contract.duration) console.log(`Narration (${audioDuration.toFixed(2)}s) is longer than the scene (${contract.duration.toFixed(2)}s); holding the final scene while audio finishes.`);
+  const sceneTimeScale = contract.duration / duration;
+  if (duration > contract.duration + 0.05) {
+    console.log(`Scene (${contract.duration.toFixed(2)}s) is shorter than final duration (${duration.toFixed(2)}s); time-scaling the full scene to avoid a frozen end card.`);
+  }
   console.log(`Rendering ${frameCount} frames at ${fps} fps (1080×1920), ${duration.toFixed(2)} seconds`);
 
   for (let i = 0; i < frameCount; i++) {
-    await page.evaluate(time => window.renderAt(time), i / fps);
+    const sceneTime = Math.min(contract.duration, (i / fps) * sceneTimeScale);
+    await page.evaluate(time => window.renderAt(time), sceneTime);
     await page.screenshot({ path: path.join(frameDir, `frame-${String(i).padStart(6, "0")}.png`), type: "png", animations: "disabled" });
     if (i % Math.max(1, Math.floor(fps * 5)) === 0 || i === frameCount - 1) process.stdout.write(`\rFrames: ${i + 1}/${frameCount}`);
   }
@@ -93,7 +97,7 @@ if (audioPath) ffmpegArgs.push("-i", audioPath);
 // Output options must follow every input; placing -frames:v before the audio input
 // makes FFmpeg incorrectly treat it as an input option.
 ffmpegArgs.push("-frames:v", String(frameCount), "-t", String(duration));
-if (audioPath) ffmpegArgs.push("-af", "apad");
+if (audioPath) ffmpegArgs.push("-af", "apad,loudnorm=I=-16:TP=-1.5:LRA=7");
 ffmpegArgs.push("-c:v", "libx264", "-preset", "slow", "-crf", "16", "-pix_fmt", "yuv420p", "-movflags", "+faststart");
 if (audioPath) ffmpegArgs.push("-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-ac", "2");
 ffmpegArgs.push(outPath);
