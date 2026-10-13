@@ -3,6 +3,10 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
+
+const here = path.dirname(fileURLToPath(import.meta.url));
+const root = path.resolve(here, "..");
 
 const args = process.argv.slice(2);
 function arg(name, fallback) { const i = args.indexOf(name); return i >= 0 ? args[i + 1] : fallback; }
@@ -62,6 +66,6 @@ if (scriptArg) {
 const renderArgs = ["scripts/render.mjs", "--html", htmlPath, "--out", outPath, "--fps", arg("--fps", "30")];
 if (audioPath) renderArgs.push("--audio", audioPath);
 if (arg("--duration")) renderArgs.push("--duration", arg("--duration"));
-const result = spawnSync(process.execPath, renderArgs, { stdio: "inherit", cwd: path.dirname(new URL(import.meta.url).pathname) });
+const result = spawnSync(process.execPath, renderArgs, { stdio: "inherit", cwd: root });
 if (result.error) fail(`Could not start renderer: ${result.error.message}`);
 process.exit(result.status ?? 1);
