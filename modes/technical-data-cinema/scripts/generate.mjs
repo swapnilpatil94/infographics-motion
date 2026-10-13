@@ -66,36 +66,9 @@ if (!/^<!doctype html>/i.test(html)) {
   console.error("Model output did not start with <!doctype html>; refusing to save incomplete HTML.");
   process.exit(1);
 }
-// Models sometimes ignore the no-randomness rule. Convert Math.random() calls to a
-// local PRNG reset from renderAt(t), so the same timestamp reproduces the same sequence.
-const randomCalls = /\bMath\s*\.\s*random\s*\(\s*\)/g;
-if (randomCalls.test(html)) {
-  const scriptTags = [...html.matchAll(/<script\b([^>]*)>/gi)];
-  const inlineScript = scriptTags.find(match => !/\bsrc\s*=/.test(match[1]));
-  if (!inlineScript) {
-    console.error("Generated HTML uses Math.random() but has no inline script for a deterministic PRNG. No file was written.");
-    process.exit(1);
-  }
-  const deterministicRandom = `
-var __tdcSeed = 0x6d2b79f5;
-function __tdcRandom() {
-  __tdcSeed = (__tdcSeed + 0x6D2B79F5) | 0;
-  var n = __tdcSeed;
-  n = Math.imul(n ^ (n >>> 15), n | 1);
-  n ^= n + Math.imul(n ^ (n >>> 7), n | 61);
-  return ((n ^ (n >>> 14)) >>> 0) / 4294967296;
-}
-`;
-  const insertion = inlineScript.index + inlineScript[0].length;
-  html = html.slice(0, insertion) + deterministicRandom + html.slice(insertion);
-  html = html.replace(/\bMath\s*\.\s*random\s*\(\s*\)/g, "__tdcRandom()");
-  const renderAt = /window\.renderAt\s*=\s*function\s*\(\s*seconds\s*\)\s*\{\s*const\s+t\s*=\s*Math\.max\(0,\s*Math\.min\(DURATION,\s*Number\(seconds\)\s*\|\|\s*0\)\)\s*;/;
-  if (!renderAt.test(html)) {
-    console.error("Cannot seed generated randomness safely: window.renderAt does not match the expected export contract. No file was written.");
-    process.exit(1);
-  }
-  html = html.replace(renderAt, match => match + "\n  __tdcSeed = ((Math.floor(t * 1000) ^ 0x6d2b79f5) >>> 0) || 1;");
-  console.log("Replaced model-generated Math.random() calls with a timestamp-seeded PRNG; determinism QA remains enabled.");
+if (/\bMath\s*\.\s*random\s*\(/.test(html)) {
+  console.error("Generated HTML uses Math.random(), which makes exported frames nondeterministic. Remove Math.random() and derive every visual value from the render timestamp. No file was written; the pipeline can retry with a targeted repair.");
+  process.exit(1);
 }
 const missing = [];
 if (!/window\.renderAt\s*=/.test(html)) missing.push("window.renderAt(seconds)");
