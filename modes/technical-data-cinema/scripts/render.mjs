@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import fs from "node:fs/promises";
 import path from "node:path";
+import crypto from "node:crypto";
 import { spawnSync } from "node:child_process";
 import process from "node:process";
 import { pathToFileURL } from "node:url";
@@ -23,13 +24,20 @@ if (audioPath) await fs.access(audioPath);
 const outDir = path.dirname(outPath), frameDir = path.join(outDir, "frames");
 await fs.mkdir(frameDir, { recursive: true });
 let duration, frameCount;
+const browserErrors = [];
+const externalRequests = [];
 const browser = await chromium.launch({ headless: true });
 try {
   const page = await browser.newPage({ viewport: { width: 540, height: 960 }, deviceScaleFactor: 2, reducedMotion: "reduce" });
-  page.on("console", message => { if (message.type() === "error") console.error("[browser console]", message.text()); });
-  page.on("pageerror", error => console.error("[browser page error]", error.message));
+  page.on("console", message => {
+    if (message.type() === "error") browserErrors.push(`console: ${message.text()}`);
+  });
+  page.on("pageerror", error => browserErrors.push(`page: ${error.message}`));
+  page.on("request", request => {
+    if (/^https?:/i.test(request.url())) externalRequests.push(request.url());
+  });
   await page.goto(pathToFileURL(htmlPath).href, { waitUntil: "load" });
-  await page.evaluate(() => document.fonts?.ready);
+  await page.evaluate(() => document.fonts.ready.then(() => true));
   const contract = await page.evaluate(() => ({
     renderAt: typeof window.renderAt,
     getDuration: typeof window.getDuration,
@@ -41,14 +49,32 @@ try {
   duration = forcedDuration ?? contract.duration;
   if (duration > 600) fail("Duration must not exceed 600 seconds.");
   frameCount = Math.ceil(duration * fps);
+
+  // Determinism check: the same timestamp must yield byte-identical PNG output
+  // after visiting a different timestamp. This catches state accumulated by frame loops.
+  await page.evaluate(() => window.renderAt(0));
+  const first = await page.screenshot({ type: "png", animations: "disabled" });
+  await page.evaluate(time => window.renderAt(time), Math.min(duration * 0.63, duration - 0.001));
+  await page.evaluate(() => window.renderAt(0));
+  const second = await page.screenshot({ type: "png", animations: "disabled" });
+  const hash = buffer => crypto.createHash("sha256").update(buffer).digest("hex");
+  if (hash(first) !== hash(second)) {
+    fail("Determinism check failed: renderAt(0) produced different pixels after seeking. Derive all scene state from absolute time.");
+  }
+  console.log("Determinism check passed (same timestamp → identical screenshot).");
   console.log(`Rendering ${frameCount} frames at ${fps} fps (1080×1920), ${duration.toFixed(2)} seconds`);
+
   for (let i = 0; i < frameCount; i++) {
     await page.evaluate(time => window.renderAt(time), i / fps);
     await page.screenshot({ path: path.join(frameDir, `frame-${String(i).padStart(6, "0")}.png`), type: "png", animations: "disabled" });
     if (i % Math.max(1, Math.floor(fps * 5)) === 0 || i === frameCount - 1) process.stdout.write(`\rFrames: ${i + 1}/${frameCount}`);
   }
   process.stdout.write("\n");
-} finally { await browser.close(); }
+  if (externalRequests.length) throw new Error(`Offline policy failed; external network requests detected: ${[...new Set(externalRequests)].join(", ")}`);
+  if (browserErrors.length) throw new Error(`Browser errors detected:\n- ${[...new Set(browserErrors)].join("\n- ")}`);
+} finally {
+  await browser.close();
+}
 
 const ffmpegArgs = ["-y", "-hide_banner", "-loglevel", "warning", "-framerate", String(fps), "-i", path.join(frameDir, "frame-%06d.png"), "-frames:v", String(frameCount)];
 if (audioPath) ffmpegArgs.push("-i", audioPath, "-af", "apad");
