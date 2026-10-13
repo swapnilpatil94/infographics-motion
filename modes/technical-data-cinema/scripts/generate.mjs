@@ -66,6 +66,10 @@ if (!/^<!doctype html>/i.test(html)) {
   process.exit(1);
 }
 const missing = [];
+if (/\\bMath\\s*\\.\\s*random\\s*\\(/.test(html)) {
+  console.error("Generated HTML uses Math.random(), which makes exported frames nondeterministic. Use a local seeded PRNG and timestamp-derived scene state. No file was written; retry generation.");
+  process.exit(1);
+}
 if (!/window\.renderAt\s*=/.test(html)) missing.push("window.renderAt(seconds)");
 if (!/window\.getDuration\s*=/.test(html)) missing.push("window.getDuration()");
 if (!/URLSearchParams\s*\(\s*(?:window\.)?location\.search\s*\)/.test(html) || !/get\s*\(\s*["']render["']\s*\)/.test(html)) {
