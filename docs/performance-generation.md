@@ -97,3 +97,41 @@ You can place the file elsewhere and set `CHATTERBOX_HINDI_T3_CHECKPOINT=/absolu
 ### Validation gate
 
 The strict state-dict load is intentional: installed Chatterbox versions may differ. If the checkpoint fails to load, do not remove strict checking or silently continue with another model. Capture the error and align the adapter with the installed package version first. Then render the same Hindi/Hinglish script and voice reference with both variants, comparing Hindi pronunciation, English technical terms, continuity, pacing, voice similarity, and expressive variation. Keep the multilingual V3 baseline as the fallback until the A/B listening test is complete.
+
+
+## Writing scripts for the dedicated Hindi fine-tune
+
+The dedicated Hindi checkpoint is still called with `language_id="hi"`. Treat each generation as Hindi-first; do not assume it automatically switches phonetics for embedded English words. The upstream model exposes a single language ID per generation, and native sentence-level code-switching is not something this adapter can guarantee. See the [Hindi model card](https://huggingface.co/ResembleAI/Chatterbox-Multilingual-hi) and upstream [multilingual tokenizer](https://github.com/resemble-ai/chatterbox/blob/master/src/chatterbox/models/tokenizers/tokenizer.py).
+
+### Recommended script style
+
+- Write Hindi in Devanagari and optimize for spoken delivery, not formal written prose.
+- Prefer connected, natural sentences (roughly 6–16 words each as a writing heuristic, not a model limit). Avoid a new line for every tiny phrase or dramatic fragment.
+- Use commas and full stops to mark natural breath groups. Use ellipses sparingly; repeated punctuation can create odd pauses.
+- Keep names, numbers, and claims unambiguous. For numbers that are often misread, write the spoken form in Devanagari.
+- Keep familiar English brand/product terms in their normal spelling in the editable script. In Hindi-first pronunciation mode, the adapter maps a glossary of common tech/startup words to Devanagari **only for TTS input**; original script and captions remain unchanged.
+- If an uncommon English name or term is mispronounced, add a targeted spoken form to `_HINDI_SPOKEN_FORMS` in `engine/shorts/voice.py`, or write a pronunciation-friendly Devanagari spelling in the script when acceptable.
+- Avoid long English sentences inside a Hindi paragraph. The dedicated model is not a guarantee of natural bilingual phonetics for arbitrary English spans.
+
+### Performance cue strategy
+
+Cues are block markers, not words to be spoken. Put a cue at the start of a line only when the delivery should change. That cue now remains active for subsequent lines until the next cue; `[DEFAULT]` resets to the baseline delivery. This lets the adapter combine several lines with one performance setting and reduces prosody resets between every line.
+
+Example:
+
+```text
+[HOOK] सोचिए, एक गलत क्लिक से आपका बैंक अकाउंट खाली हो सकता है।
+लेकिन असली सवाल है—स्कैमर आपसे ये क्लिक करवाते कैसे हैं?
+[CURIOUS] इसका जवाब आपकी टेक्नोलॉजी में नहीं, आपकी साइकोलॉजी में छिपा है।
+वे पहले भरोसा बनाते हैं, फिर जल्दबाज़ी करवाते हैं।
+[SUSPENSE] और जब तक आपको शक होता है...
+[REVEAL] पेमेंट पहले ही जा चुकी होती है।
+[EXPLAIN] इसलिए किसी भी ऐप में OTP या बैंक डिटेल डालने से पहले रुकिए।
+[CALM] बस एक सेकंड का पॉज़, आपका पैसा बचा सकता है।
+```
+
+The cue controls only blend existing model parameters; it is not a guaranteed semantic emotion instruction. Use fewer cue transitions for smoother continuity.
+
+### Cache and validation
+
+The voice cache key now includes `CHATTERBOX_MODEL_VARIANT`; switching from multilingual V3 to dedicated Hindi will not silently reuse audio cached for the other model. After generation, inspect `model_info.json` and confirm `model_variant: "dedicated_hindi"` and `dedicated_hindi_checkpoint: true`. Then A/B test the same reference audio and same script against the multilingual V3 baseline. Review Hindi pronunciation, English terms, pauses, continuity, speed, voice similarity, and emotional variation. These changes are code-level; listening tests on the target Mac are still required.
