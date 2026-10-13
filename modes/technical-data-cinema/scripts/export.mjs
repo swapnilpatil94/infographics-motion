@@ -67,6 +67,7 @@ if (scriptArg) {
 const renderArgs = ["scripts/render.mjs", "--html", htmlPath, "--out", outPath, "--fps", arg("--fps", "30")];
 if (audioPath) renderArgs.push("--audio", audioPath);
 if (arg("--duration")) renderArgs.push("--duration", arg("--duration"));
+if (has("--allow-low-visual-density")) renderArgs.push("--allow-low-visual-density");
 const result = spawnSync(process.execPath, renderArgs, { stdio: "inherit", cwd: root });
 if (result.error) fail(`Could not start renderer: ${result.error.message}`);
 process.exit(result.status ?? 1);
