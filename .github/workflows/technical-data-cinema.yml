@@ -38,12 +38,16 @@ jobs:
       - name: Syntax check
         run: |
           node --check scripts/generate.mjs
+          node --check scripts/bundle-scene.mjs
+          node --check scripts/test-three-bundle.mjs
           node --check scripts/ollama-session.mjs
           node --check scripts/render.mjs
           node --check scripts/export.mjs
           node --check scripts/ui-server.mjs
           node --check scripts/doctor.mjs
           python3 -m py_compile ../../engine/studio/server.py ../../engine/shorts/voice.py ../../tools/chatterbox_tts.py ../../tools/whisper_align.py
+      - name: Three.js offline bundle and deterministic render test
+        run: npm run test:three
       - name: Render deterministic smoke test
         run: npm run test:smoke
       - name: Upload smoke-test MP4
