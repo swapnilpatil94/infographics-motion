@@ -79,7 +79,7 @@ async function runSceneRepair(node, generateArgs, repairNote, cwd, job, label) {
     if (!modelOutputInvalid) throw error;
 
     const installedModels = await getModels();
-    const candidates = ["qwen2.5-coder:7b", "qwen3.5:9b", "qwen3:14b"];
+    const candidates = ["qwen2.5-coder:7b", "qwen3:14b"];
     const availableCandidates = candidates.filter(candidate =>
       candidate !== generateArgs[generateArgs.indexOf("--model") + 1] &&
       installedModels.some(name => name === candidate || name.startsWith(candidate + ":"))
