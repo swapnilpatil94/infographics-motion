@@ -103,7 +103,8 @@ async function ensureStudio(job) {
   }
   throw new Error(`Chatterbox Studio did not become ready at ${studioUrl}. Check that Python dependencies and the dedicated Hindi checkpoint/reference are installed. Set STUDIO_PYTHON if your working Python is not the system python3.`);
 }
-\nasync function getModels() {
+
+async function getModels() {
   const base = (process.env.OLLAMA_URL || "http://127.0.0.1:11434").replace(/\/$/, "");
   try {
     const response = await fetch(`${base}/api/tags`, { signal: AbortSignal.timeout(1500) });
