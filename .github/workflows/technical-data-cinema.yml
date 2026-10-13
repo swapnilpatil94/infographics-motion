@@ -41,6 +41,7 @@ jobs:
           node --check scripts/ollama-session.mjs
           node --check scripts/render.mjs
           node --check scripts/export.mjs
+          node --check scripts/ui-server.mjs
           node --check scripts/doctor.mjs
       - name: Render deterministic smoke test
         run: npm run test:smoke
