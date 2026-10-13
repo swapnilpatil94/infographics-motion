@@ -27,7 +27,7 @@ if (!outPath.startsWith(outputRoot)) {
   console.error("Refusing to write outside modes/technical-data-cinema/output/. Use --out under that directory.");
   process.exit(2);
 }
-console.log(`Generating with ${model}; context=${process.env.OLLAMA_NUM_CTX || "12288"} tokens`);
+console.log(`Generating with ${model}; context=${process.env.OLLAMA_NUM_CTX || "8192"} tokens`);
 console.log(`Story: ${storyPath}\nOutput: ${outPath}`);
 let response;
 try {
