@@ -8,9 +8,13 @@
     "generate": "node scripts/generate.mjs",
     "render": "node scripts/render.mjs",
     "doctor": "node scripts/doctor.mjs",
-    "install:browser": "playwright install chromium"
+    "install:browser": "playwright install chromium",
+    "test:smoke": "node scripts/render.mjs --html examples/render-smoke-test.html --out output/smoke-test.mp4 --fps 5 --duration 3"
   },
   "dependencies": {
-    "playwright": "^1.55.0"
+    "playwright": "^1.63.0"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }
