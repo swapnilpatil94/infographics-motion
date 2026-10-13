@@ -95,3 +95,41 @@ THREE.JS / 3D TOOLKIT
 - Use a fixed logical aspect ratio of 540×960, deterministic geometry and seeded/precomputed layouts, restrained lighting, deliberate camera framing, and large silhouettes. Keep primary text as HTML/SVG overlays rather than tiny 3D text.
 - Dispose of no scene resources during renderAt; reuse geometry/materials and update transforms only. Avoid expensive postprocessing and excessive meshes because every frame is rendered separately for export.
 - The final file must still expose window.renderAt(seconds), window.getDuration(), and render-only mode. Keep the scene functional when opened from a local file after bundling.
+
+
+REFERENCE-LEVEL VISUAL LANGUAGE — DOT-SKETCH + CINEMATIC 2.5D/3D
+The target is a visually authored explainer: dotted silhouettes, animated sketch construction, spatial depth, camera moves, and a story-specific visual motif. Do not interpret “particles” as generic floating dots over a background.
+
+VISUAL DIRECTOR PASS (MANDATORY INTERNAL STEP)
+Before writing implementation code, create an internal beat sheet with: narration beat/time range; viewer takeaway; chosen visual metaphor; dominant silhouette; visual medium (dot-sketch, line sketch, 2D diagram, 2.5D layers, or Three.js 3D); object/action; camera framing/movement; transition into next beat; and the causal proof the viewer will see. Give every beat a different explanatory purpose and at least three different visual grammars across the film when the story supports it. Then implement the beat sheet. Do not output the beat sheet; output the complete HTML only.
+
+DOT-SKETCH / PARTICLE SILHOUETTES
+- Use meaningful point clouds to construct recognisable silhouettes: a stadium bowl/crowd, human profile, phone, building, money flow, server rack, globe, brain, vehicle, or other story-specific object. The silhouette must be identifiable before labels appear.
+- For Canvas, create deterministic points from a grid or seeded PRNG and retain points whose positions fall inside a defined silhouette/shape mask. For SVG, use sampled points along meaningful paths or shape interiors. Precompute points once; never generate them randomly during renderAt.
+- Animate dots as a coherent construction: gather from outside frame, trace the contour, fill the silhouette, ripple to show activity, split into meaningful streams, or reform into the next object. Use time-derived easing and absolute positions. Avoid noisy jitter with no semantic purpose.
+- Give particles roles and state: people/viewers, requests, packets, money, transactions, neurons, inventory, etc. Encode states through movement, density, shape, size, or restrained semantic colour—not colour alone.
+- Use 2–3 point scales, controlled depth/parallax, and a few brighter anchor points so the silhouette reads at phone size. Do not let the particles become visual static.
+- Use shaders / Three.js Points or InstancedMesh for dense particle fields when beneficial; use Canvas/SVG for simpler scenes and crisp labels. Keep geometry precomputed and rendering deterministic.
+
+SKETCH-TO-SYSTEM TRANSFORMATIONS
+- Construct at least one important object through visible strokes, dotted contours, or progressive hatching; then transform it into the technical system it represents.
+- Examples: dotted stadium crowd → viewer requests → CDN nodes; hand-drawn bank account → transaction paths → money trail; sketch of a brain → connected neurons → recommendation pipeline; hand-drawn city → buildings extrude into service nodes.
+- Transformations must preserve visual continuity: reuse positions, paths, or components when one metaphor becomes another. Do not dissolve to black and introduce an unrelated slide unless the story demands a hard cut.
+- Mix drawing idioms deliberately: dotted silhouette, hand-drawn outline, spatial 3D mechanism, animated topology, and data chart. Each technique must answer a different explanatory question.
+
+3D / CAMERA / MOTION LANGUAGE
+- Use 3D when spatial relationships improve understanding: orbit around a system, dolly toward a bottleneck, tilt from the crowd to its infrastructure, extrude a sketch into a model, or pull back to reveal the whole causal system.
+- Compose foreground/midground/background intentionally. Use restrained key/rim lighting, depth fog only if it improves separation, and a coherent camera path. Avoid default spinning cubes, arbitrary orbiting, or gratuitous particle explosions.
+- For a flat sketch, animate stroke drawing, node-to-node path reveal, marker-style circles/underlines, tracing, and controlled camera pans/zooms. For a causal system, animate state transitions and moving flows. For evidence, animate chart growth and comparisons.
+- Use transitions as explanation: trace follows the path, a cluster branches, a queue stacks up, an object changes shape, layers separate, or a 3D camera reveals a hidden dependency.
+- Camera motion must be smooth, bounded, and subordinate to comprehension. Avoid continuous motion without new information. A meaningful event must occur every 2–4 seconds.
+
+STORY-SPECIFIC VISUAL SIGNATURE
+- Do not repeat the same visual template across different videos. Choose a unique signature motif based on the central analogy and reuse it only as a visual thread—not as the same composition every scene.
+- The visual director must explicitly decide which scenes are dotted, hand-drawn, 2D, 2.5D, or 3D and why. Do not force all scenes into Three.js, a stadium, or a dashboard.
+- Every major beat must contain one large, recognisable subject or system occupying the dominant visual area. Labels explain the visual; they must not substitute for it.
+- For a technical explanation, show the mechanism in motion: origin to edge, request to queue, money entering/leaving accounts, input transforming to output, or load changing capacity. The viewer should be able to infer the key point even if captions are hidden.
+- Make the visual pattern non-repetitive through changes in silhouette, scale, framing, material, movement grammar, and representation—not by changing only the colour.
+
+VISUAL QA GATE
+Reject and redesign any beat if: the subject is not recognisable in a paused frame; dots are decorative rather than meaningful; 3D adds no explanatory value; the camera hides labels or the mechanism; two adjacent beats have the same composition and action; or a transformation breaks visual continuity. Before final output, audit six timestamps and confirm the intended silhouette, causal action, camera framing, and change from the previous beat are all visible.
