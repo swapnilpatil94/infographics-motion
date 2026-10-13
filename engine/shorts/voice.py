@@ -50,6 +50,32 @@ _HINDI_SPOKEN_FORMS = {
     "detection": "डिटेक्शन", "synonyms": "सिनोनिम्स", "OpenAI": "ओपनएआई", "Watermark": "वॉटरमार्क",
     "public": "पब्लिक", "approved": "अप्रूव्ड", "researchers": "रिसर्चर्स", "Photo": "फ़ोटो",
     "twist": "ट्विस्ट",
+    # Common Hindi/Hinglish technology and startup vocabulary. These replacements
+    # affect TTS input only; captions and the user's original script stay unchanged.
+    "startup": "स्टार्टअप", "startups": "स्टार्टअप्स", "founder": "फाउंडर",
+    "founders": "फाउंडर्स", "funding": "फंडिंग", "funded": "फंडेड",
+    "investor": "इन्वेस्टर", "investors": "इन्वेस्टर्स", "investment": "इन्वेस्टमेंट",
+    "investments": "इन्वेस्टमेंट्स", "pitch deck": "पिच डेक", "pitch": "पिच",
+    "deck": "डेक", "revenue": "रेवेन्यू", "profit": "प्रॉफिट",
+    "profits": "प्रॉफिट्स", "business": "बिज़नेस", "product": "प्रोडक्ट",
+    "feature": "फ़ीचर", "features": "फ़ीचर्स", "app": "ऐप", "apps": "ऐप्स",
+    "browser": "ब्राउज़र", "website": "वेबसाइट", "websites": "वेबसाइट्स",
+    "internet": "इंटरनेट", "online": "ऑनलाइन", "offline": "ऑफ़लाइन",
+    "cloud": "क्लाउड", "server": "सर्वर", "servers": "सर्वर्स",
+    "data": "डेटा", "database": "डेटाबेस", "code": "कोड", "coding": "कोडिंग",
+    "developer": "डेवलपर", "developers": "डेवलपर्स", "software": "सॉफ़्टवेयर",
+    "hardware": "हार्डवेयर", "algorithm": "एल्गोरिदम", "algorithms": "एल्गोरिदम्स",
+    "API": "एपीआई", "URL": "यूआरएल", "UI": "यूआई", "UX": "यूएक्स",
+    "AI model": "एआई मॉडल", "machine learning": "मशीन लर्निंग",
+    "deep learning": "डीप लर्निंग", "prompt": "प्रॉम्प्ट", "prompts": "प्रॉम्प्ट्स",
+    "ChatGPT": "चैटजीपीटी", "Claude": "क्लॉड", "Gemini": "जेमिनी",
+    "OpenAI": "ओपनएआई", "YouTube": "यूट्यूब", "Instagram": "इंस्टाग्राम",
+    "WhatsApp": "व्हाट्सऐप", "Google": "गूगल", "Microsoft": "माइक्रोसॉफ़्ट",
+    "benchmark": "बेंचमार्क", "benchmarks": "बेंचमार्क्स",
+    "performance": "परफ़ॉर्मेंस", "automation": "ऑटोमेशन",
+    "automate": "ऑटोमेट", "workflow": "वर्कफ़्लो", "workflows": "वर्कफ़्लोज़",
+    "technology": "टेक्नोलॉजी", "tech": "टेक", "AI": "एआई",
+    "million": "मिलियन", "billion": "बिलियन", "crore": "करोड़",
 }
 _SPOKEN_FORM_RE = re.compile(r"(?<!\w)(" + "|".join(re.escape(k) for k in sorted(_HINDI_SPOKEN_FORMS, key=len, reverse=True)) + r")(?!\w)", re.IGNORECASE)
 
@@ -97,14 +123,15 @@ def _env():
     return env
 
 
-def _key(beats, seed, style, pronunciation_mode, group_lines=False, reference_audio=None, group_max_lines=5, group_max_words=45):
+def _key(beats, seed, style, pronunciation_mode, group_lines=False, reference_audio=None, group_max_lines=5, group_max_words=45, model_variant=None):
     reference_audio = reference_audio or _active_reference()
     try:
         reference_version = str(os.path.getmtime(reference_audio)) + ":" + str(os.path.getsize(reference_audio))
     except OSError:
         reference_version = "missing"
     blob = json.dumps([[b["id"], b["text"], b.get("tts_text", b["text"]), b.get("performance", "default")] for b in beats], ensure_ascii=False)
-    blob += reference_audio + reference_version + str(seed) + style + pronunciation_mode + str(group_lines) + str(group_max_lines) + str(group_max_words)
+    model_variant = model_variant or os.environ.get("CHATTERBOX_MODEL_VARIANT", "multilingual_v3")
+    blob += reference_audio + reference_version + str(seed) + style + pronunciation_mode + str(group_lines) + str(group_max_lines) + str(group_max_words) + model_variant
     blob += json.dumps(STORYTELLING_PRESETS.get(style, STORYTELLING_PRESETS["storytelling"]), sort_keys=True)
     return hashlib.sha256(blob.encode()).hexdigest()[:16]
 
@@ -130,7 +157,8 @@ def synthesize(beats, seed=42, log=print, allow_partial_alignment=False, style="
     beats = _prepare_beats(beats, pronunciation_mode)
     reference_audio = os.path.abspath(reference_audio or _active_reference())
     settings = STORYTELLING_PRESETS[style]
-    key = _key(beats, seed, style, pronunciation_mode, group_lines, reference_audio, group_max_lines, group_max_words) + ("-perf" + str(max(0, min(100, int(expression_intensity)))) if performance_mode else "-flat")
+    model_variant = os.environ.get("CHATTERBOX_MODEL_VARIANT", "multilingual_v3").strip().lower()
+    key = _key(beats, seed, style, pronunciation_mode, group_lines, reference_audio, group_max_lines, group_max_words, model_variant) + ("-perf" + str(max(0, min(100, int(expression_intensity)))) if performance_mode else "-flat")
     d = os.path.join(VOICE_DIR, key)
     os.makedirs(d, exist_ok=True)
     wav, align = os.path.join(d, "narration.wav"), os.path.join(d, "align.json")
