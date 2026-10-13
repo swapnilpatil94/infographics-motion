@@ -20,7 +20,7 @@ const commandArgs = argv.slice(separator + 2);
 const modelIndex = commandArgs.indexOf("--model");
 const model = modelIndex >= 0
   ? commandArgs[modelIndex + 1]
-  : (process.env.OLLAMA_MODEL || "qwen3-coder:30b");
+  : (process.env.OLLAMA_MODEL || "qwen2.5-coder:7b");
 const base = (process.env.OLLAMA_URL || "http://127.0.0.1:11434").replace(/\/$/, "");
 const startupTimeoutMs = Number(process.env.OLLAMA_STARTUP_TIMEOUT_MS || 30000);
 let serverProcess = null;
