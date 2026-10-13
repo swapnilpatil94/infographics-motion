@@ -47,6 +47,16 @@ async function waitForApi() {
 
 async function unloadModel() {
   try {
+    const psResponse = await fetch(`${base}/api/ps`, { signal: AbortSignal.timeout(3000) });
+    if (!psResponse.ok) throw new Error(`API /api/ps returned HTTP ${psResponse.status}`);
+    const running = await psResponse.json();
+    const loaded = (running.models || []).some(item =>
+      item.name === model || item.name?.startsWith(`${model}:`) || model.startsWith(`${item.name}:`)
+    );
+    if (!loaded) {
+      console.log(`Model already unloaded: ${model}`);
+      return;
+    }
     const response = await fetch(`${base}/api/generate`, {
       method: "POST",
       headers: { "content-type": "application/json" },
