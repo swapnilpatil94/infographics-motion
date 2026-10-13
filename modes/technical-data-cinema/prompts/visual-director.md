@@ -11,7 +11,7 @@ DELIVERABLE
 - Vanilla JS, CSS, Canvas, SVG and DOM. Use WebGL only if justified.
 - Vertical 9:16 composition, designed for 1080×1920 and phone readability.
 - Deterministic timeline: expose window.renderAt(seconds) and window.getDuration(). Every visual property is set from the supplied timestamp. Seeking to the same timestamp reproduces the same frame. No setInterval, elapsed-time deltas, CSS animation/transition, or Math.random for scene state. A requestAnimationFrame preview may call the same deterministic renderer.
-- Include preview playback, timeline seeking, caption toggle and keyboard controls where practical.
+- Include preview playback, timeline seeking, caption toggle and keyboard controls where practical.\n- When the URL contains `?render=1`, hide all preview UI, transport controls, cursor hints and editing chrome; render only the actual 9:16 composition. The offline renderer opens this mode.
 - If narration is supplied, add caption cues with explicit editable timing estimates.
 - Use seeded randomness or precomputed deterministic particle data.
 - Handle resizing while preserving the logical coordinate system.
@@ -31,7 +31,7 @@ QUALITY
 - No external network resources or tracking.
 - Never present unsourced demo numbers as factual.
 - Avoid large per-frame allocations; cache geometry and particle data.
-- Ensure no fatal console errors or clipped primary text.
+- Ensure no fatal console errors or clipped primary text.\n- Never request HTTP(S) resources; all required assets must be inline or local.\n- Keep the render-only view clean and stable; avoid a visible cursor or editor chrome.
 - End with the main insight, not an arbitrary fade to black.
 
 OUTPUT
