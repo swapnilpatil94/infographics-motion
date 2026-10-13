@@ -10,6 +10,9 @@ import crypto from "node:crypto";
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "..");
 const outputRoot = path.join(root, "output");
+const repoRoot = path.resolve(root, "../..");
+const studioUrl = (process.env.CHATTERBOX_STUDIO_URL || "http://127.0.0.1:8765").replace(/\\/$/, "");
+let managedStudio = null;
 const host = process.env.TDC_UI_HOST || "127.0.0.1";
 const port = Number(process.env.TDC_UI_PORT || 4177);
 const jobs = new Map();
@@ -63,7 +66,44 @@ function run(command, args, cwd, job, label) {
     });
   });
 }
-async function getModels() {
+
+async function ensureStudio(job) {
+  const ready = async () => {
+    try {
+      const r = await fetch(`${studioUrl}/api/options`, { signal: AbortSignal.timeout(1200) });
+      return r.ok;
+    } catch { return false; }
+  };
+  if (await ready()) {
+    log(job, `Reusing Chatterbox Studio at ${studioUrl}.`);
+    return;
+  }
+  if (!managedStudio || managedStudio.exitCode !== null) {
+    log(job, "Chatterbox Studio is not responding; starting the existing Studio with the dedicated Hindi variant…");
+    managedStudio = spawn(process.env.STUDIO_PYTHON || "python3", ["studio.py", "--ui"], {
+      cwd: repoRoot,
+      env: { ...process.env, CHATTERBOX_MODEL_VARIANT: process.env.CHATTERBOX_MODEL_VARIANT || "dedicated_hindi" },
+      stdio: ["ignore", "pipe", "pipe"]
+    });
+    const consume = chunk => {
+      for (const line of chunk.toString("utf8").split(/\\r?\\n/)) if (line.trim()) log(job, `[Studio] ${line.trim()}`);
+    };
+    managedStudio.stdout.on("data", consume);
+    managedStudio.stderr.on("data", consume);
+    managedStudio.on("exit", code => log(job, `[Studio] process exited with code ${code}`));
+  }
+  const deadline = Date.now() + 60000;
+  while (Date.now() < deadline) {
+    if (await ready()) {
+      log(job, `Chatterbox Studio is ready at ${studioUrl}.`);
+      return;
+    }
+    if (managedStudio?.exitCode !== null && managedStudio?.exitCode !== undefined) break;
+    await new Promise(resolve => setTimeout(resolve, 500));
+  }
+  throw new Error(`Chatterbox Studio did not become ready at ${studioUrl}. Check that Python dependencies and the dedicated Hindi checkpoint/reference are installed. Set STUDIO_PYTHON if your working Python is not the system python3.`);
+}
+\nasync function getModels() {
   const base = (process.env.OLLAMA_URL || "http://127.0.0.1:11434").replace(/\/$/, "");
   try {
     const response = await fetch(`${base}/api/tags`, { signal: AbortSignal.timeout(1500) });
