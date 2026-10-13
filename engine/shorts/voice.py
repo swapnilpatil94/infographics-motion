@@ -1,6 +1,6 @@
 """Narration: real Hindi TTS + word-level forced alignment.
 
-Reuses the sibling project's adapters (mythic-video-studio/tools):
+Uses repository-local adapters (tools/):
   chatterbox_tts.py  - Chatterbox Multilingual (hi), voice-cloned from a reference WAV
   whisper_align.py   - whisperx wav2vec2 forced alignment against the KNOWN script
                        (word start/end), also trims dead air between words
@@ -23,9 +23,9 @@ import numpy as np
 from engine.shorts import audio
 from engine.shorts.raster import ROOT
 
-MYTHIC = os.environ.get("MYTHIC_STUDIO_DIR", os.path.expanduser("~/mythic-video-studio"))
+REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 PY312 = os.environ.get("TTS_PYTHON", os.path.expanduser("~/.pyenv/versions/3.12.0/bin/python"))
-REFERENCE = os.environ.get("TTS_REFERENCE_AUDIO", os.path.join(MYTHIC, "assets/reference-voices/hindi-male-narrator.wav"))
+REFERENCE = os.environ.get("TTS_REFERENCE_AUDIO", os.path.join(REPO_ROOT, "assets/reference-voices/hindi-male-narrator.wav"))
 
 # Chatterbox controls: higher exaggeration adds expression; cfg_weight around 0.3 can help pacing.
 # Tuned for short-form Hindi/Hinglish reels: clarity first, controlled emphasis,
@@ -86,8 +86,8 @@ def _active_reference():
 
 def available(reference_audio=None):
     reference_audio = reference_audio or _active_reference()
-    return all(os.path.exists(p) for p in (PY312, os.path.join(MYTHIC, "tools/chatterbox_tts.py"),
-                                          os.path.join(MYTHIC, "tools/whisper_align.py"), reference_audio))
+    return all(os.path.exists(p) for p in (PY312, os.path.join(REPO_ROOT, "tools/chatterbox_tts.py"),
+                                          os.path.join(REPO_ROOT, "tools/whisper_align.py"), reference_audio))
 
 
 def _env():
@@ -135,7 +135,7 @@ def synthesize(beats, seed=42, log=print, allow_partial_alignment=False, style="
     os.makedirs(d, exist_ok=True)
     wav, align = os.path.join(d, "narration.wav"), os.path.join(d, "align.json")
     model_info_path = os.path.join(d, "model_info.json")
-    log(f"[voice] backend_check chatterbox_available={available(reference_audio)} python={PY312} mythic_studio={MYTHIC}")
+    log(f"[voice] backend_check chatterbox_available={available(reference_audio)} python={PY312} repo_root={REPO_ROOT}")
     log(f"[voice] reference_audio={reference_audio} exists={os.path.exists(reference_audio)} style={style} pronunciation_mode={pronunciation_mode}")
     log(f"[voice] settings={json.dumps(settings, sort_keys=True)} group_lines={group_lines} group_max_lines={group_max_lines} group_max_words={group_max_words} cache_key={key} cache_dir={d}")
     if available(reference_audio):
@@ -146,14 +146,14 @@ def synthesize(beats, seed=42, log=print, allow_partial_alignment=False, style="
             json.dump(job, open(os.path.join(d, "job.json"), "w"), ensure_ascii=False)
             log(f"[voice] backend=Chatterbox multilingual TTS; generating {len(beats)} beats")
             log(f"[voice] detailed TTS log: {os.path.join(d, 'tts.log')}")
-            subprocess.run([PY312, os.path.join(MYTHIC, "tools/chatterbox_tts.py"), os.path.join(d, "job.json")],
+            subprocess.run([PY312, os.path.join(REPO_ROOT, "tools/chatterbox_tts.py"), os.path.join(d, "job.json")],
                            env=_env(), check=True, stderr=open(os.path.join(d, "tts.log"), "w"))
             if os.path.exists(model_info_path):
                 info = json.load(open(model_info_path, encoding="utf-8"))
                 log(f"[voice] LOADED MODEL: {info.get('model_family')} | package={info.get('package_version')} | selector={info.get('selector_used')} | language_id={info.get('language_id')} | device={info.get('device')}")
                 log(f"[voice] dedicated_hindi_checkpoint={info.get('dedicated_hindi_checkpoint')} | model_info={model_info_path}")
             log("[voice] forced alignment (whisperx)")
-            subprocess.run([PY312, os.path.join(MYTHIC, "tools/whisper_align.py"), wav, wav + ".segments.json", align],
+            subprocess.run([PY312, os.path.join(REPO_ROOT, "tools/whisper_align.py"), wav, wav + ".segments.json", align],
                            env=_env(), check=True, stderr=open(os.path.join(d, "align.log"), "w"))
         else:
             log(f"[voice] CACHE HIT: reusing existing WAV/alignment; no model was loaded this run")
