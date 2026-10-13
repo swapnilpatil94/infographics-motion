@@ -18,6 +18,7 @@ if (!storyArg) {
 const model = arg("--model", process.env.OLLAMA_MODEL || "qwen2.5-coder:7b");
 const plannerModel = arg("--planner-model", process.env.OLLAMA_PLANNER_MODEL || "qwen3.5:9b");
 const repairNote = arg("--repair-note", "");
+const planFile = path.resolve(process.cwd(), arg("--plan-file", path.join(path.dirname(arg("--out", path.relative(process.cwd(), path.join(root, "output", slugify(storyArg))))), "visual-plan.json")));
 const ollamaUrl = (process.env.OLLAMA_URL || "http://127.0.0.1:11434").replace(/\/$/, "");
 const storyPath = path.resolve(process.cwd(), storyArg);
 const story = await fs.readFile(storyPath, "utf8");
@@ -50,7 +51,7 @@ console.log(`Visual planner: ${plannerModel}; scene coder: ${model}; context=${c
 console.log(`Story: ${storyPath}\nOutput: ${outPath}`);
 const plannerPrompt = await fs.readFile(path.join(root, "prompts", "visual-planner.md"), "utf8");
 const timeoutMs = Number(process.env.OLLAMA_TIMEOUT_MS || 600000);
-async function askOllama(messages, stage, selectedModel = model) {
+async function askOllama(messages, stage, selectedModel = model, responseFormat = null) {
   let response;
   try {
     response = await fetch(`${ollamaUrl}/api/chat`, {
@@ -58,6 +59,7 @@ async function askOllama(messages, stage, selectedModel = model) {
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
         model: selectedModel, stream: false, messages, keep_alive: 0,
+        ...(responseFormat ? { format: responseFormat } : {}),
         options: { temperature: 0.25, num_ctx: context }
       }),
       signal: AbortSignal.timeout(timeoutMs)
@@ -76,36 +78,48 @@ async function askOllama(messages, stage, selectedModel = model) {
   return content;
 }
 
-console.log("Visual Director: planning story-specific visual beats...");
-const plannerMessages = [
-  { role: "system", content: plannerPrompt },
-  { role: "user", content: `Create a concrete visual plan for this story. Adapt beat count and timing to the actual narration duration if provided.\n\n--- STORY BRIEF START ---\n${story}\n--- STORY BRIEF END ---` }
-];
-let planText;
-try {
-  planText = await askOllama(plannerMessages, "visual planning", plannerModel);
-} catch (firstError) {
-  if (!/Ollama returned no content during visual planning/i.test(firstError.message)) throw firstError;
-  console.warn(`Visual planner ${plannerModel} returned an empty response; retrying once before scene generation.`);
-  try {
-    planText = await askOllama(plannerMessages, "visual planning retry", plannerModel);
-  } catch (retryError) {
-    if (!/Ollama returned no content during visual planning retry/i.test(retryError.message) || plannerModel === model) throw retryError;
-    console.warn(`Visual planner stayed empty; falling back to the selected scene coder ${model} for planning.`);
-    planText = await askOllama(plannerMessages, "visual planning fallback", model);
-  }
-}
 let visualPlan;
 try {
-  const cleanPlan = planText.replace(/^\uFEFF/, "").replace(/^```(?:json)?\s*/i, "").replace(/\s*```\s*$/, "");
-  const jsonText = cleanPlan.slice(cleanPlan.indexOf("{"), cleanPlan.lastIndexOf("}") + 1);
-  visualPlan = JSON.parse(jsonText);
-  if (!Array.isArray(visualPlan.beats) || visualPlan.beats.length < 4) {
-    throw new Error("plan must contain at least four visual beats");
-  }
+  const cached = await fs.readFile(planFile, "utf8");
+  visualPlan = JSON.parse(cached);
+  if (!Array.isArray(visualPlan.beats) || visualPlan.beats.length < 4) throw new Error("cached plan must contain at least four visual beats");
+  console.log(`Reusing validated visual plan: ${planFile}`);
 } catch (error) {
-  console.error(`Visual Director returned an invalid plan: ${error.message}. No HTML was written. Retry or use a more capable local coding model.`);
-  process.exit(1);
+  if (error.code !== "ENOENT") {
+    console.error(`Cached visual plan is invalid at ${planFile}: ${error.message}. Remove that plan file to rebuild it.`);
+    process.exit(1);
+  }
+  console.log("Visual Director: planning story-specific visual beats...");
+  const plannerMessages = [
+    { role: "system", content: plannerPrompt },
+    { role: "user", content: `Create a concrete visual plan for this story. Adapt beat count and timing to the actual narration duration if provided. Return a single valid JSON object only; no markdown fences or commentary.\\n\\n--- STORY BRIEF START ---\\n${story}\\n--- STORY BRIEF END ---` }
+  ];
+  let planText;
+  try {
+    planText = await askOllama(plannerMessages, "visual planning", plannerModel, "json");
+  } catch (firstError) {
+    if (!/Ollama returned no content during visual planning/i.test(firstError.message)) throw firstError;
+    console.warn(`Visual planner ${plannerModel} returned an empty response; retrying once before scene generation.`);
+    try {
+      planText = await askOllama(plannerMessages, "visual planning retry", plannerModel, "json");
+    } catch (retryError) {
+      if (!/Ollama returned no content during visual planning retry/i.test(retryError.message) || plannerModel === model) throw retryError;
+      console.warn(`Visual planner stayed empty; falling back to the selected scene coder ${model} for planning.`);
+      planText = await askOllama(plannerMessages, "visual planning fallback", model, "json");
+    }
+  }
+  try {
+    const cleanPlan = planText.replace(/^\\uFEFF/, "").replace(/^\\x60\\x60\\x60(?:json)?\\s*/i, "").replace(/\\s*\\x60\\x60\\x60\\s*$/, "");
+    const jsonText = cleanPlan.slice(cleanPlan.indexOf("{"), cleanPlan.lastIndexOf("}") + 1);
+    visualPlan = JSON.parse(jsonText);
+    if (!Array.isArray(visualPlan.beats) || visualPlan.beats.length < 4) throw new Error("plan must contain at least four visual beats");
+    await fs.mkdir(path.dirname(planFile), { recursive: true });
+    await fs.writeFile(planFile, JSON.stringify(visualPlan, null, 2) + "\\n", { flag: "wx" });
+    console.log(`Saved validated visual plan: ${planFile}`);
+  } catch (error) {
+    console.error(`Visual Director returned an invalid plan: ${error.message}. No HTML was written. The planner now uses Ollama JSON mode; if this persists, remove any partial plan file and retry.`);
+    process.exit(1);
+  }
 }
 const planJson = JSON.stringify(visualPlan, null, 2);
 console.log(`Visual Director planned ${visualPlan.beats.length} beats; generating the animated scene...`);
