@@ -136,7 +136,11 @@ def main() -> int:
 
     expected_words = sum(len(str(beat.get("text", "")).split()) for beat in beats)
     aligned_words = sum(len(beat.get("words", [])) for beat in out_beats)
-    alignment_complete = len(out_beats) == len(beats) and aligned_words >= expected_words
+    alignment_complete = (
+        len(out_beats) == len(beats)
+        and all(len(aligned.get("words", [])) >= len(str(source.get("text", "")).split())
+                for source, aligned in zip(beats, out_beats))
+    )
     if not alignment_complete:
         log(f"SAFETY: alignment coverage {aligned_words}/{expected_words} words across {len(out_beats)}/{len(beats)} beats; disabling automatic audio splicing to prevent cutting unaligned speech")
         removals, total_removed = [], 0.0
