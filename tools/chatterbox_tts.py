@@ -205,7 +205,7 @@ def main() -> int:
         if not segment_text:
             continue
         performance = str(segment.get("performance") or "default").lower() if performance_mode else "default"
-        if performance not in {"hook", "suspense", "reveal", "explain", "calm", "default"}:
+        if performance not in {"hook", "curious", "suspense", "reveal", "explain", "urgent", "calm", "default"}:
             performance = "default"
         word_count = max(len(segment_text.split()), 1)
         limit_reached = group_lines and (len(current) >= group_max_lines or current_words + word_count > group_max_words)
@@ -222,10 +222,13 @@ def main() -> int:
     # These are targets, not magical emotion labels: they only adjust controls the
     # installed Chatterbox model already supports. The reference voice still matters.
     performance_targets = {
-        "hook": (0.85, 0.30, 0.62),
-        "suspense": (0.70, 0.30, 0.48),
-        "reveal": (0.95, 0.28, 0.65),
+        # Conservative parameter directions, not guaranteed semantic emotions.
+        "hook": (0.78, 0.30, 0.55),
+        "curious": (0.62, 0.34, 0.50),
+        "suspense": (0.66, 0.32, 0.48),
+        "reveal": (0.82, 0.30, 0.58),
         "explain": (0.50, 0.40, 0.45),
+        "urgent": (0.78, 0.30, 0.52),
         "calm": (0.48, 0.40, 0.45),
     }
     blend = expression_intensity / 100.0
