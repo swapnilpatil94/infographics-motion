@@ -62,3 +62,38 @@ The current adapter uses the **Chatterbox Multilingual V3 family** with `languag
 Resemble AI publishes `ResembleAI/Chatterbox-Multilingual-hi`, a Hindi-specific fine-tune in its V3 single-language pack. This is the strongest next candidate to A/B test for Hindi quality. Do not assume it is a drop-in model-name change: its Hindi T3 weights and shared V3 speech decoder need to be loaded using a compatible loader. Keep the existing multilingual path as the known baseline until the dedicated checkpoint is loaded and tested locally.
 
 Suggested evaluation: render the same 20–30 second Hindi/Hinglish script with the same reference voice, text, seed where supported, and comparable settings. Score Devanagari pronunciation, English technical terms, continuity across sentences, natural pacing, speaker similarity, and emotional variation. Keep whichever version wins listening tests; the Hindi-only fine-tune may not necessarily win on English code-switching.
+
+
+## Dedicated Hindi checkpoint experiment
+
+The adapter now supports two model variants without replacing the existing baseline:
+
+- `multilingual_v3` (default): existing multilingual V3 weights, with `language_id="hi"`.
+- `dedicated_hindi`: loads the shared V3 architecture/assets first, then strictly loads `t3_hi.safetensors` into the T3 module. A missing or incompatible checkpoint is a hard error; it will not silently fall back to the baseline.
+
+### Download the Hindi checkpoint
+
+From the repository root, run:
+
+```bash
+python3 -m pip install -U huggingface_hub
+hf download ResembleAI/Chatterbox-Multilingual-hi t3_hi.safetensors --local-dir models/chatterbox-hindi
+```
+
+The file is approximately 2.14 GB. Keep it out of Git; it is a local model asset. The official model card identifies this as the dedicated Hindi fine-tune and documents the shared V3 decoder/tokenizer assets. See [the model card](https://huggingface.co/ResembleAI/Chatterbox-Multilingual-hi).
+
+### Select the dedicated Hindi variant
+
+For a one-session test, start Studio from the same terminal with:
+
+```bash
+CHATTERBOX_MODEL_VARIANT=dedicated_hindi python3 studio.py --ui
+```
+
+To return to the baseline, omit the environment variable or set `CHATTERBOX_MODEL_VARIANT=multilingual_v3`.
+
+You can place the file elsewhere and set `CHATTERBOX_HINDI_T3_CHECKPOINT=/absolute/path/to/t3_hi.safetensors`. The adapter writes the selected variant and checkpoint path to `model_info.json`. Confirm that it reports `model_variant: "dedicated_hindi"` and `dedicated_hindi_checkpoint: true` before judging the output.
+
+### Validation gate
+
+The strict state-dict load is intentional: installed Chatterbox versions may differ. If the checkpoint fails to load, do not remove strict checking or silently continue with another model. Capture the error and align the adapter with the installed package version first. Then render the same Hindi/Hinglish script and voice reference with both variants, comparing Hindi pronunciation, English technical terms, continuity, pacing, voice similarity, and expressive variation. Keep the multilingual V3 baseline as the fallback until the A/B listening test is complete.
