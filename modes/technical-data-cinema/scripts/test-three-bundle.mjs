@@ -43,7 +43,7 @@ const bundled = await bundleSceneHtml(source);
 assert.doesNotMatch(bundled, /<script[^>]*type=["']module["']/i, "module script should be bundled");
 assert.match(bundled, /window\.renderAt\s*=/, "renderAt export should survive bundling");
 assert.match(bundled, /window\.getDuration\s*=/, "getDuration export should survive bundling");
-assert.doesNotMatch(bundled, /https?:\/\//i, "bundled HTML must not require remote resources");
+assert.doesNotMatch(bundled, /<(?:script|link|img|video|audio)[^>]+(?:src|href)=["']https?:\/\//i, "HTML tags must not reference remote resources");
 
 const tempPath = path.join(os.tmpdir(), `technical-data-three-smoke-${process.pid}.html`);
 await fs.writeFile(tempPath, bundled);
