@@ -235,13 +235,17 @@ def script_to_audio(body: dict):
     if style not in production_voice.STORYTELLING_PRESETS:
         raise C.StudioError("invalid_narration_style", "Choose Storytelling, Conversational, or Dramatic narration.")
     beats = []
+    # A cue starts a delivery block and remains active until the next cue.
+    # This lets multiple lines share one TTS take, improving continuity and
+    # avoiding a fresh prosody reset on every short line. [DEFAULT] resets it.
+    active_performance = "default"
     for i, line in enumerate(lines):
         match = re.match(r"^\s*\[(HOOK|CURIOUS|SUSPENSE|REVEAL|EXPLAIN|URGENT|CALM|DEFAULT)\]\s*", line, re.IGNORECASE)
-        performance = match.group(1).lower() if match else "default"
         if match:
+            active_performance = match.group(1).lower()
             line = line[match.end():].strip()
         if line:
-            beats.append(dict(id=f"n{i+1:03d}", text=line, performance=performance if performance_mode else "default"))
+            beats.append(dict(id=f"n{i+1:03d}", text=line, performance=active_performance if performance_mode else "default"))
     try:
         v = production_voice.synthesize(beats, seed=42, allow_partial_alignment=True,
                                         style=style, pronunciation_mode=pronunciation_mode, group_lines=True,
