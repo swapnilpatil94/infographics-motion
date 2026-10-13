@@ -262,7 +262,27 @@ const server = http.createServer(async (req, res) => {
           if (voiceMode === "generate") await fs.writeFile(narrationPath, narrationContent, "utf8");
           const node = process.execPath;
           const generateArgs = ["scripts/ollama-session.mjs", "--", "node", "scripts/generate.mjs", "--story", storyPath, "--model", model, "--out", htmlPath];
-          if (!reuseScene) await run(node, generateArgs, root, job, "Ollama scene generation (model unload happens before narration)");
+          if (!reuseScene) {
+            try {
+              await run(node, generateArgs, root, job, "Ollama scene generation (model unload happens before narration)");
+            } catch (error) {
+              const validationFailure = /Generated HTML uses Math\\.random|Generated HTML failed export validation|Model output did not start with|Ollama returned no message content/i.test(job.logs.slice(-100).join("\\n"));
+              if (!validationFailure) throw error;
+              const archivedScene = path.join(dir, `index.invalid-${Date.now()}.log.html`);
+              // generate.mjs validates before writing, but preserve any unexpected partial artifact safely.
+              try { await fs.rename(htmlPath, archivedScene); log(job, `Archived invalid generated scene as ${path.basename(archivedScene)}.`); }
+              catch (archiveError) { if (archiveError.code !== "ENOENT") throw archiveError; }
+              const repairNote = [
+                "AUTOMATIC FIRST-PASS VALIDATION REPAIR. The previous model output was rejected by deterministic scene validation.",
+                "Do not use Math.random() anywhere, including initialization. Do not use timers or CSS transitions for scene state.",
+                "Every visible value must be a pure function of absolute timestamp; renderAt(seconds) must reset the full scene state and reproduce identical pixels when called repeatedly for the same timestamp.",
+                "Return a complete HTML document beginning with <!doctype html>, include window.renderAt, window.getDuration, and render-only mode via new URLSearchParams(window.location.search).get('render').",
+                "Keep the original story and narration meaning. Do not weaken or bypass any validation."
+              ].join("\\n");
+              log(job, "Initial scene failed HTML/determinism validation; starting one targeted repair, then a single fallback-model attempt if needed. Narration is preserved.");
+              await runSceneRepair(node, generateArgs, repairNote, root, job, "Repair invalid initial scene");
+            }
+          }
           if (voiceMode === "generate") {
             if (reuseNarration) {
               try {
