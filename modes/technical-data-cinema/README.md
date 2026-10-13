@@ -28,6 +28,14 @@ npx playwright install chromium
 npm run doctor
 ```
 
+## UI workflow
+
+Start the local production UI:
+```bash
+npm run ui
+```
+Open `http://127.0.0.1:4177`. Paste or edit the story brief and narration, select an installed Ollama model, then choose Chatterbox narration, an existing WAV, or silent export. The UI runs generation first, waits for the Ollama wrapper to unload the model, and only then starts narration/rendering. It prevents concurrent production jobs and shows live logs plus output links. For Chatterbox voice, the existing Studio must be running with your dedicated Hindi configuration. The UI server binds to localhost by default and should not be exposed to your network.
+
 ## Generate a scene
 ```bash
 npm run generate -- --story examples/viral-traffic.md --model qwen3-coder:30b
