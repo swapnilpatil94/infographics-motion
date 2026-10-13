@@ -87,3 +87,23 @@ The renderer tests deterministic seeking, rejects browser errors and external re
 
 ## Current validation status
 The renderer smoke fixture passed CI previously. The new UI and auto-start behavior still need a fresh CI run and a local end-to-end test; generated scene quality, Chatterbox runtime compatibility, and final audio/video sync have not yet been validated on the Mac.
+
+
+## Visual Director benchmark
+
+The repository includes a deterministic Three.js benchmark scene demonstrating a dotted stadium/crowd, moving request particles, delivery nodes, an overload queue, camera reframing, and a resolution beat. It is a renderer/visual-language test—not proof that the local LLM will generate equally strong scenes for every story.
+
+Build and render the silent benchmark without calling Ollama or Chatterbox:
+```bash
+npm run test:visual-benchmark
+```
+Output:
+- `output/visual-director-benchmark/index.html` — offline, bundled scene
+- `output/visual-director-benchmark.mp4` — 16-second vertical benchmark
+
+To test the Visual Director with a real episode while preserving approved narration, generate the episode scene first, then export with the existing WAV:
+```bash
+npm run generate -- --story <story-brief.md> --model qwen3-coder:30b
+npm run export -- --html output/<story-slug>/index.html --out output/<story-slug>/final.mp4 --audio /absolute/path/to/approved-narration.wav
+```
+Do not run a new TTS pass just to test visuals. Review the MP4 for recognisable silhouettes, meaningful motion, continuity between visual metaphors, mobile readability, and narration sync; passing automated tests alone is not a creative-quality sign-off.
