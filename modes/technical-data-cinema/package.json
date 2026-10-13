@@ -13,6 +13,7 @@
     "test:smoke": "node scripts/render.mjs --html examples/render-smoke-test.html --out output/smoke-test.mp4 --fps 5 --duration 3",
     "ui": "node scripts/ui-server.mjs",
     "test:three": "node scripts/test-three-bundle.mjs",
+    "test:fallback": "node scripts/test-fallback-scene.mjs",
     "test:visual-benchmark": "node scripts/build-visual-benchmark.mjs"
   },
   "dependencies": {
