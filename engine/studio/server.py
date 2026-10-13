@@ -248,7 +248,7 @@ def script_to_audio(body: dict):
                                         performance_mode=performance_mode, expression_intensity=expression_intensity)
     except Exception as e:
         raise C.StudioError("tts_failed", "Chatterbox narration failed.", reasons=[str(e)[-1000:]],
-                            hint="Check TTS_PYTHON, MYTHIC_STUDIO_DIR, TTS_REFERENCE_AUDIO and the TTS/alignment logs.")
+                            hint="Check TTS_PYTHON, TTS_REFERENCE_AUDIO and the TTS/alignment logs.")
     if v.get("placeholder"):
         raise C.StudioError("chatterbox_unavailable", "Chatterbox production assets are not configured; no placeholder audio was exported.",
                             reasons=[v.get("voice", "placeholder fallback")],
