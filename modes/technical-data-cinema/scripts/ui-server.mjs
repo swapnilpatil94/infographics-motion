@@ -172,9 +172,9 @@ const server = http.createServer(async (req, res) => {
           const mp4Path = path.join(dir, voiceMode === "silent" ? "final-silent.mp4" : "final.mp4");
           const storyContent = `# ${title}\n\n${story}\n`;
 
-          // Completed exports are never overwritten. An existing scene may be reused
-          // only when its saved brief matches exactly, allowing narration/render retries.
-          for (const name of ["final.mp4", "final-silent.mp4", "final.narration.wav"]) {
+          // Never overwrite a completed video. Reuse a narration WAV only when its source
+          // script matches exactly; this avoids rerunning Chatterbox after a render failure.
+          for (const name of ["final.mp4", "final-silent.mp4"]) {
             try {
               await fs.access(path.join(dir, name));
               throw new Error(`Output already exists: ${path.join(dir, name)}. Choose a new output folder to preserve the previous production.`);
@@ -183,30 +183,54 @@ const server = http.createServer(async (req, res) => {
             }
           }
 
+          const narrationContent = voiceScript ? voiceScript + "\n" : "";
+          const finalWavPath = path.join(dir, "final.narration.wav");
+          let reuseNarration = false;
+          try {
+            await fs.access(finalWavPath);
+            if (voiceMode !== "generate") throw new Error(`Narration WAV already exists: ${finalWavPath}. Choose a new output folder to avoid overwriting it.`);
+            let savedNarration;
+            try { savedNarration = await fs.readFile(narrationPath, "utf8"); }
+            catch { throw new Error(`Narration WAV exists at ${finalWavPath}, but its source script is missing. Preserve it and choose a new output folder.`); }
+            if (savedNarration !== narrationContent) throw new Error("Narration WAV exists, but narration.md does not match the submitted script. Choose a new output folder to preserve the existing voice.");
+            reuseNarration = true;
+            log(job, "Reusing the existing narration WAV; Chatterbox will not run again.");
+          } catch (error) {
+            if (error.code !== "ENOENT") throw error;
+          }
+
           let reuseScene = false;
           try {
             await fs.access(htmlPath);
             const savedStory = await fs.readFile(storyPath, "utf8");
-            if (savedStory !== storyContent) {
-              throw new Error(`A scene already exists in ${dir}, but its saved story does not match this brief. Choose a new output folder to avoid mixing productions.`);
-            }
+            if (savedStory !== storyContent) throw new Error(`A scene already exists in ${dir}, but its saved story does not match this brief. Choose a new output folder to avoid mixing productions.`);
             reuseScene = true;
             log(job, "Reusing the existing scene because story.md matches; skipping Ollama generation.");
           } catch (error) {
             if (error.code !== "ENOENT") throw error;
           }
 
+          // A previous run that produced narration but no MP4 failed in the render stage.
+          // Keep the WAV and archive the old scene before regenerating visuals on retry.
+          if (reuseNarration && reuseScene) {
+            const archivedScene = path.join(dir, `index.failed-${Date.now()}.html`);
+            await fs.rename(htmlPath, archivedScene);
+            reuseScene = false;
+            log(job, `Archived the failed scene as ${path.basename(archivedScene)}; regenerating visuals while preserving narration.`);
+          }
+
           await fs.writeFile(storyPath, storyContent, "utf8");
-          if (voiceMode === "generate") await fs.writeFile(narrationPath, voiceScript + "\n", "utf8");
+          if (voiceMode === "generate") await fs.writeFile(narrationPath, narrationContent, "utf8");
           const node = process.execPath;
           const generateArgs = ["scripts/ollama-session.mjs", "--", "node", "scripts/generate.mjs", "--story", storyPath, "--model", model, "--out", htmlPath];
-          if (!reuseScene) {
-            await run(node, generateArgs, root, job, "Ollama scene generation (model unload happens before narration)");
-          }
+          if (!reuseScene) await run(node, generateArgs, root, job, "Ollama scene generation (model unload happens before narration)");
           if (voiceMode === "generate") {
-            // Start or reuse Chatterbox only after Ollama has been unloaded.
-            await ensureStudio(job);
-            await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--voice-script", narrationPath, "--fps", String(fps), "--style", String(body.style || "storytelling"), "--performance", String(body.performance || "directed"), "--expression-intensity", String(body.intensity ?? 65)], root, job, "Chatterbox narration, then video render");
+            if (reuseNarration) {
+              await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--audio", finalWavPath, "--fps", String(fps)], root, job, "Render with reused narration WAV");
+            } else {
+              await ensureStudio(job);
+              await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--voice-script", narrationPath, "--fps", String(fps), "--style", String(body.style || "storytelling"), "--performance", String(body.performance || "directed"), "--expression-intensity", String(body.intensity ?? 65)], root, job, "Chatterbox narration, then video render");
+            }
           } else if (voiceMode === "wav") {
             await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--audio", path.resolve(wavPath), "--fps", String(fps)], root, job, "Render with existing WAV narration");
           } else {
