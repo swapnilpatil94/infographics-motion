@@ -33,7 +33,7 @@ from pathlib import Path
 
 warnings.filterwarnings("ignore")
 
-GAP_CAP = 0.35   # max inter-word silence to keep, seconds — a natural sentence-boundary pause
+GAP_CAP = 0.42   # max high-confidence inter-word silence to keep, seconds
 LEAD_CAP = 0.15  # max silence to keep before the first word
 TRAIL_CAP = 0.35  # max silence to keep after the last word
 
@@ -54,7 +54,9 @@ def tighten(out_beats, duration: float):
         removals.append((0.0, flat[0]["start"] - LEAD_CAP))
     for i in range(1, len(flat)):
         gap = flat[i]["start"] - flat[i - 1]["end"]
-        if gap > GAP_CAP:
+        # Only splice long gaps between two confidently aligned words. A low-confidence
+        # word boundary can hide a spoken token; cutting it would sound like a skipped word.
+        if gap > GAP_CAP and float(flat[i - 1].get("score", 0.0)) >= 0.75 and float(flat[i].get("score", 0.0)) >= 0.75:
             removals.append((flat[i - 1]["end"] + GAP_CAP, flat[i]["start"]))
     if duration - flat[-1]["end"] > TRAIL_CAP:
         removals.append((flat[-1]["end"] + TRAIL_CAP, duration))
@@ -132,9 +134,20 @@ def main() -> int:
         out_beats.append({"beat_id": beat["beat_id"], "words": words})
         log(f"beat {beat['beat_id']}: {len(words)}/{len(beat['text'].split())} words placed")
 
-    removals, total_removed = tighten(out_beats, duration)
+    expected_words = sum(len(str(beat.get("text", "")).split()) for beat in beats)
+    aligned_words = sum(len(beat.get("words", [])) for beat in out_beats)
+    alignment_complete = (
+        len(out_beats) == len(beats)
+        and all(len(aligned.get("words", [])) >= len(str(source.get("text", "")).split())
+                for source, aligned in zip(beats, out_beats))
+    )
+    if not alignment_complete:
+        log(f"SAFETY: alignment coverage {aligned_words}/{expected_words} words across {len(out_beats)}/{len(beats)} beats; disabling automatic audio splicing to prevent cutting unaligned speech")
+        removals, total_removed = [], 0.0
+    else:
+        removals, total_removed = tighten(out_beats, duration)
     if total_removed > 0.05:
-        log(f"tightening {len(removals)} dead-air gap(s), removing {total_removed:.2f}s total")
+        log(f"tightening {len(removals)} high-confidence dead-air gap(s), removing {total_removed:.2f}s total")
         native_audio, native_sr = sf.read(str(audio_path), dtype="float32", always_2d=False)
         kept = []
         cursor = 0.0

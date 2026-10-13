@@ -29,14 +29,12 @@ DEFAULT_REFERENCE = REPO_ROOT / "assets" / "reference-voices" / "hindi-male-narr
 SILENCE_PAD_SECONDS = 0.18
 TRIM_THRESHOLD = 0.01  # preserve quieter consonants and sentence tails
 TRIM_MARGIN_SECONDS = 0.06
-# Post-generation tempo multiplier (ffmpeg atempo). Trimming Chatterbox's own boundary silence
-# (see trim_silence) already pushes the natural pace to ~170 WPM on its own, and the downstream
-# Whisper-driven dead-air tightening (tools/whisper_align.py) removes further inter-word gaps —
-# both push effective WPM up further, so this needs to undershoot 165 WPM on its own to leave
-# room. 1.0 disables it. Measured on this voice/reference, after both trim and gap-tightening:
-# 0.92x -> ~165.5 WPM (over target); 0.90x -> see PROGRESS.md for the re-measured value.
+# Post-generation tempo multiplier (ffmpeg atempo): values above 1.0 make speech faster.
+# Keep the default Reel-forward; preset-specific values from engine/shorts/voice.py override it.
+# Audio splicing is confidence-gated in whisper_align.py so speed is not achieved by risking
+# cuts through unaligned speech. 1.0 disables tempo processing.
 import os as _os
-TEMPO = float(_os.environ.get("TTS_ATEMPO", "0.90"))
+TEMPO = float(_os.environ.get("TTS_ATEMPO", "1.08"))
 
 
 def log(message: str) -> None:
@@ -124,15 +122,26 @@ def main() -> int:
     except (TypeError, ValueError):
         selector_available = False
     requested_selector = "v3" if selector_available else None
+    model_variant = str(job.get("model_variant") or _os.environ.get("CHATTERBOX_MODEL_VARIANT", "multilingual_v3")).strip().lower()
+    if model_variant not in {"multilingual_v3", "dedicated_hindi"}:
+        log(f"unknown model_variant={model_variant!r}; use multilingual_v3 or dedicated_hindi")
+        return 2
+    hindi_checkpoint = Path(_os.environ.get(
+        "CHATTERBOX_HINDI_T3_CHECKPOINT",
+        str(REPO_ROOT / "models" / "chatterbox-hindi" / "t3_hi.safetensors"),
+    )).expanduser()
     log(f"CONFIG device={device} package=chatterbox-tts@{package_version} class={ChatterboxMultilingualTTS.__module__}.{ChatterboxMultilingualTTS.__name__}")
     log(f"CONFIG language_id=hi reference={reference_path} reference_exists={reference_path.exists()}")
-    log(f"CONFIG checkpoint_selector={requested_selector or 'not supported by installed loader; package default will be used'}")
-    log(f"CONFIG tempo={tempo} exaggeration={exaggeration} cfg_weight={cfg_weight} temperature={temperature} silence_pad_seconds={silence_pad_seconds} seed={seed} performance_mode={performance_mode} expression_intensity={expression_intensity}")
+    log(f"CONFIG model_variant={model_variant} checkpoint_selector={requested_selector or 'not supported by installed loader; package default will be used'}")
+    if model_variant == "dedicated_hindi":
+        log(f"CONFIG dedicated_hindi_checkpoint={hindi_checkpoint} exists={hindi_checkpoint.is_file()}")
+        if not hindi_checkpoint.is_file():
+            log("Dedicated Hindi checkpoint not found. Download t3_hi.safetensors or set CHATTERBOX_HINDI_T3_CHECKPOINT.")
+            return 1
 
     t0 = time.time()
-    # Prefer the package's V3 selector when available. This is the multilingual
-    # V3 family with Hindi selected at inference; it is NOT the dedicated
-    # ResembleAI/Chatterbox-Multilingual-hi checkpoint.
+    # Start with the compatible shared V3 architecture/assets. For the Hindi
+    # variant, replace only its T3 weights with the dedicated Hindi fine-tune.
     try:
         if selector_available:
             model = loader(device=device, t3_model="v3")
@@ -144,6 +153,23 @@ def main() -> int:
         log(f"V3 selector call failed ({exc}); loading installed default checkpoint")
         model = loader(device=device)
         selector_used = "installed-default-after-selector-failure"
+
+    if model_variant == "dedicated_hindi":
+        try:
+            from safetensors.torch import load_file
+            state_dict = load_file(str(hindi_checkpoint), device="cpu")
+            incompatible = model.t3.load_state_dict(state_dict, strict=True)
+            if incompatible.missing_keys or incompatible.unexpected_keys:
+                raise RuntimeError(
+                    f"checkpoint keys mismatch: missing={incompatible.missing_keys[:8]}, "
+                    f"unexpected={incompatible.unexpected_keys[:8]}"
+                )
+            selector_used = "dedicated-hindi-t3"
+            log("MODEL dedicated Hindi T3 weights loaded successfully")
+        except Exception as exc:
+            log(f"failed to load dedicated Hindi checkpoint into installed Chatterbox T3 architecture: {exc}")
+            log("No fallback will be used; fix the checkpoint/package compatibility before retrying.")
+            return 1
 
     def _class_name(value):
         cls = type(value)
@@ -159,14 +185,16 @@ def main() -> int:
             pass
     model_info = {
         "model_family": "ChatterboxMultilingualTTS",
+        "model_variant": model_variant,
         "loader_class": f"{ChatterboxMultilingualTTS.__module__}.{ChatterboxMultilingualTTS.__name__}",
         "package_version": package_version,
         "device": device,
         "language_id": "hi",
         "selector_requested": requested_selector,
         "selector_used": selector_used,
-        "dedicated_hindi_checkpoint": False,
-        "checkpoint_note": "Multilingual Chatterbox loader with Hindi language_id; not the dedicated ResembleAI/Chatterbox-Multilingual-hi checkpoint.",
+        "dedicated_hindi_checkpoint": model_variant == "dedicated_hindi",
+        "dedicated_hindi_checkpoint_path": str(hindi_checkpoint.resolve()) if model_variant == "dedicated_hindi" else None,
+        "checkpoint_note": ("Dedicated ResembleAI/Chatterbox-Multilingual-hi T3 weights loaded into the shared V3 architecture." if model_variant == "dedicated_hindi" else "Multilingual Chatterbox V3 with Hindi language_id; not the dedicated Hindi fine-tune."),
         "sample_rate": int(getattr(model, "sr", 0) or 0),
         "reference_audio": str(reference_path.resolve()),
         "reference_bytes": reference_path.stat().st_size if reference_path.exists() else None,
@@ -183,7 +211,7 @@ def main() -> int:
     }
     info_path = output_path.with_name("model_info.json")
     info_path.write_text(json.dumps(model_info, ensure_ascii=False, indent=2), encoding="utf-8")
-    log(f"MODEL family={model_info['model_family']} selector={selector_used} dedicated_hindi_checkpoint=false sample_rate={model_info['sample_rate']} submodels={submodels}")
+    log(f"MODEL family={model_info['model_family']} selector={selector_used} dedicated_hindi_checkpoint={model_info['dedicated_hindi_checkpoint']} sample_rate={model_info['sample_rate']} submodels={submodels}")
     log(f"MODEL_INFO path={info_path}")
     log(f"model loaded in {time.time() - t0:.1f}s")
 
@@ -194,8 +222,8 @@ def main() -> int:
     cursor_samples = 0
 
     group_lines = bool(job.get("group_lines", False))
-    group_max_lines = max(1, int(job.get("group_max_lines", 5)))
-    group_max_words = max(1, int(job.get("group_max_words", 45)))
+    group_max_lines = max(1, int(job.get("group_max_lines", 3)))
+    group_max_words = max(1, int(job.get("group_max_words", 34)))
     groups: list[tuple[list[dict], str]] = []
     current: list[dict] = []
     current_words = 0
@@ -208,8 +236,11 @@ def main() -> int:
         if performance not in {"hook", "curious", "suspense", "reveal", "explain", "urgent", "calm", "default"}:
             performance = "default"
         word_count = max(len(segment_text.split()), 1)
+        # Keep neighboring narration cues in the same take unless a safe chunk
+        # boundary is reached. Splitting on every emotion tag causes audible resets
+        # in pitch, rhythm and breath. The group's settings are blended below.
         limit_reached = group_lines and (len(current) >= group_max_lines or current_words + word_count > group_max_words)
-        if current and (limit_reached or performance != current_performance):
+        if current and limit_reached:
             groups.append((current, current_performance))
             current, current_words = [], 0
         if not current:
@@ -238,8 +269,19 @@ def main() -> int:
         torch.manual_seed(seed + group_index)
         t1 = time.time()
         take_exaggeration, take_cfg, take_temperature = exaggeration, cfg_weight, temperature
-        if performance_mode and performance in performance_targets:
-            target_exaggeration, target_cfg, target_temperature = performance_targets[performance]
+        if performance_mode:
+            # Blend cues in a connected take by word count. This keeps an overall
+            # emotional direction without a separate TTS reset for every cue marker.
+            weighted_targets = []
+            for segment in group:
+                cue = str(segment.get("performance") or "default").lower()
+                target = performance_targets.get(cue, (exaggeration, cfg_weight, temperature))
+                weight = max(len((segment.get("text") or "").split()), 1)
+                weighted_targets.append((target, weight))
+            total_weight = sum(weight for _, weight in weighted_targets) or 1
+            target_exaggeration = sum(target[0] * weight for target, weight in weighted_targets) / total_weight
+            target_cfg = sum(target[1] * weight for target, weight in weighted_targets) / total_weight
+            target_temperature = sum(target[2] * weight for target, weight in weighted_targets) / total_weight
             take_exaggeration = exaggeration + (target_exaggeration - exaggeration) * blend
             take_cfg = cfg_weight + (target_cfg - cfg_weight) * blend
             take_temperature = temperature + (target_temperature - temperature) * blend

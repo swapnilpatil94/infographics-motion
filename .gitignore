@@ -36,3 +36,6 @@ assets/raw/rgs/*
 # Kathaya: reference originals downloaded by the asset builder are provenance copies (re-downloadable); the built library assets are tracked
 assets/references/*/approved_*.jpg
 assets/references/*/[0-9a-f]*.jpg
+
+# Local Chatterbox checkpoints (downloaded separately; never commit multi-GB weights)
+models/chatterbox-hindi/

@@ -671,7 +671,7 @@ function renderProject() {
 const AUD = { text: sessionStorage.getItem("ks.audioText") || "", style: "storytelling", hindiPronunciation: true, performanceMode: "directed", expressionIntensity: 65, job: null, busy: false, error: null };
 function viewAudio() {
   view.innerHTML = `<section class="kflow">
-    <div class="khero"><h1>Script → Audio</h1><p>Paste Hindi in Devanagari. This reuses the same Chatterbox + WhisperX narration adapter as production and does not render a film.</p></div>
+    <div class="khero"><h1>Script → Audio</h1><p>Write spoken Hindi in Devanagari, one natural sentence or thought per line. This reuses the same Chatterbox + WhisperX narration adapter as production and does not render a film.</p></div>
     <div class="card kcard">
       <label class="f">Script / narration<textarea id="audio-script" rows="12" placeholder="रात के दस बजे। कमरे में अकेला आरव।&#10;तभी फ़ोन बज उठा।&#10;आरव ने स्क्रीन की तरफ़ देखा।">${esc(AUD.text)}</textarea></label>
       <div class="row sp" style="margin-top:10px;align-items:center"><small class="muted"><span id="audio-count">${AUD.text.trim() ? AUD.text.trim().split(/\s+/).length : 0}</span> words · one narration beat per line</small><button class="btn sm ghost" id="audio-clear">Clear script</button></div>
@@ -699,8 +699,9 @@ function viewAudio() {
         </label>
       </div>
       <div class="row" style="justify-content:flex-start;margin-top:12px"><button class="btn sm" id="audio-example">Load emotional example</button></div>
-      <div class="note" style="margin-top:16px">Storytelling uses expressive Chatterbox settings and a slower finishing tempo. Hindi-first pronunciation changes only the spoken form of common English terms; your script and exported captions remain in their original wording.</div>
-      <div class="note" style="margin-top:8px">Uses production settings: <code>MYTHIC_STUDIO_DIR</code>, <code>TTS_PYTHON</code>, <code>TTS_REFERENCE_AUDIO</code>. Placeholder macOS speech is not exported as Chatterbox.</div>
+      <div class="note" style="margin-top:16px"><b>Dedicated Hindi script tips:</b> Keep Hindi in Devanagari and write for the ear, not the page. Use short, connected sentences with commas and full stops; avoid one-word fragments on separate lines. Common English tech terms are converted to Hindi spoken forms for TTS only, while your script and captions keep their original wording. For an unrecognized English name or term, use a pronunciation-friendly Devanagari form if the model says it incorrectly.</div>
+      <div class="note" style="margin-top:8px"><b>Performance cues:</b> Put [HOOK], [CURIOUS], [SUSPENSE], [REVEAL], [EXPLAIN], [URGENT], [CALM] or [DEFAULT] at the start of a line only when the delivery should change. The cue continues across following lines until the next cue. Use fewer, longer blocks for smoother continuity; cues steer settings but do not guarantee emotion.</div>
+      <div class="note" style="margin-top:8px">Storytelling uses expressive Chatterbox settings and a slower finishing tempo. Uses production settings: <code>MYTHIC_STUDIO_DIR</code>, <code>TTS_PYTHON</code>, <code>TTS_REFERENCE_AUDIO</code>. Placeholder macOS speech is not exported as Chatterbox.</div>
       <div id="audio-error" style="margin-top:12px">${AUD.error ? errBox(AUD.error) : ""}</div>
       <div class="row" style="justify-content:center;margin-top:20px"><button class="btn primary bigbtn" id="audio-generate" ${AUD.busy ? "disabled" : ""}>${AUD.busy ? '<span class="spin"></span>Generating…' : "Generate WAV"}</button></div>
     </div>
@@ -738,7 +739,7 @@ view.addEventListener("click", e => {
   if (!b) return;
   if (b.id === "audio-generate") return generateScriptAudio();
   if (b.id === "audio-example") {
-    AUD.text = "[HOOK] सोचिए, सिर्फ़ एक गलत क्लिक... और आपके बैंक अकाउंट से लाखों रुपये गायब हो सकते हैं।\n[CURIOUS] लेकिन असली सवाल है—स्कैमर आपसे वही गलती कैसे करवाते हैं?\n[SUSPENSE] जवाब जानने से पहले, एक बात समझिए।\n[REVEAL] कई बार, पैसा निकल जाने के बाद भी आपको पता नहीं चलता कि असली गलती कहाँ हुई।\n[EXPLAIN] स्कैमर भरोसा बनाते हैं, जल्दबाज़ी करवाते हैं, और फिर आपसे वही बटन दबवाते हैं जिसकी उन्हें ज़रूरत होती है।\n[URGENT] कोई पेमेंट करने से पहले, डिटेल्स ज़रूर चेक कीजिए।\n[CALM] एक सेकंड रुकना, आपका पैसा बचा सकता है।";
+    AUD.text = "[HOOK] सोचिए, एक गलत क्लिक से आपका बैंक अकाउंट खाली हो सकता है।\nलेकिन असली सवाल है—स्कैमर आपसे ये क्लिक करवाते कैसे हैं?\n[CURIOUS] इसका जवाब आपकी टेक्नोलॉजी में नहीं, आपकी साइकोलॉजी में छिपा है।\nवे पहले भरोसा बनाते हैं, फिर जल्दबाज़ी करवाते हैं।\n[SUSPENSE] और जब तक आपको शक होता है...\n[REVEAL] पेमेंट पहले ही जा चुकी होती है।\n[EXPLAIN] इसलिए किसी भी ऐप में OTP या बैंक डिटेल डालने से पहले रुकिए।\n[CALM] बस एक सेकंड का पॉज़, आपका पैसा बचा सकता है।";
     AUD.job = null; AUD.error = null; try { sessionStorage.setItem("ks.audioText", AUD.text); } catch (_) {} return viewAudio();
   }
   if (b.id === "audio-clear") { AUD.text = ""; AUD.job = null; AUD.error = null; try { sessionStorage.removeItem("ks.audioText"); } catch (_) {} return viewAudio(); }

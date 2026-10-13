@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Technical Data Cinema Render Smoke Test</title>
+<style>
+  html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080b10;color:#f4f1e8;font-family:system-ui,sans-serif}
+  canvas{display:block;width:100vw;height:100vh}
+</style>
+</head>
+<body>
+<canvas id="stage" width="540" height="960" aria-label="Deterministic renderer smoke test"></canvas>
+<script>
+(() => {
+  const canvas = document.getElementById("stage");
+  const ctx = canvas.getContext("2d");
+  const duration = 3;
+  const clamp = (v,a,b) => Math.max(a,Math.min(b,v));
+  window.getDuration = () => duration;
+  window.renderAt = (seconds) => {
+    const t = clamp(Number(seconds) || 0, 0, duration);
+    ctx.clearRect(0,0,540,960);
+    ctx.fillStyle = "#080b10"; ctx.fillRect(0,0,540,960);
+    ctx.fillStyle = "#7c8794"; ctx.font = "600 13px system-ui"; ctx.fillText("TECHNICAL DATA CINEMA · RENDER CHECK", 32, 54);
+    ctx.fillStyle = "#f4f1e8"; ctx.font = "700 29px system-ui"; ctx.fillText("Deterministic timeline", 32, 112);
+    ctx.fillStyle = "#2fd3e6"; ctx.fillRect(32, 166, 476, 3);
+    const progress = t / duration;
+    ctx.fillStyle = "#141c27"; ctx.fillRect(32, 224, 476, 96);
+    ctx.fillStyle = "#2fd3e6"; ctx.fillRect(32, 224, 476 * progress, 96);
+    ctx.fillStyle = "#f4f1e8"; ctx.font = "700 20px system-ui"; ctx.fillText("Absolute time → repeatable frame", 32, 370);
+    ctx.fillStyle = "#7c8794"; ctx.font = "15px system-ui"; ctx.fillText("The same timestamp must render identical pixels.", 32, 404);
+    ctx.fillStyle = "#e63b2e"; ctx.beginPath(); ctx.arc(32 + 476 * progress, 272, 11, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = "#f4f1e8"; ctx.font = "700 36px system-ui"; ctx.fillText(t.toFixed(2) + "s", 32, 500);
+    ctx.fillStyle = "#7c8794"; ctx.font = "13px system-ui"; ctx.fillText("SMOKE TEST · NOT A STORY TEMPLATE", 32, 916);
+  };
+  window.renderAt(0);
+})();
+</script>
+</body>
+</html>
