@@ -4,7 +4,7 @@ A local-first, story-specific mode for animation-led technical explainers. It re
 
 ## Workflow
 1. Approve the story brief and spoken narration script.
-2. Generate one self-contained HTML scene with one local Ollama coding model.
+2. Plan the visual beats with a local reasoning model, then generate one self-contained HTML scene with a coding model; the two models run sequentially and unload after each stage to protect unified memory.
 3. Preview and revise the story-specific animation.
 4. Export silently, add an approved WAV, or generate narration through the existing Chatterbox Studio API.
 5. Inspect the final MP4 and audio before publishing.
@@ -38,9 +38,9 @@ Open `http://127.0.0.1:4177`. Paste or edit the story brief and narration, selec
 
 ## Generate a scene
 ```bash
-npm run generate -- --story examples/viral-traffic.md --model qwen3-coder:30b
+npm run generate -- --story examples/viral-traffic.md --planner-model qwen3.5:9b --model qwen2.5-coder:7b
 ```
-The default context is 8192 tokens for the 24 GB Mac. Generation runs one Ollama model, then unloads it before exiting. Use `--model qwen2.5-coder:7b` for quick revisions. Models are never pulled automatically.
+Recommended defaults for the 24 GB Apple Silicon Mac: `qwen3.5:9b` for visual planning and `qwen2.5-coder:7b` for HTML/JS scene implementation. They run sequentially (`keep_alive: 0`), so both models are not kept resident together. The default context is 8192 tokens. The coding model is also the repair model unless the UI selects an installed alternative. Override with `--planner-model` / `--model`, or `OLLAMA_PLANNER_MODEL` / `OLLAMA_MODEL`. Models are never pulled automatically; the generator checks that the planner model is installed and reports available models if not.
 
 Generated scenes must expose `window.renderAt(seconds)` and `window.getDuration()`, and must hide preview UI for `?render=1`. Invalid output is rejected before writing the HTML. Each generation writes a new file and never overwrites prior output.
 
