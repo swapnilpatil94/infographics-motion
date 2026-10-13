@@ -73,6 +73,27 @@ try {
     fail("Determinism check failed: renderAt(0) produced different pixels after seeking. Derive all scene state from absolute time.");
   }
   console.log("Determinism check passed (same timestamp → identical screenshot).");
+
+  // With narration, reject a dead visual ending instead of exporting a long frozen
+  // takeaway card. Sample the final 3.5 seconds at half-second intervals.
+  if (audioPath && duration >= 3.5) {
+    const tailHashes = [];
+    for (let sample = 0; sample <= 7; sample++) {
+      const t = duration - 3.5 + sample * 0.5;
+      await page.evaluate(time => window.renderAt(time), Math.min(contract.duration, t * (contract.duration / duration)));
+      tailHashes.push(hash(await page.screenshot({ type: "png", animations: "disabled" })));
+    }
+    let unchangedSeconds = 0;
+    for (let i = 1; i < tailHashes.length; i++) {
+      unchangedSeconds = tailHashes[i] === tailHashes[i - 1] ? unchangedSeconds + 0.5 : 0;
+      if (unchangedSeconds > 2.5) {
+        fail("Visual ending check failed: the final scene stays pixel-identical for more than 2.5 seconds. Animate the final insight or shorten the scene ending before exporting.");
+      }
+    }
+    await page.evaluate(() => window.renderAt(0));
+    console.log("Narrated ending check passed (no frozen final frame longer than 2.5 seconds).");
+  }
+
   const sceneTimeScale = contract.duration / duration;
   if (duration > contract.duration + 0.05) {
     console.log(`Scene (${contract.duration.toFixed(2)}s) is shorter than final duration (${duration.toFixed(2)}s); time-scaling the full scene to avoid a frozen end card.`);
