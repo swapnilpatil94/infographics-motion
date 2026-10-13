@@ -36,9 +36,15 @@ ffmpeg -version
 
 ## Generate a story-specific HTML page
 ```bash
-node scripts/generate.mjs --story examples/viral-traffic.md --model qwen3-coder:30b
+npm run generate -- --story examples/viral-traffic.md --model qwen3-coder:30b
 ```
 Output is written under `output/`. The generator writes only a new generated HTML file and never modifies application source. Use `--model qwen2.5-coder:7b` for faster iterations.
+
+## Automatic Ollama lifecycle
+
+Use `npm run generate` (rather than invoking `scripts/generate.mjs` directly) for managed lifecycle handling. The wrapper checks the Ollama API, starts `ollama serve` only if no server is already responding, verifies the selected model is already downloaded, runs generation, unloads that model if it is resident, and stops the server only when this command started it. An existing Ollama server is left running. It never silently downloads models; if one is missing, the error tells you to run `ollama pull <model>` yourself.
+
+The model is unloaded after the generation command, including failed runs, so memory is available for Chatterbox. The service is not stopped if it was already running before generation.
 
 ## Render a deterministic timeline
 Generated HTML must expose `window.renderAt(seconds)` and `window.getDuration()`. Render with:
