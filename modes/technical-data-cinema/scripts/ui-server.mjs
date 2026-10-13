@@ -92,6 +92,29 @@ async function runSceneRepair(node, generateArgs, repairNote, cwd, job, label) {
   }
 }
 
+async function retryExportWithEndingRepair(node, generateArgs, htmlPath, mp4Path, finalWavPath, fps, dir, root, job) {
+  const exportArgs = [ "scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--audio", finalWavPath, "--fps", String(fps) ];
+  try {
+    await run(node, exportArgs, root, job, "Retry render with preserved narration WAV");
+    return;
+  } catch (error) {
+    const endingFailure = job.logs.slice(-100).some(line => line.includes("Visual ending check failed"));
+    if (!endingFailure) throw error;
+    const archivedScene = path.join(dir, `index.failed-ending-${Date.now()}.html`);
+    await fs.rename(htmlPath, archivedScene);
+    const repairNote = [
+      "SECOND, MORE STRICT VISUAL-ENDING REPAIR. The previous repaired scene still failed QA because its final frames are pixel-identical for more than 2.5 seconds.",
+      "Keep the same story and visual explanation, but redesign the ending timeline. The final explanatory action must continue changing through the last narration beat. Only in the final 1.5 to 2.5 seconds may the scene resolve to the takeaway.",
+      "Do not use a static card, static text, a long fade, or a frozen final composition. Add timestamp-driven motion or a visible causal resolution that changes at multiple timestamps during the final 3 seconds.",
+      "The full scene must remain deterministic: renderAt(t) sets every visible property from absolute t and resets the complete drawing state. Preserve the exact export contract: define positive DURATION and global window.getDuration = function () { return DURATION; } and window.renderAt = function (seconds) { const t = Math.max(0, Math.min(DURATION, Number(seconds) || 0)); draw(t); }; adapt draw only if the renderer function has another name.",
+      "Include render-only mode using new URLSearchParams(window.location.search).get('render') === '1'. Return a complete valid HTML document, not a fragment. No Math.random(), timers for scene state, or CSS transitions."
+    ].join("\n");
+    log(job, `The first repaired scene still failed ending QA; archived it as ${path.basename(archivedScene)} and making one stricter ending-only repair. Narration WAV remains unchanged.`);
+    await runSceneRepair(node, generateArgs, repairNote, root, job, "Strict visual-ending repair");
+    await run(node, exportArgs, root, job, "Final render after strict ending repair");
+  }
+}
+
 async function ensureStudio(job) {
   const ready = async () => {
     try {
@@ -256,7 +279,7 @@ const server = http.createServer(async (req, res) => {
                   : "The previous export failed determinism QA. Ensure every visual property is derived from absolute timestamp and renderAt(t) resets the full scene state.";
                 log(job, `${endingFailure ? "Visual ending" : "Determinism"} QA failed; archived scene as ${path.basename(archivedScene)} and attempting one targeted scene repair while preserving narration.`);
                 await runSceneRepair(node, generateArgs, repairNote, root, job, endingFailure ? "Repair frozen visual ending" : "Regenerate nondeterministic scene");
-                await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--audio", finalWavPath, "--fps", String(fps)], root, job, "Retry render with preserved narration WAV");
+                await retryExportWithEndingRepair(node, generateArgs, htmlPath, mp4Path, finalWavPath, fps, dir, root, job);
               }
             } else {
               await ensureStudio(job);
@@ -270,7 +293,7 @@ const server = http.createServer(async (req, res) => {
                 const repairNote = "The previous export failed visual-ending QA: its final frames were pixel-identical for more than 2.5 seconds. Redesign the final 5 seconds: keep meaningful narration-synchronized motion through the last explanatory beat, then resolve into a takeaway only in the final 1.5–2.5 seconds. Do not stretch or freeze an end card; keep deterministic renderAt(seconds) behavior.";
                 log(job, `Visual ending QA failed; archived scene as ${path.basename(archivedScene)} and attempting one targeted scene repair while preserving the generated narration WAV.`);
                 await runSceneRepair(node, generateArgs, repairNote, root, job, "Repair frozen visual ending");
-                await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--audio", finalWavPath, "--fps", String(fps)], root, job, "Retry render with preserved narration WAV");
+                await retryExportWithEndingRepair(node, generateArgs, htmlPath, mp4Path, finalWavPath, fps, dir, root, job);
               }
             }
           } else if (voiceMode === "wav") {
