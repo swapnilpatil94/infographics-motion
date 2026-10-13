@@ -34,7 +34,7 @@ Start the local production UI:
 ```bash
 npm run ui
 ```
-Open `http://127.0.0.1:4177`. Paste or edit the story brief and narration, select an installed Ollama model, then choose Chatterbox narration, an existing WAV, or silent export. The UI runs generation first, waits for the Ollama wrapper to unload the model, and only then starts narration/rendering. It prevents concurrent production jobs and shows live logs plus output links. For Chatterbox voice, the existing Studio must be running with your dedicated Hindi configuration. The UI server binds to localhost by default and should not be exposed to your network.
+Open `http://127.0.0.1:4177`. Paste or edit the story brief and narration, select an installed Ollama model, then choose Chatterbox narration, an existing WAV, or silent export. The UI runs generation first, waits for the Ollama wrapper to unload the model, and only then starts narration/rendering. It prevents concurrent production jobs and shows live logs plus output links. For Chatterbox voice, the UI checks for an existing Studio and starts it with `CHATTERBOX_MODEL_VARIANT=dedicated_hindi` if needed. If your Chatterbox dependencies use a custom Python environment, set `STUDIO_PYTHON` to that interpreter path before `npm run ui`. The UI server binds to localhost by default and should not be exposed to your network.
 
 ## Generate a scene
 ```bash
@@ -86,4 +86,4 @@ The renderer tests deterministic seeking, rejects browser errors and external re
 - Preview the entire scene and inspect the exported MP4 before publishing.
 
 ## Current validation status
-The renderer smoke fixture has passed CI previously. These new export and narration changes still need to be pulled and run locally; generated scene quality, Chatterbox runtime compatibility, and final audio/video sync have not been validated on the Mac yet.
+The renderer smoke fixture passed CI previously. The new UI and auto-start behavior still need a fresh CI run and a local end-to-end test; generated scene quality, Chatterbox runtime compatibility, and final audio/video sync have not yet been validated on the Mac.
