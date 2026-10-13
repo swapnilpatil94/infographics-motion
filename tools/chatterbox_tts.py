@@ -224,8 +224,8 @@ def main() -> int:
     cursor_samples = 0
 
     group_lines = bool(job.get("group_lines", False))
-    group_max_lines = max(1, int(job.get("group_max_lines", 5)))
-    group_max_words = max(1, int(job.get("group_max_words", 45)))
+    group_max_lines = max(1, int(job.get("group_max_lines", 3)))
+    group_max_words = max(1, int(job.get("group_max_words", 34)))
     groups: list[tuple[list[dict], str]] = []
     current: list[dict] = []
     current_words = 0
@@ -238,8 +238,11 @@ def main() -> int:
         if performance not in {"hook", "curious", "suspense", "reveal", "explain", "urgent", "calm", "default"}:
             performance = "default"
         word_count = max(len(segment_text.split()), 1)
+        # Keep neighboring narration cues in the same take unless a safe chunk
+        # boundary is reached. Splitting on every emotion tag causes audible resets
+        # in pitch, rhythm and breath. The group's settings are blended below.
         limit_reached = group_lines and (len(current) >= group_max_lines or current_words + word_count > group_max_words)
-        if current and (limit_reached or performance != current_performance):
+        if current and limit_reached:
             groups.append((current, current_performance))
             current, current_words = [], 0
         if not current:
@@ -268,8 +271,19 @@ def main() -> int:
         torch.manual_seed(seed + group_index)
         t1 = time.time()
         take_exaggeration, take_cfg, take_temperature = exaggeration, cfg_weight, temperature
-        if performance_mode and performance in performance_targets:
-            target_exaggeration, target_cfg, target_temperature = performance_targets[performance]
+        if performance_mode:
+            # Blend cues in a connected take by word count. This keeps an overall
+            # emotional direction without a separate TTS reset for every cue marker.
+            weighted_targets = []
+            for segment in group:
+                cue = str(segment.get("performance") or "default").lower()
+                target = performance_targets.get(cue, (exaggeration, cfg_weight, temperature))
+                weight = max(len((segment.get("text") or "").split()), 1)
+                weighted_targets.append((target, weight))
+            total_weight = sum(weight for _, weight in weighted_targets) or 1
+            target_exaggeration = sum(target[0] * weight for target, weight in weighted_targets) / total_weight
+            target_cfg = sum(target[1] * weight for target, weight in weighted_targets) / total_weight
+            target_temperature = sum(target[2] * weight for target, weight in weighted_targets) / total_weight
             take_exaggeration = exaggeration + (target_exaggeration - exaggeration) * blend
             take_cfg = cfg_weight + (target_cfg - cfg_weight) * blend
             take_temperature = temperature + (target_temperature - temperature) * blend
