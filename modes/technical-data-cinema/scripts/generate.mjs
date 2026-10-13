@@ -1,0 +1,75 @@
+#!/usr/bin/env node
+import fs from "node:fs/promises";
+import path from "node:path";
+import process from "node:process";
+import { fileURLToPath } from "node:url";
+
+const here = path.dirname(fileURLToPath(import.meta.url));
+const root = path.resolve(here, "..");
+const args = process.argv.slice(2);
+function arg(name, fallback) { const i = args.indexOf(name); return i >= 0 ? args[i + 1] : fallback; }
+function slugify(value) { return value.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 64) || "story"; }
+const storyArg = arg("--story");
+if (!storyArg) {
+  console.error("Usage: node scripts/generate.mjs --story <file.md> [--model qwen3-coder:30b] [--out output/<slug>/index.html]");
+  process.exit(2);
+}
+const model = arg("--model", process.env.OLLAMA_MODEL || "qwen3-coder:30b");
+const ollamaUrl = (process.env.OLLAMA_URL || "http://127.0.0.1:11434").replace(/\/$/, "");
+const storyPath = path.resolve(process.cwd(), storyArg);
+const story = await fs.readFile(storyPath, "utf8");
+const system = await fs.readFile(path.join(root, "prompts", "visual-director.md"), "utf8");
+const title = story.match(/^#\s+(.+)$/m)?.[1] || path.basename(storyPath, path.extname(storyPath));
+const defaultOut = path.join(root, "output", slugify(title), "index.html");
+const outPath = path.resolve(process.cwd(), arg("--out", path.relative(process.cwd(), defaultOut)));
+const outputRoot = path.join(root, "output") + path.sep;
+if (!outPath.startsWith(outputRoot)) {
+  console.error("Refusing to write outside modes/technical-data-cinema/output/. Use --out under that directory.");
+  process.exit(2);
+}
+console.log(`Generating with ${model}; context=${process.env.OLLAMA_NUM_CTX || "12288"} tokens`);
+console.log(`Story: ${storyPath}\nOutput: ${outPath}`);
+let response;
+try {
+  response = await fetch(`${ollamaUrl}/api/chat`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      model, stream: false,
+      messages: [
+        { role: "system", content: system },
+        { role: "user", content: `Create the visual explainer for this story brief.\n\n--- STORY BRIEF START ---\n${story}\n--- STORY BRIEF END ---\n\nReturn only complete HTML.\n` }
+      ],
+      options: { temperature: 0.25, num_ctx: Number(process.env.OLLAMA_NUM_CTX || 12288) }
+    }),
+    signal: AbortSignal.timeout(Number(process.env.OLLAMA_TIMEOUT_MS || 600000))
+  });
+} catch (error) {
+  console.error(`Could not reach Ollama at ${ollamaUrl}: ${error.message}`);
+  process.exit(1);
+}
+if (!response.ok) {
+  console.error(`Ollama returned HTTP ${response.status}: ${await response.text()}`);
+  process.exit(1);
+}
+const payload = await response.json();
+let html = payload?.message?.content?.trim();
+if (!html) { console.error("Ollama returned no message content."); process.exit(1); }
+html = html.replace(/^\uFEFF/, "").replace(/^```(?:html)?\s*/i, "").replace(/\s*```\s*$/, "");
+if (!/^<!doctype html>/i.test(html)) {
+  console.error("Model output did not start with <!doctype html>; refusing to save incomplete HTML.");
+  process.exit(1);
+}
+if (!/window\.renderAt\s*=/.test(html) || !/window\.getDuration\s*=/.test(html)) {
+  console.error("Generated HTML is missing window.renderAt(seconds) / window.getDuration() contract.");
+  process.exit(1);
+}
+await fs.mkdir(path.dirname(outPath), { recursive: true });
+try { await fs.writeFile(outPath, html + "\n", { flag: "wx" }); }
+catch (error) {
+  if (error.code === "EEXIST") console.error(`Output already exists: ${outPath}. Choose a new --out path; previous output was not overwritten.`);
+  else console.error(error.message);
+  process.exit(1);
+}
+console.log(`Saved ${Buffer.byteLength(html)} bytes to ${outPath}`);
+console.log("Next: preview the HTML, approve Chatterbox narration, then run scripts/render.mjs.");
