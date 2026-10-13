@@ -236,7 +236,7 @@ def script_to_audio(body: dict):
         raise C.StudioError("invalid_narration_style", "Choose Storytelling, Conversational, or Dramatic narration.")
     beats = []
     for i, line in enumerate(lines):
-        match = re.match(r"^\s*\[(HOOK|SUSPENSE|REVEAL|EXPLAIN|CALM|DEFAULT)\]\s*", line, re.IGNORECASE)
+        match = re.match(r"^\s*\[(HOOK|CURIOUS|SUSPENSE|REVEAL|EXPLAIN|URGENT|CALM|DEFAULT)\]\s*", line, re.IGNORECASE)
         performance = match.group(1).lower() if match else "default"
         if match:
             line = line[match.end():].strip()
