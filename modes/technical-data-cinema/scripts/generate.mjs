@@ -84,7 +84,7 @@ if (missing.length) {
 // Bundle the single optional ES-module scene script into the saved HTML. This lets
 // generated scenes import Three.js/addons from npm while the final export remains
 // self-contained and offline (the browser never needs node_modules or a CDN).
-const moduleScripts = [...html.matchAll(/<script\\b(?=[^>]*\\btype\\s*=\\s*["']module["'])[^>]*>([\\s\\S]*?)<\\/script\\s*>/gi)];
+const moduleScripts = [...html.matchAll(/<script\b(?=[^>]*\btype\s*=\s*["']module["'])[^>]*>([\s\S]*?)<\/script\s*>/gi)];
 if (moduleScripts.length > 1) {
   console.error("Generated HTML contains multiple module scripts. Use one module script so the scene can be bundled into a single offline HTML file.");
   process.exit(1);
@@ -105,13 +105,13 @@ if (moduleScripts.length === 1) {
     });
     const bundled = result.outputFiles[0]?.text;
     if (!bundled) throw new Error("esbuild returned no bundled output");
-    html = html.replace(match[0], `<script>\\n${bundled}\\n</script>`);
+    html = html.replace(match[0], `<script>\n${bundled}\n</script>`);
     console.log(`Bundled the scene's module dependencies into offline HTML (${Buffer.byteLength(bundled)} JS bytes).`);
   } catch (error) {
     console.error(`Could not bundle the generated module scene: ${error.message}. Check imports and ensure dependencies are installed with npm install.`);
     process.exit(1);
   }
-} else if (/from\\s*["']three(?:\\/|["'])|import\\s*["']three(?:\\/|["'])/.test(html)) {
+} else if (/from\s*["']three(?:\/|["'])|import\s*["']three(?:\/|["'])/.test(html)) {
   console.error("Generated HTML imports Three.js but has no <script type=\"module\"> block. Put Three.js imports in one module script so they can be bundled offline.");
   process.exit(1);
 }
