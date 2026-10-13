@@ -1,0 +1,16 @@
+{
+  "name": "technical-data-cinema",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Local-first, story-specific animated HTML explainer generation and rendering",
+  "scripts": {
+    "generate": "node scripts/generate.mjs",
+    "render": "node scripts/render.mjs",
+    "doctor": "node scripts/doctor.mjs",
+    "install:browser": "playwright install chromium"
+  },
+  "dependencies": {
+    "playwright": "^1.55.0"
+  }
+}
