@@ -10,14 +10,14 @@ DELIVERABLE
 - One self-contained index.html; no CDN, external fonts, remote assets, build step, or network access.
 - Vanilla JS, CSS, Canvas, SVG and DOM. Use WebGL only if justified.
 - Vertical 9:16 composition, designed for 1080×1920 and phone readability.
-- Deterministic timeline: expose window.renderAt(seconds) and window.getDuration(). Every visual property is set from the supplied timestamp. Seeking to the same timestamp reproduces the same frame. No setInterval, elapsed-time deltas, CSS animation/transition, or Math.random for scene state. A requestAnimationFrame preview may call the same deterministic renderer.
+- Deterministic timeline: expose window.renderAt(seconds) and window.getDuration(). Every visual property is set from the supplied timestamp. Seeking to the same timestamp reproduces the same frame. Never call Math.random(), setInterval(), or use CSS animation/transition for scene state. If particles need variation, implement a local seeded PRNG and precompute immutable positions once. Never mutate persistent arrays (requests, particles, trails, etc.) inside draw() or renderAt(); derive each item's state from t or rebuild per-frame arrays from scratch. Server/load/queue states must be assigned from t, not previous frames. renderAt(t) must clear/reset the full drawing state and render only t. Preview playback may use requestAnimationFrame to call renderAt(t), but render-only mode must not start its own animation loop or timer; the exporter alone drives frames.
 - REQUIRED EXPORT CONTRACT: define a positive constant DURATION in seconds and implement exactly these global functions after the scene renderer exists:
   window.getDuration = function () { return DURATION; };
   window.renderAt = function (seconds) { const t = Math.max(0, Math.min(DURATION, Number(seconds) || 0)); draw(t); };
   Replace draw(t) with the actual deterministic scene-render function name if different. Do not omit either function, rename them, or put them inside a private scope.
 - REQUIRED RENDER-ONLY MODE: read new URLSearchParams(window.location.search).get("render") === "1". In this mode hide all editor, playback, transport, timeline, helper, and cursor UI; remove page margins and make the 9:16 artwork fill the exact viewport. Keep only the scene composition visible. The canvas/SVG/stage must be 540×960 logical pixels and scale proportionally to the viewport without letterboxed editor chrome. Preview controls may exist only outside render-only mode.
 - Include preview playback, timeline seeking, caption toggle and keyboard controls where practical.\n- If narration is supplied, add caption cues with explicit editable timing estimates.
-- Use seeded randomness or precomputed deterministic particle data.
+- Use a custom local seeded PRNG or precomputed deterministic particle data; never call Math.random(), even for one-time initialization.
 - Handle resizing while preserving the logical coordinate system.
 - Build a clear first-second hook, visual escalation, payoff and deliberate ending.
 
