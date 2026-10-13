@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Local-first, story-specific animated HTML explainer generation and rendering",
   "scripts": {
-    "generate": "node scripts/generate.mjs",
+    "generate": "node scripts/ollama-session.mjs -- node scripts/generate.mjs",
     "render": "node scripts/render.mjs",
     "doctor": "node scripts/doctor.mjs",
     "install:browser": "playwright install chromium",
