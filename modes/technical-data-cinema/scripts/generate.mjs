@@ -15,6 +15,7 @@ if (!storyArg) {
   process.exit(2);
 }
 const model = arg("--model", process.env.OLLAMA_MODEL || "qwen3-coder:30b");
+const repairNote = arg("--repair-note", "");
 const ollamaUrl = (process.env.OLLAMA_URL || "http://127.0.0.1:11434").replace(/\/$/, "");
 const storyPath = path.resolve(process.cwd(), storyArg);
 const story = await fs.readFile(storyPath, "utf8");
@@ -43,7 +44,7 @@ try {
       model, stream: false,
       messages: [
         { role: "system", content: system },
-        { role: "user", content: `Create the visual explainer for this story brief.\n\n--- STORY BRIEF START ---\n${story}\n--- STORY BRIEF END ---\n\nReturn only complete HTML.\n` }
+        { role: "user", content: `Create the visual explainer for this story brief.\n\n--- STORY BRIEF START ---\n${story}\n--- STORY BRIEF END ---\n${repairNote ? `\nMANDATORY REPAIR REQUEST:\n${repairNote}\nPreserve the story, narration meaning, offline behavior, and export contract. Fix the specific QA failure; do not simply add a static end card.\n` : ""}\nReturn only complete HTML.\n` }
       ],
       options: { temperature: 0.25, num_ctx: context }
     }),
