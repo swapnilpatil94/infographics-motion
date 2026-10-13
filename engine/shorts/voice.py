@@ -32,9 +32,9 @@ REFERENCE = os.environ.get("TTS_REFERENCE_AUDIO", os.path.join(REPO_ROOT, "asset
 # less sampling variance, and a little more room between connected takes.
 # These are starting presets; the best values still depend on the reference voice.
 STORYTELLING_PRESETS = {
-    "storytelling": dict(exaggeration=0.60, cfg_weight=0.35, temperature=0.55, tempo=0.96, silence_pad_seconds=0.12),
-    "conversational": dict(exaggeration=0.52, cfg_weight=0.38, temperature=0.50, tempo=0.98, silence_pad_seconds=0.10),
-    "dramatic": dict(exaggeration=0.66, cfg_weight=0.32, temperature=0.50, tempo=0.92, silence_pad_seconds=0.15),
+    "storytelling": dict(exaggeration=0.64, cfg_weight=0.32, temperature=0.52, tempo=1.08, silence_pad_seconds=0.08),
+    "conversational": dict(exaggeration=0.56, cfg_weight=0.35, temperature=0.52, tempo=1.10, silence_pad_seconds=0.07),
+    "dramatic": dict(exaggeration=0.72, cfg_weight=0.30, temperature=0.52, tempo=1.04, silence_pad_seconds=0.10),
 }
 
 # Optional spoken forms for frequent English/technical terms in Hindi narration.
@@ -123,7 +123,7 @@ def _env():
     return env
 
 
-def _key(beats, seed, style, pronunciation_mode, group_lines=False, reference_audio=None, group_max_lines=5, group_max_words=45, model_variant=None):
+def _key(beats, seed, style, pronunciation_mode, group_lines=False, reference_audio=None, group_max_lines=3, group_max_words=34, model_variant=None):
     reference_audio = reference_audio or _active_reference()
     try:
         reference_version = str(os.path.getmtime(reference_audio)) + ":" + str(os.path.getsize(reference_audio))
@@ -143,7 +143,7 @@ def _read_wav_any(path):
     return np.frombuffer(raw, np.float32).copy()
 
 
-def synthesize(beats, seed=42, log=print, allow_partial_alignment=False, style="storytelling", pronunciation_mode="hindi_mixed", group_lines=False, reference_audio=None, group_max_lines=5, group_max_words=45, performance_mode=False, expression_intensity=65):
+def synthesize(beats, seed=42, log=print, allow_partial_alignment=False, style="storytelling", pronunciation_mode="hindi_mixed", group_lines=False, reference_audio=None, group_max_lines=3, group_max_words=34, performance_mode=False, expression_intensity=65):
     """beats: [{id, text}] -> dict(samples, voice, beats=[{id,text,start,end,words:[{word,start,end}]}], duration).
 
     allow_partial_alignment is for standalone script-to-audio export only: when WhisperX
