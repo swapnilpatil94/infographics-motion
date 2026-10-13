@@ -17,7 +17,7 @@ This is **not a fixed scene template**. Visual language, motion, pacing and comp
 - Ollama with a downloaded coding model
 - FFmpeg available as `ffmpeg` and `ffprobe`
 - Existing Chatterbox environment and reference WAV for voice generation
-- Existing Studio server and Playwright Chromium
+- Playwright Chromium; Chatterbox dependencies and the dedicated Hindi checkpoint/reference when generating voice
 
 ## Setup
 From repository root:
