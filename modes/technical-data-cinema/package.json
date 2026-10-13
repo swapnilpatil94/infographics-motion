@@ -10,7 +10,8 @@
     "export": "node scripts/export.mjs",
     "doctor": "node scripts/doctor.mjs",
     "install:browser": "playwright install chromium",
-    "test:smoke": "node scripts/render.mjs --html examples/render-smoke-test.html --out output/smoke-test.mp4 --fps 5 --duration 3"
+    "test:smoke": "node scripts/render.mjs --html examples/render-smoke-test.html --out output/smoke-test.mp4 --fps 5 --duration 3",
+    "ui": "node scripts/ui-server.mjs"
   },
   "dependencies": {
     "playwright": "^1.63.0"
