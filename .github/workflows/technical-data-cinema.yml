@@ -1,0 +1,54 @@
+name: Technical Data Cinema Smoke Test
+
+on:
+  push:
+    branches:
+      - feat/technical-data-cinema
+    paths:
+      - "modes/technical-data-cinema/**"
+      - ".github/workflows/technical-data-cinema.yml"
+  pull_request:
+    paths:
+      - "modes/technical-data-cinema/**"
+      - ".github/workflows/technical-data-cinema.yml"
+  workflow_dispatch:
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: modes/technical-data-cinema
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: modes/technical-data-cinema/package-lock.json
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+      - name: Install npm dependencies
+        run: npm install
+      - name: Install Chromium
+        run: npx playwright install chromium
+      - name: Syntax check
+        run: |
+          node --check scripts/generate.mjs
+          node --check scripts/render.mjs
+          node --check scripts/doctor.mjs
+      - name: Render deterministic smoke test
+        run: npm run test:smoke
+      - name: Upload smoke-test MP4
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: technical-data-cinema-smoke-test
+          path: modes/technical-data-cinema/output/smoke-test.mp4
+          if-no-files-found: ignore
+          retention-days: 7
