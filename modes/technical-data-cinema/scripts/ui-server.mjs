@@ -67,6 +67,31 @@ function run(command, args, cwd, job, label) {
   });
 }
 
+async function runSceneRepair(node, generateArgs, repairNote, cwd, job, label) {
+  const repairArgs = [...generateArgs, "--repair-note", repairNote];
+  try {
+    await run(node, repairArgs, cwd, job, label);
+    return;
+  } catch (error) {
+    const recent = job.logs.slice(-80).join("\n");
+    const modelOutputInvalid = /Generated HTML failed export validation|Model output did not start with|Ollama returned no message content|Generated HTML uses Math\.random/i.test(recent);
+    if (!modelOutputInvalid) throw error;
+
+    const fallbackModel = "qwen2.5-coder:7b";
+    const availableModels = await getModels();
+    if (!availableModels.some(name => name === fallbackModel || name.startsWith(fallbackModel + ":"))) {
+      throw new Error(`${label} failed because the model returned an invalid scene contract, and fallback model ${fallbackModel} is not installed. Install it with: ollama pull ${fallbackModel}`);
+    }
+
+    const fallbackArgs = [...repairArgs];
+    const modelIndex = fallbackArgs.indexOf("--model");
+    if (modelIndex < 0 || !fallbackArgs[modelIndex + 1]) throw error;
+    fallbackArgs[modelIndex + 1] = fallbackModel;
+    log(job, `Primary repair model returned invalid HTML; retrying once with fallback model ${fallbackModel}. Narration WAV remains unchanged.`);
+    await run(node, fallbackArgs, cwd, job, `${label} (fallback ${fallbackModel})`);
+  }
+}
+
 async function ensureStudio(job) {
   const ready = async () => {
     try {
@@ -230,7 +255,7 @@ const server = http.createServer(async (req, res) => {
                   ? "The previous export failed visual-ending QA: its final frames were pixel-identical for more than 2.5 seconds. Redesign the final 5 seconds: keep meaningful narration-synchronized motion through the last explanatory beat, then resolve into a takeaway only in the final 1.5–2.5 seconds. Do not stretch or freeze an end card; keep deterministic renderAt(seconds) behavior."
                   : "The previous export failed determinism QA. Ensure every visual property is derived from absolute timestamp and renderAt(t) resets the full scene state.";
                 log(job, `${endingFailure ? "Visual ending" : "Determinism"} QA failed; archived scene as ${path.basename(archivedScene)} and attempting one targeted scene repair while preserving narration.`);
-                await run(node, [...generateArgs, "--repair-note", repairNote], root, job, endingFailure ? "Repair frozen visual ending" : "Regenerate nondeterministic scene");
+                await runSceneRepair(node, generateArgs, repairNote, root, job, endingFailure ? "Repair frozen visual ending" : "Regenerate nondeterministic scene");
                 await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--audio", finalWavPath, "--fps", String(fps)], root, job, "Retry render with preserved narration WAV");
               }
             } else {
@@ -244,7 +269,7 @@ const server = http.createServer(async (req, res) => {
                 await fs.rename(htmlPath, archivedScene);
                 const repairNote = "The previous export failed visual-ending QA: its final frames were pixel-identical for more than 2.5 seconds. Redesign the final 5 seconds: keep meaningful narration-synchronized motion through the last explanatory beat, then resolve into a takeaway only in the final 1.5–2.5 seconds. Do not stretch or freeze an end card; keep deterministic renderAt(seconds) behavior.";
                 log(job, `Visual ending QA failed; archived scene as ${path.basename(archivedScene)} and attempting one targeted scene repair while preserving the generated narration WAV.`);
-                await run(node, [...generateArgs, "--repair-note", repairNote], root, job, "Repair frozen visual ending");
+                await runSceneRepair(node, generateArgs, repairNote, root, job, "Repair frozen visual ending");
                 await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--audio", finalWavPath, "--fps", String(fps)], root, job, "Retry render with preserved narration WAV");
               }
             }
