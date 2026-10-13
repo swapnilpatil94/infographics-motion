@@ -91,8 +91,8 @@ async function runSceneRepair(node, generateArgs, repairNote, cwd, job, label) {
     try {
       await run(node, fallbackArgs, cwd, job, `${label} (fallback ${fallbackModel})`);
     } catch (fallbackError) {
-      const fallbackLogs = job.logs.slice(-80).join("\\n");
-      const reason = /Generated HTML uses Math\\.random/i.test(fallbackLogs)
+      const fallbackLogs = job.logs.slice(-80).join("\n");
+      const reason = /Generated HTML uses Math\.random/i.test(fallbackLogs)
         ? "the fallback model still emitted Math.random(), which is not allowed in deterministic renders"
         : /Generated HTML failed export validation|Model output did not start with|Ollama returned no message content/i.test(fallbackLogs)
           ? "the fallback model still failed the required HTML/export contract"
@@ -276,7 +276,7 @@ const server = http.createServer(async (req, res) => {
             try {
               await run(node, generateArgs, root, job, "Ollama scene generation (model unload happens before narration)");
             } catch (error) {
-              const validationFailure = /Generated HTML uses Math\\.random|Generated HTML failed export validation|Model output did not start with|Ollama returned no message content/i.test(job.logs.slice(-100).join("\\n"));
+              const validationFailure = /Generated HTML uses Math\.random|Generated HTML failed export validation|Model output did not start with|Ollama returned no message content/i.test(job.logs.slice(-100).join("\n"));
               if (!validationFailure) throw error;
               const archivedScene = path.join(dir, `index.invalid-${Date.now()}.log.html`);
               // generate.mjs validates before writing, but preserve any unexpected partial artifact safely.
@@ -288,7 +288,7 @@ const server = http.createServer(async (req, res) => {
                 "Every visible value must be a pure function of absolute timestamp; renderAt(seconds) must reset the full scene state and reproduce identical pixels when called repeatedly for the same timestamp.",
                 "Return a complete HTML document beginning with <!doctype html>, include window.renderAt, window.getDuration, and render-only mode via new URLSearchParams(window.location.search).get('render').",
                 "Keep the original story and narration meaning. Do not weaken or bypass any validation."
-              ].join("\\n");
+              ].join("\n");
               log(job, "Initial scene failed HTML/determinism validation; starting one targeted repair, then a single fallback-model attempt if needed. Narration is preserved.");
               await runSceneRepair(node, generateArgs, repairNote, root, job, "Repair invalid initial scene");
             }
