@@ -210,15 +210,6 @@ const server = http.createServer(async (req, res) => {
             if (error.code !== "ENOENT") throw error;
           }
 
-          // A previous run that produced narration but no MP4 failed in the render stage.
-          // Keep the WAV and archive the old scene before regenerating visuals on retry.
-          if (reuseNarration && reuseScene) {
-            const archivedScene = path.join(dir, `index.failed-${Date.now()}.html`);
-            await fs.rename(htmlPath, archivedScene);
-            reuseScene = false;
-            log(job, `Archived the failed scene as ${path.basename(archivedScene)}; regenerating visuals while preserving narration.`);
-          }
-
           await fs.writeFile(storyPath, storyContent, "utf8");
           if (voiceMode === "generate") await fs.writeFile(narrationPath, narrationContent, "utf8");
           const node = process.execPath;
@@ -226,7 +217,17 @@ const server = http.createServer(async (req, res) => {
           if (!reuseScene) await run(node, generateArgs, root, job, "Ollama scene generation (model unload happens before narration)");
           if (voiceMode === "generate") {
             if (reuseNarration) {
-              await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--audio", finalWavPath, "--fps", String(fps)], root, job, "Render with reused narration WAV");
+              try {
+                await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--audio", finalWavPath, "--fps", String(fps)], root, job, "Render with reused narration WAV");
+              } catch (error) {
+                const deterministicFailure = job.logs.slice(-100).some(line => line.includes("Determinism check failed"));
+                if (!deterministicFailure) throw error;
+                const archivedScene = path.join(dir, `index.failed-${Date.now()}.html`);
+                await fs.rename(htmlPath, archivedScene);
+                log(job, `Determinism check failed; archived scene as ${path.basename(archivedScene)} and regenerating visuals while preserving narration.`);
+                await run(node, generateArgs, root, job, "Regenerate nondeterministic scene");
+                await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--audio", finalWavPath, "--fps", String(fps)], root, job, "Retry render with preserved narration WAV");
+              }
             } else {
               await ensureStudio(job);
               await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--voice-script", narrationPath, "--fps", String(fps), "--style", String(body.style || "storytelling"), "--performance", String(body.performance || "directed"), "--expression-intensity", String(body.intensity ?? 65)], root, job, "Chatterbox narration, then video render");
