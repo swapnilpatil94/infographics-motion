@@ -42,7 +42,7 @@ npm run generate -- --story examples/viral-traffic.md --planner-model qwen3.5:9b
 ```
 Recommended defaults for the 24 GB Apple Silicon Mac: `qwen3.5:9b` for visual planning and `qwen2.5-coder:7b` for HTML/JS scene implementation. They run sequentially (`keep_alive: 0`), so both models are not kept resident together. The default context is 8192 tokens. The coding model is also the repair model unless the UI selects an installed alternative. Override with `--planner-model` / `--model`, or `OLLAMA_PLANNER_MODEL` / `OLLAMA_MODEL`. Models are never pulled automatically; the generator checks that the planner model is installed and reports available models if not.
 
-Generated scenes must expose `window.renderAt(seconds)` and `window.getDuration()`, and must hide preview UI for `?render=1`. Invalid output is rejected before writing the HTML. Each generation writes a new file and never overwrites prior output.
+Generated scenes must expose `window.renderAt(seconds)` and `window.getDuration()`, and must hide preview UI for `?render=1`. Invalid output is rejected before writing the HTML. Each generation writes a new file and never overwrites prior output. If the scene coder returns invalid HTML, uses `Math.random()`, omits the export contract, or becomes unreachable after a valid visual plan has been saved, the generator compiles a deterministic plan-driven SVG fallback instead of repeatedly spending minutes on unreliable model retries. This fallback is explicitly logged and still goes through the normal export determinism, offline, visual-ending, browser-error and audio checks; it is a recovery path, not creative-quality approval. Review the preview before publishing. `npm run test:fallback` checks its export contract.
 
 ## Export options
 
