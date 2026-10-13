@@ -79,10 +79,16 @@ async function ensureStudio(job) {
     return;
   }
   if (!managedStudio || managedStudio.exitCode !== null) {
-    log(job, "Chatterbox Studio is not responding; starting the existing Studio with the dedicated Hindi variant…");
-    managedStudio = spawn(process.env.STUDIO_PYTHON || "python3", ["studio.py", "--ui"], {
+    log(job, "Chatterbox API is not responding; starting it headlessly in the background with the dedicated Hindi variant…");
+    let python = process.env.STUDIO_PYTHON;
+    if (!python) {
+      const venvPython = path.join(repoRoot, ".venv", "bin", "python");
+      try { await fs.access(venvPython); python = venvPython; }
+      catch { python = "python3"; }
+    }
+    managedStudio = spawn(python, ["-u", "-m", "engine.studio.server", "--api-only", "--host", "127.0.0.1", "--port", String(new URL(studioUrl).port || 8765)], {
       cwd: repoRoot,
-      env: { ...process.env, CHATTERBOX_MODEL_VARIANT: process.env.CHATTERBOX_MODEL_VARIANT || "dedicated_hindi" },
+      env: { ...process.env, PYTHONPATH: repoRoot, PYTHONUNBUFFERED: "1", CHATTERBOX_MODEL_VARIANT: process.env.CHATTERBOX_MODEL_VARIANT || "dedicated_hindi" },
       stdio: ["ignore", "pipe", "pipe"]
     });
     const consume = chunk => {
@@ -95,13 +101,13 @@ async function ensureStudio(job) {
   const deadline = Date.now() + 60000;
   while (Date.now() < deadline) {
     if (await ready()) {
-      log(job, `Chatterbox Studio is ready at ${studioUrl}.`);
+      log(job, `Background Chatterbox API is ready at ${studioUrl}.`);
       return;
     }
     if (managedStudio?.exitCode !== null && managedStudio?.exitCode !== undefined) break;
     await new Promise(resolve => setTimeout(resolve, 500));
   }
-  throw new Error(`Chatterbox Studio did not become ready at ${studioUrl}. Check that Python dependencies and the dedicated Hindi checkpoint/reference are installed. Set STUDIO_PYTHON if your working Python is not the system python3.`);
+  throw new Error(`Background Chatterbox API did not become ready at ${studioUrl}. Check that Python dependencies and the dedicated Hindi checkpoint/reference are installed. Set STUDIO_PYTHON if your working Python is not the system python3.`);
 }
 
 async function getModels() {
