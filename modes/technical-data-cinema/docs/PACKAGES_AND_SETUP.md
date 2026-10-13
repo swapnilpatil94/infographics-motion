@@ -32,7 +32,7 @@ If Node is older than the supported version documented by the current Playwright
 
 ## Update packages safely
 
-Playwright's browser binaries are tied to the Playwright package version. After upgrading Playwright, reinstall Chromium. Do not update package.json manually without refreshing the lockfile.
+The package currently targets Playwright 1.63.x (see the official release notes for the release current at research time). Playwright's browser binaries are tied to the Playwright package version. After upgrading Playwright, reinstall Chromium. Do not update package.json manually without refreshing the lockfile.
 
 ```bash
 npm install playwright@latest
