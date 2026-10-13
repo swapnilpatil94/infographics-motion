@@ -39,6 +39,7 @@ jobs:
         run: |
           node --check scripts/generate.mjs
           node --check scripts/test-three-bundle.mjs
+          node --check scripts/build-visual-benchmark.mjs
           node --check scripts/ollama-session.mjs
           node --check scripts/render.mjs
           node --check scripts/export.mjs
@@ -49,11 +50,15 @@ jobs:
         run: npm run test:three
       - name: Render deterministic smoke test
         run: npm run test:smoke
-      - name: Upload smoke-test MP4
+      - name: Build and render cinematic dotted-scene benchmark
+        run: npm run test:visual-benchmark
+      - name: Upload smoke-test and visual benchmark MP4s
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: technical-data-cinema-smoke-test
-          path: modes/technical-data-cinema/output/smoke-test.mp4
+          name: technical-data-cinema-visual-benchmarks
+          path: |
+            modes/technical-data-cinema/output/smoke-test.mp4
+            modes/technical-data-cinema/output/visual-director-benchmark.mp4
           if-no-files-found: ignore
           retention-days: 7
