@@ -88,9 +88,13 @@ try {
   await browser.close();
 }
 
-const ffmpegArgs = ["-y", "-hide_banner", "-loglevel", "warning", "-framerate", String(fps), "-i", path.join(frameDir, "frame-%06d.png"), "-frames:v", String(frameCount)];
-if (audioPath) ffmpegArgs.push("-i", audioPath, "-af", "apad");
-ffmpegArgs.push("-t", String(duration), "-c:v", "libx264", "-preset", "slow", "-crf", "16", "-pix_fmt", "yuv420p", "-movflags", "+faststart");
+const ffmpegArgs = ["-y", "-hide_banner", "-loglevel", "warning", "-framerate", String(fps), "-i", path.join(frameDir, "frame-%06d.png")];
+if (audioPath) ffmpegArgs.push("-i", audioPath);
+// Output options must follow every input; placing -frames:v before the audio input
+// makes FFmpeg incorrectly treat it as an input option.
+ffmpegArgs.push("-frames:v", String(frameCount), "-t", String(duration));
+if (audioPath) ffmpegArgs.push("-af", "apad");
+ffmpegArgs.push("-c:v", "libx264", "-preset", "slow", "-crf", "16", "-pix_fmt", "yuv420p", "-movflags", "+faststart");
 if (audioPath) ffmpegArgs.push("-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-ac", "2");
 ffmpegArgs.push(outPath);
 const result = spawnSync("ffmpeg", ffmpegArgs, { stdio: "inherit" });
