@@ -18,7 +18,7 @@ if (!storyArg) {
 const model = arg("--model", process.env.OLLAMA_MODEL || "qwen2.5-coder:7b");
 const plannerModel = arg("--planner-model", process.env.OLLAMA_PLANNER_MODEL || "qwen3.5:9b");
 const repairNote = arg("--repair-note", "");
-const planFile = path.resolve(process.cwd(), arg("--plan-file", path.join(path.dirname(arg("--out", path.relative(process.cwd(), path.join(root, "output", slugify(storyArg))))), "visual-plan.json")));
+const planFileArg = arg("--plan-file", "");
 const ollamaUrl = (process.env.OLLAMA_URL || "http://127.0.0.1:11434").replace(/\/$/, "");
 const storyPath = path.resolve(process.cwd(), storyArg);
 const story = await fs.readFile(storyPath, "utf8");
@@ -26,6 +26,7 @@ const system = await fs.readFile(path.join(root, "prompts", "visual-director.md"
 const title = story.match(/^#\s+(.+)$/m)?.[1] || path.basename(storyPath, path.extname(storyPath));
 const defaultOut = path.join(root, "output", slugify(title), "index.html");
 const outPath = path.resolve(process.cwd(), arg("--out", path.relative(process.cwd(), defaultOut)));
+const planFile = path.resolve(process.cwd(), planFileArg || path.join(path.dirname(outPath), "visual-plan.json"));
 const outputRoot = path.join(root, "output") + path.sep;
 if (!outPath.startsWith(outputRoot)) {
   console.error("Refusing to write outside modes/technical-data-cinema/output/. Use --out under that directory.");
