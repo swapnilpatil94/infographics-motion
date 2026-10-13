@@ -227,12 +227,25 @@ def script_to_audio(body: dict):
                             hint="Hindi, Hinglish, English terms, numerals, and normal punctuation are supported.")
     style = str(body.get("style") or "storytelling")
     pronunciation_mode = "hindi_mixed" if body.get("hindi_pronunciation", True) else "original"
+    performance_mode = str(body.get("performance_mode") or "directed") == "directed"
+    try:
+        expression_intensity = max(0, min(100, int(body.get("expression_intensity", 65))))
+    except (TypeError, ValueError):
+        raise C.StudioError("invalid_expression_intensity", "Expression intensity must be a number from 0 to 100.")
     if style not in production_voice.STORYTELLING_PRESETS:
         raise C.StudioError("invalid_narration_style", "Choose Storytelling, Conversational, or Dramatic narration.")
-    beats = [dict(id=f"n{i+1:03d}", text=line) for i, line in enumerate(lines)]
+    beats = []
+    for i, line in enumerate(lines):
+        match = re.match(r"^\s*\[(HOOK|SUSPENSE|REVEAL|EXPLAIN|CALM|DEFAULT)\]\s*", line, re.IGNORECASE)
+        performance = match.group(1).lower() if match else "default"
+        if match:
+            line = line[match.end():].strip()
+        if line:
+            beats.append(dict(id=f"n{i+1:03d}", text=line, performance=performance if performance_mode else "default"))
     try:
         v = production_voice.synthesize(beats, seed=42, allow_partial_alignment=True,
-                                        style=style, pronunciation_mode=pronunciation_mode, group_lines=True)
+                                        style=style, pronunciation_mode=pronunciation_mode, group_lines=True,
+                                        performance_mode=performance_mode, expression_intensity=expression_intensity)
     except Exception as e:
         raise C.StudioError("tts_failed", "Chatterbox narration failed.", reasons=[str(e)[-1000:]],
                             hint="Check TTS_PYTHON, MYTHIC_STUDIO_DIR, TTS_REFERENCE_AUDIO and the TTS/alignment logs.")
@@ -250,7 +263,7 @@ def script_to_audio(body: dict):
                               for b in v["beats"]])
     with open(os.path.join(out, "narration.segments.json"), "w", encoding="utf-8") as f:
         json.dump(segments, f, ensure_ascii=False, indent=2)
-    return dict(id=job_id, voice=v["voice"], duration=v["duration"], segments=len(v["beats"]))
+    return dict(id=job_id, voice=v["voice"], duration=v["duration"], segments=len(v["beats"]), performance_mode=("directed" if performance_mode else "uniform"), expression_intensity=expression_intensity)
 
 
 def _audio_output_path(job_id: str, filename: str) -> str:

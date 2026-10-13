@@ -668,7 +668,7 @@ function renderProject() {
   if (!active && S.k.poll) { clearInterval(S.k.poll); S.k.poll = null; }                 // idle: no re-render while the user types / decides
 }
 
-const AUD = { text: sessionStorage.getItem("ks.audioText") || "", style: "storytelling", hindiPronunciation: true, job: null, busy: false, error: null };
+const AUD = { text: sessionStorage.getItem("ks.audioText") || "", style: "storytelling", hindiPronunciation: true, performanceMode: "directed", expressionIntensity: 65, job: null, busy: false, error: null };
 function viewAudio() {
   view.innerHTML = `<section class="kflow">
     <div class="khero"><h1>Script → Audio</h1><p>Paste Hindi in Devanagari. This reuses the same Chatterbox + WhisperX narration adapter as production and does not render a film.</p></div>
@@ -690,6 +690,15 @@ function viewAudio() {
           </select>
         </label>
       </div>
+      <div class="grid two" style="margin-top:14px;gap:12px">
+        <label class="f">Performance generation
+          <select id="audio-performance"><option value="directed" ${AUD.performanceMode === "directed" ? "selected" : ""}>Directed · use [HOOK], [SUSPENSE], [REVEAL], [EXPLAIN], [CALM]</option><option value="uniform" ${AUD.performanceMode === "uniform" ? "selected" : ""}>Uniform · one delivery across the script</option></select>
+        </label>
+        <label class="f">Expression intensity · <span id="audio-intensity-value">${AUD.expressionIntensity}%</span>
+          <input id="audio-intensity" type="range" min="0" max="100" step="5" value="${AUD.expressionIntensity}">
+        </label>
+      </div>
+      <div class="row" style="justify-content:flex-start;margin-top:12px"><button class="btn sm" id="audio-example">Load emotional example</button></div>
       <div class="note" style="margin-top:16px">Storytelling uses expressive Chatterbox settings and a slower finishing tempo. Hindi-first pronunciation changes only the spoken form of common English terms; your script and exported captions remain in their original wording.</div>
       <div class="note" style="margin-top:8px">Uses production settings: <code>MYTHIC_STUDIO_DIR</code>, <code>TTS_PYTHON</code>, <code>TTS_REFERENCE_AUDIO</code>. Placeholder macOS speech is not exported as Chatterbox.</div>
       <div id="audio-error" style="margin-top:12px">${AUD.error ? errBox(AUD.error) : ""}</div>
@@ -711,19 +720,27 @@ function viewAudio() {
   if (style) style.addEventListener("change", () => { AUD.style = style.value; });
   const pronunciation = $("#audio-pronunciation");
   if (pronunciation) pronunciation.addEventListener("change", () => { AUD.hindiPronunciation = pronunciation.value === "hindi_mixed"; });
+  const performance = $("#audio-performance");
+  if (performance) performance.addEventListener("change", () => { AUD.performanceMode = performance.value; });
+  const intensity = $("#audio-intensity");
+  if (intensity) intensity.addEventListener("input", () => { AUD.expressionIntensity = Number(intensity.value); const label = $("#audio-intensity-value"); if (label) label.textContent = intensity.value + "%"; });
 }
 async function generateScriptAudio() {
   if (!AUD.text.trim()) { AUD.error = {error:{code:"empty_script",message:"Paste a script first."}}; return viewAudio(); }
   if (AUD.busy) return;
   AUD.busy = true; AUD.error = null; viewAudio();
-  try { AUD.job = await api("/audio", { text: AUD.text, style: AUD.style, hindi_pronunciation: AUD.hindiPronunciation }); AUD.busy = false; viewAudio(); }
+  try { AUD.job = await api("/audio", { text: AUD.text, style: AUD.style, hindi_pronunciation: AUD.hindiPronunciation, performance_mode: AUD.performanceMode, expression_intensity: AUD.expressionIntensity }); AUD.busy = false; viewAudio(); }
   catch (e) { AUD.error = e; AUD.busy = false; viewAudio(); }
 }
 
 view.addEventListener("click", e => {
-  const b = e.target.closest("#audio-generate,#audio-clear,#audio-new");
+  const b = e.target.closest("#audio-generate,#audio-clear,#audio-new,#audio-example");
   if (!b) return;
   if (b.id === "audio-generate") return generateScriptAudio();
+  if (b.id === "audio-example") {
+    AUD.text = "[HOOK] सोचिए, सिर्फ़ एक गलत क्लिक... और आपके बैंक अकाउंट से लाखों रुपये गायब हो सकते हैं।\n[SUSPENSE] लेकिन रुकिए। सबसे डरावनी बात अभी बाकी है।\n[REVEAL] कई बार, पैसा निकल जाने के बाद भी आपको पता नहीं चलता कि असली गलती कहाँ हुई।\n[EXPLAIN] स्कैमर भरोसा बनाते हैं, जल्दबाज़ी करवाते हैं, और फिर आपसे वही बटन दबवाते हैं जिसकी उन्हें ज़रूरत होती है।\n[CALM] इसलिए अगली बार कोई भी पेमेंट करने से पहले, एक सेकंड रुकिए... और डिटेल्स दोबारा चेक कीजिए।";
+    AUD.job = null; AUD.error = null; try { sessionStorage.setItem("ks.audioText", AUD.text); } catch (_) {} return viewAudio();
+  }
   if (b.id === "audio-clear") { AUD.text = ""; AUD.job = null; AUD.error = null; try { sessionStorage.removeItem("ks.audioText"); } catch (_) {} return viewAudio(); }
   if (b.id === "audio-new") { AUD.job = null; AUD.error = null; return viewAudio(); }
 });
