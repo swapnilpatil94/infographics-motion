@@ -55,3 +55,34 @@ QUALITY
 
 OUTPUT
 Return only the complete HTML source starting with <!doctype html>. No Markdown fences, explanations or placeholders.
+
+VISUAL COMPOSITION CONTRACT — MEASURABLE, NOT VAGUE
+The previous rules are mandatory, but do not satisfy them with tiny labels and a few lines floating in a mostly empty canvas. The artwork must occupy the frame intentionally.
+
+CANVAS / SAFE ZONES
+- Treat 540×960 as the logical canvas. Keep a 36 px side margin and a 48 px top/bottom safe margin.
+- In every major beat, allocate a clear headline zone (roughly y=90–230), a dominant visual zone (roughly y=250–730), and a concise caption / metric zone (roughly y=760–880). These are flexible zones, not three permanent boxes; vary the composition between beats.
+- A primary diagram or metaphor should normally span at least 55% of canvas width and 28% of canvas height. A key number should normally be 52–100 px; a scene headline 30–46 px; supporting labels 18–26 px. Never rely on 10–16 px labels to carry the story.
+- Do not center all content in a tiny strip or place all information in the top 20% of the frame. Keep the primary action within the central 65% of the frame and use the full vertical format.
+- A background grid, gradient, glow, border, particle field or decorative texture is not meaningful visual content and does not count toward visual coverage.
+
+SCENE GRAMMAR
+Plan a sequence of distinct visual compositions, selecting only the grammar that serves each beat:
+1. HOOK / SCALE: a giant legible number, object or visual contradiction with an immediate reveal.
+2. FLOW / FAN-OUT: one source branches into clearly separated paths and destinations; animate paths being drawn and endpoints arriving.
+3. BOTTLENECK / QUEUE: show arrivals versus fixed service capacity, queue accumulation, and an obvious warning state; the viewer should see the mismatch without reading labels.
+4. DELAY / RESPONSE: use a time axis, staggered capacity blocks, or a before/after split to show why the response arrives too late.
+5. RELIEF / INTERVENTION: transform the previous composition; show cache hits bypassing the origin, capacity added before the surge, or retries spreading apart.
+6. PAYOFF: resolve the same visual system from earlier beats so the ending feels causally connected, not a separate title card.
+These are semantic roles, not a fixed six-panel layout. Use a different scale, camera framing, silhouette or representation when the explanatory job changes.
+
+MOTION / FINISH
+- Each beat needs a visible entrance, a meaningful state transition, and a resolved pose. Use deterministic easing derived from time; do not depend on CSS transitions.
+- Use at least two levels of depth or scale when useful, but never add parallax that obscures the mechanism.
+- Prefer large silhouettes, thick paths (3–6 logical px), generous spacing and two or three semantic colors plus neutrals. Ensure readable contrast on the chosen background.
+- Use progressive reveals, counters, directional arrows, focus shifts, split-screen comparisons, or transforming diagrams where they make cause and effect clearer.
+- Captions are concise and phrase-level. They must not duplicate a giant headline or cover the key action.
+- A visually sparse scene is acceptable only when sparseness is the deliberate concept (e.g. isolation or absence) and it is resolved by a clear, large focal point. Empty space caused by tiny drawings is a defect.
+
+FINAL SELF-TEST
+Before outputting HTML, imagine six screenshots at 1s, 20%, 40%, 60%, 80%, and 95% of duration. For each screenshot answer: what is the one thing the viewer should notice, does it occupy enough of the frame to read on a phone, and what has changed from the previous beat? If any answer is “a few tiny labels or dots”, redesign the scene. Make the main diagram visually dominant before adding secondary details.
