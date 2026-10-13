@@ -69,39 +69,58 @@ function run(command, args, cwd, job, label) {
 
 async function runSceneRepair(node, generateArgs, repairNote, cwd, job, label) {
   const repairArgs = [...generateArgs, "--repair-note", repairNote];
+  const logStart = job.logs.length;
   try {
     await run(node, repairArgs, cwd, job, label);
     return;
   } catch (error) {
-    const recent = job.logs.slice(-80).join("\n");
-    const modelOutputInvalid = /Generated HTML failed export validation|Model output did not start with|Ollama returned no message content|Generated HTML uses Math\.random/i.test(recent);
+    const primaryLogs = job.logs.slice(logStart).join("\n");
+    const modelOutputInvalid = /Generated HTML failed export validation|Model output did not start with|Ollama returned no message content|Generated HTML uses Math\\.random/i.test(primaryLogs);
     if (!modelOutputInvalid) throw error;
 
-    const fallbackModel = "qwen2.5-coder:7b";
-    const availableModels = await getModels();
-    if (!availableModels.some(name => name === fallbackModel || name.startsWith(fallbackModel + ":"))) {
-      throw new Error(`${label} failed because the model returned an invalid scene contract, and fallback model ${fallbackModel} is not installed. Install it with: ollama pull ${fallbackModel}`);
+    const installedModels = await getModels();
+    const candidates = ["qwen3:14b", "qwen3.5:9b", "qwen2.5-coder:7b"];
+    const availableCandidates = candidates.filter(candidate =>
+      candidate !== generateArgs[generateArgs.indexOf("--model") + 1] &&
+      installedModels.some(name => name === candidate || name.startsWith(candidate + ":"))
+    ).slice(0, 2);
+    if (!availableCandidates.length) {
+      throw new Error(`${label} failed validation and no alternate repair model is installed. Install one of: ${candidates.join(", ")}. Original failure: ${summarizeSceneFailure(primaryLogs)}. Narration WAV remains unchanged; QA was not bypassed.`);
     }
 
-    const fallbackArgs = [...repairArgs];
-    const modelIndex = fallbackArgs.indexOf("--model");
-    if (modelIndex < 0 || !fallbackArgs[modelIndex + 1]) throw error;
-    fallbackArgs[modelIndex + 1] = fallbackModel;
-    log(job, `Primary repair model returned invalid HTML; retrying once with fallback model ${fallbackModel}. Narration WAV remains unchanged.`);
-    try {
-      await run(node, fallbackArgs, cwd, job, `${label} (fallback ${fallbackModel})`);
-    } catch (fallbackError) {
-      const fallbackLogs = job.logs.slice(-80).join("\n");
-      const reason = /Generated HTML uses Math\.random/i.test(fallbackLogs)
-        ? "the fallback model still emitted Math.random(), which is not allowed in deterministic renders"
-        : /Generated HTML failed export validation|Model output did not start with|Ollama returned no message content/i.test(fallbackLogs)
-          ? "the fallback model still failed the required HTML/export contract"
-          : fallbackError.message;
-      throw new Error(`${label} could not produce a valid scene after the primary and fallback attempts: ${reason}. The existing narration WAV was not regenerated. Review the archived scene/logs, or try a stronger installed coding model; QA was not bypassed.`);
+    let lastFailure = error;
+    for (const fallbackModel of availableCandidates) {
+      const fallbackArgs = [...repairArgs];
+      const modelIndex = fallbackArgs.indexOf("--model");
+      if (modelIndex < 0 || !fallbackArgs[modelIndex + 1]) throw error;
+      fallbackArgs[modelIndex + 1] = fallbackModel;
+      const attemptStart = job.logs.length;
+      log(job, `Repair output from the primary model was invalid; trying alternate model ${fallbackModel}. Narration WAV remains unchanged.`);
+      try {
+        await run(node, fallbackArgs, cwd, job, `${label} (fallback ${fallbackModel})`);
+        return;
+      } catch (fallbackError) {
+        lastFailure = fallbackError;
+        const attemptLogs = job.logs.slice(attemptStart).join("\n");
+        const reason = summarizeSceneFailure(attemptLogs);
+        log(job, `Fallback ${fallbackModel} did not produce a valid scene: ${reason}.`);
+      }
     }
+
+    const allRecentLogs = job.logs.slice(-160).join("\n");
+    throw new Error(`${label} could not produce a valid scene after ${availableCandidates.length} alternate model attempt(s). Last failure: ${summarizeSceneFailure(allRecentLogs) || lastFailure.message}. Existing narration WAV was not regenerated. Try another installed coding model or revise the scene prompt; QA was not bypassed.`);
   }
 }
 
+function summarizeSceneFailure(logText) {
+  if (/Ollama returned no message content/i.test(logText)) return "Ollama returned an empty response";
+  if (/Generated HTML uses Math\\.random/i.test(logText)) return "generated HTML uses Math.random(), which is forbidden for deterministic rendering";
+  const missing = logText.match(/Generated HTML failed export validation: missing ([^.\\n]+)/i);
+  if (missing) return `export contract is missing ${missing[1]}`;
+  if (/Model output did not start with <!doctype html>/i.test(logText)) return "model output is not a complete HTML document";
+  if (/Could not reach Ollama|Ollama returned HTTP|timed out|AbortError/i.test(logText)) return "Ollama request failed or timed out";
+  return "";
+}
 async function retryExportWithEndingRepair(node, generateArgs, htmlPath, mp4Path, finalWavPath, fps, dir, root, job) {
   const exportArgs = [ "scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--audio", finalWavPath, "--fps", String(fps) ];
   try {
