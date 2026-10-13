@@ -79,11 +79,11 @@ async function runSceneRepair(node, generateArgs, repairNote, cwd, job, label) {
     if (!modelOutputInvalid) throw error;
 
     const installedModels = await getModels();
-    const candidates = ["qwen3:14b", "qwen3.5:9b", "qwen2.5-coder:7b"];
+    const candidates = ["qwen2.5-coder:7b", "qwen3.5:9b", "qwen3:14b"];
     const availableCandidates = candidates.filter(candidate =>
       candidate !== generateArgs[generateArgs.indexOf("--model") + 1] &&
       installedModels.some(name => name === candidate || name.startsWith(candidate + ":"))
-    ).slice(0, 2);
+    ).slice(0, 3);
     if (!availableCandidates.length) {
       throw new Error(`${label} failed validation and no alternate repair model is installed. Install one of: ${candidates.join(", ")}. Original failure: ${summarizeSceneFailure(primaryLogs)}. Narration WAV remains unchanged; QA was not bypassed.`);
     }
