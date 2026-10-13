@@ -88,7 +88,7 @@ function __tdcRandom() {
 `;
   const insertion = inlineScript.index + inlineScript[0].length;
   html = html.slice(0, insertion) + deterministicRandom + html.slice(insertion);
-  html = html.replace(/\\bMath\\s*\\.\\s*random\\s*\\(\\s*\\)/g, "__tdcRandom()");
+  html = html.replace(/\bMath\s*\.\s*random\s*\(\s*\)/g, "__tdcRandom()");
   const renderAt = /window\.renderAt\s*=\s*function\s*\(\s*seconds\s*\)\s*\{\s*const\s+t\s*=\s*Math\.max\(0,\s*Math\.min\(DURATION,\s*Number\(seconds\)\s*\|\|\s*0\)\)\s*;/;
   if (!renderAt.test(html)) {
     console.error("Cannot seed generated randomness safely: window.renderAt does not match the expected export contract. No file was written.");
