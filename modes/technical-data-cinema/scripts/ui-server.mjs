@@ -75,7 +75,7 @@ async function runSceneRepair(node, generateArgs, repairNote, cwd, job, label) {
     return;
   } catch (error) {
     const primaryLogs = job.logs.slice(logStart).join("\n");
-    const modelOutputInvalid = /Generated HTML failed export validation|Model output did not start with|Ollama returned no message content|Generated HTML uses Math\\.random/i.test(primaryLogs);
+    const modelOutputInvalid = /Generated HTML failed export validation|Model output did not start with|Ollama returned no message content|Generated HTML uses Math\.random/i.test(primaryLogs);
     if (!modelOutputInvalid) throw error;
 
     const installedModels = await getModels();
@@ -89,6 +89,7 @@ async function runSceneRepair(node, generateArgs, repairNote, cwd, job, label) {
     }
 
     let lastFailure = error;
+  let lastReason = summarizeSceneFailure(primaryLogs) || error.message;
     for (const fallbackModel of availableCandidates) {
       const fallbackArgs = [...repairArgs];
       const modelIndex = fallbackArgs.indexOf("--model");
@@ -102,20 +103,20 @@ async function runSceneRepair(node, generateArgs, repairNote, cwd, job, label) {
       } catch (fallbackError) {
         lastFailure = fallbackError;
         const attemptLogs = job.logs.slice(attemptStart).join("\n");
-        const reason = summarizeSceneFailure(attemptLogs);
+        const reason = summarizeSceneFailure(attemptLogs) || fallbackError.message;
+        lastReason = reason;
         log(job, `Fallback ${fallbackModel} did not produce a valid scene: ${reason}.`);
       }
     }
 
-    const allRecentLogs = job.logs.slice(-160).join("\n");
-    throw new Error(`${label} could not produce a valid scene after ${availableCandidates.length} alternate model attempt(s). Last failure: ${summarizeSceneFailure(allRecentLogs) || lastFailure.message}. Existing narration WAV was not regenerated. Try another installed coding model or revise the scene prompt; QA was not bypassed.`);
+    throw new Error(`${label} could not produce a valid scene after ${availableCandidates.length} alternate model attempt(s). Last failure: ${lastReason || lastFailure.message}. Existing narration WAV was not regenerated. Try another installed coding model or revise the scene prompt; QA was not bypassed.`);
   }
 }
 
 function summarizeSceneFailure(logText) {
   if (/Ollama returned no message content/i.test(logText)) return "Ollama returned an empty response";
-  if (/Generated HTML uses Math\\.random/i.test(logText)) return "generated HTML uses Math.random(), which is forbidden for deterministic rendering";
-  const missing = logText.match(/Generated HTML failed export validation: missing ([^.\\n]+)/i);
+  if (/Generated HTML uses Math\.random/i.test(logText)) return "generated HTML uses Math.random(), which is forbidden for deterministic rendering";
+  const missing = logText.match(/Generated HTML failed export validation: missing ([^\n.]+)/i);
   if (missing) return `export contract is missing ${missing[1]}`;
   if (/Model output did not start with <!doctype html>/i.test(logText)) return "model output is not a complete HTML document";
   if (/Could not reach Ollama|Ollama returned HTTP|timed out|AbortError/i.test(logText)) return "Ollama request failed or timed out";
