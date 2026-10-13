@@ -692,7 +692,7 @@ function viewAudio() {
       </div>
       <div class="grid two" style="margin-top:14px;gap:12px">
         <label class="f">Performance generation
-          <select id="audio-performance"><option value="directed" ${AUD.performanceMode === "directed" ? "selected" : ""}>Directed · use [HOOK], [SUSPENSE], [REVEAL], [EXPLAIN], [CALM]</option><option value="uniform" ${AUD.performanceMode === "uniform" ? "selected" : ""}>Uniform · one delivery across the script</option></select>
+          <select id="audio-performance"><option value="directed" ${AUD.performanceMode === "directed" ? "selected" : ""}>Directed · [HOOK], [CURIOUS], [SUSPENSE], [REVEAL], [EXPLAIN], [URGENT], [CALM]</option><option value="uniform" ${AUD.performanceMode === "uniform" ? "selected" : ""}>Uniform · one delivery across the script</option></select>
         </label>
         <label class="f">Expression intensity · <span id="audio-intensity-value">${AUD.expressionIntensity}%</span>
           <input id="audio-intensity" type="range" min="0" max="100" step="5" value="${AUD.expressionIntensity}">
@@ -738,7 +738,7 @@ view.addEventListener("click", e => {
   if (!b) return;
   if (b.id === "audio-generate") return generateScriptAudio();
   if (b.id === "audio-example") {
-    AUD.text = "[HOOK] सोचिए, सिर्फ़ एक गलत क्लिक... और आपके बैंक अकाउंट से लाखों रुपये गायब हो सकते हैं।\n[SUSPENSE] लेकिन रुकिए। सबसे डरावनी बात अभी बाकी है।\n[REVEAL] कई बार, पैसा निकल जाने के बाद भी आपको पता नहीं चलता कि असली गलती कहाँ हुई।\n[EXPLAIN] स्कैमर भरोसा बनाते हैं, जल्दबाज़ी करवाते हैं, और फिर आपसे वही बटन दबवाते हैं जिसकी उन्हें ज़रूरत होती है।\n[CALM] इसलिए अगली बार कोई भी पेमेंट करने से पहले, एक सेकंड रुकिए... और डिटेल्स दोबारा चेक कीजिए।";
+    AUD.text = "[HOOK] सोचिए, सिर्फ़ एक गलत क्लिक... और आपके बैंक अकाउंट से लाखों रुपये गायब हो सकते हैं।\n[CURIOUS] लेकिन असली सवाल है—स्कैमर आपसे वही गलती कैसे करवाते हैं?\n[SUSPENSE] जवाब जानने से पहले, एक बात समझिए।\n[REVEAL] कई बार, पैसा निकल जाने के बाद भी आपको पता नहीं चलता कि असली गलती कहाँ हुई।\n[EXPLAIN] स्कैमर भरोसा बनाते हैं, जल्दबाज़ी करवाते हैं, और फिर आपसे वही बटन दबवाते हैं जिसकी उन्हें ज़रूरत होती है।\n[URGENT] कोई पेमेंट करने से पहले, डिटेल्स ज़रूर चेक कीजिए।\n[CALM] एक सेकंड रुकना, आपका पैसा बचा सकता है।";
     AUD.job = null; AUD.error = null; try { sessionStorage.setItem("ks.audioText", AUD.text); } catch (_) {} return viewAudio();
   }
   if (b.id === "audio-clear") { AUD.text = ""; AUD.job = null; AUD.error = null; try { sessionStorage.removeItem("ks.audioText"); } catch (_) {} return viewAudio(); }
