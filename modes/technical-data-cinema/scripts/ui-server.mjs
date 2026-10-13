@@ -166,23 +166,43 @@ const server = http.createServer(async (req, res) => {
           job.status = "running";
           const dir = path.join(outputRoot, slug);
           await fs.mkdir(dir, { recursive: true });
-          for (const name of ["index.html", "final.mp4", "final-silent.mp4", "final.narration.wav"]) {
-            try {
-              await fs.access(path.join(dir, name));
-              throw new Error(`Output already exists: ${path.join(dir, name)}. Change the output folder name to avoid overwriting a previous production.`);
-            } catch (error) {
-              if (error.code !== "ENOENT") throw error;
-            }
-          }
           const storyPath = path.join(dir, "story.md");
           const htmlPath = path.join(dir, "index.html");
           const narrationPath = path.join(dir, "narration.md");
           const mp4Path = path.join(dir, voiceMode === "silent" ? "final-silent.mp4" : "final.mp4");
-          await fs.writeFile(storyPath, `# ${title}\n\n${story}\n`, "utf8");
+          const storyContent = `# ${title}\n\n${story}\n`;
+
+          // Completed exports are never overwritten. An existing scene may be reused
+          // only when its saved brief matches exactly, allowing narration/render retries.
+          for (const name of ["final.mp4", "final-silent.mp4", "final.narration.wav"]) {
+            try {
+              await fs.access(path.join(dir, name));
+              throw new Error(`Output already exists: ${path.join(dir, name)}. Choose a new output folder to preserve the previous production.`);
+            } catch (error) {
+              if (error.code !== "ENOENT") throw error;
+            }
+          }
+
+          let reuseScene = false;
+          try {
+            await fs.access(htmlPath);
+            const savedStory = await fs.readFile(storyPath, "utf8");
+            if (savedStory !== storyContent) {
+              throw new Error(`A scene already exists in ${dir}, but its saved story does not match this brief. Choose a new output folder to avoid mixing productions.`);
+            }
+            reuseScene = true;
+            log(job, "Reusing the existing scene because story.md matches; skipping Ollama generation.");
+          } catch (error) {
+            if (error.code !== "ENOENT") throw error;
+          }
+
+          await fs.writeFile(storyPath, storyContent, "utf8");
           if (voiceMode === "generate") await fs.writeFile(narrationPath, voiceScript + "\n", "utf8");
           const node = process.execPath;
           const generateArgs = ["scripts/ollama-session.mjs", "--", "node", "scripts/generate.mjs", "--story", storyPath, "--model", model, "--out", htmlPath];
-          await run(node, generateArgs, root, job, "Ollama scene generation (model unload happens before narration)");
+          if (!reuseScene) {
+            await run(node, generateArgs, root, job, "Ollama scene generation (model unload happens before narration)");
+          }
           if (voiceMode === "generate") {
             // Start or reuse Chatterbox only after Ollama has been unloaded.
             await ensureStudio(job);
