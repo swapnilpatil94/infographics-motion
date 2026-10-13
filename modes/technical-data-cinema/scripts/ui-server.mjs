@@ -292,7 +292,7 @@ const server = http.createServer(async (req, res) => {
           await fs.writeFile(storyPath, storyContent, "utf8");
           if (voiceMode === "generate") await fs.writeFile(narrationPath, narrationContent, "utf8");
           const node = process.execPath;
-          const generateArgs = ["scripts/ollama-session.mjs", "--", "node", "scripts/generate.mjs", "--story", storyPath, "--planner-model", plannerModel, "--model", model, "--out", htmlPath];
+          const generateArgs = ["scripts/ollama-session.mjs", "--", "node", "scripts/generate.mjs", "--story", storyPath, "--planner-model", plannerModel, "--model", model, "--out", htmlPath, "--plan-file", path.join(dir, "visual-plan.json")];
           if (!reuseScene) {
             try {
               await run(node, generateArgs, root, job, "Ollama scene generation (model unload happens before narration)");
