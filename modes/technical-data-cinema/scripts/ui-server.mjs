@@ -11,7 +11,7 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "..");
 const outputRoot = path.join(root, "output");
 const repoRoot = path.resolve(root, "../..");
-const studioUrl = (process.env.CHATTERBOX_STUDIO_URL || "http://127.0.0.1:8765").replace(/\\/$/, "");
+const studioUrl = (process.env.CHATTERBOX_STUDIO_URL || "http://127.0.0.1:8765").replace(/\/$/, "");
 let managedStudio = null;
 const host = process.env.TDC_UI_HOST || "127.0.0.1";
 const port = Number(process.env.TDC_UI_PORT || 4177);
@@ -86,7 +86,7 @@ async function ensureStudio(job) {
       stdio: ["ignore", "pipe", "pipe"]
     });
     const consume = chunk => {
-      for (const line of chunk.toString("utf8").split(/\\r?\\n/)) if (line.trim()) log(job, `[Studio] ${line.trim()}`);
+      for (const line of chunk.toString("utf8").split(/\r?\n/)) if (line.trim()) log(job, `[Studio] ${line.trim()}`);
     };
     managedStudio.stdout.on("data", consume);
     managedStudio.stderr.on("data", consume);
