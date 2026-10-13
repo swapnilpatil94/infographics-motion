@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
+import { build } from "esbuild";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "..");
@@ -78,6 +79,40 @@ if (!/URLSearchParams\s*\(\s*(?:window\.)?location\.search\s*\)/.test(html) || !
 }
 if (missing.length) {
   console.error(`Generated HTML failed export validation: missing ${missing.join(", ")}.\nNo file was written. Try again with --model qwen2.5-coder:7b for a targeted repair, or revise the prompt.`);
+  process.exit(1);
+}
+// Bundle the single optional ES-module scene script into the saved HTML. This lets
+// generated scenes import Three.js/addons from npm while the final export remains
+// self-contained and offline (the browser never needs node_modules or a CDN).
+const moduleScripts = [...html.matchAll(/<script\\b(?=[^>]*\\btype\\s*=\\s*["']module["'])[^>]*>([\\s\\S]*?)<\\/script\\s*>/gi)];
+if (moduleScripts.length > 1) {
+  console.error("Generated HTML contains multiple module scripts. Use one module script so the scene can be bundled into a single offline HTML file.");
+  process.exit(1);
+}
+if (moduleScripts.length === 1) {
+  const match = moduleScripts[0];
+  const source = match[1];
+  try {
+    const result = await build({
+      stdin: { contents: source, resolveDir: root, sourcefile: "generated-scene.js", loader: "js" },
+      bundle: true,
+      write: false,
+      platform: "browser",
+      format: "iife",
+      target: "es2022",
+      minify: true,
+      legalComments: "none"
+    });
+    const bundled = result.outputFiles[0]?.text;
+    if (!bundled) throw new Error("esbuild returned no bundled output");
+    html = html.replace(match[0], `<script>\\n${bundled}\\n</script>`);
+    console.log(`Bundled the scene's module dependencies into offline HTML (${Buffer.byteLength(bundled)} JS bytes).`);
+  } catch (error) {
+    console.error(`Could not bundle the generated module scene: ${error.message}. Check imports and ensure dependencies are installed with npm install.`);
+    process.exit(1);
+  }
+} else if (/from\\s*["']three(?:\\/|["'])|import\\s*["']three(?:\\/|["'])/.test(html)) {
+  console.error("Generated HTML imports Three.js but has no <script type=\"module\"> block. Put Three.js imports in one module script so they can be bundled offline.");
   process.exit(1);
 }
 await fs.mkdir(path.dirname(outPath), { recursive: true });
