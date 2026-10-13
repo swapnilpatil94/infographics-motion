@@ -14,7 +14,9 @@
     "ui": "node scripts/ui-server.mjs"
   },
   "dependencies": {
-    "playwright": "^1.63.0"
+    "playwright": "^1.63.0",
+    "esbuild": "^0.25.0",
+    "three": "^0.180.0"
   },
   "engines": {
     "node": ">=22"
