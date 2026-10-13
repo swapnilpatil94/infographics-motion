@@ -35,6 +35,17 @@ if (!Number.isInteger(context) || context < 2048 || context > 32768) {
   console.error("OLLAMA_NUM_CTX must be an integer between 2048 and 32768.");
   process.exit(2);
 }
+const tagsResponse = await fetch(`${ollamaUrl}/api/tags`, { signal: AbortSignal.timeout(5000) });
+if (!tagsResponse.ok) {
+  console.error(`Could not list installed Ollama models (HTTP ${tagsResponse.status}).`);
+  process.exit(1);
+}
+const installedModels = ((await tagsResponse.json()).models || []).map(item => item.name).filter(Boolean);
+const hasModel = requested => installedModels.some(name => name === requested || name.startsWith(`${requested}:`) || requested.startsWith(`${name}:`));
+if (!hasModel(plannerModel)) {
+  console.error(`Visual planner model '${plannerModel}' is not downloaded. Run 'ollama pull ${plannerModel}' explicitly. Installed models: ${installedModels.join(", ") || "(none)"}`);
+  process.exit(1);
+}
 console.log(`Visual planner: ${plannerModel}; scene coder: ${model}; context=${context} tokens`);
 console.log(`Story: ${storyPath}\nOutput: ${outPath}`);
 const plannerPrompt = await fs.readFile(path.join(root, "prompts", "visual-planner.md"), "utf8");
