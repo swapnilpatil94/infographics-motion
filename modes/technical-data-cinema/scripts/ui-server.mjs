@@ -225,6 +225,7 @@ const server = http.createServer(async (req, res) => {
       const voiceScript = String(body.voiceScript || "").trim();
       const wavPath = String(body.wavPath || "").trim();
       const model = String(body.model || "").trim();
+      const plannerModel = String(body.plannerModel || process.env.OLLAMA_PLANNER_MODEL || "qwen3.5:9b").trim();
       const slug = safeSlug(body.slug || title);
       const fps = Number(body.fps || 30);
       if (!title || !story) return json(res, 400, { error: "Add a title and story brief." });
@@ -291,7 +292,7 @@ const server = http.createServer(async (req, res) => {
           await fs.writeFile(storyPath, storyContent, "utf8");
           if (voiceMode === "generate") await fs.writeFile(narrationPath, narrationContent, "utf8");
           const node = process.execPath;
-          const generateArgs = ["scripts/ollama-session.mjs", "--", "node", "scripts/generate.mjs", "--story", storyPath, "--model", model, "--out", htmlPath];
+          const generateArgs = ["scripts/ollama-session.mjs", "--", "node", "scripts/generate.mjs", "--story", storyPath, "--planner-model", plannerModel, "--model", model, "--out", htmlPath];
           if (!reuseScene) {
             try {
               await run(node, generateArgs, root, job, "Ollama scene generation (model unload happens before narration)");
