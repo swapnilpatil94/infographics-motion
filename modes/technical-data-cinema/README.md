@@ -48,7 +48,7 @@ Make sure the Hindi checkpoint and voice reference are installed as documented i
 
 Then, from this folder:
 ```bash
-npm run export -- --html output/<story>/index.html --out output/<story>/final.mp4 --voice-script examples/viral-traffic.md
+npm run export -- --html output/<story>/index.html --out output/<story>/final.mp4 --voice-script examples/viral-traffic-narration.md
 ```
 Use a narration-only file with spoken lines (no visual directions); you can use `--style storytelling|conversational|dramatic`, `--pronunciation hindi_mixed|original`, `--performance directed|uniform`, and `--expression-intensity 0..100`. Defaults match the current Studio audio tab: storytelling, Hindi-first pronunciation, directed performance, intensity 65. Existing performance cues such as `[HOOK]`, `[SUSPENSE]`, `[REVEAL]`, and `[EXPLAIN]` are preserved.
 
