@@ -29,14 +29,12 @@ DEFAULT_REFERENCE = REPO_ROOT / "assets" / "reference-voices" / "hindi-male-narr
 SILENCE_PAD_SECONDS = 0.18
 TRIM_THRESHOLD = 0.01  # preserve quieter consonants and sentence tails
 TRIM_MARGIN_SECONDS = 0.06
-# Post-generation tempo multiplier (ffmpeg atempo). Trimming Chatterbox's own boundary silence
-# (see trim_silence) already pushes the natural pace to ~170 WPM on its own, and the downstream
-# Whisper-driven dead-air tightening (tools/whisper_align.py) removes further inter-word gaps —
-# both push effective WPM up further, so this needs to undershoot 165 WPM on its own to leave
-# room. 1.0 disables it. Measured on this voice/reference, after both trim and gap-tightening:
-# 0.92x -> ~165.5 WPM (over target); 0.90x -> see PROGRESS.md for the re-measured value.
+# Post-generation tempo multiplier (ffmpeg atempo): values above 1.0 make speech faster.
+# Keep the default Reel-forward; preset-specific values from engine/shorts/voice.py override it.
+# Audio splicing is confidence-gated in whisper_align.py so speed is not achieved by risking
+# cuts through unaligned speech. 1.0 disables tempo processing.
 import os as _os
-TEMPO = float(_os.environ.get("TTS_ATEMPO", "0.90"))
+TEMPO = float(_os.environ.get("TTS_ATEMPO", "1.08"))
 
 
 def log(message: str) -> None:
