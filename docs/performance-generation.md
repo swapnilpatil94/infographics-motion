@@ -13,12 +13,14 @@ This first iteration adds **performance-directed takes** to the existing local C
 
 The sample uses these optional line-prefix cues (not spoken aloud):
 
-- `[HOOK]` — more energetic opening
-- `[SUSPENSE]` — controlled, tense delivery
-- `[REVEAL]` — stronger emphasis
-- `[EXPLAIN]` — clearer, less dramatic explanation
-- `[CALM]` — calmer closing
-- `[DEFAULT]` — use the base storytelling preset
+- `[HOOK]` — attention-grabbing opening
+- `[CURIOUS]` — question-led, interested delivery
+- `[SUSPENSE]` — restrained tension
+- `[REVEAL]` — stronger emphasis on a discovery
+- `[EXPLAIN]` — clear, controlled explanation
+- `[URGENT]` — time-sensitive warning; use sparingly
+- `[CALM]` — reassuring or reflective close
+- `[DEFAULT]` — return to the base storytelling preset
 
 Lines with the same cue are generated together where possible. A change of cue starts a new take so Chatterbox settings can change between thought groups. **Uniform** mode ignores the cues and uses one delivery throughout.
 
@@ -45,3 +47,18 @@ Compare the same script with **Uniform** and **Directed** at the same style and 
 - Parameter changes cannot guarantee specific emotions, and every new take may vary.
 - No new model is downloaded and no cloud service is required.
 - This is an experiment branch; validate locally before merging into the main production path.
+
+
+## Cue design decisions
+
+This intentionally stays a small, script-writer-friendly vocabulary. Use one cue per thought group, not one emotion label per sentence. The cue is stripped before synthesis and is never spoken. Keep adjacent lines under the same cue together to protect continuity; a cue change may start a new take.
+
+We do not add generic `[ANGER]`, `[SAD]`, `[FEAR]`, or `[WHISPER]` cues in this iteration. The supported generation controls do not guarantee those specific acting behaviors, and a larger label vocabulary would imply more control than we have validated. If a future use case needs them, evaluate dedicated model capabilities and reference recordings first.
+
+## Hindi model status (research, not yet switched)
+
+The current adapter uses the **Chatterbox Multilingual V3 family** with `language_id="hi"` when the installed package supports the V3 selector. Its generated `model_info.json` explicitly records `dedicated_hindi_checkpoint: false`. It is not currently loading the dedicated Hindi single-language checkpoint.
+
+Resemble AI publishes `ResembleAI/Chatterbox-Multilingual-hi`, a Hindi-specific fine-tune in its V3 single-language pack. This is the strongest next candidate to A/B test for Hindi quality. Do not assume it is a drop-in model-name change: its Hindi T3 weights and shared V3 speech decoder need to be loaded using a compatible loader. Keep the existing multilingual path as the known baseline until the dedicated checkpoint is loaded and tested locally.
+
+Suggested evaluation: render the same 20–30 second Hindi/Hinglish script with the same reference voice, text, seed where supported, and comparable settings. Score Devanagari pronunciation, English technical terms, continuity across sentences, natural pacing, speaker similarity, and emotional variation. Keep whichever version wins listening tests; the Hindi-only fine-tune may not necessarily win on English code-switching.
