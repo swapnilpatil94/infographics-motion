@@ -36,7 +36,7 @@ try {
   page.on("request", request => {
     if (/^https?:/i.test(request.url())) externalRequests.push(request.url());
   });
-  await page.goto(pathToFileURL(htmlPath).href, { waitUntil: "load" });
+  const sceneUrl = pathToFileURL(htmlPath);\n  sceneUrl.searchParams.set("render", "1");\n  await page.goto(sceneUrl.href, { waitUntil: "load" });
   await page.evaluate(() => document.fonts.ready.then(() => true));
   const contract = await page.evaluate(() => ({
     renderAt: typeof window.renderAt,
