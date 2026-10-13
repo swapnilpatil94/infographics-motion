@@ -178,6 +178,8 @@ const server = http.createServer(async (req, res) => {
           const generateArgs = ["scripts/ollama-session.mjs", "--", "node", "scripts/generate.mjs", "--story", storyPath, "--model", model, "--out", htmlPath];
           await run(node, generateArgs, root, job, "Ollama scene generation (model unload happens before narration)");
           if (voiceMode === "generate") {
+            // Start or reuse Chatterbox only after Ollama has been unloaded.
+            await ensureStudio(job);
             await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--voice-script", narrationPath, "--fps", String(fps), "--style", String(body.style || "storytelling"), "--performance", String(body.performance || "directed"), "--expression-intensity", String(body.intensity ?? 65)], root, job, "Chatterbox narration, then video render");
           } else if (voiceMode === "wav") {
             await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--audio", path.resolve(wavPath), "--fps", String(fps)], root, job, "Render with existing WAV narration");
