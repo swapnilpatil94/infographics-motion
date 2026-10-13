@@ -7,6 +7,7 @@
   "scripts": {
     "generate": "node scripts/ollama-session.mjs -- node scripts/generate.mjs",
     "render": "node scripts/render.mjs",
+    "export": "node scripts/export.mjs",
     "doctor": "node scripts/doctor.mjs",
     "install:browser": "playwright install chromium",
     "test:smoke": "node scripts/render.mjs --html examples/render-smoke-test.html --out output/smoke-test.mp4 --fps 5 --duration 3"
