@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import { build } from "esbuild";
 import { normalizeVisualPlan, validateVisualPlan } from "./visual-plan.mjs";
 import { validateSceneSource, assertSceneCandidate } from "./scene-contract.mjs";
+import { applySceneCompatibility } from "./scene-compat.mjs";
 import crypto from "node:crypto";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -149,6 +150,9 @@ try {
   sceneFailure = error.message || "Ollama scene generation failed";
 }
 let html = (payload || "").replace(/^\uFEFF/, "").replace(/^\`\`\`(?:html)?\s*/i, "").replace(/\s*\`\`\`\s*$/, "");
+let compatibility = applySceneCompatibility(html);
+html = compatibility.html;
+if (compatibility.changes.length) console.warn("Applied narrow scene compatibility: " + compatibility.changes.join("; ") + ". Visual QA and browser render checks still apply.");
 const validationErrors = validateSceneSource(html);
 if (!sceneFailure && validationErrors.length === 0) {
   try {
@@ -191,9 +195,12 @@ if (validationErrors.length || sceneFailure) {
       }
     ], "scene repair");
     const repaired = repair.replace(/^\uFEFF/, "").replace(/^\`\`\`(?:html)?\s*/i, "").replace(/\s*\`\`\`\s*$/, "");
-    const errors = validateSceneSource(repaired);
+    const repairedCompatibility = applySceneCompatibility(repaired);
+    const compatibleRepair = repairedCompatibility.html;
+    const errors = validateSceneSource(compatibleRepair);
     if (errors.length) throw new Error(errors.join("; "));
-    html = repaired;
+    html = compatibleRepair;
+    if (repairedCompatibility.changes.length) console.warn("Applied narrow scene compatibility to repaired output: " + repairedCompatibility.changes.join("; "));
     console.log("Scene repair passed deterministic export-contract validation.");
   } catch (repairError) {
     const reason = [firstFailure, "repair failed: " + repairError.message].join("; ");
