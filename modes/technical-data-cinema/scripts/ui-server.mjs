@@ -239,7 +239,7 @@ const server = http.createServer(async (req, res) => {
       const dir = path.join(outputRoot, slug);
       try { await fs.access(path.join(dir, "story.md")); }
       catch { return json(res, 404, { error: "Analyze this story first; no matching project folder exists." }); }
-      await fs.writeFile(path.join(dir, "visual-plan.json"), JSON.stringify(plan, null, 2) + "\\n", "utf8");
+      await fs.writeFile(path.join(dir, "visual-plan.json"), JSON.stringify(plan, null, 2) + "\n", "utf8");
       return json(res, 200, { ok: true, beats: plan.beats.length, plan });
     }
     if (req.method === "POST" && url.pathname === "/api/run") {
