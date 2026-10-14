@@ -49,6 +49,11 @@ export function applySceneCompatibility(source) {
     }
   });
   if (renderOnly) {
+    // Prevent a model-authored preview loop from racing the renderer-controlled absolute timeline.
+    window.__tdcRenderOnly = true;
+    window.requestAnimationFrame = () => 0;
+    window.cancelAnimationFrame = () => {};
+    window.setInterval = () => 0;
     const style = document.createElement("style");
     style.id = "tdc-compat-render-only-style";
     style.textContent = `
