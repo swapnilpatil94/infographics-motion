@@ -6,6 +6,7 @@ import process from "node:process";
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import crypto from "node:crypto";
+import { normalizeVisualPlan } from "./visual-plan.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "..");
@@ -216,12 +217,38 @@ const server = http.createServer(async (req, res) => {
       if (!job) return json(res, 404, { error: "Job not found." });
       return json(res, 200, { id: job.id, status: job.status, logs: job.logs, error: job.error || null, files: job.files || {} });
     }
+    if (req.method === "POST" && url.pathname === "/api/plan") {
+      const body = await readBody(req);
+      const slug = safeSlug(body.slug || "");
+      if (!slug) return json(res, 400, { error: "Enter a valid output folder name." });
+      let inputPlan;
+      try { inputPlan = typeof body.plan === "string" ? JSON.parse(body.plan) : body.plan; }
+      catch { return json(res, 400, { error: "Visual plan is not valid JSON." }); }
+      let plan;
+      try { plan = normalizeVisualPlan(inputPlan); }
+      catch (error) { return json(res, 400, { error: error.message }); }
+      let previousEnd = -Infinity;
+      for (let i = 0; i < plan.beats.length; i++) {
+        const beat = plan.beats[i];
+        const start = Number(beat.start), end = Number(beat.end);
+        if (!Number.isFinite(start) || !Number.isFinite(end) || start < 0 || end <= start || start < previousEnd - 0.05) {
+          return json(res, 400, { error: `Beat ${i + 1} has invalid or overlapping start/end times.` });
+        }
+        previousEnd = end;
+      }
+      const dir = path.join(outputRoot, slug);
+      try { await fs.access(path.join(dir, "story.md")); }
+      catch { return json(res, 404, { error: "Analyze this story first; no matching project folder exists." }); }
+      await fs.writeFile(path.join(dir, "visual-plan.json"), JSON.stringify(plan, null, 2) + "\\n", "utf8");
+      return json(res, 200, { ok: true, beats: plan.beats.length, plan });
+    }
     if (req.method === "POST" && url.pathname === "/api/run") {
       if (activeJob) return json(res, 409, { error: "A job is already running. Wait for it to finish before starting another model." });
       const body = await readBody(req);
       const title = String(body.title || "").trim();
       const story = String(body.story || "").trim();
       const voiceMode = String(body.voiceMode || "generate");
+      const phase = String(body.phase || "all");
       const voiceScript = String(body.voiceScript || "").trim();
       const wavPath = String(body.wavPath || "").trim();
       const model = String(body.model || "").trim();
@@ -232,6 +259,7 @@ const server = http.createServer(async (req, res) => {
       if (!slug) return json(res, 400, { error: "The output name must contain letters or numbers." });
       if (!model) return json(res, 400, { error: "Choose an installed Ollama model." });
       if (!["generate", "wav", "silent"].includes(voiceMode)) return json(res, 400, { error: "Choose a valid voice mode." });
+      if (!["all", "analysis", "scene"].includes(phase)) return json(res, 400, { error: "Choose analysis, scene, or all stages." });
       if (voiceMode === "generate" && !voiceScript) return json(res, 400, { error: "Add the narration script for Chatterbox." });
       if (voiceMode === "wav" && !wavPath) return json(res, 400, { error: "Enter the absolute path to an existing WAV file." });
       if (!Number.isFinite(fps) || fps < 10 || fps > 60) return json(res, 400, { error: "FPS must be between 10 and 60." });
@@ -293,6 +321,8 @@ const server = http.createServer(async (req, res) => {
           if (voiceMode === "generate") await fs.writeFile(narrationPath, narrationContent, "utf8");
           const node = process.execPath;
           const generateArgs = ["scripts/ollama-session.mjs", "--", "node", "scripts/generate.mjs", "--story", storyPath, "--planner-model", plannerModel, "--model", model, "--out", htmlPath, "--plan-file", path.join(dir, "visual-plan.json")];
+          if (phase === "analysis") generateArgs.push("--phase", "plan");
+          else if (phase === "scene") generateArgs.push("--phase", "scene");
           if (!reuseScene) {
             try {
               await run(node, generateArgs, root, job, "Ollama scene generation (model unload happens before narration)");
@@ -313,6 +343,12 @@ const server = http.createServer(async (req, res) => {
               log(job, "Initial scene failed HTML/determinism validation; starting one targeted repair, then a single fallback-model attempt if needed. Narration is preserved.");
               await runSceneRepair(node, generateArgs, repairNote, root, job, "Repair invalid initial scene");
             }
+          }
+          if (phase === "analysis") {
+            job.files = { plan: `/files/${encodeURIComponent(slug)}/visual-plan.json` };
+            job.status = "completed";
+            log(job, "ANALYSIS STAGE VALIDATED. Visual plan saved; scene generation, narration and rendering were not started.");
+            return;
           }
           if (voiceMode === "generate") {
             if (reuseNarration) {
@@ -376,6 +412,7 @@ const server = http.createServer(async (req, res) => {
             await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--fps", String(fps)], root, job, "Silent video render");
           }
           job.files = {
+            plan: `/files/${encodeURIComponent(slug)}/visual-plan.json`,
             scene: `/files/${encodeURIComponent(slug)}/index.html`,
             video: `/files/${encodeURIComponent(slug)}/${path.basename(mp4Path)}`,
             audio: voiceMode === "generate" ? `/files/${encodeURIComponent(slug)}/final.narration.wav` : voiceMode === "wav" ? `/files/${encodeURIComponent(slug)}/${path.basename(wavPath)}` : null
