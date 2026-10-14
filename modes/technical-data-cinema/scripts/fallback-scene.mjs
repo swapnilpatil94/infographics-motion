@@ -1,59 +1,40 @@
-export function buildFallbackScene({ title, story, plan }) {
-  const beats = (Array.isArray(plan?.beats) ? plan.beats : []).slice(0, 12).map((beat, index) => ({
-    start: Number.isFinite(Number(beat.start)) ? Math.max(0, Number(beat.start)) : index * 4,
-    end: Number.isFinite(Number(beat.end)) ? Math.max(0.5, Number(beat.end)) : (index + 1) * 4,
-    idea: String(beat.narration_idea || beat.viewer_takeaway || beat.dominant_subject || `Visual beat ${index + 1}`).slice(0, 150),
-    subject: String(beat.dominant_subject || beat.visual_grammar || "SYSTEM").slice(0, 90),
-    action: String(beat.action_and_causal_proof || beat.viewer_takeaway || "Observe how the system changes").slice(0, 180),
-    grammar: String(beat.visual_grammar || "transformation"),
-    labels: Array.isArray(beat.overlay_text) ? beat.overlay_text.slice(0, 3).map(String) : []
-  }));
-  if (beats.length < 4) throw new Error("Cannot build safe fallback: visual plan needs at least four beats.");
-  const duration = Math.max(8, Math.min(600, ...[beats[beats.length - 1].end].filter(Number.isFinite)));
-  const safeJson = value => JSON.stringify(value).replace(/</g, "\\u003c").replace(/>/g, "\\u003e").replace(/&/g, "\\u0026");
-  return `<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${String(title).replace(/[&<>"]/g, "")}</title>
+const clean = value => String(value ?? "").replace(/\s+/g, " ").trim().slice(0, 220);
+const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+export function buildFallbackScene({title,story,plan}) {
+ const source=Array.isArray(plan?.beats)?plan.beats:[];
+ const beats=source.slice(0,18).map((b,i)=>({start:Number.isFinite(Number(b.start))?Math.max(0,Number(b.start)):i*4,end:Number.isFinite(Number(b.end))?Math.max(.5,Number(b.end)):(i+1)*4,idea:clean(b.narration_idea||b.viewer_takeaway||b.dominant_subject||("Visual beat "+(i+1))),subject:clean(b.dominant_subject||"SYSTEM"),action:clean(b.action_and_causal_proof||b.viewer_takeaway||"Follow the cause and its consequence"),grammar:String(b.visual_grammar||"transformation").toLowerCase().replace(/[^a-z0-9_-]/g,""),labels:Array.isArray(b.overlay_text)?b.overlay_text.slice(0,3).map(clean).filter(Boolean):[]}));
+ if(beats.length<4)throw new Error("Cannot build safe fallback: visual plan needs at least four beats.");
+ beats.forEach((b,i)=>{if(b.end<=b.start)b.end=b.start+1;if(i&&b.start<beats[i-1].start)b.start=beats[i-1].start;});
+ const duration=clamp(beats[beats.length-1].end,8,600);
+ const json=JSON.stringify(beats).replace(/</g,"\\u003c").replace(/>/g,"\\u003e").replace(/&/g,"\\u0026");
+ const safeTitle=clean(title).replace(/[&<>"]/g,"");
+ return String.raw\`<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>__TITLE__</title>
 <style>
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:#07110f;color:#f5f1e8;font-family:Inter,ui-sans-serif,system-ui,-apple-system,sans-serif;overflow:hidden}
-#stage{width:100vw;height:100vh;display:block;background:radial-gradient(ellipse at 50% 44%,#15332b 0%,#0b1c18 48%,#050b0a 100%)}
-.kicker{font-size:24px;letter-spacing:5px;fill:#d9a441;font-weight:800}.headline{font-size:54px;fill:#fff8e9;font-weight:850}.sub{font-size:28px;fill:#c6d3ca}.micro{font-size:23px;fill:#e3b44f;font-weight:700;letter-spacing:2px}
-#subject{fill:#112d25;stroke:#e0ae47;stroke-width:5}#orbit{fill:none;stroke:#4d8c74;stroke-width:3;stroke-dasharray:12 15}#core{fill:#e5b44e}#flow{stroke:#e5b44e;stroke-width:8;stroke-linecap:round;fill:none}#dot{fill:#fff4d6}
-#progress{stroke:#dba83f;stroke-width:8;stroke-linecap:round}#base{stroke:#37574b;stroke-width:8;stroke-linecap:round}
-#footer{font-size:22px;fill:#91a99b;letter-spacing:3px}
-@media(prefers-reduced-motion:reduce){*{animation:none!important}}
-</style></head><body><svg id="stage" viewBox="0 0 1080 1920" role="img" aria-label="Animated explainer visual fallback">
-<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#204c3d"/><stop offset="1" stop-color="#0b1915"/></linearGradient><filter id="glow"><feGaussianBlur stdDeviation="14"/></filter></defs>
-<g id="grain" opacity=".35"></g>
-<text x="76" y="115" class="kicker">VISUAL EXPLAINER / STORY MODE</text>
-<text id="beatNo" x="78" y="220" class="micro">BEAT 01</text>
-<text id="headline" x="76" y="305" class="headline">Story mechanism</text>
-<text id="description" x="78" y="365" class="sub">Cause → effect → consequence</text>
-<g id="mechanism" transform="translate(540 940)">
-  <circle id="halo" r="300" fill="#dba83f" opacity=".08" filter="url(#glow)"/>
-  <circle id="orbit" r="250"/>
-  <circle id="orbit2" r="180" fill="none" stroke="#3c705c" stroke-width="2" stroke-dasharray="4 17"/>
-  <path id="flow" d="M-300 0 C-170 -110,-90 120,0 0 S170 -100,300 0"/>
-  <rect id="subject" x="-175" y="-175" width="350" height="350" rx="48" fill="url(#g)"/>
-  <circle id="core" r="64"/>
-  <circle id="dot" cx="-245" cy="0" r="18"/>
-  <g id="nodes"></g>
-  <text id="subjectText" text-anchor="middle" y="12" font-size="28" font-weight="850" fill="#f9f0da">SYSTEM</text>
-</g>
-<text id="action" x="76" y="1390" class="headline" style="font-size:38px">Watch the relationship change</text>
-<g id="labels"></g>
-<line id="base" x1="78" y1="1760" x2="1002" y2="1760"/>
-<line id="progress" x1="78" y1="1760" x2="78" y2="1760"/>
-<text id="footer" x="78" y="1830">A VISUAL MODEL · NOT A DATA SOURCE</text>
-</svg><script>
-const BEATS=${safeJson(beats)}, DURATION=${duration};
-const $=id=>document.getElementById(id);
-const NS="http://www.w3.org/2000/svg";
-function el(name,attrs={}){const e=document.createElementNS(NS,name);for(const [k,v] of Object.entries(attrs))e.setAttribute(k,v);return e}
-function drawNodes(index){const group=$("nodes");group.replaceChildren();const count=7+(index%5);for(let i=0;i<count;i++){const a=(Math.PI*2*i/count)+(index*.31),r=218+(i%3)*25,x=Math.cos(a)*r,y=Math.sin(a)*r;group.append(el("circle",{cx:x.toFixed(2),cy:y.toFixed(2),r:i%3===0?13:8,fill:i%2?"#75b89a":"#e5b44e",opacity:.92}));if(i<count-1){const b=a+Math.PI*2/count;group.append(el("line",{x1:x.toFixed(2),y1:y.toFixed(2),x2:(Math.cos(b)*r).toFixed(2),y2:(Math.sin(b)*r).toFixed(2),stroke:"#578c74","stroke-width":2,opacity:.55}))}}}
-function setText(id,value){$(id).textContent=String(value||"")}
-function renderAt(seconds){const t=Math.max(0,Math.min(DURATION,Number(seconds)||0));let index=BEATS.findIndex((b,i)=>t>=b.start&&(t<b.end||i===BEATS.length-1));if(index<0)index=BEATS.length-1;const b=BEATS[index],local=Math.max(0,Math.min(1,(t-b.start)/Math.max(.01,b.end-b.start)));drawNodes(index);setText("beatNo","BEAT "+String(index+1).padStart(2,"0")+" / "+String(BEATS.length).padStart(2,"0"));setText("headline",b.idea);setText("description",b.grammar.replace(/_/g," ").toUpperCase());setText("action",b.action);setText("subjectText",b.subject.toUpperCase().slice(0,18));$("mechanism").setAttribute("transform","translate(540 940) rotate("+((index%2?1:-1)*local*5).toFixed(2)+") scale("+(0.96+0.04*Math.sin(local*Math.PI)).toFixed(3)+")");$("dot").setAttribute("cx",(-245+490*local).toFixed(2));$("core").setAttribute("r",(52+12*Math.sin(local*Math.PI)).toFixed(2));$("orbit").setAttribute("transform","rotate("+(index*13+local*16)+")");$("progress").setAttribute("x2",(78+924*t/DURATION).toFixed(2));$("labels").replaceChildren();b.labels.forEach((label,i)=>{const g=el("g",{transform:"translate(78 "+(1500+i*62)+")"});g.append(el("circle",{cx:12,cy:-8,r:7,fill:"#e5b44e"}));const tx=el("text",{x:36,y:0,fill:"#e9e2d1","font-size":25});tx.textContent=label.slice(0,48);g.append(tx);$("labels").append(g)});$("halo").setAttribute("opacity",(.05+.06*Math.sin(local*Math.PI)).toFixed(3));}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:#07110f;font-family:Inter,ui-sans-serif,system-ui,sans-serif;overflow:hidden}
+#stage{width:100vw;height:100vh;display:block;background:radial-gradient(ellipse at 50% 47%,#17382d 0%,#0b1c18 48%,#050b0a 100%)}
+.kicker{font-size:22px;letter-spacing:4px;fill:#d9a441;font-weight:800}.micro{font-size:22px;fill:#e3b44f;font-weight:750;letter-spacing:2px}.headline{font-size:54px;fill:#fff8e9;font-weight:850}.sub{font-size:25px;fill:#b8cdc1}.action{font-size:31px;fill:#f7f0df;font-weight:700}.label{font-size:24px;fill:#d9e3d8}.footer{font-size:19px;fill:#819b8e;letter-spacing:2px}.rule{stroke:#426c59;stroke-width:3;fill:none}.gold{stroke:#e5b44e;fill:none;stroke-width:6;stroke-linecap:round;stroke-linejoin:round}.green{stroke:#70b395;fill:none;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}.panel{fill:#10271f;stroke:#3e725b;stroke-width:3}.node{fill:#e5b44e;stroke:#10271f;stroke-width:3}
+</style></head><body><svg id="stage" viewBox="0 0 1080 1920" role="img" aria-label="Story-driven animated explainer">
+<defs><linearGradient id="panelFill" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#214b3b"/><stop offset="1" stop-color="#0b1915"/></linearGradient><filter id="glow"><feGaussianBlur stdDeviation="15"/></filter></defs>
+<text x="76" y="108" class="kicker">VISUAL EXPLAINER / STORY MODE</text><text id="beatNo" x="78" y="192" class="micro"></text><text id="headline" x="76" y="280" class="headline"></text><text id="description" x="78" y="400" class="sub"></text><line x1="78" y1="445" x2="1002" y2="445" class="rule" opacity=".55"/>
+<g id="sceneArt"></g><text id="action" x="78" y="1378" class="action"></text><g id="labels"></g>
+<line x1="78" y1="1760" x2="1002" y2="1760" class="rule" opacity=".65"/><line id="progress" x1="78" y1="1760" x2="78" y2="1760" stroke="#dba83f" stroke-width="8" stroke-linecap="round"/><text x="78" y="1830" class="footer">ILLUSTRATIVE VISUAL MODEL · NOT A DATA SOURCE</text></svg>
+<script>
+const BEATS=__BEATS__,DURATION=__DURATION__, $=id=>document.getElementById(id),NS="http://www.w3.org/2000/svg";
+function el(n,a){const e=document.createElementNS(NS,n);Object.entries(a||{}).forEach(([k,v])=>e.setAttribute(k,String(v)));return e}
+function add(p,n,a,t){const e=el(n,a);if(t!==undefined)e.textContent=t;p.append(e);return e}
+function wrap(p,text,x,y,max,lineHeight,cls,limit){const words=String(text||"").split(/\s+/).filter(Boolean),lines=[];let line="";words.forEach(w=>{const c=line?line+" "+w:w;if(c.length>max&&line){lines.push(line);line=w}else line=c});if(line)lines.push(line);const shown=lines.slice(0,limit);if(lines.length>limit)shown[limit-1]=shown[limit-1].slice(0,max-1).trimEnd()+"…";const t=add(p,"text",{x,y,class:cls});shown.forEach((s,i)=>add(t,"tspan",{x,dy:i?lineHeight:0},s));return t}
+function network(g,i,l){const cx=540,cy=850,n=7+i%3,pts=[];for(let k=0;k<n;k++){const a=2*Math.PI*k/n-Math.PI/2,r=185+k%3*25;pts.push([cx+Math.cos(a)*r,cy+Math.sin(a)*r])}pts.forEach((p,k)=>{const q=pts[(k+2)%n];add(g,"line",{x1:p[0],y1:p[1],x2:q[0],y2:q[1],class:"rule",opacity:.75})});pts.forEach((p,k)=>add(g,"circle",{cx:p[0],cy:p[1],r:k===i%n?23:13,class:"node"}));add(g,"circle",{cx,cy,r:78,fill:"url(#panelFill)",stroke:"#e5b44e","stroke-width":5});add(g,"text",{x:cx,y:cy+8,"text-anchor":"middle",fill:"#fff4d6","font-size":24,"font-weight":800},["SOURCE","NETWORK","TARGET"][i%3])}
+function flow(g,i,l){const x0=92,y=820,gap=226,labels=["INPUT","QUEUE","PROCESS","OUTPUT"];labels.forEach((s,k)=>{const x=x0+k*gap;add(g,"rect",{x,y:y-75,width:166,height:150,rx:20,class:"panel"});add(g,"text",{x:x+83,y:y+8,"text-anchor":"middle",fill:"#f7f0df","font-size":22,"font-weight":750},s);if(k<3)add(g,"path",{d:"M "+(x+170)+" "+y+" h 42 l -13 -13 m 13 13 l -13 13",class:k===i%4?"gold":"green",opacity:k===i%4?1:.6})});for(let k=0;k<12;k++)add(g,"circle",{cx:180+(k%6)*145,cy:1040+Math.floor(k/6)*48,r:9,fill:k<i%12?"#e5b44e":"#436d59"})}
+function compare(g,i){[[130,"BEFORE",0],[585,"AFTER",1]].forEach(([x,s,side])=>{add(g,"rect",{x,y:680,width:360,height:370,rx:26,class:"panel"});add(g,"text",{x:x+180,y:725,"text-anchor":"middle",class:"micro"},s);for(let k=0;k<5;k++)add(g,"rect",{x:x+35,y:770+k*48,width:side?95+((k+i)%4)*48:55+((k*2+i)%3)*22,height:17,rx:8,fill:side?"#e5b44e":"#6c8e7b"})});add(g,"path",{d:"M 510 855 h 55 l -16 -16 m 16 16 l -16 16",class:"gold"});add(g,"text",{x:540,y:1120,"text-anchor":"middle",fill:"#d9e3d8","font-size":23},["CHANGE","CONTRAST","RESULT"][i%3])}
+function timeline(g,i,l){const y=850,x0=130,x1=950;add(g,"line",{x1:x0,y1:y,x2:x1,y2:y,class:"green"});["TRIGGER","REACTION","ESCALATION","OUTCOME"].forEach((s,k)=>{const x=x0+k*(x1-x0)/3;add(g,"circle",{cx:x,cy:y,r:k===i%4?24:15,fill:k===i%4?"#e5b44e":"#6fa78b"});add(g,"text",{x,y:y+66,"text-anchor":"middle",fill:"#e9e2d1","font-size":20,"font-weight":700},s);add(g,"line",{x1:x,y1:y+28,x2:x,y2:y+48,class:"rule"})});const x=x0+(x1-x0)*((i%4+l)/4);add(g,"circle",{cx:x,cy:y,r:10,fill:"#fff4d6"});add(g,"path",{d:"M 130 1000 Q 540 1110 950 1000",class:"gold",opacity:.65})}
+function scale(g,i){const cx=540,cy=820;add(g,"line",{x1:cx,y1:cy-170,x2:cx,y2:cy+120,class:"gold"});add(g,"line",{x1:cx-230,y1:cy-90,x2:cx+230,y2:cy-90,class:"gold"});[cx-230,cx+230].forEach((x,side)=>{add(g,"path",{d:"M "+(x-110)+" "+(cy-35)+" L "+(x+110)+" "+(cy-35)+" L "+(x+75)+" "+(cy+140)+" Q "+x+" "+(cy+185)+" "+(x-75)+" "+(cy+140)+" Z",class:"panel"});const n=side?8+i%4:2+i%3;for(let k=0;k<n;k++)add(g,"circle",{cx:x-65+k%5*32,cy:cy+10+Math.floor(k/5)*32,r:8,fill:side?"#e5b44e":"#70b395"})});add(g,"circle",{cx,cy:cy-170,r:24,class:"node"});add(g,"text",{x:cx,y:cy+240,"text-anchor":"middle",fill:"#d9e3d8","font-size":23},["IMBALANCE","LEVERAGE","AMPLIFICATION"][i%3])}
+function stack(g,i){const x=285,y=600,w=510,h=88;["VISIBLE EVENT","HIDDEN INCENTIVE","SYSTEM PRESSURE","ROOT CAUSE"].forEach((s,k)=>{const yy=y+k*126;add(g,"rect",{x,y:yy,width:w,height:h,rx:18,fill:k===i%4?"#254d3b":"#10271f",stroke:k===i%4?"#e5b44e":"#426c59","stroke-width":k===i%4?5:3});add(g,"text",{x:x+w/2,y:yy+54,"text-anchor":"middle",fill:"#f7f0df","font-size":24,"font-weight":750},s);if(k<3)add(g,"path",{d:"M 540 "+(yy+h+8)+" v 25 m -11 -11 l 11 11 l 11 -11",class:"gold"})})}
+function transform(g,i,l){const cx=540,cy=850;for(let k=0;k<4;k++){const r=70+k*68;add(g,"circle",{cx,cy,r,fill:"none",stroke:k===i%4?"#e5b44e":"#426c59","stroke-width":k===i%4?6:3,"stroke-dasharray":k%2?"8 18":"none"})}for(let k=0;k<12;k++){const a=k*Math.PI/6+l*.6,r=100+k%3*68;add(g,"circle",{cx:cx+Math.cos(a)*r,cy:cy+Math.sin(a)*r,r:k%4===0?14:8,fill:k%3===0?"#e5b44e":"#70b395"})}add(g,"rect",{x:420,y:780,width:240,height:140,rx:24,fill:"url(#panelFill)",stroke:"#e5b44e","stroke-width":4});add(g,"text",{x:540,y:858,"text-anchor":"middle",fill:"#fff4d6","font-size":23,"font-weight":800},["INPUT","SHIFT","NEW STATE"][i%3])}
+function draw(b,i,l){const g=$("sceneArt");g.replaceChildren();const s=b.grammar+" "+b.subject.toLowerCase();if(/compare|contrast|before_after|versus|tradeoff|distribution/.test(s))compare(g,i);else if(/timeline|sequence|history|escalat|causal_chain/.test(s))timeline(g,i,l);else if(/scale|leverage|amplif|inequal|concentration|imbalance/.test(s))scale(g,i);else if(/stack|layer|incentive|root_cause|hierarch|system/.test(s))stack(g,i);else if(/flow|queue|pipeline|bottleneck|process|traffic|particle/.test(s))flow(g,i,l);else if(/network|graph|ecosystem|connection|relationship/.test(s))network(g,i,l);else transform(g,i,l);const glow=add(g,"circle",{cx:540,cy:850,r:340,fill:"#dba83f",opacity:.025+.025*Math.sin(l*Math.PI),filter:"url(#glow)"});g.insertBefore(glow,g.firstChild)}
+function renderAt(seconds){const t=clamp(Number(seconds)||0,0,DURATION);let i=BEATS.findIndex((b,k)=>t>=b.start&&(t<b.end||k===BEATS.length-1));if(i<0)i=BEATS.length-1;const b=BEATS[i],l=clamp((t-b.start)/Math.max(.01,b.end-b.start),0,1);$("beatNo").textContent="BEAT "+String(i+1).padStart(2,"0")+" / "+String(BEATS.length).padStart(2,"0");const h=$("headline");h.replaceChildren();wrap(h,b.idea,76,265,b.idea.length>38?23:29,64,"headline",2);$("description").textContent=b.grammar.replace(/[_-]/g," ").toUpperCase().slice(0,60);$("action").textContent=b.action.length>58?b.action.slice(0,57).trimEnd()+"…":b.action;$("labels").replaceChildren();b.labels.forEach((s,k)=>{const y=1480+k*66;add($("labels"),"circle",{cx:88,cy:y-8,r:7,fill:"#e5b44e"});wrap($("labels"),s,112,y,48,30,"label",1)});draw(b,i,l);$("progress").setAttribute("x2",(78+924*t/DURATION).toFixed(2));$("stage").setAttribute("aria-label","Visual beat "+(i+1)+": "+b.idea)}
 window.renderAt=renderAt;window.getDuration=()=>DURATION;
-if(new URLSearchParams(window.location.search).get("render")!=="1"){document.body.insertAdjacentHTML("beforeend",'<div style="position:fixed;bottom:12px;right:12px;color:#9bb4a7;font:12px system-ui">SAFE FALLBACK · review visuals before publishing</div>')}
+if(new URLSearchParams(window.location.search).get("render")!=="1")document.body.insertAdjacentHTML("beforeend",'<div style="position:fixed;bottom:12px;right:12px;color:#9bb4a7;font:12px system-ui">SAFE FALLBACK · review visuals before publishing</div>');
 renderAt(0);
-</script></body></html>`;
+</script></body></html>\`.replace("__TITLE__",safeTitle).replace("__BEATS__",json).replace("__DURATION__",String(duration));
 }
