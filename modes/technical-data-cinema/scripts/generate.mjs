@@ -158,7 +158,7 @@ if (!sceneFailure && validationErrors.length === 0) {
         "\\nGENERATED HTML (source excerpt):\\n" + html.slice(0, 14000)
       }
     ], "visual quality audit", plannerModel, "json");
-    const cleanAudit = auditText.replace(/^\\uFEFF/, "").trim();
+    const cleanAudit = auditText.replace(/^\uFEFF/, "").trim();
     const auditJson = cleanAudit.slice(cleanAudit.indexOf("{"), cleanAudit.lastIndexOf("}") + 1);
     const audit = JSON.parse(auditJson);
     if (audit.pass !== true) {
