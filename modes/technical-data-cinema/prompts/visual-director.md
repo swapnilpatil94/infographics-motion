@@ -33,6 +33,15 @@ STRICT EDITORIAL GATES — FAIL THESE AND THE SCENE IS NOT ACCEPTABLE
 - Every 2–4 seconds, something explanatory must change: a state, relation, composition, scale, annotation, or camera view. Continuous particle motion by itself does not count.
 - Before returning HTML, mentally audit the whole timeline at 0s, 1s, 25%, 50%, 75%, and the final 3 seconds. Reject any repeated composition that persists without new information.
 
+YANTRALOK BRAND CONTRACT — REQUIRED DEFAULT FOR THIS PROJECT
+- Background: near-black (#050607), with restrained charcoal depth; never the default green gradient.
+- Main linework and dotted sketch elements: white/off-white (#f5f7f8). Use hand-drawn/dotted strokes, stippled particles, sketch contours, and progressive line reveals when they help explain the mechanism.
+- Accent: Yantralok red-orange (#e64b36), used sparingly for the active cause, warning, transformation, or key reveal. Neutral gray is allowed for inactive structure.
+- Do not introduce a competing gold/green/blue palette. Preserve strong contrast and consistent visual identity across every beat.
+- The same brand palette must not force the same composition: use story-specific objects, silhouettes, camera framing, and causal motion. Dots must represent something meaningful, not generic decoration.
+- Keep the render/editor UI separate from the scene; use the same dark/red/white visual language in preview controls.
+- This contract takes priority over optional palette suggestions elsewhere in this prompt.
+
 VISUAL STORYTELLING
 - Particles have explicit meaning (people, requests, packets, money, attention, etc.) and purposeful movement.
 - Show paths, branching, accumulation, delay, failure, recovery or state changes when they explain the mechanism.
