@@ -201,6 +201,18 @@ if (validationErrors.length || sceneFailure) {
     if (errors.length) throw new Error(errors.join("; "));
     html = compatibleRepair;
     if (repairedCompatibility.changes.length) console.warn("Applied narrow scene compatibility to repaired output: " + repairedCompatibility.changes.join("; "));
+    const repairedAuditText = await askOllama([
+      { role: "system", content: "You are a strict visual-storytelling QA reviewer. Return JSON only with keys pass (boolean) and issues (array of strings). Fail if the scene is a repeated central icon/diagram, generic orbit/network animation, title cards with changing labels, decorative motion without causal proof, or if narration beats do not produce meaningfully different subjects/compositions. Pass only when story-specific visible actions and causal state changes are implemented. Be strict and concise." },
+      { role: "user", content: ["STORY:", story, "VISUAL PLAN:", planJson, "REPAIRED HTML:", html.slice(0, 14000)].join("\\n") }
+    ], "repaired visual quality audit", plannerModel, "json");
+    const cleanRepairedAudit = repairedAuditText.replace(/^\\uFEFF/, "").trim();
+    const repairedAuditJson = cleanRepairedAudit.slice(cleanRepairedAudit.indexOf("{"), cleanRepairedAudit.lastIndexOf("}") + 1);
+    const repairedAudit = JSON.parse(repairedAuditJson);
+    if (repairedAudit.pass !== true) {
+      const issues = Array.isArray(repairedAudit.issues) ? repairedAudit.issues.map(String).slice(0, 5) : ["visual QA did not approve the repaired scene"];
+      throw new Error("repaired scene failed story-specific visual QA: " + issues.join("; "));
+    }
+    console.log("Repaired scene passed story-specific visual QA.");
     console.log("Scene repair passed deterministic export-contract validation.");
   } catch (repairError) {
     const reason = [firstFailure, "repair failed: " + repairError.message].join("; ");
