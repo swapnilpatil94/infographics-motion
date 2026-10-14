@@ -148,9 +148,40 @@ if (!/window\.renderAt\s*=/.test(html)) validationErrors.push("missing window.re
 if (!/window\.getDuration\s*=/.test(html)) validationErrors.push("missing window.getDuration()");
 if (!/URLSearchParams\s*\(\s*(?:window\.)?location\.search\s*\)/.test(html) || !/get\s*\(\s*["']render["']\s*\)/.test(html)) validationErrors.push("missing ?render=1 render-only mode");
 if (validationErrors.length || sceneFailure) {
-  const reason = [sceneFailure, ...validationErrors].filter(Boolean).join("; ");
-  console.warn("LLM scene failed validation: " + reason + ". Compiling a deterministic plan-driven fallback scene; export QA remains enabled.");
-  html = buildFallbackScene({ title, story, plan: visualPlan });
+  const firstFailure = [sceneFailure, ...validationErrors].filter(Boolean).join("; ");
+  console.warn("Scene generation failed its export-contract check: " + firstFailure + ". Attempting one targeted repair with the same coding model.");
+  try {
+    const repair = await askOllama([
+      { role: "system", content: system },
+      { role: "user", content:
+        "REPAIR THE FAILED SCENE. Return a complete replacement HTML document, not a patch. The previous attempt failed this deterministic gate: " + firstFailure + ". " +
+        "Do not simplify this into a generic infographic, repeated central icon, generic network/orbit diagram, or title-card sequence. Implement the supplied story and each beat as distinct, causally meaningful visual action. " +
+        "Use different dominant silhouettes and compositions when the narration changes subject; animate actual state changes, not only decorative particles. " +
+        "Preserve offline deterministic rendering, no Math.random(), window.renderAt(seconds), window.getDuration(), and URLSearchParams(location.search).get('render') === '1'. " +
+        "Story brief:\\n" + story + "\\nVisual plan JSON:\\n" + planJson + "\\nReturn only complete HTML starting with <!doctype html>."
+      }
+    ], "scene repair");
+    const repaired = repair.replace(/^\\uFEFF/, "").replace(/^\\`\\`\\`(?:html)?\\s*/i, "").replace(/\\s*\\`\\`\\`\\s*$/, "");
+    const errors = [];
+    if (!/^<!doctype html>/i.test(repaired)) errors.push("output is not a complete HTML document");
+    if (/\\bMath\\s*\\.\\s*random\\s*\\(/.test(repaired)) errors.push("uses Math.random()");
+    if (!/window\\.renderAt\\s*=/.test(repaired)) errors.push("missing window.renderAt(seconds)");
+    if (!/window\\.getDuration\\s*=/.test(repaired)) errors.push("missing window.getDuration()");
+    if (!/URLSearchParams\\s*\\(\\s*(?:window\\.)?location\\.search\\s*\\)/.test(repaired) || !/get\\s*\\(\\s*["']render["']\\s*\\)/.test(repaired)) errors.push("missing ?render=1 render-only mode");
+    if (errors.length) throw new Error(errors.join("; "));
+    html = repaired;
+    console.log("Scene repair passed deterministic export-contract validation.");
+  } catch (repairError) {
+    const reason = [firstFailure, "repair failed: " + repairError.message].join("; ");
+    if (process.env.ALLOW_GENERIC_FALLBACK === "1") {
+      console.warn("Both model attempts failed. ALLOW_GENERIC_FALLBACK=1 is set, so compiling the generic recovery scene. Do not treat it as creative-quality approved.");
+      html = buildFallbackScene({ title, story, plan: visualPlan });
+    } else {
+      console.error("Scene generation failed after one automatic repair. Refusing to silently export a generic fallback that can look like a finished video. " + reason);
+      console.error("Fix the model/prompt issue and rerun. For diagnostic-only fallback output, explicitly set ALLOW_GENERIC_FALLBACK=1.");
+      process.exit(1);
+    }
+  }
 }
 // Bundle the optional module script so the final scene is self-contained and offline.
 const moduleScripts = [...html.matchAll(/<script\b(?=[^>]*\btype\s*=\s*["']module["'])[^>]*>([\s\S]*?)<\/script\s*>/gi)];
