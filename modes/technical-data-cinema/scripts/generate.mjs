@@ -4,9 +4,9 @@ import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 import { build } from "esbuild";
-import { buildFallbackScene } from "./fallback-scene.mjs";
 import { normalizeVisualPlan } from "./visual-plan.mjs";
-import { installDeterministicCompatibility } from "./export-compat.mjs";
+import { validateSceneSource, assertSceneCandidate } from "./scene-contract.mjs";
+import crypto from "node:crypto";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "..");
@@ -82,15 +82,20 @@ async function askOllama(messages, stage, selectedModel = model, responseFormat 
   return content;
 }
 
+const storyFingerprint = crypto.createHash("sha256").update(story).digest("hex");
 let visualPlan;
 try {
   const cached = await fs.readFile(planFile, "utf8");
   visualPlan = JSON.parse(cached);
-  if (!Array.isArray(visualPlan.beats) || visualPlan.beats.length < 4) throw new Error("cached plan must contain at least four visual beats");
-  console.log(`Reusing validated visual plan: ${planFile}`);
+  if (String(visualPlan.story_fingerprint || "") !== storyFingerprint) {
+    if (phase !== "plan") throw new Error("cached visual plan belongs to different story inputs; rerun analysis before scene generation");
+    const archivedPlan = planFile.replace(/\\.json$/i, ".stale-" + Date.now() + ".json");
+    await fs.rename(planFile, archivedPlan); visualPlan = undefined;
+    console.log(`Archived stale plan as ${archivedPlan}`);
+  } else console.log(`Reusing validated visual plan: ${planFile}`);
 } catch (error) {
-  if (error.code !== "ENOENT") {
-    console.error(`Cached visual plan is invalid at ${planFile}: ${error.message}. Remove that plan file to rebuild it.`);
+  if (error.code !== "ENOENT" && visualPlan !== undefined) {
+    console.error(`Cached visual plan is invalid at ${planFile}: ${error.message}. Review it or rerun analysis.`);
     process.exit(1);
   }
   if (phase === "scene") { console.error(`Scene-only phase requires an existing visual plan at ${planFile}. Run --phase plan first.`); process.exit(1); }
@@ -117,7 +122,7 @@ try {
     const cleanPlan = planText.replace(/^\uFEFF/, "").trim();
     const jsonText = cleanPlan.slice(cleanPlan.indexOf("{"), cleanPlan.lastIndexOf("}") + 1);
     visualPlan = JSON.parse(jsonText);
-    if (!Array.isArray(visualPlan.beats) || visualPlan.beats.length < 4) throw new Error("plan must contain at least four visual beats");
+    visualPlan.story_fingerprint = storyFingerprint;
     await fs.mkdir(path.dirname(planFile), { recursive: true });
     await fs.writeFile(planFile, JSON.stringify(visualPlan, null, 2) + String.fromCharCode(10), { flag: "wx" });
     console.log(`Saved validated visual plan: ${planFile}`);
@@ -146,15 +151,7 @@ try {
   sceneFailure = error.message || "Ollama scene generation failed";
 }
 let html = (payload || "").replace(/^\uFEFF/, "").replace(/^\`\`\`(?:html)?\s*/i, "").replace(/\s*\`\`\`\s*$/, "");
-if (/\bMath\s*\.\s*random\s*\(/.test(html) || !/URLSearchParams\s*\(\s*(?:window\.)?location\.search\s*\)/.test(html)) {
-  html=installDeterministicCompatibility(html);
-}
-const validationErrors = [];
-if (!/^<!doctype html>/i.test(html)) validationErrors.push("output is not a complete HTML document");
-if (/\bMath\s*\.\s*random\s*\(/.test(html) && !html.includes("TDC deterministic compatibility layer")) validationErrors.push("uses Math.random() without deterministic compatibility");
-if (!/window\.renderAt\s*=/.test(html)) validationErrors.push("missing window.renderAt(seconds)");
-if (!/window\.getDuration\s*=/.test(html)) validationErrors.push("missing window.getDuration()");
-if (!/URLSearchParams\s*\(\s*(?:window\.)?location\.search\s*\)/.test(html) || !/get\s*\(\s*["']render["']\s*\)/.test(html)) validationErrors.push("missing ?render=1 render-only mode");
+const validationErrors = validateSceneSource(html);
 if (!sceneFailure && validationErrors.length === 0) {
   try {
     const auditText = await askOllama([
@@ -195,27 +192,16 @@ if (validationErrors.length || sceneFailure) {
         "Story brief:\\n" + story + "\\nVisual plan JSON:\\n" + planJson + "\\nReturn only complete HTML starting with <!doctype html>."
       }
     ], "scene repair");
-    let repaired = repair.replace(/^\uFEFF/, "").replace(/^\`\`\`(?:html)?\s*/i, "").replace(/\s*\`\`\`\s*$/, "");
-    if (/\bMath\s*\.\s*random\s*\(/.test(repaired) || !/URLSearchParams\s*\(\s*(?:window\.)?location\.search\s*\)/.test(repaired)) repaired = installDeterministicCompatibility(repaired);
-    const errors = [];
-    if (!/^<!doctype html>/i.test(repaired)) errors.push("output is not a complete HTML document");
-    if (/\bMath\s*\.\s*random\s*\(/.test(repaired) && !repaired.includes("TDC deterministic compatibility layer")) errors.push("uses Math.random() without deterministic compatibility");
-    if (!/window\.renderAt\s*=/.test(repaired)) errors.push("missing window.renderAt(seconds)");
-    if (!/window\.getDuration\s*=/.test(repaired)) errors.push("missing window.getDuration()");
-    if (!/URLSearchParams\s*\(\s*(?:window\.)?location\.search\s*\)/.test(repaired) || !/get\s*\(\s*["']render["']\s*\)/.test(repaired)) errors.push("missing ?render=1 render-only mode");
+    const repaired = repair.replace(/^\uFEFF/, "").replace(/^\`\`\`(?:html)?\s*/i, "").replace(/\s*\`\`\`\s*$/, "");
+    const errors = validateSceneSource(repaired);
     if (errors.length) throw new Error(errors.join("; "));
     html = repaired;
     console.log("Scene repair passed deterministic export-contract validation.");
   } catch (repairError) {
     const reason = [firstFailure, "repair failed: " + repairError.message].join("; ");
-    if (process.env.ALLOW_GENERIC_FALLBACK === "1") {
-      console.warn("Both model attempts failed. ALLOW_GENERIC_FALLBACK=1 is set, so compiling the generic recovery scene. Do not treat it as creative-quality approved.");
-      html = buildFallbackScene({ title, story, plan: visualPlan });
-    } else {
-      console.error("Scene generation failed after one automatic repair. Refusing to silently export a generic fallback that can look like a finished video. " + reason);
-      console.error("Fix the model/prompt issue and rerun. For diagnostic-only fallback output, explicitly set ALLOW_GENERIC_FALLBACK=1.");
-      process.exit(1);
-    }
+    console.error("Scene generation failed after one targeted repair. Refusing to emit a generic substitute as a production scene. " + reason);
+    console.error("Revise the plan or retry scene generation. Existing narration/audio artifacts remain untouched.");
+    process.exit(1);
   }
 }
 // Bundle the optional module script so the final scene is self-contained and offline.
@@ -244,6 +230,10 @@ if (moduleScripts.length === 1) {
   console.error('Generated HTML imports Three.js but has no <script type="module"> block. Put imports in one module script.');
   process.exit(1);
 }
+const planFingerprint = crypto.createHash("sha256").update(JSON.stringify(visualPlan)).digest("hex");
+html = html.replace(/<head([^>]*)>/i, match => match + `<meta name="tdc-story-fingerprint" content="${storyFingerprint}"><meta name="tdc-plan-fingerprint" content="${planFingerprint}">`);
+try { await assertSceneCandidate(html); console.log("Browser render-only/seek/determinism validation passed."); }
+catch (error) { console.error(`Generated scene failed browser render-only validation: ${error.message}`); process.exit(1); }
 await fs.mkdir(path.dirname(outPath), { recursive: true });
 try { await fs.writeFile(outPath, html + "\n", { flag: "wx" }); }
 catch (error) {
