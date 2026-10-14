@@ -8,7 +8,7 @@ export function buildFallbackScene({title,story,plan}) {
  const duration=clamp(beats[beats.length-1].end,8,600);
  const json=JSON.stringify(beats).replace(/</g,"\\u003c").replace(/>/g,"\\u003e").replace(/&/g,"\\u0026");
  const safeTitle=clean(title).replace(/[&<>"]/g,"");
- return String.raw\`<!doctype html>
+ return String.raw`<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>__TITLE__</title>
 <style>
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:#07110f;font-family:Inter,ui-sans-serif,system-ui,sans-serif;overflow:hidden}
@@ -36,5 +36,5 @@ function renderAt(seconds){const t=clamp(Number(seconds)||0,0,DURATION);let i=BE
 window.renderAt=renderAt;window.getDuration=()=>DURATION;
 if(new URLSearchParams(window.location.search).get("render")!=="1")document.body.insertAdjacentHTML("beforeend",'<div style="position:fixed;bottom:12px;right:12px;color:#9bb4a7;font:12px system-ui">SAFE FALLBACK · review visuals before publishing</div>');
 renderAt(0);
-</script></body></html>\`.replace("__TITLE__",()=>safeTitle).replace("__BEATS__",()=>json).replace("__DURATION__",()=>String(duration));
+</script></body></html>`.replace("__TITLE__",()=>safeTitle).replace("__BEATS__",()=>json).replace("__DURATION__",()=>String(duration));
 }
