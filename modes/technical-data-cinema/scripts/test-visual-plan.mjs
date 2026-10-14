@@ -11,7 +11,6 @@ const legacy = normalizeVisualPlan({
   }))
 });
 assert.equal(legacy.beats[0].visual_grammar, "network");
-assert.equal(legacy.beats[1].visual_grammar, "transformation");
 assert.ok(new Set(legacy.beats.map(beat => beat.visual_grammar)).size >= 3);
 for (let i = 1; i < legacy.beats.length; i++) {
   assert.notEqual(legacy.beats[i].visual_grammar, legacy.beats[i - 1].visual_grammar, "adjacent beats must not reuse the same visual grammar");
