@@ -340,12 +340,14 @@ const server = http.createServer(async (req, res) => {
       const plannerModel = String(body.plannerModel || process.env.OLLAMA_PLANNER_MODEL || "qwen3.5:9b").trim();
       const slug = safeSlug(body.slug || title);
       const fps = Number(body.fps || 30);
+      const exportName = phase === "render" ? safeSlug(body.exportName || "") : "";
       if (!title || !story) return json(res, 400, { error: "Add a title and story brief." });
       if (!slug) return json(res, 400, { error: "The output name must contain letters or numbers." });
       if (!model) return json(res, 400, { error: "Choose an installed Ollama model." });
       if (!["generate", "wav", "silent"].includes(voiceMode)) return json(res, 400, { error: "Choose a valid voice mode." });
       if (!["all", "analysis", "scene", "render"].includes(phase)) return json(res, 400, { error: "Choose analysis, scene, render, or legacy all-in-one mode." });
       if (phase === "render" && voiceMode === "generate") return json(res, 400, { error: "Render is audio-preserving: select an existing approved WAV or silent video. Generate narration in the separate audio-only panel." });
+      if (phase === "render" && !exportName) return json(res, 400, { error: "Enter a new export filename for a retry; existing MP4s are never overwritten." });
       if (phase !== "analysis" && voiceMode === "generate" && !voiceScript) return json(res, 400, { error: "Add the narration script for Chatterbox." });
       if (phase !== "analysis" && voiceMode === "wav" && !wavPath) return json(res, 400, { error: "Enter the absolute path to an existing WAV file." });
       if (!Number.isFinite(fps) || fps < 10 || fps > 60) return json(res, 400, { error: "FPS must be between 10 and 60." });
@@ -362,12 +364,12 @@ const server = http.createServer(async (req, res) => {
           const storyPath = path.join(dir, "story.md");
           const htmlPath = path.join(dir, "index.html");
           const narrationPath = path.join(dir, "narration.md");
-          const mp4Path = path.join(dir, voiceMode === "silent" ? "final-silent.mp4" : "final.mp4");
+          const mp4Path = path.join(dir, phase === "render" ? `${exportName}${voiceMode === "silent" ? "-silent" : ""}.mp4` : (voiceMode === "silent" ? "final-silent.mp4" : "final.mp4"));
           const storyContent = `# ${title}\n\n${story}\n`;
 
           // Never overwrite a completed video. Reuse a narration WAV only when its source
           // script matches exactly; this avoids rerunning Chatterbox after a render failure.
-          for (const name of ["final.mp4", "final-silent.mp4"]) {
+          for (const name of (phase === "render" ? [path.basename(mp4Path)] : ["final.mp4", "final-silent.mp4"])) {
             try {
               await fs.access(path.join(dir, name));
               throw new Error(`Output already exists: ${path.join(dir, name)}. Choose a new output folder to preserve the previous production.`);
