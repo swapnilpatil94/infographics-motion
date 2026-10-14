@@ -692,7 +692,7 @@ function viewAudio() {
       </div>
       <div class="grid two" style="margin-top:14px;gap:12px">
         <label class="f">Performance generation
-          <select id="audio-performance"><option value="directed" ${AUD.performanceMode === "directed" ? "selected" : ""}>Directed · [HOOK], [CURIOUS], [SUSPENSE], [REVEAL], [EXPLAIN], [URGENT], [CALM]</option><option value="uniform" ${AUD.performanceMode === "uniform" ? "selected" : ""}>Uniform · one delivery across the script</option></select>
+          <select id="audio-performance"><option value="directed" ${AUD.performanceMode === "directed" ? "selected" : ""}>Directed · story delivery cues</option><option value="uniform" ${AUD.performanceMode === "uniform" ? "selected" : ""}>Uniform · one delivery across the script</option></select>
         </label>
         <label class="f">Expression intensity · <span id="audio-intensity-value">${AUD.expressionIntensity}%</span>
           <input id="audio-intensity" type="range" min="0" max="100" step="5" value="${AUD.expressionIntensity}">
@@ -700,7 +700,7 @@ function viewAudio() {
       </div>
       <div class="row" style="justify-content:flex-start;margin-top:12px"><button class="btn sm" id="audio-example">Load emotional example</button></div>
       <div class="note" style="margin-top:16px"><b>Dedicated Hindi script tips:</b> Keep Hindi in Devanagari and write for the ear, not the page. Use short, connected sentences with commas and full stops; avoid one-word fragments on separate lines. Common English tech terms are converted to Hindi spoken forms for TTS only, while your script and captions keep their original wording. For an unrecognized English name or term, use a pronunciation-friendly Devanagari form if the model says it incorrectly.</div>
-      <div class="note" style="margin-top:8px"><b>Performance cues:</b> Put [HOOK], [CURIOUS], [SUSPENSE], [REVEAL], [EXPLAIN], [URGENT], [CALM] or [DEFAULT] at the start of a line only when the delivery should change. The cue continues across following lines until the next cue. Use fewer, longer blocks for smoother continuity; cues steer settings but do not guarantee emotion.</div>
+      <div class="note" style="margin-top:8px"><b>Delivery cues:</b> Put one cue on its own line: [HOOK], [CURIOUS], [SUSPENSE], [REVEAL], [EXPLAIN], [URGENT], [CALM], [EMPHASIS], [CONFIDENT], [WARM], [CONCERNED], [SHOCKED], [REFLECTIVE], [PLAYFUL], or [DEFAULT]. It applies until the next cue. Use a few longer blocks for smoother continuity. These are app-level parameter profiles, not native Chatterbox emotion tags or guaranteed emotions; do not use Turbo-only sound tags such as [laugh] or [sigh] with the dedicated Hindi model.</div>
       <div class="note" style="margin-top:8px">Storytelling uses expressive Chatterbox settings and a slower finishing tempo. Uses production settings: <code>MYTHIC_STUDIO_DIR</code>, <code>TTS_PYTHON</code>, <code>TTS_REFERENCE_AUDIO</code>. Placeholder macOS speech is not exported as Chatterbox.</div>
       <div id="audio-error" style="margin-top:12px">${AUD.error ? errBox(AUD.error) : ""}</div>
       <div class="row" style="justify-content:center;margin-top:20px"><button class="btn primary bigbtn" id="audio-generate" ${AUD.busy ? "disabled" : ""}>${AUD.busy ? '<span class="spin"></span>Generating…' : "Generate WAV"}</button></div>
