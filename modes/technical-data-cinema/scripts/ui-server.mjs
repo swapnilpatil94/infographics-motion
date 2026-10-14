@@ -326,7 +326,7 @@ const server = http.createServer(async (req, res) => {
           else if (phase === "scene") generateArgs.push("--phase", "scene");
           if (!reuseScene) {
             try {
-              await run(node, generateArgs, root, job, "Ollama scene generation (model unload happens before narration)");
+              await run(node, generateArgs, root, job, phase === "analysis" ? "Visual analysis (model unload before next stage)" : "Ollama scene generation (model unload happens before narration)");
             } catch (error) {
               const validationFailure = /Generated HTML uses Math\.random|Generated HTML failed export validation|Model output did not start with|Ollama returned no message content/i.test(job.logs.slice(-100).join("\n"));
               if (!validationFailure) throw error;
