@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - feat/technical-data-cinema
+      - feat/visual-engine-v1
     paths:
       - "modes/technical-data-cinema/**"
       - ".github/workflows/technical-data-cinema.yml"
