@@ -19,7 +19,8 @@
     "test:visual-plan": "node scripts/test-visual-plan.mjs",
     "test:ui": "node scripts/test-ui.mjs",
     "test:export-compat": "node scripts/test-export-compat.mjs",
-    "test:scene-contract": "node scripts/test-export-compat.mjs"
+    "test:scene-contract": "node scripts/test-export-compat.mjs",
+    "test:scene-compat": "node scripts/test-scene-compat.mjs"
   },
   "dependencies": {
     "playwright": "^1.63.0",
