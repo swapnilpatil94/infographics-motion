@@ -72,7 +72,7 @@ Use illustrative values only when clearly labelled. Every particle or object mus
 <div class="foot">Yantralok · Local-only interface · Ollama + your existing Chatterbox Studio + Playwright + FFmpeg</div>
 <script>
 const $=id=>document.getElementById(id);
-let pollTimer=null,currentJob=null,knownLogs=0,analysisReady=false,pendingPhase="all";
+let pollTimer=null,currentJob=null,knownLogs=0,analysisReady=false,planDirty=false,pendingPhase="all";
 function selectedMode(){return document.querySelector('input[name="voiceMode"]:checked').value}
 function toggleVoice(){const mode=selectedMode();$("voiceScriptWrap").classList.toggle("hidden",mode!=="generate");$("wavWrap").classList.toggle("hidden",mode!=="wav");$("style").disabled=mode!=="generate"}
 document.querySelectorAll('input[name="voiceMode"]').forEach(x=>x.addEventListener("change",toggleVoice));toggleVoice();
@@ -95,18 +95,19 @@ async function poll(){if(!currentJob)return;try{const r=await fetch("/api/jobs/"
 if(j.status==="running"||j.status==="queued"){status(j.status==="queued"?"Queued":"Production running…");pollTimer=setTimeout(poll,900);return}
 $("run").disabled=false;$("analyze").disabled=false;
 if(j.status==="completed"){status("Completed successfully");$("formHint").textContent="Ready for the next stage";$("results").replaceChildren();if(j.files.plan)$("results").append(link("Open visual-plan.json",j.files.plan));if(j.files.video)$("results").append(link("▶ Open final MP4",j.files.video));if(j.files.scene)$("results").append(link("Open generated HTML scene",j.files.scene));if(j.files.audio)$("results").append(link("Open generated Chatterbox WAV",j.files.audio));
-if(j.files.plan&&j.logs.some(x=>x.includes("ANALYSIS STAGE VALIDATED"))){analysisReady=true;$("planPanel").classList.remove("hidden");try{const p=await fetch(j.files.plan);$("planEditor").value=JSON.stringify(await p.json(),null,2);$("planMessage").textContent="Review or edit the plan, then validate and save it before rendering."}catch(e){$("planMessage").textContent="Could not load plan: "+e.message}$("run").textContent="Generate scene & export video"}
+if(j.files.plan&&j.logs.some(x=>x.includes("ANALYSIS STAGE VALIDATED"))){analysisReady=true;$("planPanel").classList.remove("hidden");try{const p=await fetch(j.files.plan);$("planEditor").value=JSON.stringify(await p.json(),null,2);planDirty=false;$("planMessage").textContent="Review or edit the plan, then validate and save it before rendering."}catch(e){$("planMessage").textContent="Could not load plan: "+e.message}$("run").textContent="Generate scene & export video"}
 else if(j.files.video){analysisReady=false;$("run").textContent="Generate & export video";$("formHint").textContent="Production complete — choose a new output folder for another film"}}
 else{status("Failed");$("formHint").textContent=j.error||"See the console for details"}}
 catch(e){status("Status check failed");$("logs").textContent+="\n"+e.message;$("run").disabled=false;$("analyze").disabled=false}}
-$("form").addEventListener("submit",async e=>{e.preventDefault();if($("run").disabled)return;
+$("form").addEventListener("submit",async e=>{e.preventDefault();if($("run").disabled)return;if(analysisReady&&planDirty){alert("Validate & save your visual-plan edits before rendering.");return}
 const payload={title:$("title").value,slug:$("slug").value,story:$("story").value,model:$("model").value,fps:$("fps").value,voiceMode:selectedMode(),voiceScript:$("voiceScript").value,wavPath:$("wavPath").value,style:$("style").value,performance:$("performance").value,intensity:$("intensity").value,phase:pendingPhase!=="all"?pendingPhase:(analysisReady?"scene":"all")};pendingPhase="all";
 if(payload.voiceMode==="generate"&&!payload.voiceScript.trim()){alert("Add the narration script.");return}
 $("run").disabled=true;$("analyze").disabled=true;$("results").replaceChildren();$("logs").textContent="Submitting production…";knownLogs=0;$("formHint").textContent="Do not close this tab while the job runs";status("Submitting…");
 try{const r=await fetch("/api/run",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(payload)});const d=await r.json();if(!r.ok)throw new Error(d.error||"Could not start job");currentJob=d.id;poll()}catch(err){$("run").disabled=false;$("analyze").disabled=false;status("Could not start");$("logs").textContent=err.message}});
 $("analyze").addEventListener("click",()=>{pendingPhase="analysis";$("form").requestSubmit()});
-$("savePlan").addEventListener("click",async()=>{const b=$("savePlan");b.disabled=true;$("planMessage").textContent="Validating plan…";try{const r=await fetch("/api/plan",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({slug:$("slug").value,plan:$("planEditor").value})});const d=await r.json();if(!r.ok)throw new Error(d.error||"Plan validation failed");$("planEditor").value=JSON.stringify(d.plan,null,2);$("planMessage").textContent="Saved and validated "+d.beats+" beats. The scene step will use this plan."}catch(e){$("planMessage").textContent="Plan not saved: "+e.message}finally{b.disabled=false}});
-function invalidateAnalysis(){analysisReady=false;pendingPhase="all";$("run").textContent="Generate & export video";$("planPanel").classList.add("hidden")}
+$("savePlan").addEventListener("click",async()=>{const b=$("savePlan");b.disabled=true;$("planMessage").textContent="Validating plan…";try{const r=await fetch("/api/plan",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({slug:$("slug").value,plan:$("planEditor").value})});const d=await r.json();if(!r.ok)throw new Error(d.error||"Plan validation failed");$("planEditor").value=JSON.stringify(d.plan,null,2);planDirty=false;$("planMessage").textContent="Saved and validated "+d.beats+" beats. The scene step will use this plan."}catch(e){$("planMessage").textContent="Plan not saved: "+e.message}finally{b.disabled=false}});
+$("planEditor").addEventListener("input",()=>{if(analysisReady){planDirty=true;$("formHint").textContent="Save and validate visual-plan edits before rendering"}});
+function invalidateAnalysis(){analysisReady=false;planDirty=false;pendingPhase="all";$("run").textContent="Generate & export video";$("planPanel").classList.add("hidden")}
 loadModels();
 </script>
 </body></html>
