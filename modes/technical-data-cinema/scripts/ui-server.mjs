@@ -340,7 +340,8 @@ const server = http.createServer(async (req, res) => {
       const plannerModel = String(body.plannerModel || process.env.OLLAMA_PLANNER_MODEL || "qwen3.5:9b").trim();
       const slug = safeSlug(body.slug || title);
       const fps = Number(body.fps || 30);
-      const audioOffset = Number(body.audioOffset ?? 0);
+      const requestedAudioOffset = Number(body.audioOffset ?? 0);
+      const audioOffset = voiceMode === "generate" ? 0 : requestedAudioOffset;
       const exportName = phase === "render" ? safeSlug(body.exportName || "") : "";
       if (!title || !story) return json(res, 400, { error: "Add a title and story brief." });
       if (!slug) return json(res, 400, { error: "The output name must contain letters or numbers." });
@@ -352,7 +353,7 @@ const server = http.createServer(async (req, res) => {
       if (phase !== "analysis" && voiceMode === "generate" && !voiceScript) return json(res, 400, { error: "Add the narration script for Chatterbox." });
       if (phase !== "analysis" && voiceMode === "wav" && !wavPath) return json(res, 400, { error: "Enter the absolute path to an existing WAV file." });
       if (!Number.isFinite(fps) || fps < 10 || fps > 60) return json(res, 400, { error: "FPS must be between 10 and 60." });
-      if (!Number.isFinite(audioOffset) || audioOffset < -5 || audioOffset > 5) return json(res, 400, { error: "Audio sync offset must be between -5 and +5 seconds." });
+      if (!Number.isFinite(requestedAudioOffset) || requestedAudioOffset < -5 || requestedAudioOffset > 5) return json(res, 400, { error: "Audio sync offset must be between -5 and +5 seconds." });
       const id = crypto.randomBytes(6).toString("hex");
       const job = { id, status: "queued", logs: [], files: {}, error: null, child: null, stage: phase, stages: freshStages() };
       jobs.set(id, job);
