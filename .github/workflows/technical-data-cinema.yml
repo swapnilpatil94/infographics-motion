@@ -42,6 +42,8 @@ jobs:
           node --check scripts/fallback-scene.mjs
           node --check scripts/test-fallback-scene.mjs
           node --check scripts/test-fallback-render.mjs
+          node --check scripts/visual-plan.mjs
+          node --check scripts/test-visual-plan.mjs
           node --check scripts/test-three-bundle.mjs
           node --check scripts/build-visual-benchmark.mjs
           node --check scripts/ollama-session.mjs
@@ -50,6 +52,8 @@ jobs:
           node --check scripts/ui-server.mjs
           node --check scripts/doctor.mjs
           python3 -m py_compile ../../engine/studio/server.py ../../engine/shorts/voice.py ../../tools/chatterbox_tts.py ../../tools/whisper_align.py
+      - name: Visual plan normalization and diversity test
+        run: npm run test:visual-plan
       - name: Deterministic fallback scene contract test
         run: npm run test:fallback
       - name: Browser-level fallback scene and safe-area test
