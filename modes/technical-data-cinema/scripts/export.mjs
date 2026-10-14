@@ -15,6 +15,8 @@ function fail(message) { console.error(message); process.exit(2); }
 
 const htmlArg = arg("--html"), outArg = arg("--out");
 const audioArg = arg("--audio"), scriptArg = arg("--voice-script");
+const audioOffset = Number(arg("--audio-offset", "0"));
+if (!Number.isFinite(audioOffset) || audioOffset < -5 || audioOffset > 5) fail("--audio-offset must be between -5 and 5 seconds.");
 if (has("--help")) {
   console.log("Usage: npm run export -- --html <scene.html> --out <final.mp4> [--audio narration.wav | --voice-script narration.md] [--studio-url http://127.0.0.1:8765] [--fps 30]");
   console.log("Use --audio to mux approved narration, or --voice-script to generate it with the existing Chatterbox Studio API.");
@@ -65,6 +67,7 @@ if (scriptArg) {
   console.log(`Voice profile: ${body.voice || "configured production reference"}; duration: ${Number(body.duration || 0).toFixed(2)}s; performance: ${body.performance_mode || "directed"}`);
 }
 const renderArgs = ["scripts/render.mjs", "--html", htmlPath, "--out", outPath, "--fps", arg("--fps", "30")];
+renderArgs.push("--audio-offset", String(audioOffset));
 if (audioPath) renderArgs.push("--audio", audioPath);
 if (arg("--duration")) renderArgs.push("--duration", arg("--duration"));
 if (has("--allow-low-visual-density")) renderArgs.push("--allow-low-visual-density");
