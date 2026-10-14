@@ -26,4 +26,5 @@ assert.ok(html.includes('fetch("/api/audio"'), "audio-only UI must use its separ
 assert.ok(html.includes('value="0.8"') && html.includes('value="1.2"'), "audio UI must expose overall pace range");
 assert.ok(server.includes('url.pathname === "/api/audio"'), "server must expose separate audio-only endpoint");
 assert.ok(server.includes('atempo=') && server.includes('narration-source.wav'), "server must preserve original audio and apply pace as a separate post-process");
+assert.ok(server.includes("content-disposition") && html.includes('?download=1'), "audio downloads must be served as attachments");
 console.log("Staged UI syntax, audio-only workflow, and pace controls tests passed.");
