@@ -115,3 +115,24 @@ def test_voice_reference_activation_rejects_unknown_profile(tmp_path):
         r = client.post("/api/voice-references/000000000000/activate")
         assert r.status_code == 404
         assert r.json()["error"]["code"] == "voice_reference_not_found"
+
+
+
+def test_script_audio_expanded_delivery_cues_are_stripped_and_mapped(tmp_path):
+    import engine.studio.server as server
+    fake = {
+        "samples": np.zeros(22050, dtype=np.float32),
+        "voice": "chatterbox-hi + whisperx alignment",
+        "duration": 1.0,
+        "beats": [{"id": "n001", "text": "यह शुरुआत है।", "start": 0.0, "end": 0.9, "words": []}],
+        "placeholder": False,
+    }
+    script = "[HOOK]\nयह शुरुआत है।\n[EMPHASIS]\nयही सबसे बड़ा कारण है।\n[REFLECTIVE]\nअब सोचिए।\n[DEFAULT]\nआगे बढ़ते हैं।"
+    with patch.object(server.production_voice, "synthesize", return_value=fake) as synth, patch.object(server, "ROOT", str(tmp_path)):
+        client = TestClient(create_app(test_mode=True))
+        response = client.post("/api/audio", json={"text": script, "performance_mode": "directed"})
+        assert response.status_code == 200, response.text
+        beats = synth.call_args.args[0]
+        assert [b["performance"] for b in beats] == ["hook", "hook", "emphasis", "emphasis", "reflective", "reflective", "default", "default"]
+        assert all("[" not in b["text"] and "]" not in b["text"] for b in beats)
+        assert synth.call_args.kwargs["performance_mode"] is True
