@@ -44,7 +44,7 @@ try {
   assert.equal(contract.renderAt, "function");
   assert.equal(contract.getDuration, "function");
   assert.equal(contract.duration, 21);
-  const artHashes = new Set();
+  const artHashes = new Set();\n  const sceneTypes = new Set();
   for (let i = 0; i < grammars.length; i++) {
     await page.evaluate(t => window.renderAt(t), i * 3 + 1.25);
     const state = await page.evaluate(() => {
@@ -54,12 +54,12 @@ try {
         return { id, x: box.x, y: box.y, right: box.x + box.width, bottom: box.y + box.height };
       });
       return {
-        art: document.getElementById("sceneArt").innerHTML,
+        art: document.getElementById("sceneArt").innerHTML,\n        sceneType: document.getElementById("sceneArt").getAttribute("data-scene"),
         bounds,
         text: document.getElementById("headline").textContent
       };
     });
-    artHashes.add(crypto.createHash("sha256").update(state.art).digest("hex"));
+    artHashes.add(crypto.createHash("sha256").update(state.art).digest("hex"));\n    sceneTypes.add(state.sceneType);
     for (const b of state.bounds) {
       assert.ok(b.x >= 0 && b.y >= 0, b.id + " starts outside the frame: " + JSON.stringify(b));
       assert.ok(b.right <= 1005, b.id + " overflows the right safe area: " + JSON.stringify(b));
@@ -67,7 +67,7 @@ try {
     }
     assert.ok(state.text.length > 0, "headline must not be empty");
   }
-  assert.equal(artHashes.size, grammars.length, "each planned grammar must compile to a different artwork composition");
+  assert.equal(artHashes.size, grammars.length, "each planned grammar must compile to different artwork");\n  assert.equal(sceneTypes.size, grammars.length, "each planned grammar must select a distinct semantic scene component");
   assert.deepEqual(errors, [], "fallback must not throw browser errors");
   await page.evaluate(() => window.renderAt(0));
   const first = await page.screenshot({ type: "png" });
