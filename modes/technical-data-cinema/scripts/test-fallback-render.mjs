@@ -61,7 +61,8 @@ try {
         text: document.getElementById("headline").textContent
       };
     });
-    artHashes.add(crypto.createHash("sha256").update(state.art).digest("hex"));\n    sceneTypes.add(state.sceneType);
+    artHashes.add(crypto.createHash("sha256").update(state.art).digest("hex"));
+    sceneTypes.add(state.sceneType);
     for (const b of state.bounds) {
       assert.ok(b.x >= 0 && b.y >= 0, b.id + " starts outside the frame: " + JSON.stringify(b));
       assert.ok(b.right <= 1005, b.id + " overflows the right safe area: " + JSON.stringify(b));
@@ -69,7 +70,8 @@ try {
     }
     assert.ok(state.text.length > 0, "headline must not be empty");
   }
-  assert.equal(artHashes.size, grammars.length, "each planned grammar must compile to different artwork");\n  assert.equal(sceneTypes.size, grammars.length, "each planned grammar must select a distinct semantic scene component");
+  assert.equal(artHashes.size, grammars.length, "each planned grammar must compile to different artwork");
+  assert.equal(sceneTypes.size, grammars.length, "each planned grammar must select a distinct semantic scene component");
   assert.deepEqual(errors, [], "fallback must not throw browser errors");
   await page.evaluate(() => window.renderAt(0));
   const first = await page.screenshot({ type: "png" });
