@@ -45,6 +45,8 @@ jobs:
           node --check scripts/visual-plan.mjs
           node --check scripts/test-visual-plan.mjs
           node --check scripts/test-ui.mjs
+          node --check scripts/export-compat.mjs
+          node --check scripts/test-export-compat.mjs
           node --check scripts/test-three-bundle.mjs
           node --check scripts/build-visual-benchmark.mjs
           node --check scripts/ollama-session.mjs
@@ -57,6 +59,8 @@ jobs:
         run: npm run test:visual-plan
       - name: Staged UI syntax and workflow contract test
         run: npm run test:ui
+      - name: Deterministic export compatibility test
+        run: npm run test:export-compat
       - name: Deterministic fallback scene contract test
         run: npm run test:fallback
       - name: Browser-level fallback scene and safe-area test
