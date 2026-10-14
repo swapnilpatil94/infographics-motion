@@ -40,6 +40,7 @@ jobs:
           node --check scripts/generate.mjs
           node --check scripts/fallback-scene.mjs
           node --check scripts/test-fallback-scene.mjs
+          node --check scripts/test-fallback-render.mjs
           node --check scripts/test-three-bundle.mjs
           node --check scripts/build-visual-benchmark.mjs
           node --check scripts/ollama-session.mjs
@@ -50,6 +51,8 @@ jobs:
           python3 -m py_compile ../../engine/studio/server.py ../../engine/shorts/voice.py ../../tools/chatterbox_tts.py ../../tools/whisper_align.py
       - name: Deterministic fallback scene contract test
         run: npm run test:fallback
+      - name: Browser-level fallback scene and safe-area test
+        run: npm run test:fallback:render
       - name: Three.js offline bundle and deterministic render test
         run: npm run test:three
       - name: Render deterministic smoke test
