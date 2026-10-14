@@ -1,29 +1,11 @@
 import assert from "node:assert/strict";
-import { normalizeVisualPlan } from "./visual-plan.mjs";
-
-const legacy = normalizeVisualPlan({
-  visual_thesis: "The same system changes over time",
-  beats: Array.from({ length: 7 }, (_, i) => ({
-    start: i * 4, end: (i + 1) * 4,
-    visual_grammar: i % 2 ? "three_d_mechanism" : "dot_silhouette",
-    narration_idea: "Beat " + i,
-    dominant_subject: "System"
-  }))
-});
-assert.equal(legacy.beats[0].visual_grammar, "network");
-assert.ok(new Set(legacy.beats.map(beat => beat.visual_grammar)).size >= 3);
-for (let i = 1; i < legacy.beats.length; i++) {
-  assert.notEqual(legacy.beats[i].visual_grammar, legacy.beats[i - 1].visual_grammar, "adjacent beats must not reuse the same visual grammar");
-}
-const supported = normalizeVisualPlan({
-  beats: [
-    { visual_grammar: "particle_flow" },
-    { visual_grammar: "particle_flow", dominant_subject: "Before after comparison" },
-    { visual_grammar: "particle_flow", dominant_subject: "Timeline escalation" },
-    { visual_grammar: "particle_flow", dominant_subject: "Scale imbalance" },
-    { visual_grammar: "particle_flow", dominant_subject: "Layered hidden incentive" }
-  ]
-});
-assert.ok(new Set(supported.beats.map(beat => beat.visual_grammar)).size >= 3);
-assert.throws(() => normalizeVisualPlan({ beats: [] }), /at least four beats/);
-console.log("Visual plan grammar normalization tests passed.");
+import { normalizeVisualPlan, validateVisualPlan } from "./visual-plan.mjs";
+const beat=(start,end,grammar,subject,composition)=>({start,end,visual_grammar:grammar,narration_idea:"Explain "+subject,viewer_takeaway:"Understand "+subject,dominant_subject:subject,action_and_causal_proof:subject+" changes because of a visible cause",composition,camera:"slow purposeful push-in",transition:"transform into the next beat",implementation_notes:"render before and after from absolute time"});
+const plan={visual_thesis:"A viral surge overwhelms finite service capacity",visual_signature:["crowd becomes requests","queue visibly accumulates","cache diverts repeated hits"],ending_image:"The overloaded queue resolves into a controlled flow",story_fingerprint:"a".repeat(64),beats:[beat(0,3,"scale","viral crowd","giant crowd fills frame"),beat(3,7,"network","request branching","one source branches into three paths"),beat(7,11,"particle_flow","backend queue","side-on growing queue"),beat(11,15,"timeline","late capacity","capacity blocks arrive on timeline"),beat(15,19,"transformation","cache intervention","requests divert to edge cache")]};
+assert.equal(validateVisualPlan(plan,{requireFingerprint:true}).beats,5);
+assert.equal(normalizeVisualPlan(plan).beats[0].visual_grammar,"scale");
+assert.throws(()=>validateVisualPlan({...plan,beats:plan.beats.slice(0,3)}),/at least four beats/);
+assert.throws(()=>validateVisualPlan({...plan,beats:plan.beats.map((b,i)=>i===2?{...b,start:b.start+2}:b)}),/gap/);
+assert.throws(()=>validateVisualPlan({...plan,beats:plan.beats.map((b,i)=>i===1?{...b,dominant_subject:plan.beats[0].dominant_subject,composition:plan.beats[0].composition}:b)}),/repeat/);
+assert.throws(()=>validateVisualPlan({...plan,story_fingerprint:""},{requireFingerprint:true}),/story_fingerprint/);
+console.log("Visual plan schema, coverage, fingerprint and diversity checks passed.");
