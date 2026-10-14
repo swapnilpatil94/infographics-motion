@@ -340,6 +340,7 @@ const server = http.createServer(async (req, res) => {
       const plannerModel = String(body.plannerModel || process.env.OLLAMA_PLANNER_MODEL || "qwen3.5:9b").trim();
       const slug = safeSlug(body.slug || title);
       const fps = Number(body.fps || 30);
+      const audioOffset = Number(body.audioOffset ?? 0);
       const exportName = phase === "render" ? safeSlug(body.exportName || "") : "";
       if (!title || !story) return json(res, 400, { error: "Add a title and story brief." });
       if (!slug) return json(res, 400, { error: "The output name must contain letters or numbers." });
@@ -351,6 +352,7 @@ const server = http.createServer(async (req, res) => {
       if (phase !== "analysis" && voiceMode === "generate" && !voiceScript) return json(res, 400, { error: "Add the narration script for Chatterbox." });
       if (phase !== "analysis" && voiceMode === "wav" && !wavPath) return json(res, 400, { error: "Enter the absolute path to an existing WAV file." });
       if (!Number.isFinite(fps) || fps < 10 || fps > 60) return json(res, 400, { error: "FPS must be between 10 and 60." });
+      if (!Number.isFinite(audioOffset) || audioOffset < -5 || audioOffset > 5) return json(res, 400, { error: "Audio sync offset must be between -5 and +5 seconds." });
       const id = crypto.randomBytes(6).toString("hex");
       const job = { id, status: "queued", logs: [], files: {}, error: null, child: null, stage: phase, stages: freshStages() };
       jobs.set(id, job);
@@ -478,13 +480,13 @@ const server = http.createServer(async (req, res) => {
             job.status = "completed"; log(job, "SCENE STAGE VALIDATED. Rendering and narration were not started."); return;
           }
           if (phase === "render") {
-            if (voiceMode === "wav") await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--audio", path.resolve(wavPath), "--fps", String(fps)], root, job, "Render and QC with approved existing WAV");
-            else await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--fps", String(fps)], root, job, "Render and QC silent video");
+            if (voiceMode === "wav") await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--audio", path.resolve(wavPath), "--fps", String(fps), "--audio-offset", String(audioOffset)], root, job, "Render and QC with approved existing WAV");
+            else await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--fps", String(fps), "--audio-offset", String(audioOffset)], root, job, "Render and QC silent video");
             setStage(job, "render", "passed"); setStage(job, "videoQc", "passed"); setStage(job, "export", "passed");
           } else if (voiceMode === "generate") {
             if (reuseNarration) {
               try {
-                await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--audio", finalWavPath, "--fps", String(fps)], root, job, "Render with reused narration WAV");
+                await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--audio", finalWavPath, "--fps", String(fps), "--audio-offset", String(audioOffset)], root, job, "Render with reused narration WAV");
               } catch (error) {
                 const recentLogs = job.logs.slice(-100);
                 const deterministicFailure = recentLogs.some(line => line.includes("Determinism check failed"));
@@ -530,11 +532,11 @@ const server = http.createServer(async (req, res) => {
                 log(job, "Visual QA failed after narration was saved; repairing only the scene and reusing final.narration.wav unchanged.");
                 await runSceneRepair(node, generateArgs, repairNote, root, job, "Repair scene with preserved Chatterbox narration");
                 if (endingFailure) await retryExportWithEndingRepair(node, generateArgs, htmlPath, mp4Path, finalWavPath, fps, dir, root, job);
-                else await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--audio", finalWavPath, "--fps", String(fps)], root, job, "Render repaired scene with preserved narration WAV");
+                else await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--audio", finalWavPath, "--fps", String(fps), "--audio-offset", String(audioOffset)], root, job, "Render repaired scene with preserved narration WAV");
               }
             }
           } else if (voiceMode === "wav") {
-            const wavExportArgs = ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--audio", path.resolve(wavPath), "--fps", String(fps)];
+            const wavExportArgs = ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--audio", path.resolve(wavPath), "--fps", String(fps), "--audio-offset", String(audioOffset)];
             try {
               await run(node, wavExportArgs, root, job, "Render with existing WAV narration");
             } catch (error) {
@@ -559,7 +561,7 @@ const server = http.createServer(async (req, res) => {
               await run(node, wavExportArgs, root, job, "Render repaired scene with the same WAV narration");
             }
           } else {
-            await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--fps", String(fps)], root, job, "Silent video render");
+            await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--fps", String(fps), "--audio-offset", String(audioOffset)], root, job, "Silent video render");
           }
           if (phase === "all") { setStage(job, "scene", "passed"); setStage(job, "sceneValidation", "passed"); setStage(job, "audio", voiceMode === "generate" ? "passed" : "skipped"); setStage(job, "render", "passed"); setStage(job, "videoQc", "passed"); setStage(job, "export", "passed"); }
           job.files = {
