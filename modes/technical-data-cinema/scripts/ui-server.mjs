@@ -240,8 +240,19 @@ const server = http.createServer(async (req, res) => {
       const dir = path.join(outputRoot, slug);
       try { await fs.access(path.join(dir, "story.md")); }
       catch { return json(res, 404, { error: "Analyze this story first; no matching project folder exists." }); }
+      for (const videoName of ["final.mp4", "final-silent.mp4"]) {
+        try { await fs.access(path.join(dir, videoName)); return json(res, 409, { error: "This project already has a final video. Use a new output folder for a new render." }); }
+        catch (error) { if (error.code !== "ENOENT") throw error; }
+      }
       await fs.writeFile(path.join(dir, "visual-plan.json"), JSON.stringify(plan, null, 2) + "\n", "utf8");
-      return json(res, 200, { ok: true, beats: plan.beats.length, plan });
+      let archivedScene = null;
+      try {
+        const scenePath = path.join(dir, "index.html");
+        archivedScene = path.join(dir, `index.stale-plan-${Date.now()}.html`);
+        await fs.rename(scenePath, archivedScene);
+        archivedScene = path.basename(archivedScene);
+      } catch (error) { if (error.code === "ENOENT") archivedScene = null; else throw error; }
+      return json(res, 200, { ok: true, beats: plan.beats.length, plan, archivedScene });
     }
     if (req.method === "POST" && url.pathname === "/api/run") {
       if (activeJob) return json(res, 409, { error: "A job is already running. Wait for it to finish before starting another model." });
