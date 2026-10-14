@@ -10,7 +10,7 @@ Return ONE valid JSON object only. No Markdown fences, no commentary. Schema:
       "end": 4,
       "narration_idea": "what is being explained",
       "viewer_takeaway": "what the viewer should understand",
-      "visual_grammar": "dot_silhouette | hand_drawn_sketch | particle_flow | 2d_diagram | three_d_mechanism | chart | transformation | split_comparison",
+      "visual_grammar": "network | particle_flow | split_comparison | timeline | scale | layered_system | transformation",
       "dominant_subject": "recognisable large object/system",
       "action_and_causal_proof": "what visibly changes and proves the idea",
       "composition": "foreground/midground/background, scale and screen placement",
@@ -37,3 +37,16 @@ Rules:
 - Camera movement must be purposeful and bounded. All output must be implementable with deterministic time-based rendering and no external assets/network calls.
 - Keep captions concise and readable on a 9:16 phone screen.
 - The plan is a blueprint for the next coding pass, not generic advice. Use concrete object names, movement, framing, and implementation details.
+
+
+FALLBACK-SAFE GRAMMAR VOCABULARY
+Use exactly one of these seven visual_grammar values so the deterministic recovery renderer can preserve scene diversity when the coding model fails:
+- network: connected entities, branching relationships, topology or ecosystem
+- particle_flow: a source, directional paths, queue, pipeline or bottleneck
+- split_comparison: before/after, competing options, contrast or trade-off
+- timeline: causal sequence, escalation, history or delayed response
+- scale: imbalance, leverage, concentration, relative size or amplification
+- layered_system: hidden causes, incentives, dependencies or stacked mechanisms
+- transformation: state change, reveal, conversion or a physical mechanism
+
+Do not invent new grammar names. Choose the grammar based on the explanatory job, not on visual decoration. Across a suitable 40+ second story, use at least three different grammars; do not repeat the same grammar in adjacent beats unless the visual action and composition clearly transform.
