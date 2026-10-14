@@ -304,7 +304,7 @@ const server = http.createServer(async (req, res) => {
             reuseNarration = true;
             log(job, "Reusing the existing narration WAV; Chatterbox will not run again.");
           } catch (error) {
-            if (error.code !== "ENOENT") throw error;
+            if (phase !== "analysis" && error.code !== "ENOENT") throw error;
           }
 
           let reuseScene = false;
@@ -359,12 +359,18 @@ const server = http.createServer(async (req, res) => {
                 const recentLogs = job.logs.slice(-100);
                 const deterministicFailure = recentLogs.some(line => line.includes("Determinism check failed"));
                 const endingFailure = recentLogs.some(line => line.includes("Visual ending check failed"));
-                if (!deterministicFailure && !endingFailure) throw error;
+                const densityFailure = recentLogs.some(line => line.includes("Visual density QA failed"));
+                const offlineFailure = recentLogs.some(line => line.includes("Offline policy failed") || line.includes("Browser errors detected"));
+                if (!deterministicFailure && !endingFailure && !densityFailure && !offlineFailure) throw error;
                 const archivedScene = path.join(dir, `index.failed-${Date.now()}.html`);
                 await fs.rename(htmlPath, archivedScene);
-                const repairNote = endingFailure
-                  ? "The previous export failed visual-ending QA: its final frames were pixel-identical for more than 2.5 seconds. Redesign the final 5 seconds: keep meaningful narration-synchronized motion through the last explanatory beat, then resolve into a takeaway only in the final 1.5–2.5 seconds. Do not stretch or freeze an end card; keep deterministic renderAt(seconds) behavior."
-                  : "The previous export failed determinism QA. Ensure every visual property is derived from absolute timestamp and renderAt(t) resets the full scene state.";
+                const repairNote = densityFailure
+                  ? "VISUAL DENSITY REPAIR: sampled frames are too sparse. Enlarge the dominant story-specific action; preserve deterministic seeking, offline behavior and the export contract."
+                  : endingFailure
+                    ? "The previous export failed visual-ending QA. Keep meaningful narration-synchronized motion through the last explanatory beat, then resolve into a takeaway only in the final 1.5–2.5 seconds. Do not freeze an end card."
+                    : offlineFailure
+                      ? "OFFLINE / RUNTIME REPAIR: fix browser errors or external requests without changing the story. Keep the scene self-contained and deterministic."
+                      : "DETERMINISM REPAIR: derive every visual property from absolute time and reset the full scene state in renderAt(t).";
                 log(job, `${endingFailure ? "Visual ending" : "Determinism"} QA failed; archived scene as ${path.basename(archivedScene)} and attempting one targeted scene repair while preserving narration.`);
                 await runSceneRepair(node, generateArgs, repairNote, root, job, endingFailure ? "Repair frozen visual ending" : "Regenerate nondeterministic scene");
                 await retryExportWithEndingRepair(node, generateArgs, htmlPath, mp4Path, finalWavPath, fps, dir, root, job);
@@ -374,14 +380,27 @@ const server = http.createServer(async (req, res) => {
               try {
                 await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--voice-script", narrationPath, "--fps", String(fps), "--style", String(body.style || "storytelling"), "--performance", String(body.performance || "directed"), "--expression-intensity", String(body.intensity ?? 65)], root, job, "Chatterbox narration, then video render");
               } catch (error) {
-                const endingFailure = job.logs.slice(-100).some(line => line.includes("Visual ending check failed"));
-                if (!endingFailure) throw error;
+                const recent = job.logs.slice(-120).join("\n");
+                const endingFailure = recent.includes("Visual ending check failed");
+                const densityFailure = recent.includes("Visual density QA failed");
+                const deterministicFailure = recent.includes("Determinism check failed");
+                const offlineFailure = recent.includes("Offline policy failed") || recent.includes("Browser errors detected");
+                if (!endingFailure && !densityFailure && !deterministicFailure && !offlineFailure) throw error;
+                try { await fs.access(finalWavPath); }
+                catch { throw new Error("Visual export failed before narration was saved; Chatterbox will not be rerun by this visual repair."); }
                 const archivedScene = path.join(dir, `index.failed-${Date.now()}.html`);
                 await fs.rename(htmlPath, archivedScene);
-                const repairNote = "The previous export failed visual-ending QA: its final frames were pixel-identical for more than 2.5 seconds. Redesign the final 5 seconds: keep meaningful narration-synchronized motion through the last explanatory beat, then resolve into a takeaway only in the final 1.5–2.5 seconds. Do not stretch or freeze an end card; keep deterministic renderAt(seconds) behavior.";
-                log(job, `Visual ending QA failed; archived scene as ${path.basename(archivedScene)} and attempting one targeted scene repair while preserving the generated narration WAV.`);
-                await runSceneRepair(node, generateArgs, repairNote, root, job, "Repair frozen visual ending");
-                await retryExportWithEndingRepair(node, generateArgs, htmlPath, mp4Path, finalWavPath, fps, dir, root, job);
+                const repairNote = densityFailure
+                  ? "VISUAL DENSITY REPAIR: sampled frames are too sparse. Enlarge the dominant story-specific action and use the vertical frame intentionally; preserve the story, deterministic export contract and offline policy."
+                  : endingFailure
+                    ? "VISUAL ENDING REPAIR: keep meaningful causal action through the last explanatory beat; resolve into the takeaway only in the final 1.5–2.5 seconds. No frozen end card."
+                    : deterministicFailure
+                      ? "DETERMINISM REPAIR: reset visible state in renderAt(t) and derive every property from absolute time."
+                      : "OFFLINE / RUNTIME REPAIR: fix browser errors or external requests while preserving story-specific visuals and deterministic rendering."; 
+                log(job, "Visual QA failed after narration was saved; repairing only the scene and reusing final.narration.wav unchanged.");
+                await runSceneRepair(node, generateArgs, repairNote, root, job, "Repair scene with preserved Chatterbox narration");
+                if (endingFailure) await retryExportWithEndingRepair(node, generateArgs, htmlPath, mp4Path, finalWavPath, fps, dir, root, job);
+                else await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--audio", finalWavPath, "--fps", String(fps)], root, job, "Render repaired scene with preserved narration WAV");
               }
             }
           } else if (voiceMode === "wav") {
