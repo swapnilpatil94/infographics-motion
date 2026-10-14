@@ -5,6 +5,7 @@ import process from "node:process";
 import { fileURLToPath } from "node:url";
 import { build } from "esbuild";
 import { buildFallbackScene } from "./fallback-scene.mjs";
+import { normalizeVisualPlan } from "./visual-plan.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "..");
@@ -120,6 +121,12 @@ try {
     console.error(`Visual Director returned an invalid plan: ${error.message}. No HTML was written. The planner now uses Ollama JSON mode; if this persists, remove any partial plan file and retry.`);
     process.exit(1);
   }
+}
+const originalPlan = JSON.stringify(visualPlan);
+visualPlan = normalizeVisualPlan(visualPlan);
+if (JSON.stringify(visualPlan) !== originalPlan) {
+  console.warn("Normalized legacy or repetitive visual grammars to keep adjacent scenes visually distinct.");
+  await fs.writeFile(planFile, JSON.stringify(visualPlan, null, 2) + String.fromCharCode(10));
 }
 const planJson = JSON.stringify(visualPlan, null, 2);
 console.log(`Visual Director planned ${visualPlan.beats.length} beats; generating the animated scene...`);
