@@ -83,7 +83,7 @@ async function runSceneRepair(node, generateArgs, repairNote, cwd, job, label) {
     return;
   } catch (error) {
     const primaryLogs = job.logs.slice(logStart).join("\n");
-    const modelOutputInvalid = /Generated HTML failed export validation|Model output did not start with|Ollama returned no message content|Generated HTML uses Math\.random/i.test(primaryLogs);
+    const modelOutputInvalid = /Generated scene failed browser render-only validation|Generated HTML failed export validation|Model output did not start with|Ollama returned no message content|Math\.random\(\), forbidden|missing native \?render=1 render-only mode/i.test(primaryLogs);
     if (!modelOutputInvalid) throw error;
 
     const installedModels = await getModels();
@@ -122,8 +122,10 @@ async function runSceneRepair(node, generateArgs, repairNote, cwd, job, label) {
 }
 
 function summarizeSceneFailure(logText) {
-  if (/Ollama returned no message content/i.test(logText)) return "Ollama returned an empty response";
-  if (/Generated HTML uses Math\.random/i.test(logText)) return "generated HTML uses Math.random(), which is forbidden for deterministic rendering";
+  if (/Ollama returned no (?:message )?content/i.test(logText)) return "Ollama returned an empty response";
+  if (/Math\.random\(\), forbidden/i.test(logText)) return "generated HTML uses Math.random(), forbidden for deterministic rendering";
+  const browserFailure = logText.match(/Generated scene failed browser render-only validation: ([^\n]+)/i);
+  if (browserFailure) return browserFailure[1];
   const missing = logText.match(/Generated HTML failed export validation: missing ([^\n.]+)/i);
   if (missing) return `export contract is missing ${missing[1]}`;
   if (/Model output did not start with <!doctype html>/i.test(logText)) return "model output is not a complete HTML document";
@@ -446,7 +448,7 @@ const server = http.createServer(async (req, res) => {
             try {
               await run(node, generateArgs, root, job, "Ollama scene generation (model unload after scene generation)");
             } catch (error) {
-              const validationFailure = /Generated HTML uses Math\.random|Generated HTML failed export validation|Model output did not start with|Ollama returned no message content/i.test(job.logs.slice(-100).join("\n"));
+              const validationFailure = /Generated scene failed browser render-only validation|Generated HTML failed export validation|Model output did not start with|Ollama returned no message content|Math\.random\(\), forbidden|missing native \?render=1 render-only mode/i.test(job.logs.slice(-100).join("\n"));
               if (!validationFailure) throw error;
               const archivedScene = path.join(dir, `index.invalid-${Date.now()}.log.html`);
               // generate.mjs validates before writing, but preserve any unexpected partial artifact safely.

@@ -4,7 +4,7 @@ import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 import { build } from "esbuild";
-import { normalizeVisualPlan } from "./visual-plan.mjs";
+import { normalizeVisualPlan, validateVisualPlan } from "./visual-plan.mjs";
 import { validateSceneSource, assertSceneCandidate } from "./scene-contract.mjs";
 import crypto from "node:crypto";
 
@@ -123,6 +123,8 @@ try {
     const jsonText = cleanPlan.slice(cleanPlan.indexOf("{"), cleanPlan.lastIndexOf("}") + 1);
     visualPlan = JSON.parse(jsonText);
     visualPlan.story_fingerprint = storyFingerprint;
+    visualPlan = normalizeVisualPlan(visualPlan);
+    validateVisualPlan(visualPlan, { requireFingerprint: true });
     await fs.mkdir(path.dirname(planFile), { recursive: true });
     await fs.writeFile(planFile, JSON.stringify(visualPlan, null, 2) + String.fromCharCode(10), { flag: "wx" });
     console.log(`Saved validated visual plan: ${planFile}`);
@@ -131,12 +133,8 @@ try {
     process.exit(1);
   }
 }
-const originalPlan = JSON.stringify(visualPlan);
 visualPlan = normalizeVisualPlan(visualPlan);
-if (JSON.stringify(visualPlan) !== originalPlan) {
-  console.warn("Normalized legacy or repetitive visual grammars to keep adjacent scenes visually distinct.");
-  await fs.writeFile(planFile, JSON.stringify(visualPlan, null, 2) + String.fromCharCode(10));
-}
+validateVisualPlan(visualPlan, { requireFingerprint: true });
 if (phase === "plan") { console.log(`ANALYSIS VALIDATED: ${visualPlan.beats.length} beats saved to ${planFile}`); process.exit(0); }
 const planJson = JSON.stringify(visualPlan, null, 2);
 console.log(`Visual Director planned ${visualPlan.beats.length} beats; generating the animated scene...`);
