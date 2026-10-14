@@ -11,7 +11,7 @@ const args = process.argv.slice(2);
 function arg(name, fallback) { const i = args.indexOf(name); return i >= 0 ? args[i + 1] : fallback; }
 function fail(message) { console.error(message); process.exit(2); }
 const htmlArg = arg("--html"), outArg = arg("--out");
-if (!htmlArg || !outArg) fail("Usage: node scripts/render.mjs --html <index.html> --out <final.mp4> [--audio narration.wav] [--fps 30] [--duration seconds]");
+if (!htmlArg || !outArg) fail("Usage: node scripts/render.mjs --html <index.html> --out <final.mp4> [--audio narration.wav] [--audio-offset seconds] [--fps 30] [--duration seconds]");
 const htmlPath = path.resolve(process.cwd(), htmlArg);
 const outPath = path.resolve(process.cwd(), outArg);
 const audioPath = arg("--audio") ? path.resolve(process.cwd(), arg("--audio")) : null;
@@ -64,7 +64,7 @@ try {
     fail("HTML must define window.renderAt(seconds) and window.getDuration() returning a positive duration.");
   }
   if (contract.duration > 600) fail("Scene duration must not exceed 600 seconds.");
-  duration = forcedDuration ?? Math.max(contract.duration, audioDuration + audioOffset);
+  duration = forcedDuration ?? Math.max(contract.duration, audioPath ? audioDuration + audioOffset : 0);
   if (duration > 600) fail("Final duration must not exceed 600 seconds.");
   frameCount = Math.ceil(duration * fps);
 
