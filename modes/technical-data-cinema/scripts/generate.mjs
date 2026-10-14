@@ -203,7 +203,8 @@ if (validationErrors.length || sceneFailure) {
         "Story brief:\\n" + story + "\\nVisual plan JSON:\\n" + planJson + "\\nReturn only complete HTML starting with <!doctype html>."
       }
     ], "scene repair");
-    const repaired = repair.replace(/^\uFEFF/, "").replace(/^\`\`\`(?:html)?\s*/i, "").replace(/\s*\`\`\`\s*$/, "");
+    let repaired = repair.replace(/^\uFEFF/, "").replace(/^\`\`\`(?:html)?\s*/i, "").replace(/\s*\`\`\`\s*$/, "");
+    if (/\bMath\s*\.\s*random\s*\(/.test(repaired) || !/URLSearchParams\s*\(\s*(?:window\.)?location\.search\s*\)/.test(repaired)) repaired = installDeterministicCompatibility(repaired);
     const errors = [];
     if (!/^<!doctype html>/i.test(repaired)) errors.push("output is not a complete HTML document");
     if (/\bMath\s*\.\s*random\s*\(/.test(repaired) && !repaired.includes("TDC deterministic compatibility layer")) errors.push("uses Math.random() without deterministic compatibility");
