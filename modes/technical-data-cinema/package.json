@@ -14,7 +14,8 @@
     "ui": "node scripts/ui-server.mjs",
     "test:three": "node scripts/test-three-bundle.mjs",
     "test:fallback": "node scripts/test-fallback-scene.mjs",
-    "test:visual-benchmark": "node scripts/build-visual-benchmark.mjs"
+    "test:visual-benchmark": "node scripts/build-visual-benchmark.mjs",
+    "test:fallback:render": "node scripts/test-fallback-render.mjs"
   },
   "dependencies": {
     "playwright": "^1.63.0",
