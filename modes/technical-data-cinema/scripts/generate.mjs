@@ -161,13 +161,13 @@ if (validationErrors.length || sceneFailure) {
         "Story brief:\\n" + story + "\\nVisual plan JSON:\\n" + planJson + "\\nReturn only complete HTML starting with <!doctype html>."
       }
     ], "scene repair");
-    const repaired = repair.replace(/^\\uFEFF/, "").replace(/^\\`\\`\\`(?:html)?\\s*/i, "").replace(/\\s*\\`\\`\\`\\s*$/, "");
+    const repaired = repair.replace(/^\uFEFF/, "").replace(/^\`\`\`(?:html)?\s*/i, "").replace(/\s*\`\`\`\s*$/, "");
     const errors = [];
     if (!/^<!doctype html>/i.test(repaired)) errors.push("output is not a complete HTML document");
-    if (/\\bMath\\s*\\.\\s*random\\s*\\(/.test(repaired)) errors.push("uses Math.random()");
-    if (!/window\\.renderAt\\s*=/.test(repaired)) errors.push("missing window.renderAt(seconds)");
-    if (!/window\\.getDuration\\s*=/.test(repaired)) errors.push("missing window.getDuration()");
-    if (!/URLSearchParams\\s*\\(\\s*(?:window\\.)?location\\.search\\s*\\)/.test(repaired) || !/get\\s*\\(\\s*["']render["']\\s*\\)/.test(repaired)) errors.push("missing ?render=1 render-only mode");
+    if (/\bMath\s*\.\s*random\s*\(/.test(repaired)) errors.push("uses Math.random()");
+    if (!/window\.renderAt\s*=/.test(repaired)) errors.push("missing window.renderAt(seconds)");
+    if (!/window\.getDuration\s*=/.test(repaired)) errors.push("missing window.getDuration()");
+    if (!/URLSearchParams\s*\(\s*(?:window\.)?location\.search\s*\)/.test(repaired) || !/get\s*\(\s*["']render["']\s*\)/.test(repaired)) errors.push("missing ?render=1 render-only mode");
     if (errors.length) throw new Error(errors.join("; "));
     html = repaired;
     console.log("Scene repair passed deterministic export-contract validation.");
