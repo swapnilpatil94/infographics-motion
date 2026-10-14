@@ -233,7 +233,7 @@ def main() -> int:
         if not segment_text:
             continue
         performance = str(segment.get("performance") or "default").lower() if performance_mode else "default"
-        if performance not in {"hook", "curious", "suspense", "reveal", "explain", "urgent", "calm", "default"}:
+        if performance not in {"hook", "curious", "suspense", "reveal", "explain", "urgent", "calm", "emphasis", "confident", "warm", "concerned", "shocked", "reflective", "playful", "default"}:
             performance = "default"
         word_count = max(len(segment_text.split()), 1)
         # Keep neighboring narration cues in the same take unless a safe chunk
@@ -250,8 +250,9 @@ def main() -> int:
     if current:
         groups.append((current, current_performance))
 
-    # These are targets, not magical emotion labels: they only adjust controls the
-    # installed Chatterbox model already supports. The reference voice still matters.
+    # These are app-level delivery profiles, NOT native emotion tokens or guarantees.
+    # They only blend controls supported by the installed multilingual/dedicated-Hindi
+    # Chatterbox architecture. Voice reference, text, and context still dominate.
     performance_targets = {
         # Conservative parameter directions, not guaranteed semantic emotions.
         "hook": (0.78, 0.30, 0.55),
@@ -261,6 +262,13 @@ def main() -> int:
         "explain": (0.50, 0.40, 0.45),
         "urgent": (0.78, 0.30, 0.52),
         "calm": (0.48, 0.40, 0.45),
+        "emphasis": (0.84, 0.30, 0.58),
+        "confident": (0.65, 0.34, 0.48),
+        "warm": (0.58, 0.36, 0.48),
+        "concerned": (0.65, 0.34, 0.50),
+        "shocked": (0.85, 0.30, 0.62),
+        "reflective": (0.52, 0.38, 0.46),
+        "playful": (0.72, 0.33, 0.60),
     }
     blend = expression_intensity / 100.0
 
