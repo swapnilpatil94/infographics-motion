@@ -20,7 +20,7 @@ export function buildFallbackScene({title,story,plan}) {
 <g id="sceneArt"></g><text id="action" x="78" y="1378" class="action"></text><g id="labels"></g>
 <line x1="78" y1="1760" x2="1002" y2="1760" class="rule" opacity=".65"/><line id="progress" x1="78" y1="1760" x2="78" y2="1760" stroke="#dba83f" stroke-width="8" stroke-linecap="round"/><text x="78" y="1830" class="footer">ILLUSTRATIVE VISUAL MODEL · NOT A DATA SOURCE</text></svg>
 <script>
-const BEATS=__BEATS__,DURATION=__DURATION__, $=id=>document.getElementById(id),NS="http://www.w3.org/2000/svg";
+const BEATS=__BEATS__,DURATION=__DURATION__, $=id=>document.getElementById(id),NS="http://www.w3.org/2000/svg",clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function el(n,a){const e=document.createElementNS(NS,n);Object.entries(a||{}).forEach(([k,v])=>e.setAttribute(k,String(v)));return e}
 function add(p,n,a,t){const e=el(n,a);if(t!==undefined)e.textContent=t;p.append(e);return e}
 function wrap(p,text,x,y,max,lineHeight,cls,limit){const words=String(text||"").split(/\s+/).filter(Boolean),lines=[];let line="";words.forEach(w=>{const c=line?line+" "+w:w;if(c.length>max&&line){lines.push(line);line=w}else line=c});if(line)lines.push(line);const shown=lines.slice(0,limit);if(lines.length>limit)shown[limit-1]=shown[limit-1].slice(0,max-1).trimEnd()+"…";const t=add(p,"text",{x,y,class:cls});shown.forEach((s,i)=>add(t,"tspan",{x,dy:i?lineHeight:0},s));return t}
