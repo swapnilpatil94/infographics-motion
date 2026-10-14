@@ -147,6 +147,32 @@ if (/\bMath\s*\.\s*random\s*\(/.test(html)) validationErrors.push("uses Math.ran
 if (!/window\.renderAt\s*=/.test(html)) validationErrors.push("missing window.renderAt(seconds)");
 if (!/window\.getDuration\s*=/.test(html)) validationErrors.push("missing window.getDuration()");
 if (!/URLSearchParams\s*\(\s*(?:window\.)?location\.search\s*\)/.test(html) || !/get\s*\(\s*["']render["']\s*\)/.test(html)) validationErrors.push("missing ?render=1 render-only mode");
+if (!sceneFailure && validationErrors.length === 0) {
+  try {
+    const auditText = await askOllama([
+      { role: "system", content:
+        "You are a strict visual-storytelling QA reviewer. Inspect the generated HTML source against the story and visual plan. Return JSON only: {\\"pass\\":boolean,\\"issues\\":[string]}. Fail if it is mainly a repeated central icon/diagram, generic orbit/network animation, title cards with changing labels, decorative motion without causal proof, or if different narration beats do not produce meaningfully different subjects/compositions. Pass only if the code implements story-specific visible actions, state changes and distinct explanatory beats. Do not fail for style preference alone; mention concrete source evidence. Be strict and concise."
+      },
+      { role: "user", content:
+        "STORY:\\n" + story + "\\nVISUAL PLAN:\\n" + planJson +
+        "\\nGENERATED HTML (source excerpt):\\n" + html.slice(0, 14000)
+      }
+    ], "visual quality audit", plannerModel, "json");
+    const cleanAudit = auditText.replace(/^\\uFEFF/, "").trim();
+    const auditJson = cleanAudit.slice(cleanAudit.indexOf("{"), cleanAudit.lastIndexOf("}") + 1);
+    const audit = JSON.parse(auditJson);
+    if (audit.pass !== true) {
+      const issues = Array.isArray(audit.issues) ? audit.issues.map(String).slice(0, 5) : ["visual QA did not approve the scene"];
+      validationErrors.push("visual quality audit rejected the scene: " + issues.join("; "));
+      console.warn("Visual QA rejected the generated scene; a targeted repair will run before output.");
+    } else {
+      console.log("Visual QA passed: scene source appears story-specific with causal visual changes.");
+    }
+  } catch (error) {
+    validationErrors.push("visual quality audit failed: " + error.message);
+    console.warn("Visual QA could not verify the scene; a targeted repair will run rather than silently accepting unverified output.");
+  }
+}
 if (validationErrors.length || sceneFailure) {
   const firstFailure = [sceneFailure, ...validationErrors].filter(Boolean).join("; ");
   console.warn("Scene generation failed its export-contract check: " + firstFailure + ". Attempting one targeted repair with the same coding model.");
