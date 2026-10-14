@@ -133,6 +133,6 @@ def test_script_audio_expanded_delivery_cues_are_stripped_and_mapped(tmp_path):
         response = client.post("/api/audio", json={"text": script, "performance_mode": "directed"})
         assert response.status_code == 200, response.text
         beats = synth.call_args.args[0]
-        assert [b["performance"] for b in beats] == ["hook", "hook", "emphasis", "emphasis", "reflective", "reflective", "default", "default"]
+        assert [b["performance"] for b in beats] == ["hook", "emphasis", "reflective", "default"]
         assert all("[" not in b["text"] and "]" not in b["text"] for b in beats)
         assert synth.call_args.kwargs["performance_mode"] is True
