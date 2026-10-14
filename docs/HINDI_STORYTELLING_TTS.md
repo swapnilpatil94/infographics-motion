@@ -28,6 +28,49 @@ The Hindi-first option applies a small one-token-to-one-token pronunciation dict
 
 This is deliberately conservative. A complete automatic transliteration system could damage brand names, acronyms, numbers, and code-mixed phrases; extend the dictionary only after listening to the output.
 
+## Delivery cues (app-level, not model-native tags)
+
+The dedicated Hindi checkpoint uses the multilingual Chatterbox architecture. Do **not** put Turbo-only sound tags such as `[laugh]`, `[sigh]`, or `[gasp]` into this Hindi model's spoken text: those tags are not supported by the multilingual tokenizer and may be dropped or read aloud. The Studio cues below are instead parsed by our app, removed before synthesis, and mapped to conservative blends of supported Chatterbox controls. They guide delivery; they do not guarantee a specific emotion.
+
+Put a cue on its own line. It applies to following narration lines until another cue appears. `[DEFAULT]` resets the delivery.
+
+| Cue | Intended direction |
+|---|---|
+| `[HOOK]` | Strong opening emphasis |
+| `[CURIOUS]` | Interested, exploratory |
+| `[SUSPENSE]` | Restrained tension |
+| `[REVEAL]` | Stronger reveal/emphasis |
+| `[EXPLAIN]` | Clear, measured explanation |
+| `[URGENT]` | More energetic and direct |
+| `[CALM]` | Lower-intensity, composed |
+| `[EMPHASIS]` | Highlight an important claim |
+| `[CONFIDENT]` | Firm, assured delivery |
+| `[WARM]` | Friendlier, softer delivery |
+| `[CONCERNED]` | Serious concern |
+| `[SHOCKED]` | Higher-intensity surprise |
+| `[REFLECTIVE]` | Thoughtful, restrained delivery |
+| `[PLAYFUL]` | Slightly lighter, more animated |
+| `[DEFAULT]` | Reset to the selected base preset |
+
+Example:
+
+```text
+[HOOK]
+एक छोटी सी गलती... और आपका पूरा बैंक अकाउंट खाली हो सकता है।
+[CURIOUS]
+लेकिन स्कैमर को पता कैसे चलता है कि आप किस बात से डरते हैं?
+[EXPLAIN]
+वो आपके भरोसे और जल्दबाज़ी का फायदा उठाता है।
+[REVEAL]
+और सबसे चौंकाने वाली बात ये है...
+[EMPHASIS]
+कई बार आप खुद उसे OTP बता देते हैं।
+[DEFAULT]
+इसलिए किसी के साथ OTP शेयर मत कीजिए।
+```
+
+Use a few meaningful cue changes per script, not a new cue on every sentence. Connected lines are grouped into the same take where possible to reduce the sentence-reset effect. These cues only adjust supported generation parameters (exaggeration, CFG weight, temperature); they are not trained emotion tokens, and the voice reference and wording still dominate the result. Cues such as `[WHISPER]` or `[LAUGH]` are intentionally not advertised because the current dedicated Hindi path does not expose a reliable native control for them.
+
 ## Test procedure
 
 1. Use the same reference audio and the opening 10–15 seconds of a real Hindi/Hinglish script.
