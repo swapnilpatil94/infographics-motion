@@ -11,6 +11,21 @@ A local-first, story-specific mode for animation-led technical explainers. It re
 
 This is **not a fixed scene template**. Visual language, motion, pacing and composition should change according to the causal story being explained.
 
+## Standalone narration workflow
+
+The production UI also has a separate **Generate narration separately** panel. It calls the existing Chatterbox Studio audio API directly; it does not run the visual planner, Ollama scene coder, or video renderer. Paste a script, generate a WAV, preview it in the browser, and download the paced and original WAVs independently. This is useful for approving narration before any visual generation.
+
+### Narration input
+
+- Paste UTF-8 plain text directly into the script box. Devanagari Hindi, Roman Hindi, Hinglish, English technical terms, and normal punctuation are accepted as text input.
+- Optional existing directed-performance cues such as `[HOOK]`, `[CURIOUS]`, `[SUSPENSE]`, `[EXPLAIN]`, and `[REVEAL]` may be placed before the passage they should influence. Use **Directed cues** to preserve cue-driven delivery or **Uniform delivery** to request a more consistent read.
+- Voice delivery: **Storytelling**, **Conversational**, or **Dramatic**.
+- Expression intensity: **0–100** (default 65).
+- Overall pace: **0.8×–1.2×**. This is a post-generation FFmpeg tempo adjustment; it changes duration while aiming to preserve pitch. The original generated WAV is retained separately so you can compare. Use 1.0× when you want the untouched Studio output.
+- Each audio take is saved to its own output folder as `narration.wav`, `narration-source.wav`, and `narration.md`. Existing final audio is not overwritten; choose a new folder for another take.
+
+The pace control adjusts the whole take uniformly; it does not independently retime individual sentences or add pauses. For better natural rhythm, keep punctuation and paragraph breaks in the script and use the existing directed cues sparingly.
+
 ## Requirements
 - macOS on Apple Silicon
 - Node.js 22+ and npm
