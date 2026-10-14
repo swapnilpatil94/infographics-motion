@@ -72,26 +72,41 @@ Use illustrative values only when clearly labelled. Every particle or object mus
 <div class="foot">Yantralok · Local-only interface · Ollama + your existing Chatterbox Studio + Playwright + FFmpeg</div>
 <script>
 const $=id=>document.getElementById(id);
-let pollTimer=null, currentJob=null, knownLogs=0;
+let pollTimer=null,currentJob=null,knownLogs=0,analysisReady=false,pendingPhase="all";
 function selectedMode(){return document.querySelector('input[name="voiceMode"]:checked').value}
-function toggleVoice(){const mode=selectedMode();$('voiceScriptWrap').classList.toggle('hidden',mode!=='generate');$('wavWrap').classList.toggle('hidden',mode!=='wav');$('style').disabled=mode!=='generate'}
-document.querySelectorAll('input[name="voiceMode"]').forEach(x=>x.addEventListener('change',toggleVoice));toggleVoice();
-$('title').addEventListener('input',()=>{if(!$('slug').dataset.edited)$('slug').value=$('title').value.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,64)});
-$('slug').addEventListener('input',()=>{$('slug').dataset.edited='1'});
-async function loadModels(){try{const r=await fetch('/api/models');const d=await r.json();if(d.models&&d.models.length){const sel=$('model'),previous=sel.value;sel.innerHTML='';d.models.forEach(m=>{const o=document.createElement('option');o.value=m;o.textContent=m;sel.append(o)});sel.value=d.models.includes(previous)?previous:d.models.find(m=>/^qwen2\.5-coder:7b(?:$|:)/.test(m))||d.models.find(m=>/^qwen3-coder:30b(?:$|:)/.test(m))||d.models[0];$('modelHint').textContent='Installed locally · no model will be downloaded automatically.'}else{$('modelHint').textContent='Ollama is not currently responding. The job runner can start it; select a model already installed on this Mac.'}}catch{$('modelHint').textContent='Could not query Ollama yet. Make sure the selected model is installed.'}}
-function status(s){$('statusText').textContent=s;$('dot').className='dot '+s}
-function link(label,url){const a=document.createElement('a');a.href=url;a.textContent=label;a.target='_blank';a.rel='noopener';return a}
-async function poll(){if(!currentJob)return;try{const r=await fetch('/api/jobs/'+currentJob);const j=await r.json();if(!r.ok)throw new Error(j.error||'Could not read job status');const logs=$('logs');if(j.logs.length!==knownLogs){logs.textContent=j.logs.join('\n');logs.scrollTop=logs.scrollHeight;knownLogs=j.logs.length}
-if(j.status==='running'||j.status==='queued'){status(j.status==='queued'?'Queued':'Production running…');pollTimer=setTimeout(poll,900);return}
-$('run').disabled=false;
-if(j.status==='completed'){status('Completed successfully');$('formHint').textContent='Ready for another story';$('results').replaceChildren();if(j.files.video)$('results').append(link('▶ Open final MP4',j.files.video));if(j.files.scene)$('results').append(link('Open generated HTML scene',j.files.scene));if(j.files.audio)$('results').append(link('Open generated Chatterbox WAV',j.files.audio))}
-else{status('Failed');$('formHint').textContent=j.error||'See the console for details';}
-}catch(e){status('Status check failed');$('logs').textContent+='\n'+e.message;$('run').disabled=false}}
-$('form').addEventListener('submit',async e=>{e.preventDefault();if(currentJob&&$('run').disabled)return;
-const payload={title:$('title').value,slug:$('slug').value,story:$('story').value,model:$('model').value,fps:$('fps').value,voiceMode:selectedMode(),voiceScript:$('voiceScript').value,wavPath:$('wavPath').value,style:$('style').value,performance:$('performance').value,intensity:$('intensity').value};
-if(payload.voiceMode==='generate'&&(!payload.voiceScript.trim())){alert('Add the narration script.');return}
-$('run').disabled=true;$('results').replaceChildren();$('logs').textContent='Submitting production…';knownLogs=0;$('formHint').textContent='Do not close this tab while the job runs';status('Submitting…');
-try{const r=await fetch('/api/run',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)});const d=await r.json();if(!r.ok)throw new Error(d.error||'Could not start job');currentJob=d.id;poll()}catch(err){$('run').disabled=false;status('Could not start');$('logs').textContent=err.message}});
+function toggleVoice(){const mode=selectedMode();$("voiceScriptWrap").classList.toggle("hidden",mode!=="generate");$("wavWrap").classList.toggle("hidden",mode!=="wav");$("style").disabled=mode!=="generate"}
+document.querySelectorAll('input[name="voiceMode"]').forEach(x=>x.addEventListener("change",toggleVoice));toggleVoice();
+$("title").addEventListener("input",()=>{if(!$("slug").dataset.edited)$("slug").value=$("title").value.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,64);invalidateAnalysis()});
+$("slug").addEventListener("input",()=>{$("slug").dataset.edited="1";invalidateAnalysis()});
+$("story").addEventListener("input",invalidateAnalysis);
+async function loadModels(){try{const r=await fetch("/api/models");const d=await r.json();if(d.models&&d.models.length){const sel=$("model"),previous=sel.value;sel.innerHTML="";d.models.forEach(m=>{const o=document.createElement("option");o.value=m;o.textContent=m;sel.append(o)});sel.value=d.models.includes(previous)?previous:d.models.find(m=>/^qwen2\.5-coder:7b(?:$|:)/.test(m))||d.models.find(m=>/^qwen3-coder/.test(m))||d.models[0];$("modelHint").textContent="Installed locally · no model will be downloaded automatically."}else{$("modelHint").textContent="Ollama is not currently responding. The job runner can start it; select a model already installed on this Mac."}}catch{$("modelHint").textContent="Could not query Ollama yet. Make sure the selected model is installed."}}
+function status(s){$("statusText").textContent=s;$("dot").className="dot "+s}
+function link(label,url){const a=document.createElement("a");a.href=url;a.textContent=label;a.target="_blank";a.rel="noopener";return a}
+function updateStages(logs,statusValue){const t=logs.join("\n");const stages={
+analysis:{start:/Visual Director: planning|Saved validated visual plan|Reusing validated visual plan/,done:/ANALYSIS STAGE VALIDATED|Visual Director planned|Reusing validated visual plan/,fail:/Visual Director returned an invalid plan|Visual planner .*failed/},
+scene:{start:/Starting: Ollama scene generation|generating the animated scene/,done:/Finished: Ollama scene generation|Reusing the existing scene/,fail:/Scene generation failed|could not produce a valid scene|FAILED: Ollama scene generation/},
+validation:{start:/export-contract check|visual quality audit|Determinism check|Visual density audit|Narrated ending check/,done:/Visual QA passed|Determinism check passed|Visual density audit:|Narrated ending check passed|Exported:/,fail:/failed its export-contract|Visual QA rejected|Visual density QA failed|Determinism check failed|Visual ending check failed|Browser errors detected/},
+audio:{start:/Starting: Chatterbox narration|Reusing the existing narration WAV|Starting: Render with existing WAV narration|Starting: Silent video render/,done:/Generated narration using existing Chatterbox|Reusing the existing narration WAV|Finished: Chatterbox narration|Finished: Render with existing WAV narration|Finished: Silent video render/,fail:/Chatterbox narration failed|Could not reach Chatterbox|Narration WAV exists/},
+render:{start:/Rendering [0-9]+ frames|Frames:|Starting: .*render/,done:/Exported:|All stages completed/,fail:/Visual ending check failed|Visual density QA failed|Browser errors detected|FAILED:/}
+};
+for(const [key,rule] of Object.entries(stages)){const el=document.querySelector('[data-stage="'+key+'"]');if(!el)continue;el.className="stage";let label="Not run";if(rule.fail.test(t)&&statusValue==="failed"){el.classList.add("failed");label="Failed — inspect logs"}else if(rule.done.test(t)){el.classList.add("done");label="Validated / complete"}else if(rule.start.test(t)&&["running","queued"].includes(statusValue)){el.classList.add("active");label="Running…"}else if(statusValue==="failed"&&rule.start.test(t)){el.classList.add("failed");label="Failed — inspect logs"}el.querySelector(".stage-state").textContent=label}
+}
+async function poll(){if(!currentJob)return;try{const r=await fetch("/api/jobs/"+currentJob);const j=await r.json();if(!r.ok)throw new Error(j.error||"Could not read job status");const logs=$("logs");if(j.logs.length!==knownLogs){logs.textContent=j.logs.join("\n");logs.scrollTop=logs.scrollHeight;knownLogs=j.logs.length}updateStages(j.logs,j.status);
+if(j.status==="running"||j.status==="queued"){status(j.status==="queued"?"Queued":"Production running…");pollTimer=setTimeout(poll,900);return}
+$("run").disabled=false;$("analyze").disabled=false;
+if(j.status==="completed"){status("Completed successfully");$("formHint").textContent="Ready for the next stage";$("results").replaceChildren();if(j.files.plan)$("results").append(link("Open visual-plan.json",j.files.plan));if(j.files.video)$("results").append(link("▶ Open final MP4",j.files.video));if(j.files.scene)$("results").append(link("Open generated HTML scene",j.files.scene));if(j.files.audio)$("results").append(link("Open generated Chatterbox WAV",j.files.audio));
+if(j.files.plan&&j.logs.some(x=>x.includes("ANALYSIS STAGE VALIDATED"))){analysisReady=true;$("planPanel").classList.remove("hidden");try{const p=await fetch(j.files.plan);$("planEditor").value=JSON.stringify(await p.json(),null,2);$("planMessage").textContent="Review or edit the plan, then validate and save it before rendering."}catch(e){$("planMessage").textContent="Could not load plan: "+e.message}$("run").textContent="Generate scene & export video"}
+else if(j.files.video){analysisReady=false;$("run").textContent="Generate & export video";$("formHint").textContent="Production complete — choose a new output folder for another film"}}
+else{status("Failed");$("formHint").textContent=j.error||"See the console for details"}}
+catch(e){status("Status check failed");$("logs").textContent+="\n"+e.message;$("run").disabled=false;$("analyze").disabled=false}}
+$("form").addEventListener("submit",async e=>{e.preventDefault();if($("run").disabled)return;
+const payload={title:$("title").value,slug:$("slug").value,story:$("story").value,model:$("model").value,fps:$("fps").value,voiceMode:selectedMode(),voiceScript:$("voiceScript").value,wavPath:$("wavPath").value,style:$("style").value,performance:$("performance").value,intensity:$("intensity").value,phase:pendingPhase!=="all"?pendingPhase:(analysisReady?"scene":"all")};pendingPhase="all";
+if(payload.voiceMode==="generate"&&!payload.voiceScript.trim()){alert("Add the narration script.");return}
+$("run").disabled=true;$("analyze").disabled=true;$("results").replaceChildren();$("logs").textContent="Submitting production…";knownLogs=0;$("formHint").textContent="Do not close this tab while the job runs";status("Submitting…");
+try{const r=await fetch("/api/run",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(payload)});const d=await r.json();if(!r.ok)throw new Error(d.error||"Could not start job");currentJob=d.id;poll()}catch(err){$("run").disabled=false;$("analyze").disabled=false;status("Could not start");$("logs").textContent=err.message}});
+$("analyze").addEventListener("click",()=>{pendingPhase="analysis";$("form").requestSubmit()});
+$("savePlan").addEventListener("click",async()=>{const b=$("savePlan");b.disabled=true;$("planMessage").textContent="Validating plan…";try{const r=await fetch("/api/plan",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({slug:$("slug").value,plan:$("planEditor").value})});const d=await r.json();if(!r.ok)throw new Error(d.error||"Plan validation failed");$("planEditor").value=JSON.stringify(d.plan,null,2);$("planMessage").textContent="Saved and validated "+d.beats+" beats. The scene step will use this plan."}catch(e){$("planMessage").textContent="Plan not saved: "+e.message}finally{b.disabled=false}});
+function invalidateAnalysis(){analysisReady=false;pendingPhase="all";$("run").textContent="Generate & export video";$("planPanel").classList.add("hidden")}
 loadModels();
 </script>
 </body></html>
