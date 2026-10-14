@@ -6,7 +6,7 @@ import { pathToFileURL } from "node:url";
 import { chromium } from "playwright";
 import { installDeterministicCompatibility } from "./export-compat.mjs";
 
-const source = \`<!doctype html><html><head><style>body{margin:20px}</style></head><body><button id="preview">Preview UI</button><main id="scene">scene</main><script>window.renderAt=function(t){document.querySelector("#scene").textContent=String(Math.random())+":"+t};window.getDuration=function(){return 3};renderAt(0);</script></body></html>\`;
+const source = '<!doctype html><html><head><style>body{margin:20px}</style></head><body><button id="preview">Preview UI</button><main id="scene">scene</main><script>window.renderAt=function(t){document.querySelector("#scene").textContent=String(Math.random())+":"+t};window.getDuration=function(){return 3};renderAt(0);</script></body></html>';
 const transformed = installDeterministicCompatibility(source);
 assert.ok(transformed.includes("TDC deterministic compatibility layer"));
 assert.ok(transformed.includes("TDC export compatibility"));
