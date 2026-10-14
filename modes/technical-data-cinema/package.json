@@ -16,7 +16,8 @@
     "test:fallback": "node scripts/test-fallback-scene.mjs",
     "test:visual-benchmark": "node scripts/build-visual-benchmark.mjs",
     "test:fallback:render": "node scripts/test-fallback-render.mjs",
-    "test:visual-plan": "node scripts/test-visual-plan.mjs"
+    "test:visual-plan": "node scripts/test-visual-plan.mjs",
+    "test:ui": "node scripts/test-ui.mjs"
   },
   "dependencies": {
     "playwright": "^1.63.0",
