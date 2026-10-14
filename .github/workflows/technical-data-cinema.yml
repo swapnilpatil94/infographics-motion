@@ -53,6 +53,8 @@ jobs:
           node --check scripts/ollama-session.mjs
           node --check scripts/render.mjs
           node --check scripts/export.mjs
+          node --check scripts/scene-compat.mjs
+          node --check scripts/test-scene-compat.mjs
           node --check scripts/ui-server.mjs
           node --check scripts/doctor.mjs
           python3 -m py_compile ../../engine/studio/server.py ../../engine/shorts/voice.py ../../tools/chatterbox_tts.py ../../tools/whisper_align.py
@@ -62,6 +64,8 @@ jobs:
         run: npm run test:ui
       - name: Deterministic export compatibility test
         run: npm run test:export-compat
+      - name: Generated scene compatibility and deterministic seeking test
+        run: npm run test:scene-compat
       - name: Deterministic fallback scene contract test
         run: npm run test:fallback
       - name: Browser-level fallback scene and safe-area test
