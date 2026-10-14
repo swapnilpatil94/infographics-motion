@@ -260,8 +260,8 @@ const server = http.createServer(async (req, res) => {
       if (!model) return json(res, 400, { error: "Choose an installed Ollama model." });
       if (!["generate", "wav", "silent"].includes(voiceMode)) return json(res, 400, { error: "Choose a valid voice mode." });
       if (!["all", "analysis", "scene"].includes(phase)) return json(res, 400, { error: "Choose analysis, scene, or all stages." });
-      if (voiceMode === "generate" && !voiceScript) return json(res, 400, { error: "Add the narration script for Chatterbox." });
-      if (voiceMode === "wav" && !wavPath) return json(res, 400, { error: "Enter the absolute path to an existing WAV file." });
+      if (phase !== "analysis" && voiceMode === "generate" && !voiceScript) return json(res, 400, { error: "Add the narration script for Chatterbox." });
+      if (phase !== "analysis" && voiceMode === "wav" && !wavPath) return json(res, 400, { error: "Enter the absolute path to an existing WAV file." });
       if (!Number.isFinite(fps) || fps < 10 || fps > 60) return json(res, 400, { error: "FPS must be between 10 and 60." });
       const id = crypto.randomBytes(6).toString("hex");
       const job = { id, status: "queued", logs: [], files: {}, error: null, child: null };
