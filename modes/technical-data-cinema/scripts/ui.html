@@ -99,7 +99,7 @@ if(j.files.plan&&j.logs.some(x=>x.includes("ANALYSIS STAGE VALIDATED"))){analysi
 else if(j.files.video){analysisReady=false;$("run").textContent="Generate & export video";$("formHint").textContent="Production complete — choose a new output folder for another film"}}
 else{status("Failed");$("formHint").textContent=j.error||"See the console for details"}}
 catch(e){status("Status check failed");$("logs").textContent+="\n"+e.message;$("run").disabled=false;$("analyze").disabled=false}}
-$("form").addEventListener("submit",async e=>{e.preventDefault();if($("run").disabled)return;if(analysisReady&&planDirty){alert("Validate & save your visual-plan edits before rendering.");return}
+$("form").addEventListener("submit",async e=>{e.preventDefault();if($("run").disabled)return;if(analysisReady&&planDirty){pendingPhase="all";alert("Validate & save your visual-plan edits before rendering.");return}
 const payload={title:$("title").value,slug:$("slug").value,story:$("story").value,model:$("model").value,fps:$("fps").value,voiceMode:selectedMode(),voiceScript:$("voiceScript").value,wavPath:$("wavPath").value,style:$("style").value,performance:$("performance").value,intensity:$("intensity").value,phase:pendingPhase!=="all"?pendingPhase:(analysisReady?"scene":"all")};pendingPhase="all";
 if(payload.voiceMode==="generate"&&!payload.voiceScript.trim()){alert("Add the narration script.");return}
 $("run").disabled=true;$("analyze").disabled=true;$("results").replaceChildren();$("logs").textContent="Submitting production…";knownLogs=0;$("formHint").textContent="Do not close this tab while the job runs";status("Submitting…");
