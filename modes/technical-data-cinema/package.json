@@ -17,7 +17,8 @@
     "test:visual-benchmark": "node scripts/build-visual-benchmark.mjs",
     "test:fallback:render": "node scripts/test-fallback-render.mjs",
     "test:visual-plan": "node scripts/test-visual-plan.mjs",
-    "test:ui": "node scripts/test-ui.mjs"
+    "test:ui": "node scripts/test-ui.mjs",
+    "test:export-compat": "node scripts/test-export-compat.mjs"
   },
   "dependencies": {
     "playwright": "^1.63.0",
