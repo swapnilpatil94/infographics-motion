@@ -151,7 +151,7 @@ if (!sceneFailure && validationErrors.length === 0) {
   try {
     const auditText = await askOllama([
       { role: "system", content:
-        "You are a strict visual-storytelling QA reviewer. Inspect the generated HTML source against the story and visual plan. Return JSON only: {\\"pass\\":boolean,\\"issues\\":[string]}. Fail if it is mainly a repeated central icon/diagram, generic orbit/network animation, title cards with changing labels, decorative motion without causal proof, or if different narration beats do not produce meaningfully different subjects/compositions. Pass only if the code implements story-specific visible actions, state changes and distinct explanatory beats. Do not fail for style preference alone; mention concrete source evidence. Be strict and concise."
+        "You are a strict visual-storytelling QA reviewer. Inspect the generated HTML source against the story and visual plan. Return JSON only with keys pass (boolean) and issues (array of strings). Fail if it is mainly a repeated central icon/diagram, generic orbit/network animation, title cards with changing labels, decorative motion without causal proof, or if different narration beats do not produce meaningfully different subjects/compositions. Pass only if the code implements story-specific visible actions, state changes and distinct explanatory beats. Do not fail for style preference alone; mention concrete source evidence. Be strict and concise."
       },
       { role: "user", content:
         "STORY:\\n" + story + "\\nVISUAL PLAN:\\n" + planJson +
