@@ -198,12 +198,12 @@ async function getModels() {
     return (data.models || []).map(m => m.name).filter(Boolean).sort();
   } catch { return []; }
 }
-async function serveFile(res, filePath) {
+async function serveFile(res, filePath, download = false) {
   const ext = path.extname(filePath).toLowerCase();
   const types = { ".html": "text/html; charset=utf-8", ".mp4": "video/mp4", ".wav": "audio/wav", ".json": "application/json", ".md": "text/markdown; charset=utf-8" };
   try {
     const data = await fs.readFile(filePath);
-    res.writeHead(200, { "content-type": types[ext] || "application/octet-stream", "cache-control": "no-store" });
+    res.writeHead(200, { "content-type": types[ext] || "application/octet-stream", "cache-control": "no-store", ...(download ? { "content-disposition": `attachment; filename="${path.basename(filePath).replace(/["\\\\]/g, "")}"` } : {}) });
     res.end(data);
   } catch { json(res, 404, { error: "File not found." }); }
 }
@@ -533,7 +533,7 @@ const server = http.createServer(async (req, res) => {
     if (req.method === "GET" && url.pathname.startsWith("/files/")) {
       const parts = url.pathname.split("/").filter(Boolean).slice(1).map(decodeURIComponent);
       if (parts.length !== 2 || parts.some(p => p.includes("/") || p === "." || p === "..")) return json(res, 400, { error: "Invalid file path." });
-      return await serveFile(res, path.join(outputRoot, parts[0], parts[1]));
+      return await serveFile(res, path.join(outputRoot, parts[0], parts[1]), url.searchParams.get("download") === "1");
     }
     json(res, 404, { error: "Not found." });
   } catch (error) {
