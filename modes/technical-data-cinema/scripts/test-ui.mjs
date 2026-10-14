@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const html = await fs.readFile(path.join(here, "ui.html"), "utf8");
-const scripts = [...html.matchAll(/<script>([\\s\\S]*?)<\\/script>/gi)];
+const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/gi)];
 assert.ok(scripts.length >= 1, "UI must include its client script");
 for (const [index, match] of scripts.entries()) {
   assert.doesNotThrow(() => new Function(match[1]), "UI script " + index + " must parse");
