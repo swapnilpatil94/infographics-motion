@@ -15,6 +15,8 @@ if (!htmlArg || !outArg) fail("Usage: node scripts/render.mjs --html <index.html
 const htmlPath = path.resolve(process.cwd(), htmlArg);
 const outPath = path.resolve(process.cwd(), outArg);
 const audioPath = arg("--audio") ? path.resolve(process.cwd(), arg("--audio")) : null;
+const audioOffset = Number(arg("--audio-offset", "0"));
+if (!Number.isFinite(audioOffset) || audioOffset < -5 || audioOffset > 5) fail("--audio-offset must be between -5 and 5 seconds.");
 const fps = Number(arg("--fps", "30"));
 const forcedDuration = arg("--duration") ? Number(arg("--duration")) : null;
 if (!Number.isFinite(fps) || fps < 1 || fps > 60) fail("--fps must be between 1 and 60.");
@@ -28,8 +30,10 @@ if (audioPath) {
     fail(`Could not read narration duration with ffprobe. Check that FFmpeg is installed and the audio is valid. ${probe.stderr || probe.error?.message || ""}`);
   }
   audioDuration = Number(probe.stdout.trim());
-  if (forcedDuration !== null && forcedDuration + 0.02 < audioDuration) {
-    fail(`--duration (${forcedDuration}s) is shorter than narration (${audioDuration.toFixed(2)}s); refusing to cut off voice.`);
+  if (audioOffset < 0 && Math.abs(audioOffset) >= audioDuration) fail("Negative --audio-offset must be smaller than the narration duration.");
+  const effectiveAudioDuration = audioDuration + audioOffset;
+  if (forcedDuration !== null && forcedDuration + 0.02 < effectiveAudioDuration) {
+    fail(`--duration (${forcedDuration}s) is shorter than adjusted narration (${effectiveAudioDuration.toFixed(2)}s); refusing to cut off voice.`);
   }
 }
 const outDir = path.dirname(outPath), frameDir = path.join(outDir, "frames");
@@ -60,7 +64,7 @@ try {
     fail("HTML must define window.renderAt(seconds) and window.getDuration() returning a positive duration.");
   }
   if (contract.duration > 600) fail("Scene duration must not exceed 600 seconds.");
-  duration = forcedDuration ?? Math.max(contract.duration, audioDuration);
+  duration = forcedDuration ?? Math.max(contract.duration, audioDuration + audioOffset);
   if (duration > 600) fail("Final duration must not exceed 600 seconds.");
   frameCount = Math.ceil(duration * fps);
 
@@ -190,7 +194,13 @@ if (audioPath) ffmpegArgs.push("-i", audioPath);
 // Output options must follow every input; placing -frames:v before the audio input
 // makes FFmpeg incorrectly treat it as an input option.
 ffmpegArgs.push("-frames:v", String(frameCount), "-t", String(duration));
-if (audioPath) ffmpegArgs.push("-af", "apad,loudnorm=I=-16:TP=-1.5:LRA=7");
+if (audioPath) {
+  const audioFilters = [];
+  if (audioOffset > 0) audioFilters.push(`adelay=${Math.round(audioOffset * 1000)}:all=1`);
+  else if (audioOffset < 0) audioFilters.push(`atrim=start=${Math.abs(audioOffset).toFixed(3)}`, "asetpts=PTS-STARTPTS");
+  audioFilters.push("apad", "loudnorm=I=-16:TP=-1.5:LRA=7");
+  ffmpegArgs.push("-af", audioFilters.join(","));
+}
 ffmpegArgs.push("-c:v", "libx264", "-preset", "slow", "-crf", "16", "-pix_fmt", "yuv420p", "-movflags", "+faststart");
 if (audioPath) ffmpegArgs.push("-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-ac", "2");
 ffmpegArgs.push(outPath);
