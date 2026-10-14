@@ -254,6 +254,70 @@ const server = http.createServer(async (req, res) => {
       } catch (error) { if (error.code === "ENOENT") archivedScene = null; else throw error; }
       return json(res, 200, { ok: true, beats: plan.beats.length, plan, archivedScene });
     }
+    if (req.method === "POST" && url.pathname === "/api/audio") {
+      if (activeJob) return json(res, 409, { error: "A production job is already running. Wait for it to finish before starting another heavy stage." });
+      const body = await readBody(req);
+      const script = String(body.script || "").trim();
+      const slug = safeSlug(body.slug || "narration");
+      const style = String(body.style || "storytelling");
+      const performance = String(body.performance || "directed");
+      const intensity = Number(body.intensity ?? 65);
+      const pace = Number(body.pace ?? 1);
+      if (!script) return json(res, 400, { error: "Paste the narration script first." });
+      if (script.length > 25000) return json(res, 400, { error: "Narration is limited to 25,000 characters per take." });
+      if (!slug) return json(res, 400, { error: "Enter a valid audio output folder name." });
+      if (!["storytelling", "conversational", "dramatic"].includes(style)) return json(res, 400, { error: "Choose a supported voice delivery style." });
+      if (!["directed", "uniform"].includes(performance)) return json(res, 400, { error: "Choose directed or uniform cue handling." });
+      if (!Number.isFinite(intensity) || intensity < 0 || intensity > 100) return json(res, 400, { error: "Expression intensity must be between 0 and 100." });
+      if (!Number.isFinite(pace) || pace < 0.8 || pace > 1.2) return json(res, 400, { error: "Overall pace must be between 0.8× and 1.2×." });
+      const dir = path.join(outputRoot, slug);
+      await fs.mkdir(dir, { recursive: true });
+      const audioPath = path.join(dir, "narration.wav");
+      const sourceAudioPath = path.join(dir, "narration-source.wav");
+      const scriptPath = path.join(dir, "narration.md");
+      try { await fs.access(audioPath); return json(res, 409, { error: `An audio take already exists at ${audioPath}. Change the output folder to preserve it.` }); }
+      catch (error) { if (error.code !== "ENOENT") throw error; }
+      const id = crypto.randomBytes(6).toString("hex");
+      const job = { id, status: "queued", logs: [], files: {}, error: null, child: null };
+      jobs.set(id, job); activeJob = id;
+      log(job, "Queued audio-only job. Scene generation, Ollama and video rendering will not run.");
+      (async () => {
+        try {
+          job.status = "running";
+          await fs.writeFile(scriptPath, script + "\n", "utf8");
+          await ensureStudio(job);
+          log(job, "Narration format: pasted UTF-8 text (Hindi/Devanagari, Hinglish/Roman Hindi, English terms and punctuation).");
+          log(job, `Voice style=${style}; cue handling=${performance}; expression intensity=${intensity}; pace=${pace}×.`);
+          const response = await fetch(`${studioUrl}/api/audio`, {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ text: script, style, hindi_pronunciation: true, performance_mode: performance, expression_intensity: intensity }),
+            signal: AbortSignal.timeout(Number(process.env.CHATTERBOX_TIMEOUT_MS || 1800000))
+          });
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok) throw new Error(`Chatterbox Studio returned HTTP ${response.status}: ${payload?.error?.message || payload?.message || JSON.stringify(payload)}`);
+          if (!payload.id) throw new Error("Chatterbox Studio returned no audio job ID.");
+          const wavResponse = await fetch(`${studioUrl}/api/audio/${encodeURIComponent(payload.id)}/wav`, { signal: AbortSignal.timeout(30000) });
+          if (!wavResponse.ok) throw new Error(`Could not download generated WAV (HTTP ${wavResponse.status}).`);
+          await fs.writeFile(sourceAudioPath, Buffer.from(await wavResponse.arrayBuffer()));
+          if (Math.abs(pace - 1) < 0.001) await fs.copyFile(sourceAudioPath, audioPath);
+          else await run("ffmpeg", ["-hide_banner", "-loglevel", "error", "-y", "-i", sourceAudioPath, "-filter:a", `atempo=${pace}`, "-c:a", "pcm_s16le", audioPath], dir, job, `Apply overall pace ${pace}× without pitch shifting`);
+          log(job, `Generated WAV: ${audioPath}`);
+          log(job, `Source audio duration: ${Number(payload.duration || 0).toFixed(2)}s; final pace: ${pace}×. Listen to the result before approving it.`);
+          job.files = {
+            audio: `/files/${encodeURIComponent(slug)}/narration.wav`,
+            sourceAudio: `/files/${encodeURIComponent(slug)}/narration-source.wav`,
+            script: `/files/${encodeURIComponent(slug)}/narration.md`
+          };
+          job.status = "completed";
+          log(job, "Audio-only stage completed. No scene or video was generated.");
+        } catch (error) {
+          job.status = "failed"; job.error = error.message; log(job, `FAILED: ${error.message}`);
+          try { await fs.unlink(audioPath); } catch {}
+        } finally { activeJob = null; job.child = null; }
+      })();
+      return json(res, 202, { id });
+    }
     if (req.method === "POST" && url.pathname === "/api/run") {
       if (activeJob) return json(res, 409, { error: "A job is already running. Wait for it to finish before starting another model." });
       const body = await readBody(req);
