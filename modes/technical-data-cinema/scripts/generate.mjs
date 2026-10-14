@@ -153,7 +153,6 @@ function installDeterministicCompatibility(source) {
   if (!source.includes("TDC export compatibility")) source=source.replace(/<\/body>/i, renderShim+"</body>");
   return source;
 }
-if (/\\bMath\\s*\\.\\s*random\\s*\\(/.test(html) || !/URLSearchParams\\s*\\(\\s*(?:window\\.)?location\\.search\\s*\\)/.test(html)) {
 if (/\bMath\s*\.\s*random\s*\(/.test(html) || !/URLSearchParams\s*\(\s*(?:window\.)?location\.search\s*\)/.test(html)) {
   html=installDeterministicCompatibility(html);
 }
