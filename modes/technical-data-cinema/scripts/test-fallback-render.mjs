@@ -44,7 +44,8 @@ try {
   assert.equal(contract.renderAt, "function");
   assert.equal(contract.getDuration, "function");
   assert.equal(contract.duration, 21);
-  const artHashes = new Set();\n  const sceneTypes = new Set();
+  const artHashes = new Set();
+  const sceneTypes = new Set();
   for (let i = 0; i < grammars.length; i++) {
     await page.evaluate(t => window.renderAt(t), i * 3 + 1.25);
     const state = await page.evaluate(() => {
@@ -54,7 +55,8 @@ try {
         return { id, x: box.x, y: box.y, right: box.x + box.width, bottom: box.y + box.height };
       });
       return {
-        art: document.getElementById("sceneArt").innerHTML,\n        sceneType: document.getElementById("sceneArt").getAttribute("data-scene"),
+        art: document.getElementById("sceneArt").innerHTML,
+        sceneType: document.getElementById("sceneArt").getAttribute("data-scene"),
         bounds,
         text: document.getElementById("headline").textContent
       };
