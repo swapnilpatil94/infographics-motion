@@ -56,11 +56,9 @@ export function applySceneCompatibility(source) {
     window.setInterval = () => 0;
     const style = document.createElement("style");
     style.id = "tdc-compat-render-only-style";
-    style.textContent = `
-      html,body{margin:0!important;width:100%!important;height:100%!important;overflow:hidden!important;background:#050607!important}
-      button,input,select,textarea,nav,[role="toolbar"],[role="navigation"],.controls,.toolbar,.editor,.transport,.playback-controls,.timeline,.preview-ui,.cursor,.helper,.watermark{display:none!important;visibility:hidden!important;opacity:0!important}
-      body{cursor:none!important}
-    `;
+    style.textContent = "html,body{margin:0!important;width:100%!important;height:100%!important;overflow:hidden!important;background:#050607!important}" +
+      "button,input,select,textarea,nav,[role='toolbar'],[role='navigation'],.controls,.toolbar,.editor,.transport,.playback-controls,.timeline,.preview-ui,.cursor,.helper,.watermark{display:none!important;visibility:hidden!important;opacity:0!important}" +
+      "body{cursor:none!important}";
     document.head.appendChild(style);
   }
 })();
