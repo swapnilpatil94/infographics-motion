@@ -11,13 +11,15 @@ assert.ok(scripts.length >= 1, "UI must include its client script");
 for (const [index, match] of scripts.entries()) {
   assert.doesNotThrow(() => new Function(match[1]), "UI script " + index + " must parse");
 }
-for (const id of ["analyze", "planEditor", "savePlan", "stages", "run", "exportName"]) {
+for (const id of ["analyze", "planEditor", "savePlan", "stages", "run", "exportName", "audioOffset"]) {
   assert.ok(html.includes('id="' + id + '"'), "missing UI control: " + id);
 }
 for (const stage of ["analysis", "scene", "validation", "audio", "render"]) {
   assert.ok(html.includes('data-stage="' + stage + '"'), "missing progress stage: " + stage);
 }
 assert.ok(html.includes("/api/plan"), "editable plan must save through the validation endpoint");
+assert.ok(html.includes("#050607") && html.includes("#e64b36"), "UI must preserve Yantralok near-black and red-orange brand colors");
+assert.ok(server.includes("--audio-offset") && html.includes("audioOffset"), "render UI must expose adjustable audio/video sync offset");
 assert.ok(html.includes("updateStages(j.stages,j.status)"), "UI must consume actual server stage statuses");
 assert.ok(html.includes('analysisReady?(sceneReady?"render":"scene"):"analysis"'), "UI must gate analysis, scene, then rendering");
 assert.ok(server.includes("stages: job.stages"), "job API must expose explicit stage statuses");
@@ -32,4 +34,4 @@ assert.ok(html.includes('value="0.8"') && html.includes('value="1.2"'), "audio U
 assert.ok(server.includes('url.pathname === "/api/audio"'), "server must expose separate audio-only endpoint");
 assert.ok(server.includes('atempo=') && server.includes('narration-source.wav'), "server must preserve original audio and apply pace as a separate post-process");
 assert.ok(server.includes("content-disposition") && html.includes('?download=1'), "audio downloads must be served as attachments");
-console.log("Staged UI syntax, audio-only workflow, and pace controls tests passed.");
+console.log("Staged UI syntax, brand palette, audio-only workflow, audio sync offset, and pace controls tests passed.");
