@@ -20,6 +20,7 @@ for (const stage of ["analysis", "scene", "validation", "audio", "render"]) {
 assert.ok(html.includes("/api/plan"), "editable plan must save through the validation endpoint");
 assert.ok(html.includes("#050607") && html.includes("#e64b36"), "UI must preserve Yantralok near-black and red-orange brand colors");
 assert.ok(server.includes("--audio-offset") && html.includes("audioOffset"), "render UI must expose adjustable audio/video sync offset");
+assert.ok(html.includes("Yantralok") && html.includes("rgba(245,247,248,.12)"), "UI should use a dark dotted technical visual background");
 assert.ok(html.includes("updateStages(j.stages,j.status)"), "UI must consume actual server stage statuses");
 assert.ok(html.includes('analysisReady?(sceneReady?"render":"scene"):"analysis"'), "UI must gate analysis, scene, then rendering");
 assert.ok(server.includes("stages: job.stages"), "job API must expose explicit stage statuses");
