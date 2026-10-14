@@ -154,12 +154,12 @@ function installDeterministicCompatibility(source) {
   return source;
 }
 if (/\\bMath\\s*\\.\\s*random\\s*\\(/.test(html) || !/URLSearchParams\\s*\\(\\s*(?:window\\.)?location\\.search\\s*\\)/.test(html)) {
-  console.warn("Installing deterministic compatibility for random calls/render-only mode; scene and visual QA gates remain enabled.");
+if (/\bMath\s*\.\s*random\s*\(/.test(html) || !/URLSearchParams\s*\(\s*(?:window\.)?location\.search\s*\)/.test(html)) {
   html=installDeterministicCompatibility(html);
 }
 const validationErrors = [];
 if (!/^<!doctype html>/i.test(html)) validationErrors.push("output is not a complete HTML document");
-if (/\\bMath\\s*\\.\\s*random\\s*\\(/.test(html) && !html.includes("TDC deterministic compatibility layer")) validationErrors.push("uses Math.random() without deterministic compatibility");
+if (/\bMath\s*\.\s*random\s*\(/.test(html) && !html.includes("TDC deterministic compatibility layer")) validationErrors.push("uses Math.random() without deterministic compatibility");
 if (!/window\.renderAt\s*=/.test(html)) validationErrors.push("missing window.renderAt(seconds)");
 if (!/window\.getDuration\s*=/.test(html)) validationErrors.push("missing window.getDuration()");
 if (!/URLSearchParams\s*\(\s*(?:window\.)?location\.search\s*\)/.test(html) || !/get\s*\(\s*["']render["']\s*\)/.test(html)) validationErrors.push("missing ?render=1 render-only mode");
