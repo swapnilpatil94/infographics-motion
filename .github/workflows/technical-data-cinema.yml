@@ -39,6 +39,7 @@ jobs:
       - name: Syntax check
         run: |
           node --check scripts/generate.mjs
+          node --check scripts/scene-contract.mjs
           node --check scripts/fallback-scene.mjs
           node --check scripts/test-fallback-scene.mjs
           node --check scripts/test-fallback-render.mjs

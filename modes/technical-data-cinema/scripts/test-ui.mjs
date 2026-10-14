@@ -18,7 +18,11 @@ for (const stage of ["analysis", "scene", "validation", "audio", "render"]) {
   assert.ok(html.includes('data-stage="' + stage + '"'), "missing progress stage: " + stage);
 }
 assert.ok(html.includes("/api/plan"), "editable plan must save through the validation endpoint");
-assert.ok(html.includes('phase:pendingPhase!=="all"?pendingPhase:(analysisReady?"scene":"all")'), "UI must separate analysis from scene/export");
+assert.ok(html.includes("updateStages(j.stages,j.status)"), "UI must consume actual server stage statuses");
+assert.ok(html.includes('analysisReady?(sceneReady?"render":"scene"):"analysis"'), "UI must gate analysis, scene, then rendering");
+assert.ok(server.includes('SCENE STAGE VALIDATED. Rendering and narration were not started.'), "scene phase must stop before audio/render");
+assert.ok(server.includes('phase === "render"') && server.includes("Rendering the saved fingerprint-matched scene"), "render phase must reuse saved scene without model generation");
+assert.ok(server.includes("setStage(job") && server.includes("stages: job.stages"), "server must report explicit stage status");
 for (const id of ["audioForm", "audioScript", "audioStyle", "audioPerformance", "audioIntensity", "audioPace", "audioRun", "audioLogs", "audioLinks"]) {
   assert.ok(html.includes('id="' + id + '"'), "missing audio-only UI control: " + id);
 }
