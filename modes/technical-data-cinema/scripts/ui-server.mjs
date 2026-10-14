@@ -218,6 +218,7 @@ const server = http.createServer(async (req, res) => {
       return json(res, 200, { id: job.id, status: job.status, logs: job.logs, error: job.error || null, files: job.files || {} });
     }
     if (req.method === "POST" && url.pathname === "/api/plan") {
+      if (activeJob) return json(res, 409, { error: "Wait for the active production stage to finish before editing its plan." });
       const body = await readBody(req);
       const slug = safeSlug(body.slug || "");
       if (!slug) return json(res, 400, { error: "Enter a valid output folder name." });
