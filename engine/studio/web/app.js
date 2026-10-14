@@ -739,7 +739,7 @@ view.addEventListener("click", e => {
   if (!b) return;
   if (b.id === "audio-generate") return generateScriptAudio();
   if (b.id === "audio-example") {
-    AUD.text = "[HOOK] सोचिए, एक गलत क्लिक से आपका बैंक अकाउंट खाली हो सकता है।\nलेकिन असली सवाल है—स्कैमर आपसे ये क्लिक करवाते कैसे हैं?\n[CURIOUS] इसका जवाब आपकी टेक्नोलॉजी में नहीं, आपकी साइकोलॉजी में छिपा है।\nवे पहले भरोसा बनाते हैं, फिर जल्दबाज़ी करवाते हैं।\n[SUSPENSE] और जब तक आपको शक होता है...\n[REVEAL] पेमेंट पहले ही जा चुकी होती है।\n[EXPLAIN] इसलिए किसी भी ऐप में OTP या बैंक डिटेल डालने से पहले रुकिए।\n[CALM] बस एक सेकंड का पॉज़, आपका पैसा बचा सकता है।";
+    AUD.text = "[HOOK]\nसोचिए, एक गलत क्लिक से आपका बैंक अकाउंट खाली हो सकता है।\nलेकिन असली सवाल है—स्कैमर आपसे ये क्लिक करवाते कैसे हैं?\n[CURIOUS]\nइसका जवाब आपकी टेक्नोलॉजी में नहीं, आपकी साइकोलॉजी में छिपा है।\nवे पहले भरोसा बनाते हैं, फिर जल्दबाज़ी करवाते हैं।\n[SUSPENSE]\nऔर जब तक आपको शक होता है...\n[REVEAL]\nपेमेंट पहले ही जा चुकी होती है।\n[EMPHASIS]\nकई बार आप खुद उसे OTP बता देते हैं।\n[EXPLAIN]\nइसलिए किसी भी ऐप में OTP या बैंक डिटेल डालने से पहले रुकिए।\n[CALM]\nबस एक सेकंड का पॉज़, आपका पैसा बचा सकता है।";
     AUD.job = null; AUD.error = null; try { sessionStorage.setItem("ks.audioText", AUD.text); } catch (_) {} return viewAudio();
   }
   if (b.id === "audio-clear") { AUD.text = ""; AUD.job = null; AUD.error = null; try { sessionStorage.removeItem("ks.audioText"); } catch (_) {} return viewAudio(); }
