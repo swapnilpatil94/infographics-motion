@@ -12,7 +12,7 @@ window.renderAt = function (seconds) {
   ctx.clearRect(0, 0, 540, 960);
   ctx.fillStyle = "#050607"; ctx.fillRect(0, 0, 540, 960);
   ctx.fillStyle = "#f5f7f8";
-  ctx.beginPath(); ctx.arc(270 + window.__tdcRandom() * 80, 480, 28, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(270 + Math.random() * 80, 480, 28, 0, Math.PI * 2); ctx.fill();
 };
 window.renderAt(0);
 </script></body></html>`;
