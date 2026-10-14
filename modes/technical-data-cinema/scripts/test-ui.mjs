@@ -11,7 +11,7 @@ assert.ok(scripts.length >= 1, "UI must include its client script");
 for (const [index, match] of scripts.entries()) {
   assert.doesNotThrow(() => new Function(match[1]), "UI script " + index + " must parse");
 }
-for (const id of ["analyze", "planEditor", "savePlan", "stages", "run"]) {
+for (const id of ["analyze", "planEditor", "savePlan", "stages", "run", "exportName"]) {
   assert.ok(html.includes('id="' + id + '"'), "missing UI control: " + id);
 }
 for (const stage of ["analysis", "scene", "validation", "audio", "render"]) {
