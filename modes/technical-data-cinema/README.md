@@ -24,7 +24,7 @@ The production UI also has a separate **Generate narration separately** panel. I
 - Overall pace: **0.8×–1.2×**. This is a post-generation FFmpeg tempo adjustment; it changes duration while aiming to preserve pitch. The original generated WAV is retained separately so you can compare. Use 1.0× when you want the untouched Studio output.
 - Each audio take is saved to its own output folder as `narration.wav`, `narration-source.wav`, and `narration.md`. Existing final audio is not overwritten; choose a new folder for another take.
 
-The pace control adjusts the whole take uniformly; it does not independently retime individual sentences or add pauses. For better natural rhythm, keep punctuation and paragraph breaks in the script and use the existing directed cues sparingly.
+The pace control adjusts the whole take uniformly; it does not independently retime individual sentences or add pauses. During export, use `--audio-offset -0.25` to advance the WAV by trimming its first 250 ms, or `--audio-offset 0.25` to delay it by 250 ms; the UI provides the same ±5-second control. These adjustments are render-only and do not rewrite the source WAV. For better natural rhythm, keep punctuation and paragraph breaks in the script and use the existing directed cues sparingly.
 
 ## Requirements
 - macOS on Apple Silicon
