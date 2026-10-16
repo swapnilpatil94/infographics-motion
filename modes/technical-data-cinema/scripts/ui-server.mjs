@@ -230,8 +230,8 @@ const server = http.createServer(async (req, res) => {
         const dir = path.join(outputRoot, entry.name);
         try {
           const savedStory = await fs.readFile(path.join(dir, "story.md"), "utf8");
-          const match = savedStory.match(/^#\\s+(.+)$/m);
-          const body = savedStory.replace(/^#\\s+.+(?:\\r?\\n)+/, "").trim();
+          const match = savedStory.match(/^#\s+(.+)$/m);
+          const body = savedStory.replace(/^#\s+.+(?:\r?\n)+/, "").trim();
           const files = {};
           for (const [key, name] of Object.entries({ plan: "visual-plan.json", scene: "index.html", narration: "narration.md", audio: "final.narration.wav", video: "final.mp4", silentVideo: "final-silent.mp4" })) {
             try { await fs.access(path.join(dir, name)); files[key] = true; } catch {}
