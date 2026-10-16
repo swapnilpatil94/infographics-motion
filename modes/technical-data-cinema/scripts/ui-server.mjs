@@ -7,6 +7,7 @@ import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import crypto from "node:crypto";
 import { normalizeVisualPlan } from "./visual-plan.mjs";
+import { normalizeNarrationForTTS } from "./narration-text.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "..");
@@ -267,12 +268,13 @@ const server = http.createServer(async (req, res) => {
       if (activeJob) return json(res, 409, { error: "A production job is already running. Wait for it to finish before starting another heavy stage." });
       const body = await readBody(req);
       const script = String(body.script || "").trim();
+      const spokenScript = normalizeNarrationForTTS(script);
       const slug = safeSlug(body.slug || "narration");
       const style = String(body.style || "storytelling");
       const performance = String(body.performance || "directed");
       const intensity = Number(body.intensity ?? 65);
       const pace = Number(body.pace ?? 1);
-      if (!script) return json(res, 400, { error: "Paste the narration script first." });
+      if (!script || !spokenScript) return json(res, 400, { error: "Add spoken narration text. Control markers alone cannot be sent to Chatterbox." });
       if (script.length > 25000) return json(res, 400, { error: "Narration is limited to 25,000 characters per take." });
       if (!slug) return json(res, 400, { error: "Enter a valid audio output folder name." });
       if (!["storytelling", "conversational", "dramatic"].includes(style)) return json(res, 400, { error: "Choose a supported voice delivery style." });
@@ -296,11 +298,12 @@ const server = http.createServer(async (req, res) => {
           await fs.writeFile(scriptPath, script + "\n", "utf8");
           await ensureStudio(job);
           log(job, "Narration format: pasted UTF-8 text (Hindi/Devanagari, Hinglish/Roman Hindi, English terms and punctuation).");
+          if (spokenScript !== script) log(job, "Removed non-spoken [PAUSE]/[END] markers before Chatterbox; [PAUSE] becomes natural punctuation.");
           log(job, `Voice style=${style}; cue handling=${performance}; expression intensity=${intensity}; pace=${pace}×.`);
           const response = await fetch(`${studioUrl}/api/audio`, {
             method: "POST",
             headers: { "content-type": "application/json" },
-            body: JSON.stringify({ text: script, style, hindi_pronunciation: true, performance_mode: performance, expression_intensity: intensity }),
+            body: JSON.stringify({ text: spokenScript, style, hindi_pronunciation: true, performance_mode: performance, expression_intensity: intensity }),
             signal: AbortSignal.timeout(Number(process.env.CHATTERBOX_TIMEOUT_MS || 1800000))
           });
           const payload = await response.json().catch(() => ({}));
@@ -469,6 +472,15 @@ const server = http.createServer(async (req, res) => {
               log(job, "Initial scene failed HTML/determinism validation; starting one targeted repair, then a single fallback-model attempt if needed. Narration is preserved.");
               await runSceneRepair(node, generateArgs, repairNote, root, job, "Repair invalid initial scene");
             }
+          }
+          if (phase === "all") {
+            const completedPlan = JSON.parse(await fs.readFile(planPath, "utf8"));
+            setStage(job, "analysis", "passed", "Story analysis completed");
+            setStage(job, "planValidation", "passed", `${completedPlan.beats.length} validated beats`);
+            setStage(job, "scene", "passed");
+            setStage(job, "sceneValidation", "passed");
+            setStage(job, "audio", voiceMode === "generate" ? "running" : "skipped", voiceMode === "generate" ? "Generating narration after scene validation" : "Narration not requested");
+            setStage(job, "render", "running");
           }
           if (phase === "scene") {
             const plan = JSON.parse(await fs.readFile(planPath, "utf8"));
