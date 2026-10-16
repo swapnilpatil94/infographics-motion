@@ -37,6 +37,9 @@ Rules:
 - Camera movement must be purposeful and bounded. All output must be implementable with deterministic time-based rendering and no external assets/network calls.
 - Keep captions concise and readable on a 9:16 phone screen.
 - The plan is a blueprint for the next coding pass, not generic advice. Use concrete object names, movement, framing, and implementation details.
+- LOCKED MYTHOLOGY STYLE: For Indian mythology, epics, sacred stories and ancient-history narratives, plan dark cinematic particle animation by default: deep charcoal/near-black environments, luminous amber/antique-gold particles and connecting trails, restrained crimson accents, volumetric glow, layered 2.5D depth, and purposeful camera movement. Do not default to parchment/ink or the Yantralok technical-notebook palette for mythology.
+- Character reveals should construct a recognizable silhouette from meaningful dots and strokes, then reveal face, hair/headwear, costume, jewellery, gestures and story-specific props. Use particles to show narrative causality: gather into a character, trace a weapon, connect relationships, travel as an energy trail, form architecture, or transform into a symbolic object. Never use random-looking particles as decoration.
+- Each beat should specify a distinct cinematic action and camera composition. Use particle swarms, luminous contours, volumetric beams, parallax layers, motion trails and transformation effects only when they clarify the story. Divine moments may use a stronger aura/glow; keep faces, silhouettes and captions legible. Every effect must be deterministic and implementable through the existing renderAt(timestamp) contract.
 
 
 FALLBACK-SAFE GRAMMAR VOCABULARY
