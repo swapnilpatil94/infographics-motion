@@ -99,7 +99,7 @@ for (const spec of specs) {
 }
 function clamp(v,a=0,b=1){return Math.max(a,Math.min(b,v));}
 function smooth(v){v=clamp(v);return v*v*(3-2*v);}
-function renderAt(seconds) {
+function drawAt(seconds) {
   const t=clamp(Number(seconds)||0,0,DURATION);
   // Reveal the silhouette first, then the identity-bearing details, then the explanatory links.
   const progress = [
@@ -120,7 +120,7 @@ function renderAt(seconds) {
   document.getElementById("question").style.opacity=String(smooth((t-7.4)/1.1));
 }
 window.getDuration = function () { return DURATION; };
-window.renderAt = function (seconds) { const t = Math.max(0, Math.min(DURATION, Number(seconds) || 0)); renderAt(t); };
+window.renderAt = function (seconds) { const t = Math.max(0, Math.min(DURATION, Number(seconds) || 0)); drawAt(t); };
 const scrub=document.getElementById("scrub"), timeLabel=document.getElementById("time"), playBtn=document.getElementById("play");
 let previewStart=0, playing=false, raf=0, current=0;
 function clock(t){return "00:"+String(Math.floor(t)).padStart(2,"0");}
