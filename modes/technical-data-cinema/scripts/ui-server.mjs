@@ -54,7 +54,7 @@ function setStage(job, key, status, detail = null) {
 function run(command, args, cwd, job, label) {
   return new Promise((resolve, reject) => {
     log(job, `Starting: ${label}`);
-    const child = spawn(command, args, { cwd, env: process.env, stdio: ["ignore", "pipe", "pipe"] });
+    const child = spawn(command, args, { cwd, env: { ...process.env, TDC_EXPERIMENTAL_LLM_SCENE: "0" }, stdio: ["ignore", "pipe", "pipe"] });
     job.child = child;
     let tail = "";
     const consume = chunk => {
@@ -222,6 +222,26 @@ const server = http.createServer(async (req, res) => {
     const url = new URL(req.url, `http://${host}:${port}`);
     if (req.method === "GET" && url.pathname === "/") return await serveFile(res, path.join(here, "ui.html"));
     if (req.method === "GET" && url.pathname === "/api/models") return json(res, 200, { models: await getModels(), active: Boolean(activeJob) });
+    if (req.method === "GET" && url.pathname === "/api/projects") {
+      const entries = await fs.readdir(outputRoot, { withFileTypes: true }).catch(() => []);
+      const projects = [];
+      for (const entry of entries) {
+        if (!entry.isDirectory() || !safeSlug(entry.name)) continue;
+        const dir = path.join(outputRoot, entry.name);
+        try {
+          const savedStory = await fs.readFile(path.join(dir, "story.md"), "utf8");
+          const match = savedStory.match(/^#\\s+(.+)$/m);
+          const body = savedStory.replace(/^#\\s+.+(?:\\r?\\n)+/, "").trim();
+          const files = {};
+          for (const [key, name] of Object.entries({ plan: "visual-plan.json", scene: "index.html", narration: "narration.md", audio: "final.narration.wav", video: "final.mp4", silentVideo: "final-silent.mp4" })) {
+            try { await fs.access(path.join(dir, name)); files[key] = true; } catch {}
+          }
+          projects.push({ slug: entry.name, title: match?.[1] || entry.name, story: body, files });
+        } catch {}
+      }
+      projects.sort((a, b) => a.title.localeCompare(b.title));
+      return json(res, 200, { projects });
+    }
     if (req.method === "GET" && url.pathname.startsWith("/api/jobs/")) {
       const job = jobs.get(url.pathname.split("/").pop());
       if (!job) return json(res, 404, { error: "Job not found." });
@@ -389,10 +409,8 @@ const server = http.createServer(async (req, res) => {
             try { const existing = await fs.readFile(storyPath, "utf8"); if (existing !== storyContent) throw new Error("This output folder contains a different story.md. Choose a new folder to preserve existing artifacts."); }
             catch (e) { if (e.code === "ENOENT") await fs.writeFile(storyPath, storyContent, { flag: "wx" }); else throw e; }
             const planPath = path.join(dir, "visual-plan.json");
-            try { await fs.access(planPath); const archive = path.join(dir, "visual-plan.previous-" + Date.now() + ".json"); await fs.rename(planPath, archive); log(job, "Archived the prior plan as " + path.basename(archive)); }
-            catch (e) { if (e.code !== "ENOENT") throw e; }
-            try { await fs.access(htmlPath); const archive = path.join(dir, "index.pre-analysis-" + Date.now() + ".html"); await fs.rename(htmlPath, archive); log(job, "Archived the prior scene as " + path.basename(archive)); }
-            catch (e) { if (e.code !== "ENOENT") throw e; }
+            // Preserve existing plan/scene artifacts. generate.mjs reuses a matching plan;
+            // never archive good work merely because the user reopens the analysis stage.
             const node = process.execPath;
             const args = ["scripts/ollama-session.mjs", "--", "node", "scripts/generate.mjs", "--story", storyPath, "--planner-model", plannerModel, "--model", model, "--out", htmlPath, "--plan-file", planPath, "--phase", "plan"];
             await run(node, args, root, job, "Visual analysis (plan only; model unload before next stage)");
