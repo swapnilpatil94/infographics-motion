@@ -6,6 +6,7 @@ import process from "node:process";
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import crypto from "node:crypto";
+import { build } from "esbuild";
 import { normalizeVisualPlan } from "./visual-plan.mjs";
 import { normalizeNarrationForTTS } from "./narration-text.mjs";
 
@@ -39,6 +40,19 @@ function readBody(req, maxBytes = 500_000) {
     });
     req.on("error", reject);
   });
+}
+async function bundleSceneHtml(source) {
+  const matches = [...source.matchAll(/<script\b(?=[^>]*\btype\s*=\s*["']module["'])[^>]*>([\s\S]*?)<\/script\s*>/gi)];
+  if (matches.length > 1) throw new Error("Use one module script so dependencies can be bundled into one offline HTML file.");
+  if (!matches.length) {
+    if (/from\s*["']three(?:\/|["'])|import\s*["']three(?:\/|["'])/.test(source)) throw new Error("This HTML imports Three.js without a module script. Put imports inside one module script.");
+    return source;
+  }
+  const match = matches[0];
+  const result = await build({ stdin: { contents: match[1], resolveDir: root, sourcefile: "uploaded-scene.js", loader: "js" }, bundle: true, write: false, platform: "browser", format: "iife", target: "es2022", minify: true, legalComments: "none" });
+  const bundled = result.outputFiles[0]?.text;
+  if (!bundled) throw new Error("esbuild returned no bundled output.");
+  return source.replace(match[0], "<script>\n" + bundled + "\n</script>");
 }
 function log(job, message) {
   job.logs.push(`[${new Date().toLocaleTimeString()}] ${message}`);
@@ -248,6 +262,17 @@ const server = http.createServer(async (req, res) => {
       return json(res, 200, { id: job.id, status: job.status, stage: job.stage || null, stages: job.stages || {}, logs: job.logs, error: job.error || null, files: job.files || {} });
     }
 
+    if (req.method === "POST" && url.pathname === "/api/scene/bundle") {
+      const body = await readBody(req, 1_600_000);
+      let html = String(body.html || "");
+      if (!html.trim() || !/<!doctype\s+html/i.test(html) || !/<html\b/i.test(html) || !/<\/html\s*>/i.test(html)) return json(res, 400, { error: "Upload a complete HTML document before previewing." });
+      try { html = await bundleSceneHtml(html); } catch (error) { return json(res, 400, { error: "Could not prepare offline scene: " + error.message }); }
+      if (Buffer.byteLength(html, "utf8") > 1_500_000) return json(res, 413, { error: "Bundled HTML exceeds 1.5 MB. Reduce unused assets." });
+      if (!/window\.renderAt\s*=/.test(html) && !/function\s+renderAt\s*\(/.test(html)) return json(res, 400, { error: "Scene HTML must define window.renderAt(seconds)." });
+      if (!/window\.getDuration\s*=/.test(html) && !/(?:const|let|var)\s+DURATION\s*=\s*[0-9]/i.test(html)) return json(res, 400, { error: "Scene HTML must define window.getDuration() or a numeric DURATION." });
+      return json(res, 200, { ok: true, html });
+    }
+
     if (req.method === "POST" && url.pathname === "/api/scene/save") {
       if (activeJob) return json(res, 409, { error: "Wait for the active production stage to finish before saving or replacing scene HTML." });
       const body = await readBody(req, 1_600_000);
@@ -255,8 +280,9 @@ const server = http.createServer(async (req, res) => {
       if (!slug) return json(res, 400, { error: "Enter a valid project/output folder name." });
       let html = String(body.html || "");
       if (!html.trim()) return json(res, 400, { error: "Paste a complete HTML scene before saving." });
-      if (Buffer.byteLength(html, "utf8") > 1_500_000) return json(res, 413, { error: "Scene HTML is larger than 1.5 MB. Keep the scene self-contained and remove unused assets." });
       if (!/<!doctype\s+html/i.test(html) || !/<html\b/i.test(html) || !/<\/html\s*>/i.test(html)) return json(res, 400, { error: "Paste a complete HTML document beginning with <!doctype html>, not an HTML fragment." });
+      try { html = await bundleSceneHtml(html); } catch (error) { return json(res, 400, { error: "Could not prepare offline scene: " + error.message }); }
+      if (Buffer.byteLength(html, "utf8") > 1_500_000) return json(res, 413, { error: "Bundled HTML is larger than 1.5 MB. Keep the scene self-contained and remove unused assets." });
       if (!/window\.renderAt\s*=/.test(html) && !/function\s+renderAt\s*\(/.test(html)) return json(res, 400, { error: "Scene HTML must define window.renderAt(seconds) for deterministic frame seeking." });
       let duration = null;
       const durationMatch = html.match(/(?:window\.)?sceneDuration\s*=\s*([0-9]+(?:\.[0-9]+)?)/) || html.match(/(?:const|let|var)\s+DURATION\s*=\s*([0-9]+(?:\.[0-9]+)?)/i) || html.match(/(?:const|let|var)\s+duration\s*=\s*([0-9]+(?:\.[0-9]+)?)/i);
