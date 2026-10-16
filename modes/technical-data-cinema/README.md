@@ -129,3 +129,30 @@ npm run generate -- --story <story-brief.md> --model qwen3-coder:30b
 npm run export -- --html output/<story-slug>/index.html --out output/<story-slug>/final.mp4 --audio /absolute/path/to/approved-narration.wav
 ```
 Do not run a new TTS pass just to test visuals. Review the MP4 for recognisable silhouettes, meaningful motion, continuity between visual metaphors, mobile readability, and narration sync; passing automated tests alone is not a creative-quality sign-off.
+
+
+## Dotted-line character storytelling (same Infographics mode)
+
+Character-led stories can use progressive dotted contours and ink-like strokes inside the existing HTML/CSS/JS infographic generator. This is **not a separate mythology mode** and does not change the narration or export pipeline. The planner/director prompts now ask the models to use dots meaningfully, preserve character identity, and transform the character into explanatory diagrams instead of repeating static portraits.
+
+### Quick visual preview — no Ollama or TTS required
+
+From the repository root:
+
+```bash
+cd modes/technical-data-cinema
+npm run render -- --html examples/dotted-character-reveal.html --out output/dotted-character-reveal.mp4 --fps 30 --duration 12
+```
+
+This renders the included deterministic example to `output/dotted-character-reveal.mp4` using the normal Playwright/FFmpeg renderer. It is a visual technique demo, not the finished Draupadi episode.
+
+### Generate a story-specific scene
+
+From the same `modes/technical-data-cinema` directory, make sure Ollama is running and both models are installed:
+
+```bash
+ollama list
+npm run generate -- --story examples/draupadi-question.md --planner-model qwen3.5:9b --model qwen3-coder:30b --out output/draupadi-question/index.html
+```
+
+Then preview/export the generated HTML with the normal render command. Add narration with `--audio /absolute/path/to/narration.wav` when the approved WAV is ready; the renderer uses the same existing Chatterbox-produced audio rather than introducing a new TTS path. Review the generated character's costume and visual details before publication: the dotted treatment is an illustrative visual, not a claim of historically certain appearance.
