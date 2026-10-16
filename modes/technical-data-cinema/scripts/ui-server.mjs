@@ -417,6 +417,16 @@ const server = http.createServer(async (req, res) => {
             const plan = JSON.parse(await fs.readFile(planPath, "utf8"));
             setStage(job, "analysis", "passed"); setStage(job, "planValidation", "passed", `${plan.beats.length} beats ending at ${plan.beats.at(-1)?.end}s`);
             job.files = { plan: `/files/${encodeURIComponent(slug)}/visual-plan.json` };
+            try {
+              const savedHtml = await fs.readFile(htmlPath, "utf8");
+              const storyFingerprint = crypto.createHash("sha256").update(storyContent).digest("hex");
+              const planFingerprint = crypto.createHash("sha256").update(JSON.stringify(normalizeVisualPlan(plan))).digest("hex");
+              if (savedHtml.includes(`name="tdc-story-fingerprint" content="${storyFingerprint}"`) &&
+                  savedHtml.includes(`name="tdc-plan-fingerprint" content="${planFingerprint}"`)) {
+                job.files.scene = `/files/${encodeURIComponent(slug)}/index.html`;
+                log(job, "An existing scene matches this story and plan; it remains available and was not regenerated.");
+              }
+            } catch (error) { if (error.code !== "ENOENT") throw error; }
             job.status = "completed";
             log(job, "ANALYSIS STAGE VALIDATED. Plan saved for review; scene generation, narration and rendering were not started.");
             return;
@@ -454,6 +464,26 @@ const server = http.createServer(async (req, res) => {
           if (phase === "all" && voiceMode === "generate") await fs.writeFile(narrationPath, narrationContent, "utf8");
           const node = process.execPath;
           const planPath = path.join(dir, "visual-plan.json");
+          if (phase === "all" && reuseScene) {
+            try {
+              const savedPlan = JSON.parse(await fs.readFile(planPath, "utf8"));
+              const savedHtml = await fs.readFile(htmlPath, "utf8");
+              const storyFingerprint = crypto.createHash("sha256").update(storyContent).digest("hex");
+              const planFingerprint = crypto.createHash("sha256").update(JSON.stringify(normalizeVisualPlan(savedPlan))).digest("hex");
+              const matches = savedPlan.story_fingerprint === storyFingerprint &&
+                savedHtml.includes(`name="tdc-story-fingerprint" content="${storyFingerprint}"`) &&
+                savedHtml.includes(`name="tdc-plan-fingerprint" content="${planFingerprint}"`);
+              if (!matches) {
+                const stalePath = path.join(dir, `index.stale-fingerprint-${Date.now()}.html`);
+                await fs.rename(htmlPath, stalePath);
+                reuseScene = false;
+                log(job, `Existing scene does not match the current story/plan; archived as ${path.basename(stalePath)} and will regenerate only the scene stage.`);
+              } else log(job, "Existing scene fingerprints match the saved story and plan; reusing it without scene generation.");
+            } catch (error) {
+              if (error.code !== "ENOENT") throw error;
+              reuseScene = false;
+            }
+          }
           if (phase === "scene" || phase === "render") {
             const plan = JSON.parse(await fs.readFile(planPath, "utf8"));
             const storyFingerprint = crypto.createHash("sha256").update(storyContent).digest("hex");
