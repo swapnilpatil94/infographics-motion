@@ -306,14 +306,19 @@ $("customPreviewScene").addEventListener("click",async()=>{
  catch(e){$("customState").textContent="Preview failed: "+e.message}
  finally{button.disabled=false}
 });
-$("customDownloadScene").addEventListener("click",()=>{
- const html=$("customHtml").value;
- if(!html.trim()){$("customState").textContent="Nothing to download — upload or load an HTML scene first.";return}
- const blob=new Blob([html],{type:"text/html;charset=utf-8"});
- const url=URL.createObjectURL(blob),a=document.createElement("a");
- a.href=url;a.download=(( $("customSlug").value||"custom-mythology-scene").trim().replace(/[^a-z0-9_-]+/gi,"-").replace(/^-|-$/g,"")||"custom-mythology-scene")+".html";
- document.body.append(a);a.click();a.remove();URL.revokeObjectURL(url);
- $("customState").textContent="Downloaded current editor contents. The saved project was not modified.";});
+$("customDownloadScene").addEventListener("click",async()=>{
+ const source=$("customHtml").value;
+ if(!source.trim()){$("customState").textContent="Nothing to download — upload or load an HTML scene first.";return}
+ const button=$("customDownloadScene");button.disabled=true;$("customState").textContent="Bundling offline HTML for download…";
+ try{
+  const r=await fetch("/api/scene/bundle",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({html:source})});const d=await r.json();if(!r.ok)throw new Error(d.error||"Could not bundle scene");
+  const blob=new Blob([d.html],{type:"text/html;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=url;a.download=(( $("customSlug").value||"custom-mythology-scene").trim().replace(/[^a-z0-9_-]+/gi,"-").replace(/^-|-$/g,"")||"custom-mythology-scene")+".html";
+  document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  $("customState").textContent="Downloaded bundled, offline-ready HTML. The saved project was not modified.";
+ }catch(e){$("customState").textContent="Download failed: "+e.message}
+ finally{button.disabled=false}
+});
 $("customUnloadScene").addEventListener("click",()=>{
  if(customBusy){$("customState").textContent="Wait until the active narration/render job finishes before unloading.";return}
  $("customHtml").value="";$("customHtmlFile").value="";
