@@ -18,6 +18,7 @@
     "test:fallback:render": "node scripts/test-fallback-render.mjs",
     "test:visual-plan": "node scripts/test-visual-plan.mjs",
     "test:ui": "node scripts/test-ui.mjs",
+    "test:narration-text": "node scripts/test-narration-text.mjs",
     "test:export-compat": "node scripts/test-export-compat.mjs",
     "test:scene-contract": "node scripts/test-export-compat.mjs",
     "test:scene-compat": "node scripts/test-scene-compat.mjs"
