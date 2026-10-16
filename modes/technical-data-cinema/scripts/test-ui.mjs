@@ -16,7 +16,7 @@ for (const [index, match] of scripts.entries()) {
 for (const id of ["analyze", "planEditor", "savePlan", "stages", "run", "exportName", "audioOffset"]) {
   assert.ok(html.includes('id="' + id + '"'), "missing UI control: " + id);
 }
-for (const stage of ["analysis", "scene", "validation", "audio", "render"]) {
+for (const stage of ["analysis", "planValidation", "scene", "validation", "audio", "render"]) {
   assert.ok(html.includes('data-stage="' + stage + '"'), "missing progress stage: " + stage);
 }
 assert.ok(html.includes("/api/plan"), "editable plan must save through the validation endpoint");
@@ -24,6 +24,7 @@ assert.ok(html.includes("#050607") && html.includes("#e64b36"), "UI must preserv
 assert.ok(server.includes("--audio-offset") && html.includes("audioOffset"), "render UI must expose adjustable audio/video sync offset");
 assert.ok(html.includes("Yantralok") && html.includes("rgba(245,247,248,.12)"), "UI should use a dark dotted technical visual background");
 assert.ok(html.includes("updateStages(j.stages,j.status)"), "UI must consume actual server stage statuses");
+assert.ok(html.includes("<b>2. Plan validation</b>") && html.includes("<b>3. Scene compilation</b>"), "UI must show plan validation and scene compilation as separate stages");
 assert.ok(html.includes('pendingPhase==="all"?"all":(analysisReady?(sceneReady?"render":"scene"):"analysis")'), "UI must preserve staged workflow and allow one-click all-in-one production");
 assert.ok(html.includes('id="runAll"') && html.includes('pendingPhase="all"') && html.includes('pendingPhase==="all"?"all"'), "UI must expose one-click full production");
 assert.ok(generator.includes("OLLAMA_UNAVAILABLE") && generator.includes("attempt <= 3"), "generator must retry transient Ollama connection failures and stop cleanly when unavailable");
