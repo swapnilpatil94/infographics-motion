@@ -456,8 +456,10 @@ const server = http.createServer(async (req, res) => {
             try {
               await run(node, generateArgs, root, job, "Ollama scene generation (model unload after scene generation)");
             } catch (error) {
-              const validationFailure = /Generated scene failed browser render-only validation|Generated HTML failed export validation|Model output did not start with|Ollama returned no message content|Math\.random\(\), forbidden|missing native \?render=1 render-only mode/i.test(job.logs.slice(-100).join("\n"));
-              if (!validationFailure) throw error;
+              const recentOutput = job.logs.slice(-140).join("\n");
+              const validationFailure = /Generated scene failed browser render-only validation|Generated HTML failed export validation|Model output did not start with|Ollama returned no message content|Math\.random\(\), forbidden|missing native \?render=1 render-only mode/i.test(recentOutput);
+              const internalRepairExhausted = /Scene generation failed after one targeted repair|Scene generation stopped because Ollama connectivity failed|OLLAMA_UNAVAILABLE/i.test(recentOutput);
+              if (!validationFailure || internalRepairExhausted) throw error;
               const archivedScene = path.join(dir, `index.invalid-${Date.now()}.log.html`);
               // generate.mjs validates before writing, but preserve any unexpected partial artifact safely.
               try { await fs.rename(htmlPath, archivedScene); log(job, `Archived invalid generated scene as ${path.basename(archivedScene)}.`); }
