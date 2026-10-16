@@ -263,7 +263,7 @@ const server = http.createServer(async (req, res) => {
       if (durationMatch) duration = Number(durationMatch[1]);
       if (!/window\.getDuration\s*=/.test(html) && !/getDuration\s*\(\s*\)/.test(html)) {
         if (!Number.isFinite(duration) || duration <= 0 || duration > 600) return json(res, 400, { error: "Scene must define window.getDuration(), or provide a numeric window.sceneDuration between 0 and 600 seconds." });
-        const bridge = "<script>window.getDuration = window.getDuration || function () { return Number(window.sceneDuration) || " + duration + "; };<\/script>";
+        const bridge = "<script>window.getDuration = window.getDuration || function () { return Number(window.sceneDuration) || " + duration + "; };</script>";
         html = html.replace(/<\/body\s*>/i, bridge + "\n</body>");
         if (!html.includes(bridge)) html += "\n" + bridge;
       }
@@ -280,8 +280,8 @@ const server = http.createServer(async (req, res) => {
       const planFingerprint = crypto.createHash("sha256").update(JSON.stringify(plan)).digest("hex");
       const upsertMeta = (source, name, value) => {
         const tag = '<meta name="' + name + '" content="' + value + '">';
-        const expression = new RegExp('<meta\\s+name=["\\']' + name + '["\\'][^>]*>', "i");
-        return expression.test(source) ? source.replace(expression, tag) : source.replace(/<head\\b[^>]*>/i, match => match + "\\n  " + tag);
+        const expression = new RegExp("<meta\\s+name=[\"']" + name + "[\"'][^>]*>", "i");
+        return expression.test(source) ? source.replace(expression, tag) : source.replace(/<head\b[^>]*>/i, match => match + "\n  " + tag);
       };
       html = upsertMeta(html, "tdc-story-fingerprint", storyFingerprint);
       html = upsertMeta(html, "tdc-plan-fingerprint", planFingerprint);
@@ -295,8 +295,7 @@ const server = http.createServer(async (req, res) => {
         }
       } catch (error) { if (error.code !== "ENOENT") throw error; }
       await fs.writeFile(scenePath, html, "utf8");
-      const resolvedDuration = duration || Number((html.match(/(?:window\\.)?sceneDuration\\s*=\\s*([0-9]+(?:\\.[0-9]+)?)/) || [])[1]) || null;
-      return json(res, 200, { ok: true, path: "output/" + slug + "/index.html", backup, html, duration: resolvedDuration });
+      return json(res, 200, { ok: true, path: "output/" + slug + "/index.html", backup, html, duration });
     }
 
     if (req.method === "POST" && url.pathname === "/api/plan") {
