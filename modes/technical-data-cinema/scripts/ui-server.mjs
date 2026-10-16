@@ -261,7 +261,7 @@ const server = http.createServer(async (req, res) => {
       let duration = null;
       const durationMatch = html.match(/(?:window\.)?sceneDuration\s*=\s*([0-9]+(?:\.[0-9]+)?)/) || html.match(/(?:const|let|var)\s+DURATION\s*=\s*([0-9]+(?:\.[0-9]+)?)/);
       if (durationMatch) duration = Number(durationMatch[1]);
-      if (!/window\.getDuration\s*=/.test(html) && !/getDuration\s*\(\s*\)/.test(html)) {
+      if (!/window\.getDuration\s*=/.test(html)) {
         if (!Number.isFinite(duration) || duration <= 0 || duration > 600) return json(res, 400, { error: "Scene must define window.getDuration(), or provide a numeric window.sceneDuration between 0 and 600 seconds." });
         const bridge = "<script>window.getDuration = window.getDuration || function () { return Number(window.sceneDuration) || " + duration + "; };</script>";
         html = html.replace(/<\/body\s*>/i, bridge + "\n</body>");
