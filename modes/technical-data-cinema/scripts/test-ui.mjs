@@ -8,6 +8,9 @@ const html = await fs.readFile(path.join(here, "ui.html"), "utf8");
 const server = await fs.readFile(path.join(here, "ui-server.mjs"), "utf8");
 const generator = await fs.readFile(path.join(here, "generate.mjs"), "utf8");
 const director = await fs.readFile(path.join(here, "../prompts/visual-director.md"), "utf8");
+const planner = await fs.readFile(path.join(here, "../prompts/visual-planner.md"), "utf8");
+const fallbackScene = await fs.readFile(path.join(here, "fallback-scene.mjs"), "utf8");
+const generatorSource = await fs.readFile(path.join(here, "generate.mjs"), "utf8");
 const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/gi)];
 assert.ok(scripts.length >= 1, "UI must include its client script");
 for (const [index, match] of scripts.entries()) {
@@ -39,6 +42,9 @@ assert.ok(server.includes('[...generateArgs, "--phase", "plan"]') && server.incl
 assert.ok(server.includes('setStage(job, "planValidation", "passed"'), "analysis plan validation must be reported before scene compilation starts");
 assert.ok(server.includes("internalRepairExhausted"), "UI must not launch a second repair after the generator has already exhausted its repair");
 assert.ok(director.includes("LOCKED MYTHOLOGY ART DIRECTION") && director.includes("dark cinematic particle aesthetic") && director.includes("Do NOT use parchment as the default mythology background"), "mythology scenes must default to locked dark cinematic particles, not parchment");
+assert.ok(planner.includes("LOCKED MYTHOLOGY STYLE") && planner.includes("dark cinematic particle animation"), "planner must lock mythology scenes to dark cinematic particles");
+assert.ok(fallbackScene.includes('const theme=mythology?"mythology":"technical"') && fallbackScene.includes('data-theme="mythology"{background:radial-gradient') && fallbackScene.includes('fill:"#fff0ad"'), "deterministic fallback must render mythology in a luminous dark particle style");
+assert.ok(generatorSource.includes("locked dark cinematic particle style") && !generatorSource.includes("use parchment (#F5EBE0)"), "scene generation prompts must not override the mythology style lock with parchment");
 assert.ok(director.includes("meaningful particle contours and connecting strokes") && director.includes("timestamp-driven"), "mythology character particles must be story-driven and deterministic");
 const planner = await fs.readFile(path.join(here, "../prompts/visual-planner.md"), "utf8");
 assert.ok(planner.includes("LOCKED MYTHOLOGY STYLE") && planner.includes("dark cinematic particle animation"), "visual planner must use the locked mythology particle style");
