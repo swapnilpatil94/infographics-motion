@@ -41,6 +41,7 @@ jobs:
           node --check scripts/generate.mjs
           node --check scripts/scene-contract.mjs
           node --check scripts/fallback-scene.mjs
+          node --check scripts/test-plan-compiler.mjs
           node --check scripts/test-fallback-scene.mjs
           node --check scripts/test-fallback-render.mjs
           node --check scripts/visual-plan.mjs
@@ -66,6 +67,8 @@ jobs:
         run: npm run test:export-compat
       - name: Generated scene compatibility and deterministic seeking test
         run: npm run test:scene-compat
+      - name: Deterministic plan compiler test
+        run: npm run test:plan-compiler
       - name: Deterministic fallback scene contract test
         run: npm run test:fallback
       - name: Browser-level fallback scene and safe-area test
