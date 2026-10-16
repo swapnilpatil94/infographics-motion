@@ -28,6 +28,8 @@ assert.ok(html.includes('pendingPhase==="all"?"all":(analysisReady?(sceneReady?"
 assert.ok(html.includes('id="runAll"') && html.includes('pendingPhase="all"') && html.includes('pendingPhase==="all"?"all"'), "UI must expose one-click full production");
 assert.ok(generator.includes("OLLAMA_UNAVAILABLE") && generator.includes("attempt <= 3"), "generator must retry transient Ollama connection failures and stop cleanly when unavailable");
 assert.ok(generator.includes("num_ctx: context, num_predict:"), "scene generation must set an explicit context and output-token budget");
+assert.ok(generator.includes("buildFallbackScene") && generator.includes("TDC_EXPERIMENTAL_LLM_SCENE"), "production scene generation must compile the validated plan without depending on LLM-authored renderer code");
+assert.ok(server.includes("deterministic renderer"), "scene stage logs must distinguish plan compilation from analysis");
 assert.ok(server.includes("internalRepairExhausted"), "UI must not launch a second repair after the generator has already exhausted its repair");
 assert.ok(director.includes("Do NOT force the dark Yantralok palette onto mythology/history stories"), "mythology/history scenes must use their story-appropriate parchment palette in infographic mode");
 assert.ok(director.includes("a real balance/scale with two labelled pans") && director.includes("recognisable spatial environment"), "mythology scenes must contain concrete story-specific visuals, not generic dots");
