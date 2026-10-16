@@ -60,3 +60,9 @@ assert.ok(voiceCache.includes("CACHE HIT: narration WAV already exists; skipping
 assert.ok(voiceCache.includes("CACHE HIT: reusing existing word alignment"), "existing alignment must be reused independently");
 assert.ok(exporter.includes("isolated local synthesis also failed") && exporter.includes("from engine.studio.server import script_to_audio"), "export must fall back to the local production voice adapter if Studio disappears");
 assert.ok(exporter.includes("copyFile(cachedAudio, audioPath)"), "fallback narration must be copied to the project output without regenerating visuals");
+
+
+assert.ok(html.includes('id="sceneHtml"') && html.includes('id="saveSceneHtml"'), "UI must expose a paste-and-save custom scene HTML editor");
+assert.ok(html.includes('id="previewSceneHtml"') && html.includes('id="renderSceneHtml"'), "custom scene UI must support preview and render actions");
+assert.ok(server.includes('url.pathname === "/api/scene/save"') && server.includes('index.user-backup-'), "custom scene saves must be server-backed and preserve the previous scene");
+assert.ok(server.includes("tdc-story-fingerprint") && server.includes("tdc-plan-fingerprint"), "custom HTML saves must be bound to the selected story and plan so render-only validation can reuse them");
