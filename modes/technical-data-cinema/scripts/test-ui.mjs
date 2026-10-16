@@ -68,3 +68,6 @@ assert.ok(server.includes('url.pathname === "/api/scene/save"') && server.includ
 assert.ok(server.includes("tdc-story-fingerprint") && server.includes("tdc-plan-fingerprint"), "custom HTML saves must be bound to the selected story and plan so render-only validation can reuse them");
 
 assert.ok(html.includes('id="sceneHtmlFile"'), "UI must allow loading the provided HTML file directly from disk");
+
+assert.ok(html.includes('value="projectWav"'), "UI must support rendering with the project’s saved narration WAV");
+assert.ok(server.includes('voiceMode === "projectWav"') && server.includes('final.narration.wav'), "server must resolve the project WAV without requiring a machine-specific path");
