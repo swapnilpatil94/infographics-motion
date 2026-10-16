@@ -38,7 +38,10 @@ assert.ok(html.includes('id="existingProject"') && html.includes('id="loadProjec
 assert.ok(server.includes('[...generateArgs, "--phase", "plan"]') && server.includes('[...generateArgs, "--phase", "scene"]'), "one-click production must run analysis and scene compilation as separately reported stages");
 assert.ok(server.includes('setStage(job, "planValidation", "passed"'), "analysis plan validation must be reported before scene compilation starts");
 assert.ok(server.includes("internalRepairExhausted"), "UI must not launch a second repair after the generator has already exhausted its repair");
-assert.ok(director.includes("Do NOT force the dark Yantralok palette onto mythology/history stories"), "mythology/history scenes must use their story-appropriate parchment palette in infographic mode");
+assert.ok(director.includes("LOCKED MYTHOLOGY ART DIRECTION") && director.includes("dark cinematic particle aesthetic") && director.includes("Do NOT use parchment as the default mythology background"), "mythology scenes must default to locked dark cinematic particles, not parchment");
+assert.ok(director.includes("meaningful particle contours and connecting strokes") && director.includes("timestamp-driven"), "mythology character particles must be story-driven and deterministic");
+const planner = await fs.readFile(path.join(here, "../prompts/visual-planner.md"), "utf8");
+assert.ok(planner.includes("LOCKED MYTHOLOGY STYLE") && planner.includes("dark cinematic particle animation"), "visual planner must use the locked mythology particle style");
 assert.ok(director.includes("a real balance/scale with two labelled pans") && director.includes("recognisable spatial environment"), "mythology scenes must contain concrete story-specific visuals, not generic dots");
 assert.ok(server.includes("stages: job.stages"), "job API must expose explicit stage statuses");
 assert.ok(server.includes('SCENE STAGE VALIDATED. Rendering and narration were not started.'), "scene phase must stop before audio/render");
