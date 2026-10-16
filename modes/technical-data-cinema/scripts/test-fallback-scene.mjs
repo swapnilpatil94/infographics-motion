@@ -33,7 +33,7 @@ assert.match(html, /function transform\(/);
 assert.match(html, /very long headline explaining how an invisible system/i);
 assert.match(html, /Requests accumulate/);
 assert.match(html, /renderAt\(0\)/);
-assert.match(html, /SAFE FALLBACK/);
+assert.match(html, /PLAN-COMPILED SCENE/);
 assert.ok(html.length > 10000, "fallback should contain multiple substantial scene grammars");
 assert.throws(() => buildFallbackScene({ title: "Bad", story: "", plan: { beats: [] } }), /at least four beats/);
 console.log("Story-grammar fallback scene tests passed.");
