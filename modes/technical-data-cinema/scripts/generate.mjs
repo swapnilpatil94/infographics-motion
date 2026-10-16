@@ -38,7 +38,7 @@ if (!outPath.startsWith(outputRoot)) {
   console.error("Refusing to write outside modes/technical-data-cinema/output/. Use --out under that directory.");
   process.exit(2);
 }
-const context = Number(process.env.OLLAMA_NUM_CTX || 8192);
+const context = Number(process.env.OLLAMA_NUM_CTX || 12288);
 if (!Number.isInteger(context) || context < 2048 || context > 32768) {
   console.error("OLLAMA_NUM_CTX must be an integer between 2048 and 32768.");
   process.exit(2);
@@ -69,7 +69,7 @@ async function askOllama(messages, stage, selectedModel = model, responseFormat 
         body: JSON.stringify({
           model: selectedModel, stream: false, messages, keep_alive: 0,
           ...(responseFormat ? { format: responseFormat } : {}),
-          options: { temperature: 0.25, num_ctx: context }
+          options: { temperature: 0.25, num_ctx: context, num_predict: Number(process.env.OLLAMA_NUM_PREDICT || 6144) }
         }),
         signal: AbortSignal.timeout(timeoutMs)
       });
@@ -77,10 +77,13 @@ async function askOllama(messages, stage, selectedModel = model, responseFormat 
       break;
     } catch (error) {
       lastNetworkError = error;
-      if (attempt < 3) {
+      const retryableConnection = /fetch failed|ECONNREFUSED|ECONNRESET|EHOSTUNREACH|ENOTFOUND|socket hang up|other side closed/i.test(String(error.message || error));
+      if (attempt < 3 && retryableConnection) {
         const delayMs = attempt * 2000;
         console.warn(`Ollama connection failed during ${stage} (attempt ${attempt}/3): ${error.message}. Retrying in ${delayMs / 1000}s without regenerating the plan or changing models.`);
         await new Promise(resolve => setTimeout(resolve, delayMs));
+      } else {
+        break;
       }
     }
   }
