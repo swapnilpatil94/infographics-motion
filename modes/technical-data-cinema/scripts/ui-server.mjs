@@ -259,7 +259,7 @@ const server = http.createServer(async (req, res) => {
       if (!/<!doctype\s+html/i.test(html) || !/<html\b/i.test(html) || !/<\/html\s*>/i.test(html)) return json(res, 400, { error: "Paste a complete HTML document beginning with <!doctype html>, not an HTML fragment." });
       if (!/window\.renderAt\s*=/.test(html) && !/function\s+renderAt\s*\(/.test(html)) return json(res, 400, { error: "Scene HTML must define window.renderAt(seconds) for deterministic frame seeking." });
       let duration = null;
-      const durationMatch = html.match(/(?:window\.)?sceneDuration\s*=\s*([0-9]+(?:\.[0-9]+)?)/) || html.match(/(?:const|let|var)\s+DURATION\s*=\s*([0-9]+(?:\.[0-9]+)?)/);
+      const durationMatch = html.match(/(?:window\.)?sceneDuration\s*=\s*([0-9]+(?:\.[0-9]+)?)/) || html.match(/(?:const|let|var)\s+DURATION\s*=\s*([0-9]+(?:\.[0-9]+)?)/i) || html.match(/(?:const|let|var)\s+duration\s*=\s*([0-9]+(?:\.[0-9]+)?)/i);
       if (durationMatch) duration = Number(durationMatch[1]);
       if (!/window\.getDuration\s*=/.test(html)) {
         if (!Number.isFinite(duration) || duration <= 0 || duration > 600) return json(res, 400, { error: "Scene must define window.getDuration(), or provide a numeric window.sceneDuration between 0 and 600 seconds." });
