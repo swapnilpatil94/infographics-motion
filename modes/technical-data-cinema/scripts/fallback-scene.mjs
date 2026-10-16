@@ -45,7 +45,7 @@ function stack(g,i,l){const x=285,y=600,w=510,h=88;["VISIBLE EVENT","HIDDEN INCE
 function transform(g,i,l){const cx=540,cy=850;for(let k=0;k<4;k++){const r=70+k*68;add(g,"circle",{cx,cy,r,fill:"none",stroke:k===i%4?"#e64b36":"#3b4249","stroke-width":k===i%4?6:3,"stroke-dasharray":k%2?"8 18":"none"})}for(let k=0;k<12;k++){const a=k*Math.PI/6+l*.6,r=100+k%3*68;add(g,"circle",{cx:cx+Math.cos(a)*r,cy:cy+Math.sin(a)*r,r:k%4===0?14:8,fill:k%3===0?"#e64b36":"#f5f7f8"})}add(g,"rect",{x:420,y:780,width:240,height:140,rx:24,fill:"url(#panelFill)",stroke:"#e64b36","stroke-width":4});add(g,"text",{x:540,y:858,"text-anchor":"middle",fill:"#fff4d6","font-size":23,"font-weight":800},["INPUT","SHIFT","NEW STATE"][i%3])}
 function drawDraupadiConstruction(g,i,l){
  const cx=540,top=570,spacing=18;
- add(g,"circle",{cx,cy:760,r:220,fill:"none",stroke:"#9d2d22","stroke-width":3,"stroke-dasharray":"3 18",opacity:.65});
+ add(g,"circle",{cx,cy:760,r:220,fill:"none",stroke:"#e34b3d","stroke-width":3,"stroke-dasharray":"3 18",opacity:.65});
  // A recognizable person is constructed progressively from deterministic ink dots.
  for(let row=0;row<34;row++){
   const y=top+row*spacing,dy=row;
@@ -59,59 +59,59 @@ function drawDraupadiConstruction(g,i,l){
   for(let col=-Math.floor(half/spacing);col<=Math.floor(half/spacing);col++){
    const x=cx+col*spacing;
    const reveal=clamp((l*34+2)-row,0,1);
-   if(reveal>0)add(g,"circle",{cx:x,cy:y,r:(row<5?5.5:4.2),fill:(row<5||Math.abs(col)<2)?"#9d2d22":"#28231e",opacity:.22+.78*reveal});
+   if(reveal>0)add(g,"circle",{cx:x,cy:y,r:(row<5?5.5:4.2),fill:(row<5||Math.abs(col)<2)?"#fff0ad":"#e7c16f",opacity:.22+.78*reveal,filter:"url(#glow)"});
   }
  }
- add(g,"path",{d:"M 540 570 C 480 610 475 700 500 760 L 465 1040 Q 540 1115 615 1040 L 580 760 C 605 700 600 610 540 570 Z",fill:"none",stroke:"#28231e","stroke-width":5,"stroke-linejoin":"round"});
- add(g,"path",{d:"M 500 655 Q 540 700 580 655 M 500 760 Q 540 800 580 760 M 475 960 Q 540 1015 605 960",fill:"none",stroke:"#9d2d22","stroke-width":5});
- add(g,"path",{d:"M 585 700 Q 680 665 725 735 L 690 770",fill:"none",stroke:"#9d2d22","stroke-width":8,"stroke-linecap":"round"});
- add(g,"text",{x:540,y:1180,"text-anchor":"middle","font-size":23,"font-weight":800,fill:"#9d2d22"},"THE QUESTION BECOMES VISIBLE");
+ add(g,"path",{d:"M 540 570 C 480 610 475 700 500 760 L 465 1040 Q 540 1115 615 1040 L 580 760 C 605 700 600 610 540 570 Z",fill:"none",stroke:"#e7c16f","stroke-width":5,filter:"url(#glow)","stroke-linejoin":"round"});
+ add(g,"path",{d:"M 500 655 Q 540 700 580 655 M 500 760 Q 540 800 580 760 M 475 960 Q 540 1015 605 960",fill:"none",stroke:"#e34b3d","stroke-width":5});
+ add(g,"path",{d:"M 585 700 Q 680 665 725 735 L 690 770",fill:"none",stroke:"#e34b3d","stroke-width":8,"stroke-linecap":"round"});
+ add(g,"text",{x:540,y:1180,"text-anchor":"middle","font-size":23,"font-weight":800,fill:"#e34b3d"},"THE QUESTION BECOMES VISIBLE");
 }
 function drawDiceGame(g,i,l){
- add(g,"path",{d:"M 190 650 L 890 650 L 980 1050 L 100 1050 Z",fill:"#E9D8C4",stroke:"#28231e","stroke-width":5});
- for(let row=0;row<5;row++)for(let col=0;col<7;col++)add(g,"circle",{cx:205+col*112,cy:710+row*68,r:3,fill:"#28231e",opacity:.3});
- add(g,"path",{d:"M 190 850 L 540 650 L 890 850 L 540 1050 Z",fill:"none",stroke:"#9d2d22","stroke-width":5});
+ add(g,"path",{d:"M 190 650 L 890 650 L 980 1050 L 100 1050 Z",fill:"#E9D8C4",stroke:"#e7c16f","stroke-width":5});
+ for(let row=0;row<5;row++)for(let col=0;col<7;col++)add(g,"circle",{cx:205+col*112,cy:710+row*68,r:3,fill:"#e7c16f",opacity:.3});
+ add(g,"path",{d:"M 190 850 L 540 650 L 890 850 L 540 1050 Z",fill:"none",stroke:"#e34b3d","stroke-width":5});
  const rotation=(i*31+l*220)%360;
  for(let d=0;d<2;d++){
   const x=405+d*190+(d?1:-1)*Math.sin(l*Math.PI)*42,y=830+(d?45:-30)*Math.sin(l*Math.PI);
   const gdie=add(g,"g",{transform:"translate("+x+" "+y+") rotate("+(rotation*(d?-.7:1)) +")"});
-  add(gdie,"rect",{x:-62,y:-62,width:124,height:124,rx:15,fill:"#F5EBE0",stroke:"#28231e","stroke-width":5});
+  add(gdie,"rect",{x:-62,y:-62,width:124,height:124,rx:15,fill:"#21170f",stroke:"#e7c16f","stroke-width":5});
   const dots=[[ -25,-25],[25,-25],[0,0],[-25,25],[25,25]];
   const count=2+((i+d)%4);
-  dots.slice(0,count).forEach(([dx,dy])=>add(gdie,"circle",{cx:dx,cy:dy,r:8,fill:"#9d2d22"}));
+  dots.slice(0,count).forEach(([dx,dy])=>add(gdie,"circle",{cx:dx,cy:dy,r:8,fill:"#e34b3d"}));
  }
- add(g,"path",{d:"M 255 1130 H 825 M 255 1130 l 25 -18 M 255 1130 l 25 18 M 825 1130 l -25 -18 M 825 1130 l -25 18",fill:"none",stroke:"#28231e","stroke-width":4});
- add(g,"text",{x:540,y:1200,"text-anchor":"middle","font-size":24,"font-weight":800,fill:"#9d2d22"},"A GAME CHANGES THE BALANCE");
+ add(g,"path",{d:"M 255 1130 H 825 M 255 1130 l 25 -18 M 255 1130 l 25 18 M 825 1130 l -25 -18 M 825 1130 l -25 18",fill:"none",stroke:"#e7c16f","stroke-width":4});
+ add(g,"text",{x:540,y:1200,"text-anchor":"middle","font-size":24,"font-weight":800,fill:"#e34b3d"},"A GAME CHANGES THE BALANCE");
 }
 function drawAssembly(g,i,l){
  // Pillars and a row of distinct silhouettes make the royal court legible rather than abstract.
  for(let k=0;k<5;k++){
   const x=145+k*198;
-  add(g,"path",{d:"M "+(x-58)+" 670 L "+x+" 610 L "+(x+58)+" 670 Z",fill:"#DCC8B1",stroke:"#28231e","stroke-width":4});
-  add(g,"rect",{x:x-40,y:670,width:80,height:400,fill:"#E8D7C4",stroke:"#28231e","stroke-width":4});
-  add(g,"path",{d:"M "+(x-54)+" 1070 H "+(x+54),fill:"none",stroke:"#9d2d22","stroke-width":5});
+  add(g,"path",{d:"M "+(x-58)+" 670 L "+x+" 610 L "+(x+58)+" 670 Z",fill:"#21170f",stroke:"#e7c16f","stroke-width":4});
+  add(g,"rect",{x:x-40,y:670,width:80,height:400,fill:"#21170f",stroke:"#e7c16f","stroke-width":4});
+  add(g,"path",{d:"M "+(x-54)+" 1070 H "+(x+54),fill:"none",stroke:"#e34b3d","stroke-width":5});
  }
  for(let k=0;k<5;k++){
   const x=190+k*175,alpha=clamp(1-l*1.2-(k%2)*.12,0,1);
-  add(g,"circle",{cx:x,cy:900,r:35,fill:"#28231e",opacity:alpha});
-  add(g,"path",{d:"M "+(x-50)+" 970 Q "+x+" 910 "+(x+50)+" 970 L "+(x+68)+" 1100 L "+(x-68)+" 1100 Z",fill:"#28231e",opacity:alpha});
-  add(g,"path",{d:"M "+(x-20)+" 880 L 540 820 L "+(x+20)+" 880",fill:"none",stroke:"#9d2d22","stroke-width":3,opacity:alpha*.8});
+  add(g,"circle",{cx:x,cy:900,r:35,fill:"#e7c16f",opacity:alpha});
+  add(g,"path",{d:"M "+(x-50)+" 970 Q "+x+" 910 "+(x+50)+" 970 L "+(x+68)+" 1100 L "+(x-68)+" 1100 Z",fill:"#e7c16f",opacity:alpha});
+  add(g,"path",{d:"M "+(x-20)+" 880 L 540 820 L "+(x+20)+" 880",fill:"none",stroke:"#e34b3d","stroke-width":3,opacity:alpha*.8});
  }
- add(g,"ellipse",{cx:540,cy:1100,rx:255,ry:60,fill:"none",stroke:"#9d2d22","stroke-width":4,"stroke-dasharray":"8 12"});
- add(g,"text",{x:540,y:1200,"text-anchor":"middle","font-size":24,"font-weight":800,fill:"#9d2d22"},"THE COURT FALLS SILENT");
+ add(g,"ellipse",{cx:540,cy:1100,rx:255,ry:60,fill:"none",stroke:"#e34b3d","stroke-width":4,"stroke-dasharray":"8 12"});
+ add(g,"text",{x:540,y:1200,"text-anchor":"middle","font-size":24,"font-weight":800,fill:"#e34b3d"},"THE COURT FALLS SILENT");
 }
 function drawBalance(g,i,l){
  const cx=540,cy=790,tilt=Math.sin(l*Math.PI)*22;
- add(g,"path",{d:"M 540 650 L 540 1110 M 410 1110 H 670",fill:"none",stroke:"#28231e","stroke-width":8,"stroke-linecap":"round"});
- add(g,"circle",{cx,cy:650,r:28,fill:"#9d2d22",stroke:"#28231e","stroke-width":4});
- add(g,"path",{d:"M 300 "+(760+tilt)+" L 780 "+(760-tilt),fill:"none",stroke:"#9d2d22","stroke-width":9,"stroke-linecap":"round"});
+ add(g,"path",{d:"M 540 650 L 540 1110 M 410 1110 H 670",fill:"none",stroke:"#e7c16f","stroke-width":8,"stroke-linecap":"round"});
+ add(g,"circle",{cx,cy:650,r:28,fill:"#e34b3d",stroke:"#e7c16f","stroke-width":4});
+ add(g,"path",{d:"M 300 "+(760+tilt)+" L 780 "+(760-tilt),fill:"none",stroke:"#e34b3d","stroke-width":9,"stroke-linecap":"round"});
  for(const side of [-1,1]){
   const x=540+side*235,y=760-side*tilt;
-  add(g,"path",{d:"M "+(x-105)+" "+(y+5)+" L "+(x+105)+" "+(y+5)+" L "+(x+65)+" "+(y+160)+" Q "+x+" "+(y+205)+" "+(x-65)+" "+(y+160)+" Z",fill:"#E8D7C4",stroke:"#28231e","stroke-width":5});
-  for(let k=0;k<5+(side>0?i%4:1);k++)add(g,"circle",{cx:x-45+(k%4)*30,cy:y+45+Math.floor(k/4)*30,r:7,fill:side>0?"#9d2d22":"#28231e"});
-  add(g,"text",{x,y:y+235,"text-anchor":"middle","font-size":22,"font-weight":800,fill:"#28231e"},side<0?"AUTHORITY":"JUSTICE");
+  add(g,"path",{d:"M "+(x-105)+" "+(y+5)+" L "+(x+105)+" "+(y+5)+" L "+(x+65)+" "+(y+160)+" Q "+x+" "+(y+205)+" "+(x-65)+" "+(y+160)+" Z",fill:"#17120e",stroke:"#e7c16f","stroke-width":5});
+  for(let k=0;k<5+(side>0?i%4:1);k++)add(g,"circle",{cx:x-45+(k%4)*30,cy:y+45+Math.floor(k/4)*30,r:7,fill:side>0?"#e34b3d":"#e7c16f"});
+  add(g,"text",{x,y:y+235,"text-anchor":"middle","font-size":22,"font-weight":800,fill:"#e7c16f"},side<0?"AUTHORITY":"JUSTICE");
  }
- add(g,"text",{x:540,y:1190,"text-anchor":"middle","font-size":24,"font-weight":800,fill:"#9d2d22"},"WHO HAS THE RIGHT TO DECIDE?");
+ add(g,"text",{x:540,y:1190,"text-anchor":"middle","font-size":24,"font-weight":800,fill:"#e34b3d"},"WHO HAS THE RIGHT TO DECIDE?");
 }
 function draw(b,i,l){const g=$("sceneArt");g.replaceChildren();const semantic=(b.subject+" "+b.idea).toLowerCase(),s=(b.grammar+" "+semantic+" "+b.action).toLowerCase();let type;
  if(THEME==="mythology"&&/draupadi|queen|woman|silhouette|raised hand|question/.test(s)){type="draupadi-construction";drawDraupadiConstruction(g,i,l)}
