@@ -11,6 +11,11 @@ export function validateSceneSource(source) {
   if(!/window\.renderAt\s*=/.test(html)) errors.push("missing window.renderAt(seconds)");
   if(!/window\.getDuration\s*=/.test(html)) errors.push("missing window.getDuration()");
   if(!/new\s+URLSearchParams\s*\(\s*(?:window\.)?location\.search\s*\)/.test(html)||!/\.get\s*\(\s*["']render["']\s*\)/.test(html)) errors.push("missing native ?render=1 render-only mode");
+  // Catch model-generated placeholder renderers before spending another long repair call.
+  const commentOnlyFunction = /function\s+((?:draw|render|build|animate|paint|update)[A-Za-z0-9_$]*)\s*\([^)]*\)\s*\{\s*(?:(?:\/\/[^\n]*|\/\*[\s\S]*?\*\/)\s*)*\}/g;
+  for (const match of html.matchAll(commentOnlyFunction)) errors.push(`renderer function ${match[1]} is empty/comment-only; implement its actual drawing and timestamp-driven state changes`);
+  const commentOnlyArrow = /(?:const|let)\s+((?:draw|render|build|animate|paint|update)[A-Za-z0-9_$]*)\s*=\s*(?:\([^)]*\)|[A-Za-z_$][\w$]*)\s*=>\s*\{\s*(?:(?:\/\/[^\n]*|\/\*[\s\S]*?\*\/)\s*)*\}/g;
+  for (const match of html.matchAll(commentOnlyArrow)) errors.push(`renderer function ${match[1]} is empty/comment-only; implement its actual drawing and timestamp-driven state changes`);
   return errors;
 }
 export async function assertSceneCandidate(source) {
