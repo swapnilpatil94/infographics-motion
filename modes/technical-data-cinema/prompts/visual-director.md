@@ -142,3 +142,22 @@ STORY-SPECIFIC VISUAL SIGNATURE
 
 VISUAL QA GATE
 Reject and redesign any beat if: the subject is not recognisable in a paused frame; dots are decorative rather than meaningful; 3D adds no explanatory value; the camera hides labels or the mechanism; two adjacent beats have the same composition and action; or a transformation breaks visual continuity. Before final output, audit six timestamps and confirm the intended silhouette, causal action, camera framing, and change from the previous beat are all visible.
+
+
+## DOTTED-LINE CHARACTER CONSTRUCTION — EXISTING INFOGRAPHICS MODE ONLY
+For stories featuring a recognizable person (including mythology, history, biography, scams, startups, or social stories), you may build the character from a dotted silhouette and progressive ink-like strokes. This is a visual technique inside the existing HTML/CSS/JS infographic renderer—not a new mode, separate pipeline, or request to use Blender.
+
+CHARACTER REVEAL
+1. Establish a clear outer silhouette using SVG paths or Canvas paths: head/hair, shoulders/body, garment outline, and one or two identity-bearing details. It must be recognizable in a paused frame at 9:16 phone scale.
+2. Place points deterministically along those paths (fixed spacing or a small local seeded PRNG precomputed once). Reveal them in path order from renderAt(t), so dots trace the contour instead of appearing as a random cloud.
+3. Reveal layers in a deliberate sequence: silhouette → facial/hair/costume details → prop/gesture → relationship connectors or annotations. Stagger the sequence against narration beats, with easing derived only from timestamp.
+4. Use connecting dotted lines to explain something: relationships, hierarchy, a decision path, cause-and-effect, a timeline, or the character's role in the event. Label only details the narration supports.
+5. Preserve character continuity across shots by reusing the same geometry, proportions, costume/ornament motifs, and palette. Change pose, crop, scale, camera framing, or connected infographic—not the character identity.
+6. Use warm off-white/parchment and black ink as a restrained optional treatment for epic/historical stories; use a small red or muted-gold accent only for a meaningful emphasis. The visual grammar remains the same infographic mode and must still fit its story-specific signature.
+
+IMPLEMENTATION CONTRACT
+- Use inline SVG or Canvas paths; no remote images, fonts, or network assets. Prefer SVG paths with stroke-dasharray/stroke-dashoffset for contour tracing, plus deterministic point coordinates for dot reveals. For Canvas, derive every dot's visibility and position from t.
+- Expose all reveal timing through the existing renderAt(seconds) contract. Same timestamp must always yield the same frame; no Math.random(), render-loop mutation, setInterval(), or CSS animation for scene state.
+- Keep dots semantically meaningful and sparse enough that the silhouette remains legible. Do not replace a character with a generic dotted human icon when the story needs a distinctive person.
+- Avoid repetitive portrait-only scenes. Let the constructed character transition into a map, court, network, timeline, balance/scale, relationship diagram, or other explanatory visual when that advances the story.
+- All current output rules remain in force: one self-contained HTML page, local-only assets, deterministic rendering/export, readable labels, and a deliberate ending.
