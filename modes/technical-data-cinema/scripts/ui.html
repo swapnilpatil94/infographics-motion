@@ -252,9 +252,12 @@ $("saveSceneHtml").addEventListener("click",async()=>{
   catch(e){$("sceneHtmlMessage").textContent="Save failed: "+e.message}
   finally{button.disabled=false}
 });
-$("previewSceneHtml").addEventListener("click",()=>{
+$("previewSceneHtml").addEventListener("click",async()=>{
   const source=$("sceneHtml").value.trim();if(!source){$("sceneHtmlMessage").textContent="Paste or load an HTML scene first.";return}
-  const frame=$("scenePreview");frame.srcdoc=source;frame.classList.remove("hidden");$("sceneHtmlMessage").textContent="Preview loaded below. Use renderAt-compatible scenes for final export."
+  const button=$("previewSceneHtml");button.disabled=true;$("sceneHtmlMessage").textContent="Preparing offline preview…";
+  try{const r=await fetch("/api/scene/bundle",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({html:source})});const d=await r.json();if(!r.ok)throw new Error(d.error||"Could not prepare scene");const frame=$("scenePreview");frame.srcdoc=d.html;frame.classList.remove("hidden");$("sceneHtmlMessage").textContent="Offline preview ready. Three.js module dependencies are bundled locally when present."}
+  catch(e){$("sceneHtmlMessage").textContent="Preview failed: "+e.message}
+  finally{button.disabled=false}
 });
 $("renderSceneHtml").addEventListener("click",()=>{
   if(!$("sceneHtml").value.trim()){alert("Paste or load the scene HTML first.");return}
@@ -296,9 +299,12 @@ $("customLoadScene").addEventListener("click",async()=>{
  try{const r=await fetch("/files/"+encodeURIComponent(slug)+"/index.html");const txt=await r.text();if(!r.ok)throw new Error("No saved index.html for this project.");$("customHtml").value=txt;$("customState").textContent="Loaded saved scene for "+slug}
  catch(e){$("customState").textContent=e.message}
 });
-$("customPreviewScene").addEventListener("click",()=>{
+$("customPreviewScene").addEventListener("click",async()=>{
  const html=$("customHtml").value.trim();if(!html){$("customState").textContent="Upload or paste the HTML first.";return}
- $("customPreview").srcdoc=html;$("customPreview").classList.remove("hidden");$("customState").textContent="Visual preview loaded. The production button will save this HTML before rendering."
+ const button=$("customPreviewScene");button.disabled=true;$("customState").textContent="Preparing offline preview…";
+ try{const r=await fetch("/api/scene/bundle",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({html})});const d=await r.json();if(!r.ok)throw new Error(d.error||"Could not prepare scene");$("customPreview").srcdoc=d.html;$("customPreview").classList.remove("hidden");$("customState").textContent="Offline preview ready. You can now save, download or render this scene."}
+ catch(e){$("customState").textContent="Preview failed: "+e.message}
+ finally{button.disabled=false}
 });
 $("customDownloadScene").addEventListener("click",()=>{
  const html=$("customHtml").value;
