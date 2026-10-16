@@ -5,6 +5,7 @@ import process from "node:process";
 import { fileURLToPath } from "node:url";
 import { build } from "esbuild";
 import { normalizeVisualPlan, validateVisualPlan } from "./visual-plan.mjs";
+import { buildFallbackScene } from "./fallback-scene.mjs";
 import { validateSceneSource, assertSceneCandidate } from "./scene-contract.mjs";
 import { applySceneCompatibility } from "./scene-compat.mjs";
 import crypto from "node:crypto";
@@ -54,7 +55,7 @@ if (!hasModel(plannerModel)) {
   console.error(`Visual planner model '${plannerModel}' is not downloaded. Run 'ollama pull ${plannerModel}' explicitly. Installed models: ${installedModels.join(", ") || "(none)"}`);
   process.exit(1);
 }
-console.log(`Visual planner: ${plannerModel}; scene coder: ${model}; context=${context} tokens`);
+console.log(`Visual planner: ${plannerModel}; scene renderer: deterministic plan compiler${process.env.TDC_EXPERIMENTAL_LLM_SCENE === "1" ? ` (experimental LLM scene coder: ${model})` : ""}; context=${context} tokens`);
 console.log(`Story: ${storyPath}\nOutput: ${outPath}`);
 const plannerPrompt = await fs.readFile(path.join(root, "prompts", "visual-planner.md"), "utf8");
 const timeoutMs = Number(process.env.OLLAMA_TIMEOUT_MS || 600000);
@@ -181,6 +182,40 @@ try {
 visualPlan = normalizeVisualPlan(visualPlan);
 validateVisualPlan(visualPlan, { requireFingerprint: true });
 if (phase === "plan") { console.log(`ANALYSIS VALIDATED: ${visualPlan.beats.length} beats saved to ${planFile}`); process.exit(0); }
+
+// Default production path: compile the approved declarative plan into deterministic,
+// time-seekable SVG scene code. The LLM does analysis/planning, never core renderer code.
+// This avoids placeholder drawing functions, Math.random(), and fragile code-repair loops.
+if (process.env.TDC_EXPERIMENTAL_LLM_SCENE !== "1") {
+  console.log("Scene compiler: compiling validated visual plan; no scene-coding model call.");
+  let compiledHtml = buildFallbackScene({ title, story, plan: visualPlan });
+  const planFingerprint = crypto.createHash("sha256").update(JSON.stringify(visualPlan)).digest("hex");
+  compiledHtml = compiledHtml.replace(/<head([^>]*)>/i, match => match +
+    `<meta name="tdc-story-fingerprint" content="${storyFingerprint}"><meta name="tdc-plan-fingerprint" content="${planFingerprint}">`);
+  const sourceErrors = validateSceneSource(compiledHtml);
+  if (sourceErrors.length) {
+    console.error("Deterministic scene compiler produced invalid source: " + sourceErrors.join("; "));
+    process.exit(1);
+  }
+  try {
+    const result = await assertSceneCandidate(compiledHtml);
+    console.log(`Scene contract passed: render-only, deterministic seeking, duration=${result.duration}s.`);
+  } catch (error) {
+    console.error(`Deterministic scene failed browser validation: ${error.message}`);
+    process.exit(1);
+  }
+  await fs.mkdir(path.dirname(outPath), { recursive: true });
+  try { await fs.writeFile(outPath, compiledHtml + "\\n", { flag: "wx" }); }
+  catch (error) {
+    if (error.code === "EEXIST") console.error(`Output already exists: ${outPath}. Choose a new output folder; existing scene was not overwritten.`);
+    else console.error(error.message);
+    process.exit(1);
+  }
+  console.log(`SCENE VALIDATED: saved deterministic plan-compiled scene to ${outPath}`);
+  console.log("Narration and video rendering were not started. Continue with the separate render stage using your approved WAV.");
+  process.exit(0);
+}
+
 const planJson = JSON.stringify(visualPlan, null, 2);
 console.log(`Visual Director planned ${visualPlan.beats.length} beats; generating the animated scene...`);
 let payload = "";
