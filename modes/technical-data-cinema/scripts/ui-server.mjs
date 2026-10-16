@@ -454,7 +454,12 @@ const server = http.createServer(async (req, res) => {
           if (phase === "render") { reuseScene = true; log(job, "Rendering the saved fingerprint-matched scene; Ollama and Chatterbox will not run."); }
           if (!reuseScene) {
             try {
-              await run(node, generateArgs, root, job, "Ollama scene generation (model unload after scene generation)");
+              const generateLabel = phase === "analysis"
+                ? "Visual analysis (planner model only; save plan for review)"
+                : phase === "scene"
+                  ? "Compile and validate scene from approved plan (deterministic renderer)"
+                  : "Visual analysis and deterministic scene compilation";
+              await run(node, generateArgs, root, job, generateLabel);
             } catch (error) {
               const recentOutput = job.logs.slice(-140).join("\n");
               const validationFailure = /Generated scene failed browser render-only validation|Generated HTML failed export validation|Model output did not start with|Ollama returned no message content|Math\.random\(\), forbidden|missing native \?render=1 render-only mode/i.test(recentOutput);
