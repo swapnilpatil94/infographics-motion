@@ -263,6 +263,7 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (req.method === "POST" && url.pathname === "/api/scene/bundle") {
+      if (activeJob) return json(res, 409, { error: "Wait for the active production stage to finish before bundling a scene." });
       const body = await readBody(req, 1_600_000);
       let html = String(body.html || "");
       if (!html.trim() || !/<!doctype\s+html/i.test(html) || !/<html\b/i.test(html) || !/<\/html\s*>/i.test(html)) return json(res, 400, { error: "Upload a complete HTML document before previewing." });
