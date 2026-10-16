@@ -119,18 +119,46 @@ try {
       planText = await askOllama(plannerMessages, "visual planning fallback", model, "json");
     }
   }
-  try {
-    const cleanPlan = planText.replace(/^\uFEFF/, "").trim();
-    const jsonText = cleanPlan.slice(cleanPlan.indexOf("{"), cleanPlan.lastIndexOf("}") + 1);
-    visualPlan = JSON.parse(jsonText);
-    visualPlan.story_fingerprint = storyFingerprint;
-    visualPlan = normalizeVisualPlan(visualPlan);
-    validateVisualPlan(visualPlan, { requireFingerprint: true });
-    await fs.mkdir(path.dirname(planFile), { recursive: true });
-    await fs.writeFile(planFile, JSON.stringify(visualPlan, null, 2) + String.fromCharCode(10), { flag: "wx" });
-    console.log(`Saved validated visual plan: ${planFile}`);
-  } catch (error) {
-    console.error(`Visual Director returned an invalid plan: ${error.message}. No HTML was written. The planner now uses Ollama JSON mode; if this persists, remove any partial plan file and retry.`);
+  let planError = null;
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      const cleanPlan = String(planText || "").replace(/^\uFEFF/, "").trim();
+      const firstBrace = cleanPlan.indexOf("{");
+      const lastBrace = cleanPlan.lastIndexOf("}");
+      if (firstBrace < 0 || lastBrace <= firstBrace) throw new Error("response did not contain a complete JSON object");
+      const jsonText = cleanPlan.slice(firstBrace, lastBrace + 1);
+      const parsedPlan = JSON.parse(jsonText);
+      parsedPlan.story_fingerprint = storyFingerprint;
+      const normalizedPlan = normalizeVisualPlan(parsedPlan);
+      validateVisualPlan(normalizedPlan, { requireFingerprint: true });
+      await fs.mkdir(path.dirname(planFile), { recursive: true });
+      await fs.writeFile(planFile, JSON.stringify(normalizedPlan, null, 2) + String.fromCharCode(10), { flag: "wx" });
+      visualPlan = normalizedPlan;
+      console.log(`Saved validated visual plan: ${planFile}`);
+      planError = null;
+      break;
+    } catch (error) {
+      planError = error;
+      if (attempt === 1) {
+        console.warn(`Visual plan response was invalid (${error.message}). Requesting one corrected JSON-only response from ${plannerModel}.`);
+        const retryMessages = [
+          ...plannerMessages,
+          { role: "assistant", content: String(planText || "").slice(0, 18000) },
+          { role: "user", content: `The previous response failed JSON parsing or plan validation: ${error.message}. Return a completely corrected, valid JSON object only. Do not explain the fix. Preserve the required schema and include at least 4 distinct beats, meaningful required fields, valid timings with no gaps, and at least 3 visual grammars when there are 5+ beats.` }
+        ];
+        try {
+          planText = await askOllama(retryMessages, "visual planning JSON repair", plannerModel, "json");
+        } catch (retryError) {
+          planError = retryError;
+          break;
+        }
+      }
+    }
+  }
+  if (planError) {
+    const diagnosticPath = planFile.replace(/\.json$/i, `.invalid-${Date.now()}.txt`);
+    try { await fs.mkdir(path.dirname(diagnosticPath), { recursive: true }); await fs.writeFile(diagnosticPath, String(planText || ""), "utf8", { flag: "wx" }); } catch {}
+    console.error(`Visual Director could not produce a valid plan after one automatic correction: ${planError.message}. No HTML was written. Raw planner output saved to ${diagnosticPath}. Retry analysis after reviewing the production logs.`);
     process.exit(1);
   }
 }
