@@ -73,3 +73,5 @@ assert.ok(html.includes('value="projectWav"'), "UI must support rendering with t
 assert.ok(server.includes('voiceMode === "projectWav"') && server.includes('final.narration.wav'), "server must resolve the project WAV without requiring a machine-specific path");
 
 assert.ok(server.includes("var)\\s+duration"), "scene saver must recognize a lowercase duration constant used by the supplied HTML file");
+
+assert.ok(html.includes("Rendering always uses the saved index.html"), "UI must block rendering unsaved editor changes");
