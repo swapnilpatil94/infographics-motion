@@ -113,17 +113,17 @@ function drawBalance(g,i,l){
  }
  add(g,"text",{x:540,y:1190,"text-anchor":"middle","font-size":24,"font-weight":800,fill:"#9d2d22"},"WHO HAS THE RIGHT TO DECIDE?");
 }
-function draw(b,i,l){const g=$("sceneArt");g.replaceChildren();const s=(b.grammar+" "+b.subject+" "+b.idea+" "+b.action).toLowerCase();let type;
+function draw(b,i,l){const g=$("sceneArt");g.replaceChildren();const semantic=(b.subject+" "+b.idea).toLowerCase(),s=(b.grammar+" "+semantic+" "+b.action).toLowerCase();let type;
  if(THEME==="parchment"&&/draupadi|queen|woman|silhouette|raised hand|question/.test(s)){type="draupadi-construction";drawDraupadiConstruction(g,i,l)}
  else if(THEME==="parchment"&&/dice|game|board|gambl|roll/.test(s)){type="dice-game";drawDiceGame(g,i,l)}
  else if(THEME==="parchment"&&/elder|assembly|court|silence|throne|king/.test(s)){type="royal-assembly";drawAssembly(g,i,l)}
  else if(THEME==="parchment"&&/justice|authority|balance|dharma|rule|right to decide/.test(s)){type="authority-justice";drawBalance(g,i,l)}
- else if(/compar|contrast|before.?after|versus|trade.?off|distribution/.test(s)){type="comparison";compare(g,i,l)}
- else if(/timeline|sequence|history|escalat|causal_chain/.test(s)){type="timeline";timeline(g,i,l)}
- else if(/scale|leverage|amplif|inequal|concentration|imbalance/.test(s)){type="scale";scale(g,i,l)}
- else if(/flow|queue|pipeline|bottleneck|process|traffic|particle/.test(s)){type="flow";flow(g,i,l)}
- else if(/network|graph|ecosystem|connection|relationship/.test(s)){type="network";network(g,i,l)}
- else if(/stack|layer|incentive|root_cause|hierarch/.test(s)){type="layered-system";stack(g,i,l)}
+ else if(b.grammar==="split_comparison"||/compar|contrast|before.?after|versus|trade.?off|distribution/.test(semantic)){type="comparison";compare(g,i,l)}
+ else if(b.grammar==="timeline"||/timeline|sequence|history|escalat|causal_chain/.test(semantic)){type="timeline";timeline(g,i,l)}
+ else if(b.grammar==="scale"||/scale|leverage|amplif|inequal|concentration|imbalance/.test(semantic)){type="scale";scale(g,i,l)}
+ else if(b.grammar==="particle_flow"||/flow|queue|pipeline|bottleneck|process|traffic|particle/.test(semantic)){type="flow";flow(g,i,l)}
+ else if(b.grammar==="network"||/network|graph|ecosystem|connection|relationship/.test(semantic)){type="network";network(g,i,l)}
+ else if(b.grammar==="layered_system"||/stack|layer|incentive|root_cause|hierarch/.test(semantic)){type="layered-system";stack(g,i,l)}
  else{type="transformation";transform(g,i,l)}
  g.setAttribute("data-scene",type);
  const glow=add(g,"circle",{cx:540,cy:850,r:340,fill:THEME==="parchment"?"#9d2d22":"#dba83f",opacity:.025+.025*Math.sin(l*Math.PI),filter:"url(#glow)"});g.insertBefore(glow,g.firstChild)}
