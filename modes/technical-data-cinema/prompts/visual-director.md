@@ -33,15 +33,14 @@ STRICT EDITORIAL GATES — FAIL THESE AND THE SCENE IS NOT ACCEPTABLE
 - Every 2–4 seconds, something explanatory must change: a state, relation, composition, scale, annotation, or camera view. Continuous particle motion by itself does not count.
 - Before returning HTML, mentally audit the whole timeline at 0s, 1s, 25%, 50%, 75%, and the final 3 seconds. Reject any repeated composition that persists without new information.
 
-YANTRALOK BRAND CONTRACT — REQUIRED DEFAULT FOR THIS PROJECT
-- Background: near-black (#050607), with restrained charcoal depth; never the default green gradient.
-- Main linework and dotted sketch elements: white/off-white (#f5f7f8). Use hand-drawn/dotted strokes, stippled particles, sketch contours, and progressive line reveals when they help explain the mechanism.
-- Accent: Yantralok red-orange (#e64b36), used sparingly for the active cause, warning, transformation, or key reveal. Neutral gray is allowed for inactive structure.
-- Do not introduce a competing gold/green/blue palette. Preserve strong contrast and consistent visual identity across every beat.
-- The same brand palette must not force the same composition: use story-specific objects, silhouettes, camera framing, and causal motion. Dots must represent something meaningful, not generic decoration.
-- Keep the render/editor UI separate from the scene; use the same dark/red/white visual language in preview controls.
-- This contract takes priority over optional palette suggestions elsewhere in this prompt.
-
+STYLE SELECTION — SAME INFOGRAPHICS MODE, STORY-APPROPRIATE ART DIRECTION
+- Keep using this exact HTML/CSS/JS infographic renderer for every topic. Do not create a separate mode or fixed template.
+- Choose the visual palette from the story's subject. For technology, systems, data, startups, and engineering explainers, use Yantralok near-black (#050607), off-white linework (#f5f7f8), and restrained red-orange (#e64b36).
+- For mythology, epics, history, ancient courts, and historical storytelling, use warm parchment/off-white paper (#f4ecd8 or similar), black ink/charcoal strokes, and restrained vermilion red or muted antique gold only for meaningful emphasis. Do NOT force the dark Yantralok palette onto mythology/history stories.
+- For other subjects, select a restrained palette that strengthens the explanation; use semantic color, strong contrast, and consistent art direction.
+- Palette must not force repeated composition. Change story-specific objects, silhouettes, camera framing, and causal motion across beats.
+- Dots must represent meaningful people, events, relationships, decisions, or causal state—not generic decoration.
+- Keep preview/editor UI separate from the rendered scene.
 VISUAL STORYTELLING
 - Particles have explicit meaning (people, requests, packets, money, attention, etc.) and purposeful movement.
 - Show paths, branching, accumulation, delay, failure, recovery or state changes when they explain the mechanism.
@@ -143,6 +142,18 @@ STORY-SPECIFIC VISUAL SIGNATURE
 VISUAL QA GATE
 Reject and redesign any beat if: the subject is not recognisable in a paused frame; dots are decorative rather than meaningful; 3D adds no explanatory value; the camera hides labels or the mechanism; two adjacent beats have the same composition and action; or a transformation breaks visual continuity. Before final output, audit six timestamps and confirm the intended silhouette, causal action, camera framing, and change from the previous beat are all visible.
 
+
+## HARD VISUAL CONTRACT FOR MYTHOLOGY / HISTORY STORIES
+When the story contains terms such as Mahabharata, Ramayana, Draupadi, Krishna, Arjuna, ancient court, epic, or mythology, apply all of these requirements inside the same infographic renderer:
+- Use a warm parchment/off-white background, black ink linework and restrained vermilion/gold accents. This story-specific palette overrides the technical dark palette above.
+- The first major beat must visibly construct a large character silhouette from ordered dots and ink strokes. Include hair/head shape, shoulders, draped garment and at least one costume/ornament detail; generic circles with connecting lines do not count as a character.
+- Use inline SVG paths with stroke-dasharray/stroke-dashoffset or a precomputed deterministic Canvas point mask. Do not rely on text labels to represent a person.
+- The court beat must show a recognisable spatial environment: pillars, a raised throne/seat, a dice table or playing surface, and distinct seated/standing silhouettes. These can be stylised, but must occupy the frame.
+- The dice-game beat must visibly demonstrate causality: tokens or markers move from Yudhishthira's side to the wager/stakes area in sequential steps, then the visual state changes to indicate the question of whether he could stake Draupadi after losing himself. Do not claim historical detail beyond the story brief.
+- The unresolved-question beat must show a real balance/scale with two labelled pans or equivalent distinct visual systems for “नियम” and “न्याय”, not a single line and dot.
+- At least 5 beats must have visibly different compositions and dominant subjects. Reuse character geometry for continuity but do not repeat a static portrait or generic diagram.
+- Before returning HTML, verify these concrete subjects exist in the source and are visible at their planned timestamps. If the scene coder cannot implement the full story-specific scene, return no HTML and report the missing required elements; never substitute a generic orbit/network animation.
+- These requirements do not relax the deterministic export contract, offline policy, render-only mode or QC gates.
 
 ## DOTTED-LINE CHARACTER CONSTRUCTION — EXISTING INFOGRAPHICS MODE ONLY
 For stories featuring a recognizable person (including mythology, history, biography, scams, startups, or social stories), you may build the character from a dotted silhouette and progressive ink-like strokes. This is a visual technique inside the existing HTML/CSS/JS infographic renderer—not a new mode, separate pipeline, or request to use Blender.
