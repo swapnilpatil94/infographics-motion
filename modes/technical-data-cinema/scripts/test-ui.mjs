@@ -22,7 +22,8 @@ assert.ok(html.includes("#050607") && html.includes("#e64b36"), "UI must preserv
 assert.ok(server.includes("--audio-offset") && html.includes("audioOffset"), "render UI must expose adjustable audio/video sync offset");
 assert.ok(html.includes("Yantralok") && html.includes("rgba(245,247,248,.12)"), "UI should use a dark dotted technical visual background");
 assert.ok(html.includes("updateStages(j.stages,j.status)"), "UI must consume actual server stage statuses");
-assert.ok(html.includes('analysisReady?(sceneReady?"render":"scene"):"analysis"'), "UI must gate analysis, scene, then rendering");
+assert.ok(html.includes('pendingPhase==="all"?"all":(analysisReady?(sceneReady?"render":"scene"):"analysis")'), "UI must preserve staged workflow and allow one-click all-in-one production");
+assert.ok(html.includes('id="runAll"') && html.includes('phase="all"'), "UI must expose one-click full production");
 assert.ok(server.includes("stages: job.stages"), "job API must expose explicit stage statuses");
 assert.ok(server.includes('SCENE STAGE VALIDATED. Rendering and narration were not started.'), "scene phase must stop before audio/render");
 assert.ok(server.includes('phase === "render"') && server.includes("Rendering the saved fingerprint-matched scene"), "render phase must reuse saved scene without model generation");
