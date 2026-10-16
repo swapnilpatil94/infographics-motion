@@ -11,10 +11,24 @@
     "doctor": "node scripts/doctor.mjs",
     "install:browser": "playwright install chromium",
     "test:smoke": "node scripts/render.mjs --html examples/render-smoke-test.html --out output/smoke-test.mp4 --fps 5 --duration 3",
-    "ui": "node scripts/ui-server.mjs"
+    "ui": "node scripts/ui-server.mjs",
+    "test:three": "node scripts/test-three-bundle.mjs",
+    "test:fallback": "node scripts/test-fallback-scene.mjs",
+    "test:visual-benchmark": "node scripts/build-visual-benchmark.mjs",
+    "test:fallback:render": "node scripts/test-fallback-render.mjs",
+    "test:visual-plan": "node scripts/test-visual-plan.mjs",
+    "test:ui": "node scripts/test-ui.mjs",
+    "test:narration-text": "node scripts/test-narration-text.mjs",
+    "test:export-compat": "node scripts/test-export-compat.mjs",
+    "test:scene-contract": "node scripts/test-export-compat.mjs",
+    "test:scene-compat": "node scripts/test-scene-compat.mjs",
+    "test:plan-compiler": "node scripts/test-plan-compiler.mjs",
+    "test:audio-resilience": "node scripts/test-ui.mjs"
   },
   "dependencies": {
-    "playwright": "^1.63.0"
+    "playwright": "^1.63.0",
+    "esbuild": "^0.25.0",
+    "three": "^0.180.0"
   },
   "engines": {
     "node": ">=22"

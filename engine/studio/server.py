@@ -235,12 +235,13 @@ def script_to_audio(body: dict):
     if style not in production_voice.STORYTELLING_PRESETS:
         raise C.StudioError("invalid_narration_style", "Choose Storytelling, Conversational, or Dramatic narration.")
     beats = []
-    # A cue starts a delivery block and remains active until the next cue.
-    # This lets multiple lines share one TTS take, improving continuity and
-    # avoiding a fresh prosody reset on every short line. [DEFAULT] resets it.
+    # App-level delivery cues, not native Chatterbox special tokens. Each cue
+    # maps to conservative supported generation settings in chatterbox_tts.py.
+    # A cue remains active until the next cue; [DEFAULT] resets it. Keep lines
+    # grouped into connected takes so a cue does not force a new TTS take.
     active_performance = "default"
     for i, line in enumerate(lines):
-        match = re.match(r"^\s*\[(HOOK|CURIOUS|SUSPENSE|REVEAL|EXPLAIN|URGENT|CALM|DEFAULT)\]\s*", line, re.IGNORECASE)
+        match = re.match(r"^\s*\[(HOOK|CURIOUS|SUSPENSE|REVEAL|EXPLAIN|URGENT|CALM|EMPHASIS|CONFIDENT|WARM|CONCERNED|SHOCKED|REFLECTIVE|PLAYFUL|DEFAULT)\]\s*", line, re.IGNORECASE)
         if match:
             active_performance = match.group(1).lower()
             line = line[match.end():].strip()

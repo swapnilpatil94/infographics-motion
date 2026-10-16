@@ -20,6 +20,12 @@ Paste Hindi in Devanagari, one beat per line. Blank lines/headings are ignored; 
 Run mocked API tests with `.venv/bin/python -m pytest tests/test_script_audio.py -q`. The actual Chatterbox stack still needs a local smoke test because model files, the sibling project and reference voice are machine-local.
 
 
+## Delivery cues
+
+In Directed mode, place one cue on its own line. It remains active until the next cue; `[DEFAULT]` resets to the base delivery. Supported cues: `[HOOK]`, `[CURIOUS]`, `[SUSPENSE]`, `[REVEAL]`, `[EXPLAIN]`, `[URGENT]`, `[CALM]`, `[EMPHASIS]`, `[CONFIDENT]`, `[WARM]`, `[CONCERNED]`, `[SHOCKED]`, `[REFLECTIVE]`, `[PLAYFUL]`, and `[DEFAULT]`.
+
+These are application-level delivery profiles that map to supported Chatterbox generation parameters; they are **not** native emotion tokens. The dedicated Hindi path uses the multilingual tokenizer, so do not insert Turbo-only non-speech tags such as `[laugh]`, `[sigh]`, or `[gasp]` into the script. Those are unsupported for multilingual models and can be spoken literally. The UI strips recognized cue lines before synthesis. Prefer a handful of longer cue blocks over changing delivery every sentence.
+
 ## Voice Setup
 
 Open **Voice Setup** in Studio to upload audio or record through the browser microphone. FFmpeg removes low-frequency rumble, applies conservative noise reduction, filters the speech band and normalizes loudness. The cleaned output is mono 24 kHz PCM WAV under `output/voice/references/<id>/cleaned.wav`; the original file is retained for comparison. Preview each cleaned profile and click **Use for narration** to activate it. The active profile is used by the production Chatterbox adapter and changes the synthesis cache key. The default `TTS_REFERENCE_AUDIO` remains in effect until a profile is activated. Audio stays local and git-ignored; only clone voices you own or have permission to use.

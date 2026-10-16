@@ -167,7 +167,7 @@ def synthesize(beats, seed=42, log=print, allow_partial_alignment=False, style="
     log(f"[voice] reference_audio={reference_audio} exists={os.path.exists(reference_audio)} style={style} pronunciation_mode={pronunciation_mode}")
     log(f"[voice] settings={json.dumps(settings, sort_keys=True)} group_lines={group_lines} group_max_lines={group_max_lines} group_max_words={group_max_words} cache_key={key} cache_dir={d}")
     if available(reference_audio):
-        if not (os.path.exists(wav) and os.path.exists(align)):
+        if not os.path.exists(wav):
             job = dict(output_path=wav, reference_audio=reference_audio, seed=seed, group_lines=group_lines, group_max_lines=group_max_lines, group_max_words=group_max_words, performance_mode=performance_mode, expression_intensity=max(0, min(100, int(expression_intensity))), **settings,
                        narration_style=style,
                        segments=[dict(beat_id=b["id"], text=b["tts_text"], display_text=b["text"], performance=b.get("performance", "default")) for b in beats])
@@ -176,21 +176,20 @@ def synthesize(beats, seed=42, log=print, allow_partial_alignment=False, style="
             log(f"[voice] detailed TTS log: {os.path.join(d, 'tts.log')}")
             subprocess.run([PY312, os.path.join(REPO_ROOT, "tools/chatterbox_tts.py"), os.path.join(d, "job.json")],
                            env=_env(), check=True, stderr=open(os.path.join(d, "tts.log"), "w"))
-            if os.path.exists(model_info_path):
-                info = json.load(open(model_info_path, encoding="utf-8"))
-                log(f"[voice] LOADED MODEL: {info.get('model_family')} | package={info.get('package_version')} | selector={info.get('selector_used')} | language_id={info.get('language_id')} | device={info.get('device')}")
-                log(f"[voice] dedicated_hindi_checkpoint={info.get('dedicated_hindi_checkpoint')} | model_info={model_info_path}")
+        else:
+            log("[voice] CACHE HIT: narration WAV already exists; skipping Chatterbox synthesis")
+        if not os.path.exists(align):
             log("[voice] forced alignment (whisperx)")
             subprocess.run([PY312, os.path.join(REPO_ROOT, "tools/whisper_align.py"), wav, wav + ".segments.json", align],
                            env=_env(), check=True, stderr=open(os.path.join(d, "align.log"), "w"))
         else:
-            log(f"[voice] CACHE HIT: reusing existing WAV/alignment; no model was loaded this run")
-            if os.path.exists(model_info_path):
-                info = json.load(open(model_info_path, encoding="utf-8"))
-                log(f"[voice] CACHED MODEL: {info.get('model_family')} | package={info.get('package_version')} | selector={info.get('selector_used')} | language_id={info.get('language_id')} | device={info.get('device')}")
-                log(f"[voice] dedicated_hindi_checkpoint={info.get('dedicated_hindi_checkpoint')} | model_info={model_info_path}")
-            else:
-                log(f"[voice] WARNING: this cached narration has no model_info.json; model identity cannot be confirmed from this cache entry")
+            log("[voice] CACHE HIT: reusing existing word alignment; no alignment model was loaded")
+        if os.path.exists(model_info_path):
+            info = json.load(open(model_info_path, encoding="utf-8"))
+            log(f"[voice] CACHED MODEL: {info.get('model_family')} | package={info.get('package_version')} | selector={info.get('selector_used')} | language_id={info.get('language_id')} | device={info.get('device')}")
+            log(f"[voice] dedicated_hindi_checkpoint={info.get('dedicated_hindi_checkpoint')} | model_info={model_info_path}")
+        elif os.path.exists(wav):
+            log("[voice] WARNING: narration cache has no model_info.json; model identity cannot be confirmed from this cache entry")
         data = _read_wav_any(wav)
         al = {b["beat_id"]: b["words"] for b in json.load(open(align))["beats"]}
         out = []

@@ -1,0 +1,11 @@
+import assert from "node:assert/strict";
+import { normalizeVisualPlan, validateVisualPlan } from "./visual-plan.mjs";
+const beat=(start,end,grammar,subject,composition)=>({start,end,visual_grammar:grammar,narration_idea:"Explain "+subject,viewer_takeaway:"Understand "+subject,dominant_subject:subject,action_and_causal_proof:subject+" changes because of a visible cause",composition,camera:"slow purposeful push-in",transition:"transform into the next beat",implementation_notes:"render before and after from absolute time"});
+const plan={visual_thesis:"A viral surge overwhelms finite service capacity",visual_signature:["crowd becomes requests","queue visibly accumulates","cache diverts repeated hits"],ending_image:"The overloaded queue resolves into a controlled flow",story_fingerprint:"a".repeat(64),beats:[beat(0,3,"scale","viral crowd","giant crowd fills frame"),beat(3,7,"network","request branching","one source branches into three paths"),beat(7,11,"particle_flow","backend queue","side-on growing queue"),beat(11,15,"timeline","late capacity","capacity blocks arrive on timeline"),beat(15,19,"transformation","cache intervention","requests divert to edge cache")]};
+assert.equal(validateVisualPlan(plan,{requireFingerprint:true}).beats,5);
+assert.equal(normalizeVisualPlan(plan).beats[0].visual_grammar,"scale");
+assert.throws(()=>validateVisualPlan({...plan,beats:plan.beats.slice(0,3)}),/at least four beats/);
+assert.throws(()=>validateVisualPlan({...plan,beats:plan.beats.map((b,i)=>i===2?{...b,start:b.start+2}:b)}),/gap/);
+assert.throws(()=>validateVisualPlan({...plan,beats:plan.beats.map((b,i)=>i===1?{...b,dominant_subject:plan.beats[0].dominant_subject,composition:plan.beats[0].composition}:b)}),/repeat/);
+assert.throws(()=>validateVisualPlan({...plan,story_fingerprint:""},{requireFingerprint:true}),/story_fingerprint/);
+console.log("Visual plan schema, coverage, fingerprint and diversity checks passed.");

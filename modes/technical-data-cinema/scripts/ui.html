@@ -5,91 +5,369 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Yantralok · Technical Data Cinema</title>
 <style>
-:root{color-scheme:dark;--bg:#101311;--panel:#181d19;--line:#303a31;--text:#f2f0e8;--muted:#a8b1a7;--red:#d85c48;--gold:#d8b66a;--green:#8bbf94}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 80% -10%,#27372b 0,transparent 45%),var(--bg);color:var(--text);font:15px/1.5 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+:root{color-scheme:dark;--bg:#050607;--panel:#0b0d10;--line:#2b3035;--text:#f5f7f8;--muted:#a7adb2;--red:#e64b36;--gold:#e64b36;--green:#f5f7f8}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle,rgba(245,247,248,.12) 1px,transparent 1.3px) 0 0/22px 22px,radial-gradient(ellipse at 80% -10%,#171b20 0,transparent 45%),var(--bg);color:var(--text);font:15px/1.5 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 header{max-width:1180px;margin:auto;padding:34px 24px 20px;display:flex;justify-content:space-between;gap:20px;align-items:flex-start} .eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-weight:700}h1{font-size:clamp(28px,4vw,42px);line-height:1.06;margin:8px 0 10px;letter-spacing:-.04em}header p{margin:0;color:var(--muted);max-width:680px}.pill{border:1px solid var(--line);border-radius:999px;padding:7px 11px;color:var(--muted);font-size:12px;white-space:nowrap}
-main{max-width:1180px;margin:auto;padding:0 24px 40px;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(320px,.95fr);gap:18px}.panel{background:linear-gradient(145deg,#1b211c,#151915);border:1px solid var(--line);border-radius:16px;padding:22px;min-width:0}.panel h2{font-size:16px;margin:0 0 5px}.sub{font-size:13px;color:var(--muted);margin:0 0 18px}.field{display:grid;gap:6px;margin:15px 0}.field label,.legend{font-size:12px;font-weight:700;letter-spacing:.03em;color:#d9dfd6}.field input,.field textarea,.field select{width:100%;background:#0f130f;color:var(--text);border:1px solid #3a443b;border-radius:9px;padding:11px 12px;font:inherit;outline:none}.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--gold)}textarea{resize:vertical;min-height:130px}.story{min-height:220px}.script{min-height:190px}.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.mode{display:flex;gap:7px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:11px 9px;cursor:pointer;background:#121612;font-size:12px}.mode:has(input:checked){border-color:var(--gold);background:#24251b}.mode input{accent-color:var(--gold);margin-top:3px}.hidden{display:none!important}.actions{display:flex;gap:10px;align-items:center;margin-top:20px}.primary{background:var(--gold);color:#161811;border:0;border-radius:10px;padding:12px 18px;font-weight:800;font-size:14px;cursor:pointer}.primary:disabled{opacity:.45;cursor:wait}.hint{font-size:12px;color:var(--muted)}.status{display:inline-flex;gap:7px;align-items:center;font-size:12px;color:var(--muted)}.dot{width:7px;height:7px;border-radius:50%;background:#788477}.dot.running{background:var(--gold);box-shadow:0 0 0 4px #d8b66a22}.dot.completed{background:var(--green)}.dot.failed{background:var(--red)}.log{height:350px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;background:#0b0e0b;border:1px solid #2b332b;border-radius:10px;padding:13px;color:#c8d0c6;font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace}.result{display:grid;gap:10px;margin-top:15px}.result a{display:block;border:1px solid var(--line);border-radius:9px;padding:10px 12px;color:var(--gold);text-decoration:none}.result a:hover{border-color:var(--gold)}.warning{padding:10px 12px;background:#30271a;border-radius:8px;color:#e3c990;font-size:12px;margin-top:14px}.foot{max-width:1180px;margin:0 auto;padding:0 24px 30px;color:#818a80;font-size:11px}
+main{max-width:1180px;margin:auto;padding:0 24px 40px;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(320px,.95fr);gap:18px}.panel{background:linear-gradient(145deg,#111418,#090b0d);border:1px solid var(--line);border-radius:16px;padding:22px;min-width:0}.panel h2{font-size:16px;margin:0 0 5px}.sub{font-size:13px;color:var(--muted);margin:0 0 18px}.field{display:grid;gap:6px;margin:15px 0}.field label,.legend{font-size:12px;font-weight:700;letter-spacing:.03em;color:#d9dfd6}.field input,.field textarea,.field select{width:100%;background:#050607;color:var(--text);border:1px solid #3a443b;border-radius:9px;padding:11px 12px;font:inherit;outline:none}.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--gold)}textarea{resize:vertical;min-height:130px}.story{min-height:220px}.script{min-height:190px}.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.mode{display:flex;gap:7px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:11px 9px;cursor:pointer;background:#090b0d;font-size:12px}.mode:has(input:checked){border-color:var(--gold);background:#24251b}.mode input{accent-color:var(--gold);margin-top:3px}.hidden{display:none!important}.actions{display:flex;gap:10px;align-items:center;margin-top:20px}.primary{background:var(--gold);color:#161811;border:0;border-radius:10px;padding:12px 18px;font-weight:800;font-size:14px;cursor:pointer}.primary:disabled,.secondary:disabled{opacity:.45;cursor:wait}.secondary{background:#15191d;color:var(--text);border:1px solid #49564a;border-radius:10px;padding:11px 14px;font-weight:750;font-size:13px;cursor:pointer}.hint{font-size:12px;color:var(--muted)}.status{display:inline-flex;gap:7px;align-items:center;font-size:12px;color:var(--muted)}.dot{width:7px;height:7px;border-radius:50%;background:#788477}.dot.running{background:var(--gold);box-shadow:0 0 0 4px #d8b66a22}.dot.completed{background:var(--green)}.dot.failed{background:var(--red)}.log{height:350px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;background:#030405;border:1px solid #2b332b;border-radius:10px;padding:13px;color:#e1e5e8;font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace}.result{display:grid;gap:10px;margin-top:15px}.result a{display:block;border:1px solid var(--line);border-radius:9px;padding:10px 12px;color:var(--gold);text-decoration:none}.result a:hover{border-color:var(--gold)}.stages{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:14px 0}.stage{border:1px solid var(--line);border-radius:9px;padding:10px;background:#080a0c;min-width:0}.stage b{display:block;font-size:12px}.stage-state{display:block;font-size:11px;color:var(--muted);margin-top:3px}.stage.done{border-color:#4e7c5a}.stage.done .stage-state{color:var(--green)}.stage.active{border-color:var(--gold)}.stage.active .stage-state{color:var(--gold)}.stage.failed{border-color:var(--red)}.stage.failed .stage-state{color:var(--red)}.plan-panel{margin-top:16px;border-top:1px solid var(--line);padding-top:15px}.plan-panel textarea{min-height:280px;font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}.plan-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}.plan-message{font-size:12px;color:var(--muted)}.warning{padding:10px 12px;background:#29120f;border:1px solid #6b2a20;border-radius:8px;color:#ffb2a5;font-size:12px;margin-top:14px}.foot{max-width:1180px;margin:0 auto;padding:0 24px 30px;color:#818a80;font-size:11px}
+.audio-panel{max-width:1180px;margin:0 auto 28px;padding:22px 24px;background:linear-gradient(145deg,#1b211c,#151915);border:1px solid var(--line);border-radius:16px}.audio-panel h2{font-size:16px;margin:0 0 5px}.audio-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr);gap:18px}.audio-panel textarea{min-height:240px}.audio-panel .audio-output{background:#0b0e0b;border:1px solid #2b332b;border-radius:10px;padding:14px;min-height:100px}.audio-panel audio{width:100%;margin-top:10px}.audio-panel .audio-links{display:grid;gap:8px;margin-top:12px}.audio-panel .audio-links a{display:block;border:1px solid var(--line);border-radius:9px;padding:10px 12px;color:var(--gold);text-decoration:none}.audio-panel .audio-links a:hover{border-color:var(--gold)}
+@media(max-width:850px){.audio-panel{margin:0 14px 24px;padding:17px}.audio-grid{grid-template-columns:1fr}}
 @media(max-width:850px){header{display:block}header .pill{display:inline-block;margin-top:14px}main{grid-template-columns:1fr;padding:0 14px 28px}header{padding:24px 14px 18px}.panel{padding:17px}.log{height:260px}}@media(max-width:440px){.two{grid-template-columns:1fr}.modes{grid-template-columns:1fr}.mode{align-items:center}}
+
+.scene-editor{margin-top:16px;border:1px solid var(--line);border-radius:14px;padding:18px;background:rgba(5,6,7,.48)}
+.scene-editor h2{margin:0 0 6px;font-size:18px}.scene-editor .sub{margin:0 0 12px;color:var(--muted)}
+#sceneHtml{width:100%;min-height:300px;resize:vertical;background:#050607;color:#e9ecef;border:1px solid #41474d;border-radius:10px;padding:13px;font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;tab-size:2}
+.scene-editor-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center}.scene-message{font-size:12px;color:var(--muted);flex:1;min-width:180px}
+.scene-preview{width:100%;height:min(70vh,700px);border:1px solid var(--line);border-radius:10px;background:#171715;margin-top:12px}
+
+
+.tabbar{max-width:1180px;margin:0 auto 18px;padding:0 24px;display:flex;gap:8px;flex-wrap:wrap}
+.tab-button{border:1px solid var(--line);background:#101316;color:var(--text);padding:12px 16px;border-radius:10px;font-weight:800;cursor:pointer}
+.tab-button[aria-selected="true"]{border-color:var(--gold);background:#28241a;color:#fff0c4}
+.custom-workspace{max-width:1180px;margin:0 auto 28px;padding:22px 24px;background:linear-gradient(145deg,#111418,#090b0d);border:1px solid var(--line);border-radius:16px}
+.custom-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+.custom-workspace textarea{width:100%;min-height:300px;background:#050607;color:var(--text);border:1px solid #3a443b;border-radius:9px;padding:12px;font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}
+.custom-workspace #customNarration{min-height:210px;font:14px/1.6 inherit}
+.custom-preview{width:100%;height:min(64vh,700px);border:1px solid var(--line);border-radius:10px;background:#f3ead6}
+.custom-output{margin-top:14px;display:grid;gap:10px}
+.custom-output video,.custom-output audio{width:100%;max-height:70vh}
+.custom-status{white-space:pre-wrap;overflow-wrap:anywhere;background:#030405;border:1px solid #2b332b;border-radius:10px;padding:12px;min-height:80px;font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;color:#e1e5e8}
+.custom-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
+@media(max-width:850px){.tabbar{padding:0 14px}.custom-workspace{margin:0 14px 24px;padding:17px}.custom-grid{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
 <header><div><div class="eyebrow">YANTRALOK · LOCAL PRODUCTION</div><h1>Technical Data Cinema</h1><p>Turn a story into a custom animated explainer, add your tuned Hindi/Hinglish Chatterbox narration, and export a vertical MP4. Heavy stages run one at a time.</p></div><div class="pill">Local-first · 1080 × 1920</div></header>
-<main>
+<nav class="tabbar" role="tablist" aria-label="Studio workspace"><button id="builderTab" class="tab-button" role="tab" aria-selected="true" type="button">Film Builder</button><button id="customTab" class="tab-button" role="tab" aria-selected="false" type="button">Custom Visuals + Narration</button></nav>
+<main id="builderWorkspace">
 <section class="panel">
 <h2>01 / Build your film</h2><p class="sub">Enter the explanation brief and the narration you want spoken. Visuals are generated for this story, not from a fixed template.</p>
 <form id="form">
-<div class="field"><label for="title">VIDEO TITLE</label><input id="title" value="Why a viral moment can break a backend" required maxlength="120"></div>
-<div class="field"><label for="slug">OUTPUT FOLDER NAME</label><input id="slug" value="viral-traffic-explainer" maxlength="64" pattern="[A-Za-z0-9 _-]+" required><span class="hint">A new folder is used; existing scene files are not overwritten.</span></div>
-<div class="field"><label for="story">STORY / VISUAL BRIEF</label><textarea id="story" class="story" required>Core question: Why can a product that worked for thousands of users fail when a post suddenly goes viral?
+<div class="field"><label for="title">VIDEO TITLE</label><input id="title" value="Draupadi’s Question — The Court Falls Silent" required maxlength="120"></div>
+<div class="field"><label for="existingProject">EXISTING PROJECT (OPTIONAL)</label><div class="two"><select id="existingProject"><option value="">Start or continue using the folder name below</option></select><button id="loadProject" class="secondary" type="button">Load project</button></div><span class="hint">Choose a saved project to reuse its story, validated plan, scene and narration. Existing files are preserved; only missing or stale stages should run.</span></div>
+<div class="field"><label for="slug">PROJECT / OUTPUT FOLDER</label><input id="slug" value="draupadi-question" maxlength="64" pattern="[A-Za-z0-9 _-]+" required><span class="hint">Use the same folder to continue a project. A new folder is optional, not required.</span></div>
+<div class="field"><label for="story">STORY / VISUAL BRIEF</label><textarea id="story" class="story" required>Create a cinematic Hindi mythology explainer about Draupadi's question in the Mahabharata assembly. Use the existing Infographics mode and HTML/CSS/JS renderer. Do not create a separate mode or use a fixed template.
 
-Narrative beats:
-1. A clip spreads quickly; show audience growth as a meaningful crowd, not decorative dots.
-2. One tap fans out into feed, media and recommendation requests.
-3. Requests converge on finite backend capacity; queue depth and latency rise.
-4. Show why reactive autoscaling arrives after demand has already spiked.
-5. Demonstrate prescaling and caching as interventions.
-6. Show retries spread out with backoff instead of creating a second spike.
-7. End with the lesson: prepare capacity, reduce work per request and control retries.
+VISUAL DIRECTION
+- LOCKED MYTHOLOGY LOOK: deep black/charcoal environments, luminous antique-gold and amber particles, fine connecting trails, volumetric glow, layered 2.5D depth and restrained crimson accents. Do not use parchment as the default.
+- Keep her character design, proportions, hairstyle and costume consistent across every shot.
+- Build Draupadi as a large, unmistakable character with consistent face, hair, jewellery, sari silhouette, expressive eyes and raised-hand gesture. Reveal her contours from meaningful particles, then hold a clean readable silhouette.
+- Animate dotted connectors to explain relationships, decisions, power and responsibility.
+- Cinematic flow: slow push into the towering royal court; morph to tumbling dice and changing stakes; particles gather into Draupadi; close-up as she raises her hand; elders fall into shadow; connecting trails transform into a justice scale; finish on the question and an expanding particle halo.
+- Use anticipation, eased acceleration/deceleration, overlapping motion in hair/sari/jewellery, particle follow-through, motivated camera moves, parallax and controlled trails. Let important gestures land with a brief dramatic hold.
+- Synchronize visual reveals with narration beats. Every dot, line and object must communicate something.
+- Use deterministic, timestamp-driven SVG/Canvas animation compatible with window.renderAt(seconds) and window.getDuration(). No Math.random(), external assets or nondeterministic animation.
+- Each beat needs its own composition and meaningful action. Particles must form people, architecture, objects or causal links—not generic clouds. Keep silhouettes phone-readable with sound off. Reuse the existing Infographics renderer, narration, export and QC pipeline.
 
-Use illustrative values only when clearly labelled. Every particle or object must explain something.</textarea></div>
-<div class="field"><label for="model">OLLAMA MODEL</label><select id="model" required><option value="qwen3-coder:30b">qwen3-coder:30b (default)</option><option value="qwen2.5-coder:7b">qwen2.5-coder:7b (lighter)</option></select><span class="hint" id="modelHint">Checking locally installed models…</span></div>
+STORY BEATS
+1. Establish the royal assembly and introduce Draupadi.
+2. Explain the sequence of events in the dice game.
+3. Reveal Draupadi's central question: if Yudhishthira had already lost himself, could he then stake her?
+4. Show the assembly falling silent as a visual metaphor for the unresolved question.
+5. Contrast authority and rules with justice and responsibility.
+6. End with: “जब नियम और न्याय टकराएँ, तो धर्म किसका साथ देता है?”
+
+Treat character artwork as illustration, not a historically verified depiction. Do not invent quotations or present disputed details as established fact.</textarea></div>
+<div class="field"><label for="model">LEGACY / EXPERIMENTAL SCENE-CODER MODEL</label><select id="model" required><option value="qwen2.5-coder:7b">qwen2.5-coder:7b (recommended · lighter)</option><option value="qwen3-coder:30b">qwen3-coder:30b (heavier)</option></select><span class="hint" id="modelHint">Production scenes use the deterministic plan compiler; this model is only for opt-in experiments.</span></div>
 <div class="field"><label>VIDEO OUTPUT</label><div class="two"><div><label class="hint" for="fps">Frame rate</label><select id="fps"><option value="30">30 fps · standard</option><option value="24">24 fps · cinematic</option><option value="25">25 fps</option><option value="60">60 fps · heavier</option></select></div><div><label class="hint" for="style">Narration style</label><select id="style"><option value="storytelling">Storytelling</option><option value="conversational">Conversational</option><option value="dramatic">Dramatic</option></select></div></div></div>
 <div class="field"><label>VOICE OPTION</label><div class="modes">
 <label class="mode"><input type="radio" name="voiceMode" value="generate" checked><span><b>Chatterbox voice</b><br><span class="hint">Generate from script</span></span></label>
 <label class="mode"><input type="radio" name="voiceMode" value="wav"><span><b>Existing WAV</b><br><span class="hint">Use approved audio</span></span></label>
+<label class="mode"><input type="radio" name="voiceMode" value="projectWav"><span><b>Project WAV</b><br><span class="hint">Use this folder’s final.narration.wav</span></span></label>
 <label class="mode"><input type="radio" name="voiceMode" value="silent"><span><b>Silent video</b><br><span class="hint">No narration</span></span></label>
 </div></div>
-<div id="voiceScriptWrap" class="field"><label for="voiceScript">HINDI / HINGLISH NARRATION SCRIPT</label><textarea id="voiceScript" class="script">[HOOK] सोचिए, एक वीडियो अचानक वायरल हो जाता है। कुछ ही मिनटों में लाखों लोग उसे देखने पहुँच जाते हैं।
+<div id="voiceScriptWrap" class="field"><label for="voiceScript">HINDI / HINGLISH NARRATION SCRIPT</label><textarea id="voiceScript" class="script">[HOOK] महाभारत की उस सभा में, द्रौपदी ने एक ऐसा सवाल पूछा… जिसने सत्ता और धर्म, दोनों को कटघरे में खड़ा कर दिया।
 
-[CURIOUS] लेकिन हर tap सिर्फ एक request नहीं बनाता। Feed, video, recommendations—एक ही user action पीछे कई systems को काम पर लगा सकता है।
+[EXPLAIN] जुए में युधिष्ठिर पहले अपना राज्य हारे। फिर अपने भाइयों को… और आखिर में खुद को भी दाँव पर हार गए।
 
-[SUSPENSE] Requests तेज़ी से बढ़ रही हैं, लेकिन servers उतनी तेज़ी से नहीं बढ़ सकते। Queue लंबी होती है, और response धीमा पड़ने लगता है।
+[SUSPENSE] लेकिन इसके बाद द्रौपदी को भी दाँव पर लगाया गया।
 
-[EXPLAIN] Autoscaling मदद करता है, पर अक्सर demand बढ़ने के बाद। यानी problem शुरू हो चुकी होती है, तब extra capacity पहुँचती है।
+[CURIOUS] द्रौपदी ने एक सीधा सवाल पूछा—अगर युधिष्ठिर पहले ही खुद को हार चुके थे, तो क्या उन्हें मुझे दाँव पर लगाने का अधिकार था?
 
-[REVEAL] इसलिए बड़े traffic event से पहले capacity prepare करना ज़रूरी है।
+[PAUSE] सभा में बड़े-बड़े ज्ञानी और योद्धा मौजूद थे। लेकिन इस सवाल का साफ़ जवाब देना आसान नहीं था।
 
-[EXPLAIN] Caching हर request को backend तक जाने से रोक सकती है। और retries को backoff के साथ फैलाने से दूसरी traffic spike नहीं बनती।
+[EXPLAIN] एक तरफ़ सत्ता और नियम थे। दूसरी तरफ़ न्याय, अधिकार और ज़िम्मेदारी।
 
-[REVEAL] असली lesson? सिर्फ़ ज़्यादा servers नहीं। सही समय पर capacity, कम unnecessary work, और controlled retries—यही system को viral moment में भी stable रखते हैं।</textarea><span class="hint">Performance cues carry forward until the next cue, matching your existing Chatterbox branch.</span>
+[REVEAL] द्रौपदी का सवाल सिर्फ़ उस सभा के बारे में नहीं था। वह एक बड़ी समस्या सामने रखता है—क्या हर नियम सही होता है, सिर्फ़ इसलिए क्योंकि सत्ता उसे मानती है?
+
+[CURIOUS] जब नियम और न्याय टकराएँ… तो धर्म किसका साथ देता है?
+
+[END] यही वह सवाल है, जिस पर आज भी विचार किया जा सकता है।</textarea><span class="hint">Performance cues carry forward until the next cue, matching your existing Chatterbox branch.</span>
 <div class="two"><div><label class="hint" for="performance">Performance</label><select id="performance"><option value="directed">Directed cues</option><option value="uniform">Uniform delivery</option></select></div><div><label class="hint" for="intensity">Expression intensity (0–100)</label><input id="intensity" type="number" min="0" max="100" value="65"></div></div>
 </div>
-<div id="wavWrap" class="field hidden"><label for="wavPath">ABSOLUTE PATH TO WAV FILE</label><input id="wavPath" placeholder="/Users/you/Music/narration.wav"><span class="hint">The WAV is read from this Mac. Use a local absolute path.</span></div>
-<div class="warning">Memory-safe sequence: Ollama generates the scene and unloads its model first. Chatterbox starts only after generation finishes. Do not run another heavy model alongside this job.</div>
-<div class="actions"><button id="run" class="primary" type="submit">Generate & export video</button><span class="hint" id="formHint">One production job at a time</span></div>
+<div id="wavWrap" class="field hidden"><label for="wavPath">ABSOLUTE PATH TO APPROVED WAV FILE</label><input id="wavPath" placeholder="/Users/you/Music/approved-narration.wav"><span class="hint">Use the existing approved narration. This stage never launches Chatterbox.</span></div>
+<div class="field"><label for="exportName">RENDER OUTPUT NAME / RETRY ID</label><input id="exportName" value="final-retry-01" maxlength="64" pattern="[A-Za-z0-9 _-]+"><span class="hint">Use a new name for each retry; previous MP4 exports are never overwritten.</span></div>\n<div class="field"><label for="audioOffset">AUDIO SYNC OFFSET (SECONDS)</label><input id="audioOffset" type="number" min="-5" max="5" step="0.05" value="0"><span class="hint">Use the render stage to adjust an existing WAV: negative values advance the audio; positive values delay it. Range −5s to +5s. Beat timing itself is editable in the visual plan above.</span></div>
+<div class="warning">Separated stages: Ollama analyzes the story into an editable visual plan; the deterministic scene compiler renders that approved plan and validates it. Chatterbox remains a separate stage. Approved WAV files are preserved; do not run another heavy model alongside a job.</div>
+<div class="actions"><button id="runAll" class="primary" type="button">▶ Generate complete video (one click)</button><button id="run" class="secondary" type="submit">Analyze story</button><button id="analyze" class="secondary" type="button">Analyze story first</button></div><p class="hint" id="formHint">One-click runs analysis → scene → Chatterbox narration → render &amp; QC. Use the staged buttons when you want to review between steps.</p>
 </form>
 </section>
 <section class="panel">
 <h2>02 / Production console</h2><p class="sub">Live stage logs, errors and links to the finished scene, voice and MP4.</p>
 <div class="status"><span id="dot" class="dot"></span><span id="statusText">Ready for a new production</span></div>
+<div class="stages" id="stages" aria-label="Pipeline stage status"><div class="stage" data-stage="analysis"><b>1. Story analysis</b><span class="stage-state">Not run</span></div><div class="stage" data-stage="planValidation"><b>2. Plan validation</b><span class="stage-state">Not run</span></div><div class="stage" data-stage="scene"><b>3. Scene compilation</b><span class="stage-state">Not run</span></div><div class="stage" data-stage="validation"><b>4. Visual validation</b><span class="stage-state">Not run</span></div><div class="stage" data-stage="audio"><b>5. Narration</b><span class="stage-state">Not run</span></div><div class="stage" data-stage="render"><b>6. Render &amp; QC</b><span class="stage-state">Not run</span></div></div>
 <div id="logs" class="log" aria-live="polite" style="margin-top:14px">Waiting for you to start a job…</div>
 <div id="results" class="result"></div>
+<div id="planPanel" class="plan-panel hidden"><h2>Review / edit visual plan</h2><p class="sub">Analysis is separate. Edit beat timing, visual grammar or scene direction here before rendering.</p><textarea id="planEditor" spellcheck="false" aria-label="Editable visual plan JSON"></textarea><div class="plan-actions"><button id="savePlan" class="secondary" type="button">Validate &amp; save plan</button><span id="planMessage" class="plan-message"></span></div></div>
+
+<div id="sceneEditorPanel" class="scene-editor">
+  <h2>Paste / edit custom scene HTML</h2>
+  <p class="sub">Paste a complete HTML scene, save it into this project's <code>index.html</code>, preview it, then render it using the existing production pipeline. Saving preserves a timestamped backup of the previous scene.</p>
+  <div class="field"><label for="sceneHtmlFile">UPLOAD YOUR DOWNLOADED HTML FILE</label><input id="sceneHtmlFile" type="file" accept=".html,text/html"><span class="hint">Choose the Draupadi HTML file you downloaded, or paste its contents below.</span></div>
+  <div class="field"><label for="sceneHtml">SCENE HTML FILE</label><textarea id="sceneHtml" spellcheck="false" aria-label="Custom scene HTML" placeholder="Paste the complete <!doctype html> ... </html> scene here. It must define window.renderAt(seconds) and window.getDuration()."></textarea></div>
+  <div class="scene-editor-actions">
+    <button id="loadSceneHtml" class="secondary" type="button">Load saved visuals</button>
+    <button id="saveSceneHtml" class="primary" type="button">Save visuals to project</button>
+    <button id="previewSceneHtml" class="secondary" type="button">Preview HTML</button>
+    <button id="renderSceneHtml" class="secondary" type="button">Render saved visuals</button>
+    <span id="sceneHtmlMessage" class="scene-message">Choose or load a project before saving.</span>
+  </div>
+  <iframe id="scenePreview" class="scene-preview hidden" title="Custom scene preview" sandbox="allow-scripts" referrerpolicy="no-referrer"></iframe>
+</div>
 <div class="warning">Before publishing, preview the full MP4 and listen for pronunciation, pacing, clipped words and sync. Rendering can use substantial disk space.</div>
 </section>
 </main>
+<section id="audioWorkspace" class="audio-panel" aria-labelledby="audioTitle">
+  <h2 id="audioTitle">03 / Generate narration separately</h2>
+  <p class="sub">Paste the final spoken script, generate and listen to the WAV, then download it. This job does not run Ollama, generate scenes, or render a video.</p>
+  <div class="audio-grid">
+    <form id="audioForm">
+      <div class="field"><label for="audioSlug">AUDIO OUTPUT FOLDER</label><input id="audioSlug" value="narration-take-01" maxlength="64" pattern="[A-Za-z0-9 _-]+" required><span class="hint">Creates a separate folder under modes/technical-data-cinema/output. Existing WAVs are never overwritten.</span></div>
+      <div class="field"><label for="audioScript">NARRATION SCRIPT (HINDI / HINGLISH / ENGLISH)</label><textarea id="audioScript" required placeholder="Paste the exact words you want spoken. Example: सोचिए, एक वीडियो अचानक viral हो जाता है…"></textarea><span class="hint">Use Devanagari Hindi, Roman Hindi, Hinglish, English technical terms, and normal punctuation. Optional performance cues such as [HOOK], [CURIOUS], [SUSPENSE], [EXPLAIN], and [REVEAL] are supported by your current directed-cue pipeline; use them sparingly and put each cue before the passage it should influence. [PAUSE] is converted to a natural pause, and [END] is removed before speech so neither is read aloud.</span></div>
+      <div class="two">
+        <div class="field"><label for="audioStyle">VOICE DELIVERY</label><select id="audioStyle"><option value="storytelling">Storytelling</option><option value="conversational">Conversational</option><option value="dramatic">Dramatic</option></select></div>
+        <div class="field"><label for="audioPerformance">CUE HANDLING</label><select id="audioPerformance"><option value="directed">Directed cues</option><option value="uniform">Uniform delivery</option></select></div>
+      </div>
+      <div class="two">
+        <div class="field"><label for="audioIntensity">EXPRESSION INTENSITY (0–100)</label><input id="audioIntensity" type="number" min="0" max="100" value="65" required></div>
+        <div class="field"><label for="audioPace">OVERALL PACE</label><select id="audioPace"><option value="0.8">0.80× · slower</option><option value="0.9">0.90× · slightly slower</option><option value="1" selected>1.00× · natural</option><option value="1.1">1.10× · slightly faster</option><option value="1.2">1.20× · faster</option></select></div>
+      </div>
+      <div class="actions"><button id="audioRun" class="primary" type="submit">Generate narration WAV</button><span class="hint" id="audioHint">Audio-only · no video stages</span></div>
+    </form>
+    <div>
+      <div class="status"><span id="audioDot" class="dot"></span><span id="audioStatus">Ready to generate audio</span></div>
+      <div id="audioLogs" class="log" style="height:240px;margin-top:12px" aria-live="polite">Paste a script and start an audio-only job.</div>
+      <div id="audioOutput" class="audio-output" style="margin-top:12px">Your generated WAV and playback preview will appear here.</div>
+      <div id="audioLinks" class="audio-links"></div>
+    </div>
+  </div>
+</section>
+
+<section id="customWorkspace" class="custom-workspace hidden" role="tabpanel" aria-labelledby="customTab">
+  <h2>Custom Visuals + Narration → MP4</h2>
+  <p class="sub">Upload or paste your complete HTML scene, enter the exact narration, then use one button to save the scene, generate Chatterbox audio, preview both, and render a merged MP4. This bypasses story analysis and scene generation.</p>
+  <div class="custom-grid">
+    <div>
+      <div class="field"><label for="customProject">EXISTING PROJECT</label><select id="customProject"><option value="draupadi-question11">draupadi-question11</option></select><span class="hint">Choose a project that already has story.md and visual-plan.json.</span></div>
+      <div class="two">
+        <div class="field"><label for="customSlug">PROJECT FOLDER</label><input id="customSlug" value="draupadi-question11" required></div>
+        <div class="field"><label for="customExportName">NEW MP4 NAME</label><input id="customExportName" value="draupadi-custom-v2" required></div>
+      </div>
+      <div class="field"><label for="customHtmlFile">UPLOAD THE HTML FILE</label><input id="customHtmlFile" type="file" accept=".html,text/html"><span class="hint">Load a complete offline-safe HTML scene. Load saved scene to reuse a project; Download HTML to export edits; Unload clears the editor without deleting saved files.</span></div>
+      <div class="field"><label for="customHtml">VISUAL SCENE HTML</label><textarea id="customHtml" spellcheck="false" placeholder="Upload your HTML file above or paste the complete HTML document here."></textarea></div>
+      <div class="custom-actions">
+        <button id="customLoadScene" class="secondary" type="button">Load saved scene</button>
+        <button id="customPreviewScene" class="secondary" type="button">Preview visuals</button>
+        <button id="customDownloadScene" class="secondary" type="button">Download HTML</button>
+        <button id="customUnloadScene" class="secondary" type="button">Unload / clear editor</button>
+      </div>
+    </div>
+    <div>
+      <div class="field"><label for="customNarration">NARRATION SCRIPT (HINDI / HINGLISH)</label><textarea id="customNarration" placeholder="Paste the exact words you want spoken by Chatterbox…"></textarea><span class="hint">Supports Devanagari, Hinglish, English terms, and [PAUSE]/[END] control markers.</span></div>
+      <div class="two">
+        <div class="field"><label for="customVoiceStyle">VOICE DELIVERY</label><select id="customVoiceStyle"><option value="storytelling">Storytelling</option><option value="conversational">Conversational</option><option value="dramatic">Dramatic</option></select></div>
+        <div class="field"><label for="customCueMode">CUE HANDLING</label><select id="customCueMode"><option value="directed">Directed cues</option><option value="uniform">Uniform delivery</option></select></div>
+      </div>
+      <div class="two">
+        <div class="field"><label for="customIntensity">EXPRESSION INTENSITY</label><input id="customIntensity" type="number" min="0" max="100" value="65"></div>
+        <div class="field"><label for="customPace">NARRATION PACE</label><select id="customPace"><option value="0.8">0.80× slower</option><option value="0.9">0.90×</option><option value="1" selected>1.00× natural</option><option value="1.1">1.10×</option><option value="1.2">1.20× faster</option></select></div>
+      </div>
+      <div class="custom-actions"><button id="customProduce" class="primary" type="button">Generate narration + preview &amp; render MP4</button><span id="customState" class="hint">Ready — keep this tab open during generation.</span></div>
+      <div id="customLogs" class="custom-status" aria-live="polite">The job will save your HTML, generate narration, then render the merged video.</div>
+      <div id="customOutput" class="custom-output"></div>
+    </div>
+  </div>
+  <iframe id="customPreview" class="custom-preview hidden" title="Custom scene visual preview" sandbox="allow-scripts" referrerpolicy="no-referrer"></iframe>
+</section>
+
 <div class="foot">Yantralok · Local-only interface · Ollama + your existing Chatterbox Studio + Playwright + FFmpeg</div>
 <script>
 const $=id=>document.getElementById(id);
-let pollTimer=null, currentJob=null, knownLogs=0;
+let pollTimer=null,currentJob=null,knownLogs=0,analysisReady=false,sceneReady=false,planDirty=false,pendingPhase="analysis",sceneHtmlSavedContent="";
 function selectedMode(){return document.querySelector('input[name="voiceMode"]:checked').value}
-function toggleVoice(){const mode=selectedMode();$('voiceScriptWrap').classList.toggle('hidden',mode!=='generate');$('wavWrap').classList.toggle('hidden',mode!=='wav');$('style').disabled=mode!=='generate'}
-document.querySelectorAll('input[name="voiceMode"]').forEach(x=>x.addEventListener('change',toggleVoice));toggleVoice();
-$('title').addEventListener('input',()=>{if(!$('slug').dataset.edited)$('slug').value=$('title').value.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,64)});
-$('slug').addEventListener('input',()=>{$('slug').dataset.edited='1'});
-async function loadModels(){try{const r=await fetch('/api/models');const d=await r.json();if(d.models&&d.models.length){const sel=$('model'),previous=sel.value;sel.innerHTML='';d.models.forEach(m=>{const o=document.createElement('option');o.value=m;o.textContent=m;sel.append(o)});sel.value=d.models.includes(previous)?previous:d.models.find(m=>/qwen3-coder:30b/.test(m))||d.models.find(m=>/qwen2\.5-coder:7b/.test(m))||d.models[0];$('modelHint').textContent='Installed locally · no model will be downloaded automatically.'}else{$('modelHint').textContent='Ollama is not currently responding. The job runner can start it; select a model already installed on this Mac.'}}catch{$('modelHint').textContent='Could not query Ollama yet. Make sure the selected model is installed.'}}
-function status(s){$('statusText').textContent=s;$('dot').className='dot '+s}
-function link(label,url){const a=document.createElement('a');a.href=url;a.textContent=label;a.target='_blank';a.rel='noopener';return a}
-async function poll(){if(!currentJob)return;try{const r=await fetch('/api/jobs/'+currentJob);const j=await r.json();if(!r.ok)throw new Error(j.error||'Could not read job status');const logs=$('logs');if(j.logs.length!==knownLogs){logs.textContent=j.logs.join('\n');logs.scrollTop=logs.scrollHeight;knownLogs=j.logs.length}
-if(j.status==='running'||j.status==='queued'){status(j.status==='queued'?'Queued':'Production running…');pollTimer=setTimeout(poll,900);return}
-$('run').disabled=false;
-if(j.status==='completed'){status('Completed successfully');$('formHint').textContent='Ready for another story';$('results').replaceChildren();if(j.files.video)$('results').append(link('▶ Open final MP4',j.files.video));if(j.files.scene)$('results').append(link('Open generated HTML scene',j.files.scene));if(j.files.audio)$('results').append(link('Open generated Chatterbox WAV',j.files.audio))}
-else{status('Failed');$('formHint').textContent=j.error||'See the console for details';}
-}catch(e){status('Status check failed');$('logs').textContent+='\n'+e.message;$('run').disabled=false}}
-$('form').addEventListener('submit',async e=>{e.preventDefault();if(currentJob&&$('run').disabled)return;
-const payload={title:$('title').value,slug:$('slug').value,story:$('story').value,model:$('model').value,fps:$('fps').value,voiceMode:selectedMode(),voiceScript:$('voiceScript').value,wavPath:$('wavPath').value,style:$('style').value,performance:$('performance').value,intensity:$('intensity').value};
-if(payload.voiceMode==='generate'&&(!payload.voiceScript.trim())){alert('Add the narration script.');return}
-$('run').disabled=true;$('results').replaceChildren();$('logs').textContent='Submitting production…';knownLogs=0;$('formHint').textContent='Do not close this tab while the job runs';status('Submitting…');
-try{const r=await fetch('/api/run',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)});const d=await r.json();if(!r.ok)throw new Error(d.error||'Could not start job');currentJob=d.id;poll()}catch(err){$('run').disabled=false;status('Could not start');$('logs').textContent=err.message}});
-loadModels();
+function toggleVoice(){const mode=selectedMode();$("voiceScriptWrap").classList.toggle("hidden",mode!=="generate");$("wavWrap").classList.toggle("hidden",mode!=="wav");$("style").disabled=mode!=="generate"}
+document.querySelectorAll('input[name="voiceMode"]').forEach(x=>x.addEventListener("change",toggleVoice));toggleVoice();
+$("title").addEventListener("input",()=>{if(!$("slug").dataset.edited)$("slug").value=$("title").value.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,64);invalidateAnalysis()});
+$("slug").addEventListener("input",()=>{$("slug").dataset.edited="1";invalidateAnalysis()});
+$("story").addEventListener("input",invalidateAnalysis);
+async function loadProjects(selected=""){try{const r=await fetch("/api/projects");const d=await r.json();const sel=$("existingProject");sel.innerHTML='<option value="">Start or continue using the folder name below</option>';for(const p of d.projects||[]){const o=document.createElement("option");o.value=p.slug;o.textContent=p.title+" ("+p.slug+")"+(p.files.video?" · video ready":p.files.scene?" · scene ready":p.files.plan?" · plan saved":" · story saved");o.dataset.project=JSON.stringify(p);sel.append(o)}if(selected)sel.value=selected}catch(e){$("formHint").textContent="Could not list saved projects: "+e.message}}
+$("loadProject").addEventListener("click",async()=>{const option=$("existingProject").selectedOptions[0];if(!option?.value)return;let p;try{p=JSON.parse(option.dataset.project||"{}")}catch{return} $("slug").value=p.slug;$("slug").dataset.edited="1";$("title").value=p.title;$("story").value=p.story||"";if(p.files.narration){try{const r=await fetch("/files/"+encodeURIComponent(p.slug)+"/narration.md");if(r.ok)$("voiceScript").value=await r.text()}catch{}}invalidateAnalysis();if(p.files.plan){try{const r=await fetch("/files/"+encodeURIComponent(p.slug)+"/visual-plan.json");if(r.ok){$("planEditor").value=JSON.stringify(await r.json(),null,2);analysisReady=true;$("planPanel").classList.remove("hidden");$("planMessage").textContent="Loaded existing validated plan. It will be reused unless you edit and save it."}}catch{}}if(p.files.scene){sceneReady=true;analysisReady=true;$("run").textContent="Render with approved WAV";}else if(p.files.plan){$("run").textContent="Generate scene (reuse saved plan)";} if(p.files.video)$("results").replaceChildren(link("▶ Open existing final MP4","/files/"+encodeURIComponent(p.slug)+"/final.mp4"));else if(p.files.silentVideo)$("results").replaceChildren(link("▶ Open existing silent MP4","/files/"+encodeURIComponent(p.slug)+"/final-silent.mp4"));$("formHint").textContent=p.files.video||p.files.silentVideo?"Loaded project already has a final video. Reuse it from the results link; render a new named version only if needed.":"Loaded existing project. One-click production will reuse matching saved artifacts.";});
+async function loadModels(){try{const r=await fetch("/api/models");const d=await r.json();if(d.models&&d.models.length){const sel=$("model"),previous=sel.value;sel.innerHTML="";d.models.forEach(m=>{const o=document.createElement("option");o.value=m;o.textContent=m;sel.append(o)});sel.value=d.models.includes(previous)?previous:d.models.find(m=>/^qwen2\.5-coder:7b(?:$|:)/.test(m))||d.models.find(m=>/^qwen3-coder/.test(m))||d.models[0];$("modelHint").textContent="Installed locally · production scene rendering does not call this coding model."}else{$("modelHint").textContent="Ollama is not currently responding. The job runner can start it; select a model already installed on this Mac."}}catch{$("modelHint").textContent="Could not query Ollama yet. Make sure the selected model is installed."}}
+function status(s){$("statusText").textContent=s;$("dot").className="dot "+s}
+function link(label,url){const a=document.createElement("a");a.href=url;a.textContent=label;a.target="_blank";a.rel="noopener";return a}
+function updateStages(stages,statusValue){const mapping={analysis:"analysis",planValidation:"planValidation",scene:"scene",validation:"sceneValidation",audio:"audio",render:"render"};for(const [key,stageKey] of Object.entries(mapping)){const el=document.querySelector('[data-stage="'+key+'"]');if(!el)continue;const item=stages?.[stageKey];el.className="stage";let label="Not run";if(item?.status==="passed"){el.classList.add("done");label="Passed"}else if(item?.status==="running"){el.classList.add("active");label="Running…"}else if(item?.status==="failed"){el.classList.add("failed");label=item.detail||"Failed — inspect logs"}else if(item?.status==="skipped"){label="Not required"}el.querySelector(".stage-state").textContent=label}if(statusValue==="failed"&&!Object.values(stages||{}).some(x=>x?.status==="failed")){const el=document.querySelector('[data-stage="validation"]');if(el){el.classList.add("failed");el.querySelector(".stage-state").textContent="Failed — inspect logs"}}}
+async function poll(){if(!currentJob)return;try{const r=await fetch("/api/jobs/"+currentJob);const j=await r.json();if(!r.ok)throw new Error(j.error||"Could not read job status");const logs=$("logs");if(j.logs.length!==knownLogs){logs.textContent=j.logs.join("\n");logs.scrollTop=logs.scrollHeight;knownLogs=j.logs.length}updateStages(j.stages,j.status);
+if(j.status==="running"||j.status==="queued"){status(j.status==="queued"?"Queued":"Production running…");pollTimer=setTimeout(poll,900);return}
+$("run").disabled=false;$("analyze").disabled=false;$("runAll").disabled=false;
+if(j.status==="completed"){status("Completed successfully");loadProjects($("slug").value);$("formHint").textContent="Ready for the next stage";$("results").replaceChildren();if(j.files.plan)$("results").append(link("Open visual-plan.json",j.files.plan));if(j.files.video)$("results").append(link("▶ Open final MP4",j.files.video));if(j.files.scene)$("results").append(link("Open generated HTML scene",j.files.scene));if(j.files.audio)$("results").append(link("Open generated Chatterbox WAV",j.files.audio));
+if(j.files.plan&&j.stages?.analysis?.status==="passed"&&!j.files.scene){analysisReady=true;sceneReady=false;$("planPanel").classList.remove("hidden");try{const p=await fetch(j.files.plan);$("planEditor").value=JSON.stringify(await p.json(),null,2);planDirty=false;$("planMessage").textContent="Review/edit the plan, then validate and save it before scene generation."}catch(e){$("planMessage").textContent="Could not load plan: "+e.message}$("run").textContent="Generate scene (no audio/render)"}
+else if(j.files.scene&&!j.files.video){analysisReady=true;sceneReady=true;$("planPanel").classList.remove("hidden");$("run").textContent="Render with approved WAV";$("formHint").textContent="Select Existing WAV (or Silent video); this stage never runs Chatterbox"}
+else if(j.files.video){analysisReady=false;sceneReady=false;$("run").textContent="Analyze next story";$("formHint").textContent="Production complete — choose a new output folder for another film"}}
+else{status("Failed");$("formHint").textContent=j.error||"See the console for details"}}
+catch(e){status("Status check failed");$("logs").textContent+="\n"+e.message;$("run").disabled=false;$("analyze").disabled=false;$("runAll").disabled=false}}
+$("form").addEventListener("submit",async e=>{e.preventDefault();if($("run").disabled)return;if(analysisReady&&planDirty){alert("Validate & save your visual-plan edits before continuing.");return}
+let phase=pendingPhase==="all"?"all":(analysisReady?(sceneReady?"render":"scene"):"analysis");if(pendingPhase==="analysis")phase="analysis";pendingPhase="analysis";
+const mode=selectedMode();if(phase==="render"&&mode==="generate"){alert("To preserve approved narration, select Existing WAV and enter its absolute path, or choose Silent video. Generate new narration only in the separate audio-only panel.");return}if(phase==="render"&&mode==="wav"&&!$("wavPath").value.trim()){alert("Enter the absolute path to your approved WAV.");return}if(phase==="render"&&!$("exportName").value.trim()){alert("Enter a new export name for this render attempt.");return}
+const payload={title:$("title").value,slug:$("slug").value,story:$("story").value,model:$("model").value,fps:$("fps").value,voiceMode:mode,voiceScript:$("voiceScript").value,wavPath:$("wavPath").value,exportName:$("exportName").value,style:$("style").value,performance:$("performance").value,intensity:$("intensity").value,audioOffset:Number($("audioOffset").value||0),phase};
+$("run").disabled=true;$("analyze").disabled=true;$("runAll").disabled=true;$("results").replaceChildren();$("logs").textContent="Submitting production…";knownLogs=0;$("formHint").textContent="Do not close this tab while the job runs";status("Submitting…");
+try{const r=await fetch("/api/run",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(payload)});const d=await r.json();if(!r.ok)throw new Error(d.error||"Could not start job");currentJob=d.id;poll()}catch(err){$("run").disabled=false;$("analyze").disabled=false;$("runAll").disabled=false;status("Could not start");$("logs").textContent=err.message}});
+$("runAll").addEventListener("click",()=>{if($("runAll").disabled)return;if(selectedMode()==="generate"&&!$("voiceScript").value.trim()){alert("Add the narration script before starting one-click production.");return}if(selectedMode()==="wav"&&!$("wavPath").value.trim()){alert("Enter the absolute path to an existing WAV, or select Chatterbox voice for a fully automatic run.");return}pendingPhase="all";$("form").requestSubmit()});
+$("analyze").addEventListener("click",()=>{pendingPhase="analysis";$("form").requestSubmit()});
+$("savePlan").addEventListener("click",async()=>{const b=$("savePlan");b.disabled=true;$("planMessage").textContent="Validating plan…";try{const r=await fetch("/api/plan",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({slug:$("slug").value,plan:$("planEditor").value})});const d=await r.json();if(!r.ok)throw new Error(d.error||"Plan validation failed");$("planEditor").value=JSON.stringify(d.plan,null,2);planDirty=false;$("planMessage").textContent="Saved and validated "+d.beats+" beats. The scene step will use this plan."}catch(e){$("planMessage").textContent="Plan not saved: "+e.message}finally{b.disabled=false}});
+$("planEditor").addEventListener("input",()=>{if(analysisReady){planDirty=true;$("formHint").textContent="Save and validate visual-plan edits before rendering"}});
+function invalidateAnalysis(){analysisReady=false;sceneReady=false;planDirty=false;pendingPhase="analysis";$("run").textContent="Analyze story";$("planPanel").classList.add("hidden")}
+let audioJobId=null,audioPollTimer=null,audioKnownLogs=0;
+function audioStatus(value){$("audioStatus").textContent=value;$("audioDot").className="dot "+(value==="Completed"?"completed":value==="Failed"||value==="Could not start"?"failed":value==="Generating…"?"running":"")}
+async function pollAudio(){if(!audioJobId)return;try{const r=await fetch("/api/jobs/"+audioJobId);const j=await r.json();if(!r.ok)throw new Error(j.error||"Could not read audio job");if(j.logs.length!==audioKnownLogs){$("audioLogs").textContent=j.logs.join("\n");$("audioLogs").scrollTop=$("audioLogs").scrollHeight;audioKnownLogs=j.logs.length}
+if(j.status==="queued"||j.status==="running"){audioStatus(j.status==="queued"?"Queued":"Generating…");audioPollTimer=setTimeout(pollAudio,800);return}
+$("audioRun").disabled=false;
+if(j.status==="completed"){audioStatus("Completed");$("audioHint").textContent="Listen before using this take";$("audioOutput").replaceChildren();if(j.files.audio){const audio=document.createElement("audio");audio.controls=true;audio.preload="metadata";audio.src=j.files.audio;$("audioOutput").append(audio)}$("audioLinks").replaceChildren();if(j.files.audio)$("audioLinks").append(link("Download paced narration WAV",j.files.audio+"?download=1"));if(j.files.sourceAudio)$("audioLinks").append(link("Download original generated WAV",j.files.sourceAudio+"?download=1"));if(j.files.script)$("audioLinks").append(link("Open saved narration script",j.files.script))}
+else{audioStatus("Failed");$("audioHint").textContent=j.error||"See audio logs for details";$("audioOutput").textContent=j.error||"Audio generation failed."}}
+catch(e){$("audioRun").disabled=false;audioStatus("Failed");$("audioLogs").textContent+="\n"+e.message}}
+$("audioForm").addEventListener("submit",async e=>{e.preventDefault();if($("audioRun").disabled)return;const payload={slug:$("audioSlug").value,script:$("audioScript").value,style:$("audioStyle").value,performance:$("audioPerformance").value,intensity:$("audioIntensity").value,pace:$("audioPace").value};if(!payload.script.trim()){alert("Paste the narration script first.");return}if(payload.script.length>25000){alert("Keep the script under 25,000 characters per audio take.");return}
+$("audioRun").disabled=true;$("audioHint").textContent="Keep this tab open while Chatterbox generates audio";$("audioLogs").textContent="Submitting audio-only job…";$("audioOutput").textContent="Generating…";$("audioLinks").replaceChildren();audioKnownLogs=0;audioStatus("Queued");
+try{const r=await fetch("/api/audio",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(payload)});const d=await r.json();if(!r.ok)throw new Error(d.error||"Could not start audio job");audioJobId=d.id;pollAudio()}catch(err){$("audioRun").disabled=false;audioStatus("Could not start");$("audioLogs").textContent=err.message;$("audioHint").textContent="Correct the issue and retry"}});
+
+$("sceneHtmlFile").addEventListener("change",async()=>{const file=$("sceneHtmlFile").files?.[0];if(!file)return;try{$("sceneHtml").value=await file.text();sceneHtmlSavedContent="";$("sceneHtmlMessage").textContent="Loaded "+file.name+" into the editor. Save visuals to this project when ready."}catch(e){$("sceneHtmlMessage").textContent="Could not read file: "+e.message}});
+async function loadSceneHtml(){
+  const slug=$("slug").value.trim();
+  if(!slug){$("sceneHtmlMessage").textContent="Enter or load a project folder first.";return}
+  $("sceneHtmlMessage").textContent="Loading saved scene…";
+  try{const r=await fetch("/files/"+encodeURIComponent(slug)+"/index.html");const d=await r.text();if(!r.ok)throw new Error(d||"No saved scene HTML found.");$("sceneHtml").value=d;sceneHtmlSavedContent=d;$("sceneHtmlMessage").textContent="Loaded saved index.html from "+slug+"."}
+  catch(e){$("sceneHtmlMessage").textContent="Could not load scene: "+e.message}
+}
+$("loadSceneHtml").addEventListener("click",loadSceneHtml);
+$("saveSceneHtml").addEventListener("click",async()=>{
+  const button=$("saveSceneHtml");button.disabled=true;$("sceneHtmlMessage").textContent="Validating and saving HTML…";
+  try{const r=await fetch("/api/scene/save",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({slug:$("slug").value,html:$("sceneHtml").value})});const d=await r.json();if(!r.ok)throw new Error(d.error||"Could not save scene.");$("sceneHtml").value=d.html;sceneHtmlSavedContent=d.html;$("sceneHtmlMessage").textContent="Saved to "+d.path+(d.backup?" · backup: "+d.backup:"")+" · duration "+(Number.isFinite(d.duration)?d.duration.toFixed(2)+"s":"read from getDuration()");sceneReady=true;analysisReady=true;loadProjects($("slug").value)}
+  catch(e){$("sceneHtmlMessage").textContent="Save failed: "+e.message}
+  finally{button.disabled=false}
+});
+$("previewSceneHtml").addEventListener("click",async()=>{
+  const source=$("sceneHtml").value.trim();if(!source){$("sceneHtmlMessage").textContent="Paste or load an HTML scene first.";return}
+  const button=$("previewSceneHtml");button.disabled=true;$("sceneHtmlMessage").textContent="Preparing offline preview…";
+  try{const r=await fetch("/api/scene/bundle",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({html:source})});const d=await r.json();if(!r.ok)throw new Error(d.error||"Could not prepare scene");const frame=$("scenePreview");frame.srcdoc=d.html;frame.classList.remove("hidden");$("sceneHtmlMessage").textContent="Offline preview ready. Three.js module dependencies are bundled locally when present."}
+  catch(e){$("sceneHtmlMessage").textContent="Preview failed: "+e.message}
+  finally{button.disabled=false}
+});
+$("renderSceneHtml").addEventListener("click",()=>{
+  if(!$("sceneHtml").value.trim()){alert("Paste or load the scene HTML first.");return}
+  if($("sceneHtml").value!==sceneHtmlSavedContent){alert("Save visuals to the project first. Rendering always uses the saved index.html, not unsaved editor contents.");return}
+  const mode=selectedMode();
+  if(mode==="generate"){alert("To render saved HTML without regenerating narration, choose Project WAV to reuse this folder’s final.narration.wav, choose Existing WAV and provide its path, or choose Silent video.");return}
+  if(mode==="wav"&&!$("wavPath").value.trim()){alert("Enter the absolute path to the approved narration WAV.");return}
+  if(!$("exportName").value.trim()){alert("Enter a new render output name.");return}
+  analysisReady=true;sceneReady=true;planDirty=false;pendingPhase="analysis";$("formHint").textContent="Rendering the saved custom HTML; story analysis and scene generation will be skipped.";$("form").requestSubmit();
+});
+
+
+const customTab=$("customTab"),builderTab=$("builderTab");
+function switchWorkspace(which){
+ const custom=which==="custom";
+ $("builderWorkspace").classList.toggle("hidden",custom);
+ $("audioWorkspace").classList.toggle("hidden",custom);
+ $("customWorkspace").classList.toggle("hidden",!custom);
+ customTab.setAttribute("aria-selected",String(custom));builderTab.setAttribute("aria-selected",String(!custom));
+}
+builderTab.addEventListener("click",()=>switchWorkspace("builder"));
+customTab.addEventListener("click",()=>{switchWorkspace("custom");loadCustomProjects()});
+let customProjectsLoaded=false,customBusy=false;
+async function loadCustomProjects(){
+ try{
+  const r=await fetch("/api/projects");const d=await r.json();if(!r.ok)throw new Error(d.error||"Could not load projects");
+  const select=$("customProject"),previous=$("customSlug").value;select.replaceChildren();
+  for(const p of d.projects||[]){const o=document.createElement("option");o.value=p.slug;o.textContent=p.title+" — "+p.slug;o.dataset.project=JSON.stringify(p);select.append(o)}
+  if(!select.options.length){const o=document.createElement("option");o.value=previous||"draupadi-question11";o.textContent=o.value;select.append(o)}
+  select.value=[...select.options].some(o=>o.value===previous)?previous:select.options[0].value;
+  customProjectsLoaded=true;
+ }catch(e){$("customState").textContent="Could not load project list: "+e.message}
+}
+$("customProject").addEventListener("change",()=>{$("customSlug").value=$("customProject").value});
+$("customHtmlFile").addEventListener("change",async()=>{const f=$("customHtmlFile").files?.[0];if(!f)return;try{$("customHtml").value=await f.text();$("customState").textContent="Loaded "+f.name+" into the editor."}catch(e){$("customState").textContent="Could not read HTML file: "+e.message}});
+$("customLoadScene").addEventListener("click",async()=>{
+ const slug=$("customSlug").value.trim();if(!slug){$("customState").textContent="Choose a project first.";return}
+ $("customState").textContent="Loading saved scene…";
+ try{const r=await fetch("/files/"+encodeURIComponent(slug)+"/index.html");const txt=await r.text();if(!r.ok)throw new Error("No saved index.html for this project.");$("customHtml").value=txt;$("customState").textContent="Loaded saved scene for "+slug}
+ catch(e){$("customState").textContent=e.message}
+});
+$("customPreviewScene").addEventListener("click",async()=>{
+ const html=$("customHtml").value.trim();if(!html){$("customState").textContent="Upload or paste the HTML first.";return}
+ const button=$("customPreviewScene");button.disabled=true;$("customState").textContent="Preparing offline preview…";
+ try{const r=await fetch("/api/scene/bundle",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({html})});const d=await r.json();if(!r.ok)throw new Error(d.error||"Could not prepare scene");$("customPreview").srcdoc=d.html;$("customPreview").classList.remove("hidden");$("customState").textContent="Offline preview ready. You can now save, download or render this scene."}
+ catch(e){$("customState").textContent="Preview failed: "+e.message}
+ finally{button.disabled=false}
+});
+$("customDownloadScene").addEventListener("click",async()=>{
+ const source=$("customHtml").value;
+ if(!source.trim()){$("customState").textContent="Nothing to download — upload or load an HTML scene first.";return}
+ const button=$("customDownloadScene");button.disabled=true;$("customState").textContent="Bundling offline HTML for download…";
+ try{
+  const r=await fetch("/api/scene/bundle",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({html:source})});const d=await r.json();if(!r.ok)throw new Error(d.error||"Could not bundle scene");
+  const blob=new Blob([d.html],{type:"text/html;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=url;a.download=(( $("customSlug").value||"custom-mythology-scene").trim().replace(/[^a-z0-9_-]+/gi,"-").replace(/^-|-$/g,"")||"custom-mythology-scene")+".html";
+  document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  $("customState").textContent="Downloaded bundled, offline-ready HTML. The saved project was not modified.";
+ }catch(e){$("customState").textContent="Download failed: "+e.message}
+ finally{button.disabled=false}
+});
+$("customUnloadScene").addEventListener("click",()=>{
+ if(customBusy){$("customState").textContent="Wait until the active narration/render job finishes before unloading.";return}
+ $("customHtml").value="";$("customHtmlFile").value="";
+ $("customPreview").removeAttribute("srcdoc");$("customPreview").src="about:blank";$("customPreview").classList.add("hidden");
+ $("customState").textContent="Unloaded from editor. Saved project HTML and previous MP4 are untouched.";});
+async function waitForJob(id,onUpdate){
+ while(true){
+  const r=await fetch("/api/jobs/"+encodeURIComponent(id));const j=await r.json();if(!r.ok)throw new Error(j.error||"Could not read job status");
+  onUpdate?.(j);
+  if(j.status==="completed")return j;
+  if(j.status==="failed")throw new Error(j.error||"Production stage failed");
+  await new Promise(resolve=>setTimeout(resolve,900));
+ }
+}
+$("customProduce").addEventListener("click",async()=>{
+ if(customBusy)return;
+ const slug=$("customSlug").value.trim().toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,64);
+ const html=$("customHtml").value.trim(),script=$("customNarration").value.trim();
+ const exportName=$("customExportName").value.trim().toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,64);
+ if(!slug){$("customState").textContent="Choose a valid project folder.";return}
+ if(!html){$("customState").textContent="Upload or paste the complete HTML scene first.";return}
+ if(!script){$("customState").textContent="Paste the narration script first.";return}
+ if(script.length>25000){$("customState").textContent="Narration is limited to 25,000 characters.";return}
+ if(!exportName){$("customState").textContent="Enter a new MP4 output name.";return}
+ if(!/<!doctype\s+html/i.test(html)||!/<html\b/i.test(html)){ $("customState").textContent="Please upload/paste a complete HTML document, not a fragment.";return}
+ customBusy=true;const button=$("customProduce");button.disabled=true;$("customState").textContent="Saving visuals…";$("customLogs").textContent="1/3 Saving custom HTML into the selected project…";$("customOutput").replaceChildren();
+ try{
+  const save=await fetch("/api/scene/save",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({slug,html})});
+  const saved=await save.json();if(!save.ok)throw new Error(saved.error||"Could not save HTML");
+  $("customHtml").value=saved.html;$("customPreview").srcdoc=saved.html;$("customPreview").classList.remove("hidden");
+  $("customLogs").textContent+="\nSaved "+saved.path+(saved.backup?" (previous scene backed up as "+saved.backup+")":"")+".";
+  const audioSlug=(slug+"-custom-take-"+Date.now()).slice(0,64);
+  $("customState").textContent="Generating Chatterbox narration…";$("customLogs").textContent+="\n2/3 Generating narration. Heavy stages run sequentially.";
+  const ar=await fetch("/api/audio",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({slug:audioSlug,script,style:$("customVoiceStyle").value,performance:$("customCueMode").value,intensity:$("customIntensity").value,pace:$("customPace").value})});
+  const ad=await ar.json();if(!ar.ok)throw new Error(ad.error||"Could not start Chatterbox narration");
+  const audioJob=await waitForJob(ad.id,j=>{$("customLogs").textContent="2/3 Generating Chatterbox narration…\n"+(j.logs||[]).join("\n");$("customLogs").scrollTop=$("customLogs").scrollHeight});
+  if(audioJob.files?.audio){const a=document.createElement("audio");a.controls=true;a.preload="metadata";a.src=audioJob.files.audio;$("customOutput").append(a)}
+  $("customState").textContent="Narration ready — rendering the merged MP4…";$("customLogs").textContent+="\nNarration generated. Starting render…";
+  await new Promise(resolve=>setTimeout(resolve,800));
+  const mr=await fetch("/api/custom/merge",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({slug,audioSlug,exportName})});
+  const md=await mr.json();if(!mr.ok)throw new Error(md.error||"Could not start merge/render");
+  const mergeJob=await waitForJob(md.id,j=>{$("customLogs").textContent="3/3 Rendering visuals + narration…\n"+(j.logs||[]).join("\n");$("customLogs").scrollTop=$("customLogs").scrollHeight});
+  $("customState").textContent="Completed — preview the merged MP4 below.";
+  if(mergeJob.files?.video){const v=document.createElement("video");v.controls=true;v.preload="metadata";v.src=mergeJob.files.video;$("customOutput").append(v);const a=document.createElement("a");a.href=mergeJob.files.video+"?download=1";a.textContent="Open / download rendered MP4";a.target="_blank";a.rel="noopener";$("customOutput").append(a)}
+  if(mergeJob.files?.audio){const a=document.createElement("a");a.href=mergeJob.files.audio+"?download=1";a.textContent="Download project narration WAV";a.target="_blank";a.rel="noopener";$("customOutput").append(a)}
+ }catch(e){$("customState").textContent="Stopped: "+e.message;$("customLogs").textContent+="\nERROR: "+e.message}
+ finally{customBusy=false;button.disabled=false}
+});
+
+loadModels();loadProjects();
 </script>
 </body></html>

@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dotted Character Reveal — Infographics Mode</title>
+<style>
+:root{color-scheme:light;--paper:#f5efdf;--ink:#24231f;--muted:#81796a;--red:#a33a30;--gold:#a17a2c}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:var(--paper);font-family:ui-sans-serif,system-ui,-apple-system,sans-serif;color:var(--ink)}
+body{display:grid;place-items:center}.frame{position:relative;width:min(100vw,56.25vh);height:min(177.7778vw,100vh);aspect-ratio:9/16;overflow:hidden;background:var(--paper);isolation:isolate}
+.frame:before{content:"";position:absolute;inset:0;background-image:radial-gradient(#8d806b30 .7px,transparent .7px);background-size:8px 8px;opacity:.5;pointer-events:none}
+svg{width:100%;height:100%;display:block;position:relative}
+.kicker{font-size:15px;letter-spacing:3px;font-weight:750;fill:var(--red)}.headline{font-size:35px;font-weight:800;letter-spacing:-1px;fill:var(--ink)}.sub{font-size:17px;fill:var(--muted)}.label{font-size:15px;font-weight:700;letter-spacing:1px;fill:var(--ink)}.note{font-size:13px;fill:var(--muted)}.ink{fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}.fine{fill:none;stroke:var(--muted);stroke-width:1.4;stroke-linecap:round}.accent{fill:none;stroke:var(--red);stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round}.dot{fill:var(--ink)}.reddot{fill:var(--red)}.gold{fill:var(--gold)}.hidden{opacity:0}
+#controls{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);display:flex;align-items:center;gap:10px;padding:8px 12px;background:#fffdf4e8;border:1px solid #b7ad9b;border-radius:999px;box-shadow:0 3px 20px #0001;font:12px system-ui;z-index:5}
+#controls button{border:0;border-radius:99px;background:#282720;color:#fff;padding:7px 12px;cursor:pointer}#scrub{width:min(35vw,260px)}#time{font-variant-numeric:tabular-nums;min-width:68px}
+body.render-only{display:block}body.render-only .frame{width:100vw;height:100vh;max-width:none;max-height:none}body.render-only #controls{display:none}
+</style>
+</head>
+<body>
+<main class="frame" aria-label="Dotted character infographic preview">
+<svg id="scene" viewBox="0 0 540 960" role="img" aria-label="A character is progressively drawn from dots, then connected to a question about justice">
+<defs>
+ <clipPath id="stageClip"><rect width="540" height="960"/></clipPath>
+</defs>
+<g clip-path="url(#stageClip)">
+ <text x="38" y="56" class="kicker">EPIC STORY • VISUAL EXPLAINER</text>
+ <text x="38" y="112" class="headline">The question</text>
+ <text x="38" y="153" class="headline">the court avoided.</text>
+ <text x="38" y="185" class="sub">A character reveal built from meaningful points</text>
+ <path d="M38 211 H502" class="fine" opacity=".65"/>
+ <g id="portrait" transform="translate(8 4)">
+  <!-- Canonical stylised silhouette; dots are sampled deterministically along these paths. -->
+  <path id="hairPath" class="ink" d="M151 470 C112 422 119 347 151 293 C178 247 230 229 275 252 C320 275 343 326 330 372 C324 396 309 412 302 432 L303 479 L255 511 L188 496 Z"/>
+  <path id="facePath" class="ink" d="M175 327 C195 297 245 287 278 316 C296 333 297 356 292 380 L277 405 L281 428 C282 441 268 448 252 443 L227 432 L210 450 L190 425 C174 398 164 357 175 327 Z"/>
+  <path id="neckPath" class="ink" d="M211 439 L211 477 L184 494 M252 443 L255 478 L285 497"/>
+  <path id="bodyPath" class="ink" d="M183 493 C151 507 126 536 115 577 L97 671 L355 671 L335 574 C326 534 300 509 284 498 C255 522 211 519 183 493 Z"/>
+  <path id="drapePath" class="accent" d="M182 500 C202 543 249 570 302 586 L341 649 M177 519 C194 571 211 618 216 670"/>
+  <path id="browPath" class="fine" d="M188 352 Q204 341 218 352 M249 347 Q267 339 280 351"/>
+  <path id="eyePath" class="ink" d="M190 367 Q204 357 218 368 M251 363 Q265 355 278 365"/>
+  <path id="nosePath" class="fine" d="M235 363 L230 389 L241 393"/>
+  <path id="mouthPath" class="accent" d="M219 410 Q235 418 251 409"/>
+  <path id="ornamentPath" class="accent" d="M160 312 Q180 267 226 257 Q276 247 307 290 M175 300 Q224 267 278 287"/>
+  <g id="dots"></g>
+  <g id="lineReveals"></g>
+ </g>
+ <g id="callouts" class="hidden">
+  <path id="connector1" class="accent" d="M304 339 C359 315 366 282 397 282"/>
+  <circle cx="304" cy="339" r="5" class="reddot"/>
+  <text x="402" y="276" class="label">IDENTITY</text><text x="402" y="296" class="note">Silhouette + details</text>
+  <path id="connector2" class="fine" d="M337 603 C373 616 372 652 398 652"/>
+  <circle cx="337" cy="603" r="4" class="dot"/>
+  <text x="400" y="646" class="label">CHOICE</text><text x="400" y="666" class="note">Actions have stakes</text>
+ </g>
+ <g id="question" class="hidden">
+  <rect x="38" y="728" width="464" height="128" rx="4" fill="#eee3c9" stroke="#c9bca2"/>
+  <path d="M38 728 H502" class="accent"/>
+  <text x="58" y="767" class="kicker" style="font-size:12px;letter-spacing:2px">THE MORAL CONFLICT</text>
+  <text x="58" y="805" class="headline" style="font-size:25px">When rules meet justice,</text>
+  <text x="58" y="837" class="headline" style="font-size:25px;fill:var(--red)">who gets heard?</text>
+ </g>
+ <text x="38" y="914" class="note">DOTS TRACE THE CHARACTER • CONNECTORS EXPLAIN THE STORY</text>
+ <text x="502" y="914" text-anchor="end" class="note">INFOGRAPHICS MODE</text>
+</g>
+</svg>
+</main>
+<div id="controls"><button id="play">Play</button><input id="scrub" type="range" min="0" max="12" step=".01" value="0" aria-label="Preview timeline"><span id="time">00:00 / 00:12</span></div>
+<script>
+"use strict";
+const DURATION = 12;
+const svg = document.getElementById("scene");
+const pathIds = ["hairPath","facePath","neckPath","bodyPath","drapePath","browPath","eyePath","nosePath","mouthPath","ornamentPath"];
+const lineGroup = document.getElementById("lineReveals");
+const dotGroup = document.getElementById("dots");
+const paths = pathIds.map(id => document.getElementById(id));
+const NS = "http://www.w3.org/2000/svg";
+const specs = paths.map((path, index) => {
+  const length = path.getTotalLength();
+  path.style.strokeDasharray = String(length);
+  path.style.strokeDashoffset = String(length);
+  path.style.opacity = "0";
+  const count = Math.max(8, Math.floor(length / 8));
+  const points = [];
+  for (let i = 0; i <= count; i++) {
+    const p = path.getPointAtLength(length * i / count);
+    points.push({x:p.x,y:p.y,at:i/count});
+  }
+  return {path,length,points,index};
+});
+const dots = [];
+for (const spec of specs) {
+  for (const p of spec.points) {
+    const c = document.createElementNS(NS,"circle");
+    c.setAttribute("cx",p.x); c.setAttribute("cy",p.y);
+    c.setAttribute("r", spec.index < 4 ? "2.25" : "1.7");
+    c.setAttribute("class", spec.index === 4 || spec.index === 8 || spec.index === 9 ? "reddot" : "dot");
+    dotGroup.appendChild(c);
+    dots.push({el:c, index:spec.index, at:p.at});
+  }
+}
+function clamp(v,a=0,b=1){return Math.max(a,Math.min(b,v));}
+function smooth(v){v=clamp(v);return v*v*(3-2*v);}
+function drawAt(seconds) {
+  const t=clamp(Number(seconds)||0,0,DURATION);
+  // Reveal the silhouette first, then the identity-bearing details, then the explanatory links.
+  const progress = [
+    smooth((t-0.25)/2.6), smooth((t-0.7)/2.3), smooth((t-1.7)/1.3),
+    smooth((t-2.1)/2.4), smooth((t-3.1)/1.8), smooth((t-4.2)/1.0),
+    smooth((t-4.5)/1.0), smooth((t-4.9)/.9), smooth((t-5.3)/.8), smooth((t-3.6)/1.8)
+  ];
+  for (const spec of specs) {
+    const p=progress[spec.index];
+    spec.path.style.opacity=String(p);
+    spec.path.style.strokeDashoffset=String(spec.length*(1-p));
+  }
+  for (const d of dots) {
+    const p=progress[d.index];
+    d.el.style.opacity=String(clamp((p-d.at*.82)*12));
+  }
+  document.getElementById("callouts").style.opacity=String(smooth((t-5.2)/1.2));
+  document.getElementById("question").style.opacity=String(smooth((t-7.4)/1.1));
+}
+window.getDuration = function () { return DURATION; };
+window.renderAt = function (seconds) { const t = Math.max(0, Math.min(DURATION, Number(seconds) || 0)); drawAt(t); };
+const scrub=document.getElementById("scrub"), timeLabel=document.getElementById("time"), playBtn=document.getElementById("play");
+let previewStart=0, playing=false, raf=0, current=0;
+function clock(t){return "00:"+String(Math.floor(t)).padStart(2,"0");}
+function previewFrame(now){
+ if(!playing)return;
+ current=Math.min(DURATION, (now-previewStart)/1000);
+ window.renderAt(current); scrub.value=String(current); timeLabel.textContent=clock(current)+" / "+clock(DURATION);
+ if(current>=DURATION){playing=false;playBtn.textContent="Play";return;}
+ raf=requestAnimationFrame(previewFrame);
+}
+playBtn.addEventListener("click",()=>{
+ if(playing){playing=false;cancelAnimationFrame(raf);playBtn.textContent="Play";return;}
+ if(current>=DURATION)current=0;
+ playing=true;previewStart=performance.now()-current*1000;playBtn.textContent="Pause";raf=requestAnimationFrame(previewFrame);
+});
+scrub.addEventListener("input",()=>{playing=false;cancelAnimationFrame(raf);playBtn.textContent="Play";current=Number(scrub.value);window.renderAt(current);timeLabel.textContent=clock(current)+" / "+clock(DURATION);});
+if(new URLSearchParams(window.location.search).get("render")==="1"){document.body.classList.add("render-only");}
+window.renderAt(0);
+</script>
+</body>
+</html>

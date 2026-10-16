@@ -33,6 +33,19 @@ STRICT EDITORIAL GATES — FAIL THESE AND THE SCENE IS NOT ACCEPTABLE
 - Every 2–4 seconds, something explanatory must change: a state, relation, composition, scale, annotation, or camera view. Continuous particle motion by itself does not count.
 - Before returning HTML, mentally audit the whole timeline at 0s, 1s, 25%, 50%, 75%, and the final 3 seconds. Reject any repeated composition that persists without new information.
 
+STYLE SELECTION — SAME INFOGRAPHICS MODE, STORY-APPROPRIATE ART DIRECTION
+- Keep using this exact HTML/CSS/JS infographic renderer for every topic. Do not create a separate mode or fixed template.
+- Choose the visual palette from the story's subject. For technology, systems, data, startups, and engineering explainers, use Yantralok near-black (#050607), off-white linework (#f5f7f8), and restrained red-orange (#e64b36).
+- LOCKED MYTHOLOGY ART DIRECTION: For mythology, epics, sacred stories, ancient courts, and historical Indian storytelling, use a dark cinematic particle aesthetic: near-black/deep charcoal environments, luminous antique-gold and amber particles, fine glowing connecting trails, volumetric light, layered 2.5D depth, and restrained vermilion/crimson accents for meaningful story beats. This is the default mythology style, not a per-story choice. Do NOT use parchment as the default mythology background and do NOT force the Yantralok technical-notebook look onto mythology.
+- Build recognizable characters and environments out of meaningful particle contours and connecting strokes. Reveal silhouette first, then hair/headwear, face, costume/jewellery, gesture and story-specific props. Particles must gather, travel, connect, disperse or transform in response to the narrative; never use an unexplained decorative particle cloud.
+- CINEMATIC CHARACTER PERFORMANCE: Open on a visual event or intriguing character gesture in the first second; do not begin with a static title card. Make the protagonist large enough to read on a phone. Choreograph each important action as anticipation → clear primary movement → follow-through, with overlapping motion in hair, sari, jewellery and trailing particles. Use motivated dolly/push-in, parallax and occasional close-ups; settle the camera for key lines and emotional holds.
+- VIRAL SHORT-FORM STORY FLOW (never promise virality): make the first 1–2 seconds visually legible without sound; reveal a new story fact or consequential state change every 2–4 seconds; use distinct wide/medium/close compositions and match-cut or particle-morph transitions that carry an object/gesture into the next beat. Keep one dominant focal action at a time. Captions support the action; they must not substitute for it. End on a visually resolved, emotionally memorable image, not a frozen generic title card.
+- Use cinematic camera pushes, bounded parallax, light sweeps, particle trails and depth separation to make scenes feel alive. Use stronger glow for divine/magical moments, but preserve readable silhouettes and restrained highlights. Keep every effect deterministic and timestamp-driven.
+- Change visual choreography for each story beat; this is a locked art direction, NOT a fixed composition or reusable scene template.
+- For other subjects, select a restrained palette that strengthens the explanation; use semantic color, strong contrast, and consistent art direction.
+- Palette must not force repeated composition. Change story-specific objects, silhouettes, camera framing, and causal motion across beats.
+- Dots must represent meaningful people, events, relationships, decisions, or causal state—not generic decoration.
+- Keep preview/editor UI separate from the rendered scene.
 VISUAL STORYTELLING
 - Particles have explicit meaning (people, requests, packets, money, attention, etc.) and purposeful movement.
 - Show paths, branching, accumulation, delay, failure, recovery or state changes when they explain the mechanism.
@@ -55,3 +68,112 @@ QUALITY
 
 OUTPUT
 Return only the complete HTML source starting with <!doctype html>. No Markdown fences, explanations or placeholders.
+
+VISUAL COMPOSITION CONTRACT — MEASURABLE, NOT VAGUE
+The previous rules are mandatory, but do not satisfy them with tiny labels and a few lines floating in a mostly empty canvas. The artwork must occupy the frame intentionally.
+
+CANVAS / SAFE ZONES
+- Treat 540×960 as the logical canvas. Keep a 36 px side margin and a 48 px top/bottom safe margin.
+- In every major beat, allocate a clear headline zone (roughly y=90–230), a dominant visual zone (roughly y=250–730), and a concise caption / metric zone (roughly y=760–880). These are flexible zones, not three permanent boxes; vary the composition between beats.
+- A primary diagram or metaphor should normally span at least 55% of canvas width and 28% of canvas height. A key number should normally be 52–100 px; a scene headline 30–46 px; supporting labels 18–26 px. Never rely on 10–16 px labels to carry the story.
+- Do not center all content in a tiny strip or place all information in the top 20% of the frame. Keep the primary action within the central 65% of the frame and use the full vertical format.
+- A background grid, gradient, glow, border, particle field or decorative texture is not meaningful visual content and does not count toward visual coverage.
+
+SCENE GRAMMAR
+Plan a sequence of distinct visual compositions, selecting only the grammar that serves each beat:
+1. HOOK / SCALE: a giant legible number, object or visual contradiction with an immediate reveal.
+2. FLOW / FAN-OUT: one source branches into clearly separated paths and destinations; animate paths being drawn and endpoints arriving.
+3. BOTTLENECK / QUEUE: show arrivals versus fixed service capacity, queue accumulation, and an obvious warning state; the viewer should see the mismatch without reading labels.
+4. DELAY / RESPONSE: use a time axis, staggered capacity blocks, or a before/after split to show why the response arrives too late.
+5. RELIEF / INTERVENTION: transform the previous composition; show cache hits bypassing the origin, capacity added before the surge, or retries spreading apart.
+6. PAYOFF: resolve the same visual system from earlier beats so the ending feels causally connected, not a separate title card.
+These are semantic roles, not a fixed six-panel layout. Use a different scale, camera framing, silhouette or representation when the explanatory job changes.
+
+MOTION / FINISH
+- Each beat needs a visible entrance, a meaningful state transition, and a resolved pose. Use deterministic easing derived from time; do not depend on CSS transitions.
+- Use at least two levels of depth or scale when useful, but never add parallax that obscures the mechanism.
+- Prefer large silhouettes, thick paths (3–6 logical px), generous spacing and two or three semantic colors plus neutrals. Ensure readable contrast on the chosen background.
+- Use progressive reveals, counters, directional arrows, focus shifts, split-screen comparisons, or transforming diagrams where they make cause and effect clearer.
+- Captions are concise and phrase-level. They must not duplicate a giant headline or cover the key action.
+- A visually sparse scene is acceptable only when sparseness is the deliberate concept (e.g. isolation or absence) and it is resolved by a clear, large focal point. Empty space caused by tiny drawings is a defect.
+
+FINAL SELF-TEST
+Before outputting HTML, imagine six screenshots at 1s, 20%, 40%, 60%, 80%, and 95% of duration. For each screenshot answer: what is the one thing the viewer should notice, does it occupy enough of the frame to read on a phone, and what has changed from the previous beat? If any answer is “a few tiny labels or dots”, redesign the scene. Make the main diagram visually dominant before adding secondary details.
+
+THREE.JS / 3D TOOLKIT
+- Three.js is installed locally and the generation pipeline bundles a single inline <script type="module"> into the final offline HTML. When 3D materially improves the explanation, you may use `import * as THREE from "three";` in exactly one module script. The bundler embeds dependencies; never use a CDN, remote import, external model, texture, font, or network request.
+- Use Three.js selectively for meaningful 3D systems: a network topology that rotates into view, a server rack that fills under load, layered data paths, a physical mechanism, or a spatial before/after transformation. Do not use 3D just to spin generic cubes.
+- Three.js is optional. Use SVG/Canvas/DOM when they explain the idea more clearly, render faster, or keep labels sharper. Prefer a hybrid composition: crisp HTML/SVG typography and diagrams over a controlled 3D scene.
+- For Three.js scenes, create the renderer and scene once; set camera, object transforms, materials, lighting, and all animated values from absolute time inside renderAt(seconds). Call renderer.render(scene, camera) synchronously. Never use requestAnimationFrame, timers, mixers advanced by delta time, Math.random(), or state accumulated from previous frames in render-only mode.
+- Use a fixed logical aspect ratio of 540×960, deterministic geometry and seeded/precomputed layouts, restrained lighting, deliberate camera framing, and large silhouettes. Keep primary text as HTML/SVG overlays rather than tiny 3D text.
+- Dispose of no scene resources during renderAt; reuse geometry/materials and update transforms only. Avoid expensive postprocessing and excessive meshes because every frame is rendered separately for export.
+- The final file must still expose window.renderAt(seconds), window.getDuration(), and render-only mode. Keep the scene functional when opened from a local file after bundling.
+
+
+REFERENCE-LEVEL VISUAL LANGUAGE — DOT-SKETCH + CINEMATIC 2.5D/3D
+The target is a visually authored explainer: dotted silhouettes, animated sketch construction, spatial depth, camera moves, and a story-specific visual motif. Do not interpret “particles” as generic floating dots over a background.
+
+VISUAL DIRECTOR PASS (MANDATORY INTERNAL STEP)
+Before writing implementation code, create an internal beat sheet with: narration beat/time range; viewer takeaway; chosen visual metaphor; dominant silhouette; visual medium (dot-sketch, line sketch, 2D diagram, 2.5D layers, or Three.js 3D); object/action; camera framing/movement; transition into next beat; and the causal proof the viewer will see. Give every beat a different explanatory purpose and at least three different visual grammars across the film when the story supports it. Then implement the beat sheet. Do not output the beat sheet; output the complete HTML only.
+
+DOT-SKETCH / PARTICLE SILHOUETTES
+- Use meaningful point clouds to construct recognisable silhouettes: a stadium bowl/crowd, human profile, phone, building, money flow, server rack, globe, brain, vehicle, or other story-specific object. The silhouette must be identifiable before labels appear.
+- For Canvas, create deterministic points from a grid or seeded PRNG and retain points whose positions fall inside a defined silhouette/shape mask. For SVG, use sampled points along meaningful paths or shape interiors. Precompute points once; never generate them randomly during renderAt.
+- Animate dots as a coherent construction: gather from outside frame, trace the contour, fill the silhouette, ripple to show activity, split into meaningful streams, or reform into the next object. Use time-derived easing and absolute positions. Avoid noisy jitter with no semantic purpose.
+- Give particles roles and state: people/viewers, requests, packets, money, transactions, neurons, inventory, etc. Encode states through movement, density, shape, size, or restrained semantic colour—not colour alone.
+- Use 2–3 point scales, controlled depth/parallax, and a few brighter anchor points so the silhouette reads at phone size. Do not let the particles become visual static.
+- Use shaders / Three.js Points or InstancedMesh for dense particle fields when beneficial; use Canvas/SVG for simpler scenes and crisp labels. Keep geometry precomputed and rendering deterministic.
+
+SKETCH-TO-SYSTEM TRANSFORMATIONS
+- Construct at least one important object through visible strokes, dotted contours, or progressive hatching; then transform it into the technical system it represents.
+- Examples: dotted stadium crowd → viewer requests → CDN nodes; hand-drawn bank account → transaction paths → money trail; sketch of a brain → connected neurons → recommendation pipeline; hand-drawn city → buildings extrude into service nodes.
+- Transformations must preserve visual continuity: reuse positions, paths, or components when one metaphor becomes another. Do not dissolve to black and introduce an unrelated slide unless the story demands a hard cut.
+- Mix drawing idioms deliberately: dotted silhouette, hand-drawn outline, spatial 3D mechanism, animated topology, and data chart. Each technique must answer a different explanatory question.
+
+3D / CAMERA / MOTION LANGUAGE
+- Use 3D when spatial relationships improve understanding: orbit around a system, dolly toward a bottleneck, tilt from the crowd to its infrastructure, extrude a sketch into a model, or pull back to reveal the whole causal system.
+- Compose foreground/midground/background intentionally. Use restrained key/rim lighting, depth fog only if it improves separation, and a coherent camera path. Avoid default spinning cubes, arbitrary orbiting, or gratuitous particle explosions.
+- For a flat sketch, animate stroke drawing, node-to-node path reveal, marker-style circles/underlines, tracing, and controlled camera pans/zooms. For a causal system, animate state transitions and moving flows. For evidence, animate chart growth and comparisons.
+- Use transitions as explanation: trace follows the path, a cluster branches, a queue stacks up, an object changes shape, layers separate, or a 3D camera reveals a hidden dependency.
+- Camera motion must be smooth, bounded, and subordinate to comprehension. Avoid continuous motion without new information. A meaningful event must occur every 2–4 seconds.
+
+STORY-SPECIFIC VISUAL SIGNATURE
+- Do not repeat the same visual template across different videos. Choose a unique signature motif based on the central analogy and reuse it only as a visual thread—not as the same composition every scene.
+- The visual director must explicitly decide which scenes are dotted, hand-drawn, 2D, 2.5D, or 3D and why. Do not force all scenes into Three.js, a stadium, or a dashboard.
+- Every major beat must contain one large, recognisable subject or system occupying the dominant visual area. Labels explain the visual; they must not substitute for it.
+- For a technical explanation, show the mechanism in motion: origin to edge, request to queue, money entering/leaving accounts, input transforming to output, or load changing capacity. The viewer should be able to infer the key point even if captions are hidden.
+- Make the visual pattern non-repetitive through changes in silhouette, scale, framing, material, movement grammar, and representation—not by changing only the colour.
+
+VISUAL QA GATE
+Reject and redesign any beat if: the subject is not recognisable in a paused frame; dots are decorative rather than meaningful; 3D adds no explanatory value; the camera hides labels or the mechanism; two adjacent beats have the same composition and action; or a transformation breaks visual continuity. Before final output, audit six timestamps and confirm the intended silhouette, causal action, camera framing, and change from the previous beat are all visible.
+
+
+## HARD VISUAL CONTRACT FOR MYTHOLOGY / HISTORY STORIES
+When the story contains terms such as Mahabharata, Ramayana, Draupadi, Krishna, Arjuna, ancient court, epic, or mythology, apply all of these requirements inside the same infographic renderer:
+- Use a warm parchment/off-white background, black ink linework and restrained vermilion/gold accents. This story-specific palette overrides the technical dark palette above.
+- The first major beat must visibly construct a large character silhouette from ordered dots and ink strokes. Include hair/head shape, shoulders, draped garment and at least one costume/ornament detail; generic circles with connecting lines do not count as a character.
+- Use inline SVG paths with stroke-dasharray/stroke-dashoffset or a precomputed deterministic Canvas point mask. Do not rely on text labels to represent a person.
+- The court beat must show a recognisable spatial environment: pillars, a raised throne/seat, a dice table or playing surface, and distinct seated/standing silhouettes. These can be stylised, but must occupy the frame.
+- The dice-game beat must visibly demonstrate causality: tokens or markers move from Yudhishthira's side to the wager/stakes area in sequential steps, then the visual state changes to indicate the question of whether he could stake Draupadi after losing himself. Do not claim historical detail beyond the story brief.
+- The unresolved-question beat must show a real balance/scale with two labelled pans or equivalent distinct visual systems for “नियम” and “न्याय”, not a single line and dot.
+- At least 5 beats must have visibly different compositions and dominant subjects. Reuse character geometry for continuity but do not repeat a static portrait or generic diagram.
+- Before returning HTML, verify these concrete subjects exist in the source and are visible at their planned timestamps. If the scene coder cannot implement the full story-specific scene, return no HTML and report the missing required elements; never substitute a generic orbit/network animation.
+- These requirements do not relax the deterministic export contract, offline policy, render-only mode or QC gates.
+
+## DOTTED-LINE CHARACTER CONSTRUCTION — EXISTING INFOGRAPHICS MODE ONLY
+For stories featuring a recognizable person (including mythology, history, biography, scams, startups, or social stories), you may build the character from a dotted silhouette and progressive ink-like strokes. This is a visual technique inside the existing HTML/CSS/JS infographic renderer—not a new mode, separate pipeline, or request to use Blender.
+
+CHARACTER REVEAL
+1. Establish a clear outer silhouette using SVG paths or Canvas paths: head/hair, shoulders/body, garment outline, and one or two identity-bearing details. It must be recognizable in a paused frame at 9:16 phone scale.
+2. Place points deterministically along those paths (fixed spacing or a small local seeded PRNG precomputed once). Reveal them in path order from renderAt(t), so dots trace the contour instead of appearing as a random cloud.
+3. Reveal layers in a deliberate sequence: silhouette → facial/hair/costume details → prop/gesture → relationship connectors or annotations. Stagger the sequence against narration beats, with easing derived only from timestamp.
+4. Use connecting dotted lines to explain something: relationships, hierarchy, a decision path, cause-and-effect, a timeline, or the character's role in the event. Label only details the narration supports.
+5. Preserve character continuity across shots by reusing the same geometry, proportions, costume/ornament motifs, and palette. Change pose, crop, scale, camera framing, or connected infographic—not the character identity.
+6. Use warm off-white/parchment and black ink as a restrained optional treatment for epic/historical stories; use a small red or muted-gold accent only for a meaningful emphasis. The visual grammar remains the same infographic mode and must still fit its story-specific signature.
+
+IMPLEMENTATION CONTRACT
+- Use inline SVG or Canvas paths; no remote images, fonts, or network assets. Prefer SVG paths with stroke-dasharray/stroke-dashoffset for contour tracing, plus deterministic point coordinates for dot reveals. For Canvas, derive every dot's visibility and position from t.
+- Expose all reveal timing through the existing renderAt(seconds) contract. Same timestamp must always yield the same frame; no Math.random(), render-loop mutation, setInterval(), or CSS animation for scene state.
+- Keep dots semantically meaningful and sparse enough that the silhouette remains legible. Do not replace a character with a generic dotted human icon when the story needs a distinctive person.
+- Avoid repetitive portrait-only scenes. Let the constructed character transition into a map, court, network, timeline, balance/scale, relationship diagram, or other explanatory visual when that advances the story.
+- All current output rules remain in force: one self-contained HTML page, local-only assets, deterministic rendering/export, readable labels, and a deliberate ending.

@@ -6,6 +6,9 @@ import process from "node:process";
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import crypto from "node:crypto";
+import { build } from "esbuild";
+import { normalizeVisualPlan } from "./visual-plan.mjs";
+import { normalizeNarrationForTTS } from "./narration-text.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "..");
@@ -25,12 +28,12 @@ function json(res, status, data) {
 function safeSlug(value) {
   return String(value || "").toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 64);
 }
-function readBody(req) {
+function readBody(req, maxBytes = 500_000) {
   return new Promise((resolve, reject) => {
     let body = "";
     req.on("data", chunk => {
       body += chunk;
-      if (body.length > 500_000) { reject(new Error("Request too large (max 500 KB).")); req.destroy(); }
+      if (body.length > maxBytes) { reject(new Error(`Request too large (max ${Math.round(maxBytes / 1000)} KB).`)); req.destroy(); }
     });
     req.on("end", () => {
       try { resolve(JSON.parse(body || "{}")); } catch { reject(new Error("Invalid JSON request.")); }
@@ -38,14 +41,34 @@ function readBody(req) {
     req.on("error", reject);
   });
 }
+async function bundleSceneHtml(source) {
+  const matches = [...source.matchAll(/<script\b(?=[^>]*\btype\s*=\s*["']module["'])[^>]*>([\s\S]*?)<\/script\s*>/gi)];
+  if (matches.length > 1) throw new Error("Use one module script so dependencies can be bundled into one offline HTML file.");
+  if (!matches.length) {
+    if (/from\s*["']three(?:\/|["'])|import\s*["']three(?:\/|["'])/.test(source)) throw new Error("This HTML imports Three.js without a module script. Put imports inside one module script.");
+    return source;
+  }
+  const match = matches[0];
+  const result = await build({ stdin: { contents: match[1], resolveDir: root, sourcefile: "uploaded-scene.js", loader: "js" }, bundle: true, write: false, platform: "browser", format: "iife", target: "es2022", minify: true, legalComments: "none" });
+  const bundled = result.outputFiles[0]?.text;
+  if (!bundled) throw new Error("esbuild returned no bundled output.");
+  return source.replace(match[0], "<script>\n" + bundled + "\n</script>");
+}
 function log(job, message) {
   job.logs.push(`[${new Date().toLocaleTimeString()}] ${message}`);
   if (job.logs.length > 1000) job.logs.splice(0, job.logs.length - 1000);
 }
+function freshStages() {
+  return Object.fromEntries(["input","analysis","planValidation","scene","sceneValidation","audio","render","videoQc","export"].map(key => [key, { status: "pending", detail: null, updatedAt: new Date().toISOString() }]));
+}
+function setStage(job, key, status, detail = null) {
+  if (!job.stages) job.stages = freshStages();
+  job.stages[key] = { status, detail, updatedAt: new Date().toISOString() };
+}
 function run(command, args, cwd, job, label) {
   return new Promise((resolve, reject) => {
     log(job, `Starting: ${label}`);
-    const child = spawn(command, args, { cwd, env: process.env, stdio: ["ignore", "pipe", "pipe"] });
+    const child = spawn(command, args, { cwd, env: { ...process.env, TDC_EXPERIMENTAL_LLM_SCENE: "0" }, stdio: ["ignore", "pipe", "pipe"] });
     job.child = child;
     let tail = "";
     const consume = chunk => {
@@ -75,11 +98,11 @@ async function runSceneRepair(node, generateArgs, repairNote, cwd, job, label) {
     return;
   } catch (error) {
     const primaryLogs = job.logs.slice(logStart).join("\n");
-    const modelOutputInvalid = /Generated HTML failed export validation|Model output did not start with|Ollama returned no message content|Generated HTML uses Math\.random/i.test(primaryLogs);
+    const modelOutputInvalid = /Generated scene failed browser render-only validation|Generated HTML failed export validation|Model output did not start with|Ollama returned no message content|Math\.random\(\), forbidden|missing native \?render=1 render-only mode/i.test(primaryLogs);
     if (!modelOutputInvalid) throw error;
 
     const installedModels = await getModels();
-    const candidates = ["qwen2.5-coder:7b", "qwen3.5:9b", "qwen3:14b"];
+    const candidates = ["qwen2.5-coder:7b", "qwen3:14b"];
     const availableCandidates = candidates.filter(candidate =>
       candidate !== generateArgs[generateArgs.indexOf("--model") + 1] &&
       installedModels.some(name => name === candidate || name.startsWith(candidate + ":"))
@@ -114,8 +137,10 @@ async function runSceneRepair(node, generateArgs, repairNote, cwd, job, label) {
 }
 
 function summarizeSceneFailure(logText) {
-  if (/Ollama returned no message content/i.test(logText)) return "Ollama returned an empty response";
-  if (/Generated HTML uses Math\.random/i.test(logText)) return "generated HTML uses Math.random(), which is forbidden for deterministic rendering";
+  if (/Ollama returned no (?:message )?content/i.test(logText)) return "Ollama returned an empty response";
+  if (/Math\.random\(\), forbidden/i.test(logText)) return "generated HTML uses Math.random(), forbidden for deterministic rendering";
+  const browserFailure = logText.match(/Generated scene failed browser render-only validation: ([^\n]+)/i);
+  if (browserFailure) return browserFailure[1];
   const missing = logText.match(/Generated HTML failed export validation: missing ([^\n.]+)/i);
   if (missing) return `export contract is missing ${missing[1]}`;
   if (/Model output did not start with <!doctype html>/i.test(logText)) return "model output is not a complete HTML document";
@@ -197,12 +222,12 @@ async function getModels() {
     return (data.models || []).map(m => m.name).filter(Boolean).sort();
   } catch { return []; }
 }
-async function serveFile(res, filePath) {
+async function serveFile(res, filePath, download = false) {
   const ext = path.extname(filePath).toLowerCase();
   const types = { ".html": "text/html; charset=utf-8", ".mp4": "video/mp4", ".wav": "audio/wav", ".json": "application/json", ".md": "text/markdown; charset=utf-8" };
   try {
     const data = await fs.readFile(filePath);
-    res.writeHead(200, { "content-type": types[ext] || "application/octet-stream", "cache-control": "no-store" });
+    res.writeHead(200, { "content-type": types[ext] || "application/octet-stream", "cache-control": "no-store", ...(download ? { "content-disposition": `attachment; filename="${path.basename(filePath).replace(/["\\\\]/g, "")}"` } : {}) });
     res.end(data);
   } catch { json(res, 404, { error: "File not found." }); }
 }
@@ -211,10 +236,267 @@ const server = http.createServer(async (req, res) => {
     const url = new URL(req.url, `http://${host}:${port}`);
     if (req.method === "GET" && url.pathname === "/") return await serveFile(res, path.join(here, "ui.html"));
     if (req.method === "GET" && url.pathname === "/api/models") return json(res, 200, { models: await getModels(), active: Boolean(activeJob) });
+    if (req.method === "GET" && url.pathname === "/api/projects") {
+      const entries = await fs.readdir(outputRoot, { withFileTypes: true }).catch(() => []);
+      const projects = [];
+      for (const entry of entries) {
+        if (!entry.isDirectory() || !safeSlug(entry.name)) continue;
+        const dir = path.join(outputRoot, entry.name);
+        try {
+          const savedStory = await fs.readFile(path.join(dir, "story.md"), "utf8");
+          const match = savedStory.match(/^#\s+(.+)$/m);
+          const body = savedStory.replace(/^#\s+.+(?:\r?\n)+/, "").trim();
+          const files = {};
+          for (const [key, name] of Object.entries({ plan: "visual-plan.json", scene: "index.html", narration: "narration.md", audio: "final.narration.wav", video: "final.mp4", silentVideo: "final-silent.mp4" })) {
+            try { await fs.access(path.join(dir, name)); files[key] = true; } catch {}
+          }
+          projects.push({ slug: entry.name, title: match?.[1] || entry.name, story: body, files });
+        } catch {}
+      }
+      projects.sort((a, b) => a.title.localeCompare(b.title));
+      return json(res, 200, { projects });
+    }
     if (req.method === "GET" && url.pathname.startsWith("/api/jobs/")) {
       const job = jobs.get(url.pathname.split("/").pop());
       if (!job) return json(res, 404, { error: "Job not found." });
-      return json(res, 200, { id: job.id, status: job.status, logs: job.logs, error: job.error || null, files: job.files || {} });
+      return json(res, 200, { id: job.id, status: job.status, stage: job.stage || null, stages: job.stages || {}, logs: job.logs, error: job.error || null, files: job.files || {} });
+    }
+
+    if (req.method === "POST" && url.pathname === "/api/scene/bundle") {
+      if (activeJob) return json(res, 409, { error: "Wait for the active production stage to finish before bundling a scene." });
+      const body = await readBody(req, 1_600_000);
+      let html = String(body.html || "");
+      if (!html.trim() || !/<!doctype\s+html/i.test(html) || !/<html\b/i.test(html) || !/<\/html\s*>/i.test(html)) return json(res, 400, { error: "Upload a complete HTML document before previewing." });
+      try { html = await bundleSceneHtml(html); } catch (error) { return json(res, 400, { error: "Could not prepare offline scene: " + error.message }); }
+      if (Buffer.byteLength(html, "utf8") > 1_500_000) return json(res, 413, { error: "Bundled HTML exceeds 1.5 MB. Reduce unused assets." });
+      if (!/window\.renderAt\s*=/.test(html) && !/function\s+renderAt\s*\(/.test(html)) return json(res, 400, { error: "Scene HTML must define window.renderAt(seconds)." });
+      if (!/window\.getDuration\s*=/.test(html) && !/(?:const|let|var)\s+DURATION\s*=\s*[0-9]/i.test(html)) return json(res, 400, { error: "Scene HTML must define window.getDuration() or a numeric DURATION." });
+      return json(res, 200, { ok: true, html });
+    }
+
+    if (req.method === "POST" && url.pathname === "/api/scene/save") {
+      if (activeJob) return json(res, 409, { error: "Wait for the active production stage to finish before saving or replacing scene HTML." });
+      const body = await readBody(req, 1_600_000);
+      const slug = safeSlug(body.slug || "");
+      if (!slug) return json(res, 400, { error: "Enter a valid project/output folder name." });
+      let html = String(body.html || "");
+      if (!html.trim()) return json(res, 400, { error: "Paste a complete HTML scene before saving." });
+      if (!/<!doctype\s+html/i.test(html) || !/<html\b/i.test(html) || !/<\/html\s*>/i.test(html)) return json(res, 400, { error: "Paste a complete HTML document beginning with <!doctype html>, not an HTML fragment." });
+      try { html = await bundleSceneHtml(html); } catch (error) { return json(res, 400, { error: "Could not prepare offline scene: " + error.message }); }
+      if (Buffer.byteLength(html, "utf8") > 1_500_000) return json(res, 413, { error: "Bundled HTML is larger than 1.5 MB. Keep the scene self-contained and remove unused assets." });
+      if (!/window\.renderAt\s*=/.test(html) && !/function\s+renderAt\s*\(/.test(html)) return json(res, 400, { error: "Scene HTML must define window.renderAt(seconds) for deterministic frame seeking." });
+      let duration = null;
+      const durationMatch = html.match(/(?:window\.)?sceneDuration\s*=\s*([0-9]+(?:\.[0-9]+)?)/) || html.match(/(?:const|let|var)\s+DURATION\s*=\s*([0-9]+(?:\.[0-9]+)?)/i) || html.match(/(?:const|let|var)\s+duration\s*=\s*([0-9]+(?:\.[0-9]+)?)/i);
+      if (durationMatch) duration = Number(durationMatch[1]);
+      if (!/window\.getDuration\s*=/.test(html)) {
+        if (!Number.isFinite(duration) || duration <= 0 || duration > 600) return json(res, 400, { error: "Scene must define window.getDuration(), or provide a numeric window.sceneDuration between 0 and 600 seconds." });
+        const bridge = "<script>window.getDuration = window.getDuration || function () { return Number(window.sceneDuration) || " + duration + "; };</script>";
+        html = html.replace(/<\/body\s*>/i, bridge + "\n</body>");
+        if (!html.includes(bridge)) html += "\n" + bridge;
+      }
+      const dir = path.join(outputRoot, slug);
+      let savedStory, plan;
+      try {
+        savedStory = await fs.readFile(path.join(dir, "story.md"), "utf8");
+        plan = JSON.parse(await fs.readFile(path.join(dir, "visual-plan.json"), "utf8"));
+      } catch (error) {
+        return json(res, 409, { error: "Load or analyze this project first. Saving custom visuals requires its existing story.md and validated visual-plan.json." });
+      }
+      const storyFingerprint = crypto.createHash("sha256").update(savedStory).digest("hex");
+      if (plan.story_fingerprint !== storyFingerprint) return json(res, 409, { error: "The saved visual plan is stale for story.md. Run story analysis again before saving a custom scene." });
+      const planFingerprint = crypto.createHash("sha256").update(JSON.stringify(plan)).digest("hex");
+      const upsertMeta = (source, name, value) => {
+        const tag = '<meta name="' + name + '" content="' + value + '">';
+        const expression = new RegExp("<meta\\s+name=[\"']" + name + "[\"'][^>]*>", "i");
+        return expression.test(source) ? source.replace(expression, tag) : source.replace(/<head\b[^>]*>/i, match => match + "\n  " + tag);
+      };
+      html = upsertMeta(html, "tdc-story-fingerprint", storyFingerprint);
+      html = upsertMeta(html, "tdc-plan-fingerprint", planFingerprint);
+      const scenePath = path.join(dir, "index.html");
+      let backup = null;
+      try {
+        const previous = await fs.readFile(scenePath, "utf8");
+        if (previous !== html) {
+          backup = "index.user-backup-" + Date.now() + ".html";
+          await fs.writeFile(path.join(dir, backup), previous, { flag: "wx" });
+        }
+      } catch (error) { if (error.code !== "ENOENT") throw error; }
+      await fs.writeFile(scenePath, html, "utf8");
+      return json(res, 200, { ok: true, path: "output/" + slug + "/index.html", backup, html, duration });
+    }
+
+    if (req.method === "POST" && url.pathname === "/api/custom/merge") {
+      if (activeJob) return json(res, 409, { error: "Another production stage is running. Wait for it to finish before merging." });
+      const body = await readBody(req);
+      const slug = safeSlug(body.slug || "");
+      const audioSlug = safeSlug(body.audioSlug || "");
+      const exportName = safeSlug(body.exportName || "");
+      if (!slug || !audioSlug || !exportName) return json(res, 400, { error: "Project, generated audio take, and a new MP4 output name are required." });
+      const dir = path.join(outputRoot, slug);
+      const audioDir = path.join(outputRoot, audioSlug);
+      const htmlPath = path.join(dir, "index.html");
+      const storyPath = path.join(dir, "story.md");
+      const planPath = path.join(dir, "visual-plan.json");
+      const sourceWav = path.join(audioDir, "narration.wav");
+      const finalWav = path.join(dir, "final.narration.wav");
+      const mp4Path = path.join(dir, exportName + ".mp4");
+      for (const required of [htmlPath, storyPath, planPath, sourceWav]) {
+        try { await fs.access(required); }
+        catch { return json(res, 409, { error: "Required file is missing: " + path.relative(root, required) + ". Save the custom scene and generate narration before merging." }); }
+      }
+      try { await fs.access(mp4Path); return json(res, 409, { error: "Output already exists: " + path.basename(mp4Path) + ". Choose a new output name; existing videos are never overwritten." }); }
+      catch (error) { if (error.code !== "ENOENT") throw error; }
+      let plan;
+      try { plan = JSON.parse(await fs.readFile(planPath, "utf8")); }
+      catch { return json(res, 409, { error: "The project's visual-plan.json is invalid. Validate the existing plan before merging." }); }
+      const story = await fs.readFile(storyPath, "utf8");
+      const storyFingerprint = crypto.createHash("sha256").update(story).digest("hex");
+      const html = await fs.readFile(htmlPath, "utf8");
+      if (plan.story_fingerprint !== storyFingerprint) return json(res, 409, { error: "The saved plan no longer matches story.md. Reload/validate the project before merging." });
+      if (!html.includes('name="tdc-story-fingerprint" content="' + storyFingerprint + '"')) return json(res, 409, { error: "The saved custom scene does not match this project's story. Save it again from the Custom Scene tab." });
+      const id = crypto.randomBytes(6).toString("hex");
+      const job = { id, status: "queued", logs: [], files: {}, error: null, child: null, stage: "custom-merge", stages: freshStages() };
+      jobs.set(id, job);
+      activeJob = id;
+      log(job, "Custom scene merge queued for project " + slug + ".");
+      (async () => {
+        try {
+          job.status = "running";
+          try {
+            await fs.access(finalWav);
+            const backup = path.join(dir, "final.narration.backup-" + Date.now() + ".wav");
+            await fs.copyFile(finalWav, backup);
+            log(job, "Preserved previous narration as " + path.basename(backup) + ".");
+          } catch (error) { if (error.code !== "ENOENT") throw error; }
+          await fs.copyFile(sourceWav, finalWav);
+          log(job, "Attached generated narration from " + audioSlug + "/narration.wav.");
+          setStage(job, "audio", "passed", "New Chatterbox narration attached");
+          setStage(job, "render", "running", "Rendering saved custom HTML with generated narration");
+          await run(process.execPath, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--audio", finalWav, "--fps", "30", "--audio-offset", "0"], root, job, "Preview and merge custom visuals + narration");
+          setStage(job, "render", "passed");
+          setStage(job, "videoQc", "passed");
+          job.files = {
+            scene: "/files/" + encodeURIComponent(slug) + "/index.html",
+            audio: "/files/" + encodeURIComponent(slug) + "/final.narration.wav",
+            video: "/files/" + encodeURIComponent(slug) + "/" + path.basename(mp4Path)
+          };
+          job.status = "completed";
+          log(job, "Custom scene, generated narration and MP4 render completed.");
+        } catch (error) {
+          job.status = "failed";
+          job.error = error.message;
+          if (job.stages?.render?.status === "running") setStage(job, "render", "failed", error.message);
+          log(job, "FAILED: " + error.message);
+          if (job.child) { try { job.child.kill("SIGTERM"); } catch {} }
+        } finally {
+          activeJob = null;
+          job.child = null;
+        }
+      })();
+      return json(res, 202, { id });
+    }
+    if (req.method === "POST" && url.pathname === "/api/plan") {
+      if (activeJob) return json(res, 409, { error: "Wait for the active production stage to finish before editing its plan." });
+      const body = await readBody(req);
+      const slug = safeSlug(body.slug || "");
+      if (!slug) return json(res, 400, { error: "Enter a valid output folder name." });
+      let inputPlan;
+      try { inputPlan = typeof body.plan === "string" ? JSON.parse(body.plan) : body.plan; }
+      catch { return json(res, 400, { error: "Visual plan is not valid JSON." }); }
+      let plan;
+      try { plan = normalizeVisualPlan(inputPlan); }
+      catch (error) { return json(res, 400, { error: error.message }); }
+      let previousEnd = -Infinity;
+      for (let i = 0; i < plan.beats.length; i++) {
+        const beat = plan.beats[i];
+        const start = Number(beat.start), end = Number(beat.end);
+        if (!Number.isFinite(start) || !Number.isFinite(end) || start < 0 || end <= start || start < previousEnd - 0.05) {
+          return json(res, 400, { error: `Beat ${i + 1} has invalid or overlapping start/end times.` });
+        }
+        previousEnd = end;
+      }
+      const dir = path.join(outputRoot, slug);
+      try { await fs.access(path.join(dir, "story.md")); }
+      catch { return json(res, 404, { error: "Analyze this story first; no matching project folder exists." }); }
+      for (const videoName of ["final.mp4", "final-silent.mp4"]) {
+        try { await fs.access(path.join(dir, videoName)); return json(res, 409, { error: "This project already has a final video. Use a new output folder for a new render." }); }
+        catch (error) { if (error.code !== "ENOENT") throw error; }
+      }
+      await fs.writeFile(path.join(dir, "visual-plan.json"), JSON.stringify(plan, null, 2) + "\n", "utf8");
+      let archivedScene = null;
+      try {
+        const scenePath = path.join(dir, "index.html");
+        archivedScene = path.join(dir, `index.stale-plan-${Date.now()}.html`);
+        await fs.rename(scenePath, archivedScene);
+        archivedScene = path.basename(archivedScene);
+      } catch (error) { if (error.code === "ENOENT") archivedScene = null; else throw error; }
+      return json(res, 200, { ok: true, beats: plan.beats.length, plan, archivedScene });
+    }
+    if (req.method === "POST" && url.pathname === "/api/audio") {
+      if (activeJob) return json(res, 409, { error: "A production job is already running. Wait for it to finish before starting another heavy stage." });
+      const body = await readBody(req);
+      const script = String(body.script || "").trim();
+      const spokenScript = normalizeNarrationForTTS(script);
+      const slug = safeSlug(body.slug || "narration");
+      const style = String(body.style || "storytelling");
+      const performance = String(body.performance || "directed");
+      const intensity = Number(body.intensity ?? 65);
+      const pace = Number(body.pace ?? 1);
+      if (!script || !spokenScript) return json(res, 400, { error: "Add spoken narration text. Control markers alone cannot be sent to Chatterbox." });
+      if (script.length > 25000) return json(res, 400, { error: "Narration is limited to 25,000 characters per take." });
+      if (!slug) return json(res, 400, { error: "Enter a valid audio output folder name." });
+      if (!["storytelling", "conversational", "dramatic"].includes(style)) return json(res, 400, { error: "Choose a supported voice delivery style." });
+      if (!["directed", "uniform"].includes(performance)) return json(res, 400, { error: "Choose directed or uniform cue handling." });
+      if (!Number.isFinite(intensity) || intensity < 0 || intensity > 100) return json(res, 400, { error: "Expression intensity must be between 0 and 100." });
+      if (!Number.isFinite(pace) || pace < 0.8 || pace > 1.2) return json(res, 400, { error: "Overall pace must be between 0.8× and 1.2×." });
+      const dir = path.join(outputRoot, slug);
+      await fs.mkdir(dir, { recursive: true });
+      const audioPath = path.join(dir, "narration.wav");
+      const sourceAudioPath = path.join(dir, "narration-source.wav");
+      const scriptPath = path.join(dir, "narration.md");
+      try { await fs.access(audioPath); return json(res, 409, { error: `An audio take already exists at ${audioPath}. Change the output folder to preserve it.` }); }
+      catch (error) { if (error.code !== "ENOENT") throw error; }
+      const id = crypto.randomBytes(6).toString("hex");
+      const job = { id, status: "queued", logs: [], files: {}, error: null, child: null };
+      jobs.set(id, job); activeJob = id;
+      log(job, "Queued audio-only job. Scene generation, Ollama and video rendering will not run.");
+      (async () => {
+        try {
+          job.status = "running";
+          await fs.writeFile(scriptPath, script + "\n", "utf8");
+          await ensureStudio(job);
+          log(job, "Narration format: pasted UTF-8 text (Hindi/Devanagari, Hinglish/Roman Hindi, English terms and punctuation).");
+          if (spokenScript !== script) log(job, "Removed non-spoken [PAUSE]/[END] markers before Chatterbox; [PAUSE] becomes natural punctuation.");
+          log(job, `Voice style=${style}; cue handling=${performance}; expression intensity=${intensity}; pace=${pace}×.`);
+          const response = await fetch(`${studioUrl}/api/audio`, {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ text: spokenScript, style, hindi_pronunciation: true, performance_mode: performance, expression_intensity: intensity }),
+            signal: AbortSignal.timeout(Number(process.env.CHATTERBOX_TIMEOUT_MS || 1800000))
+          });
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok) throw new Error(`Chatterbox Studio returned HTTP ${response.status}: ${payload?.error?.message || payload?.message || JSON.stringify(payload)}`);
+          if (!payload.id) throw new Error("Chatterbox Studio returned no audio job ID.");
+          const wavResponse = await fetch(`${studioUrl}/api/audio/${encodeURIComponent(payload.id)}/wav`, { signal: AbortSignal.timeout(30000) });
+          if (!wavResponse.ok) throw new Error(`Could not download generated WAV (HTTP ${wavResponse.status}).`);
+          await fs.writeFile(sourceAudioPath, Buffer.from(await wavResponse.arrayBuffer()));
+          if (Math.abs(pace - 1) < 0.001) await fs.copyFile(sourceAudioPath, audioPath);
+          else await run("ffmpeg", ["-hide_banner", "-loglevel", "error", "-y", "-i", sourceAudioPath, "-filter:a", `atempo=${pace}`, "-c:a", "pcm_s16le", audioPath], dir, job, `Apply overall pace ${pace}× without pitch shifting`);
+          log(job, `Generated WAV: ${audioPath}`);
+          log(job, `Source audio duration: ${Number(payload.duration || 0).toFixed(2)}s; final pace: ${pace}×. Listen to the result before approving it.`);
+          job.files = {
+            audio: `/files/${encodeURIComponent(slug)}/narration.wav`,
+            sourceAudio: `/files/${encodeURIComponent(slug)}/narration-source.wav`,
+            script: `/files/${encodeURIComponent(slug)}/narration.md`
+          };
+          job.status = "completed";
+          log(job, "Audio-only stage completed. No scene or video was generated.");
+        } catch (error) {
+          job.status = "failed"; job.error = error.message; log(job, `FAILED: ${error.message}`);
+          try { await fs.unlink(audioPath); } catch {}
+        } finally { activeJob = null; job.child = null; }
+      })();
+      return json(res, 202, { id });
     }
     if (req.method === "POST" && url.pathname === "/api/run") {
       if (activeJob) return json(res, 409, { error: "A job is already running. Wait for it to finish before starting another model." });
@@ -222,20 +504,31 @@ const server = http.createServer(async (req, res) => {
       const title = String(body.title || "").trim();
       const story = String(body.story || "").trim();
       const voiceMode = String(body.voiceMode || "generate");
+      const phase = String(body.phase || "all");
       const voiceScript = String(body.voiceScript || "").trim();
-      const wavPath = String(body.wavPath || "").trim();
+      const suppliedWavPath = String(body.wavPath || "").trim();
       const model = String(body.model || "").trim();
+      const plannerModel = String(body.plannerModel || process.env.OLLAMA_PLANNER_MODEL || "qwen3.5:9b").trim();
       const slug = safeSlug(body.slug || title);
+      const wavPath = voiceMode === "projectWav" ? path.join(outputRoot, slug, "final.narration.wav") : suppliedWavPath;
       const fps = Number(body.fps || 30);
+      const requestedAudioOffset = Number(body.audioOffset ?? 0);
+      const audioOffset = voiceMode === "generate" ? 0 : requestedAudioOffset;
+      const exportName = phase === "render" ? safeSlug(body.exportName || "") : "";
       if (!title || !story) return json(res, 400, { error: "Add a title and story brief." });
       if (!slug) return json(res, 400, { error: "The output name must contain letters or numbers." });
       if (!model) return json(res, 400, { error: "Choose an installed Ollama model." });
-      if (!["generate", "wav", "silent"].includes(voiceMode)) return json(res, 400, { error: "Choose a valid voice mode." });
-      if (voiceMode === "generate" && !voiceScript) return json(res, 400, { error: "Add the narration script for Chatterbox." });
-      if (voiceMode === "wav" && !wavPath) return json(res, 400, { error: "Enter the absolute path to an existing WAV file." });
+      if (!["generate", "wav", "projectWav", "silent"].includes(voiceMode)) return json(res, 400, { error: "Choose a valid voice mode." });
+      if (!["all", "analysis", "scene", "render"].includes(phase)) return json(res, 400, { error: "Choose analysis, scene, render, or legacy all-in-one mode." });
+      if (phase === "render" && voiceMode === "generate") return json(res, 400, { error: "Render is audio-preserving: select an existing approved WAV, this project’s saved WAV, or silent video. Generate narration in the separate audio-only panel." });
+      if (voiceMode === "projectWav" && phase !== "render") return json(res, 400, { error: "Project WAV mode is only available when rendering an already-saved scene." });
+      if (phase === "render" && !exportName) return json(res, 400, { error: "Enter a new export filename for a retry; existing MP4s are never overwritten." });
+      if (phase !== "analysis" && voiceMode === "generate" && !voiceScript) return json(res, 400, { error: "Add the narration script for Chatterbox." });
+      if (phase !== "analysis" && voiceMode === "wav" && !wavPath) return json(res, 400, { error: "Enter the absolute path to an existing WAV file." });
       if (!Number.isFinite(fps) || fps < 10 || fps > 60) return json(res, 400, { error: "FPS must be between 10 and 60." });
+      if (!Number.isFinite(requestedAudioOffset) || requestedAudioOffset < -5 || requestedAudioOffset > 5) return json(res, 400, { error: "Audio sync offset must be between -5 and +5 seconds." });
       const id = crypto.randomBytes(6).toString("hex");
-      const job = { id, status: "queued", logs: [], files: {}, error: null, child: null };
+      const job = { id, status: "queued", logs: [], files: {}, error: null, child: null, stage: phase, stages: freshStages() };
       jobs.set(id, job);
       activeJob = id;
       log(job, "Queued. Heavy stages will run sequentially to reduce memory pressure.");
@@ -247,12 +540,12 @@ const server = http.createServer(async (req, res) => {
           const storyPath = path.join(dir, "story.md");
           const htmlPath = path.join(dir, "index.html");
           const narrationPath = path.join(dir, "narration.md");
-          const mp4Path = path.join(dir, voiceMode === "silent" ? "final-silent.mp4" : "final.mp4");
+          const mp4Path = path.join(dir, phase === "render" ? `${exportName}${voiceMode === "silent" ? "-silent" : ""}.mp4` : (voiceMode === "silent" ? "final-silent.mp4" : "final.mp4"));
           const storyContent = `# ${title}\n\n${story}\n`;
 
           // Never overwrite a completed video. Reuse a narration WAV only when its source
           // script matches exactly; this avoids rerunning Chatterbox after a render failure.
-          for (const name of ["final.mp4", "final-silent.mp4"]) {
+          for (const name of (phase === "render" ? [path.basename(mp4Path)] : ["final.mp4", "final-silent.mp4"])) {
             try {
               await fs.access(path.join(dir, name));
               throw new Error(`Output already exists: ${path.join(dir, name)}. Choose a new output folder to preserve the previous production.`);
@@ -261,10 +554,38 @@ const server = http.createServer(async (req, res) => {
             }
           }
 
+          if (phase === "analysis") {
+            setStage(job, "input", "passed"); setStage(job, "analysis", "running");
+            try { const existing = await fs.readFile(storyPath, "utf8"); if (existing !== storyContent) throw new Error("This output folder contains a different story.md. Choose a new folder to preserve existing artifacts."); }
+            catch (e) { if (e.code === "ENOENT") await fs.writeFile(storyPath, storyContent, { flag: "wx" }); else throw e; }
+            const planPath = path.join(dir, "visual-plan.json");
+            // Preserve existing plan/scene artifacts. generate.mjs reuses a matching plan;
+            // never archive good work merely because the user reopens the analysis stage.
+            const node = process.execPath;
+            const args = ["scripts/ollama-session.mjs", "--", "node", "scripts/generate.mjs", "--story", storyPath, "--planner-model", plannerModel, "--model", model, "--out", htmlPath, "--plan-file", planPath, "--phase", "plan"];
+            await run(node, args, root, job, "Visual analysis (plan only; model unload before next stage)");
+            const plan = JSON.parse(await fs.readFile(planPath, "utf8"));
+            setStage(job, "analysis", "passed"); setStage(job, "planValidation", "passed", `${plan.beats.length} beats ending at ${plan.beats.at(-1)?.end}s`);
+            job.files = { plan: `/files/${encodeURIComponent(slug)}/visual-plan.json` };
+            try {
+              const savedHtml = await fs.readFile(htmlPath, "utf8");
+              const storyFingerprint = crypto.createHash("sha256").update(storyContent).digest("hex");
+              const planFingerprint = crypto.createHash("sha256").update(JSON.stringify(normalizeVisualPlan(plan))).digest("hex");
+              if (savedHtml.includes(`name="tdc-story-fingerprint" content="${storyFingerprint}"`) &&
+                  savedHtml.includes(`name="tdc-plan-fingerprint" content="${planFingerprint}"`)) {
+                job.files.scene = `/files/${encodeURIComponent(slug)}/index.html`;
+                log(job, "An existing scene matches this story and plan; it remains available and was not regenerated.");
+              }
+            } catch (error) { if (error.code !== "ENOENT") throw error; }
+            job.status = "completed";
+            log(job, "ANALYSIS STAGE VALIDATED. Plan saved for review; scene generation, narration and rendering were not started.");
+            return;
+          }
+          setStage(job, "input", "passed");
           const narrationContent = voiceScript ? voiceScript + "\n" : "";
           const finalWavPath = path.join(dir, "final.narration.wav");
           let reuseNarration = false;
-          try {
+          if (phase === "all" && voiceMode === "generate") try {
             await fs.access(finalWavPath);
             if (voiceMode !== "generate") throw new Error(`Narration WAV already exists: ${finalWavPath}. Choose a new output folder to avoid overwriting it.`);
             let savedNarration;
@@ -274,11 +595,11 @@ const server = http.createServer(async (req, res) => {
             reuseNarration = true;
             log(job, "Reusing the existing narration WAV; Chatterbox will not run again.");
           } catch (error) {
-            if (error.code !== "ENOENT") throw error;
+            if (phase !== "analysis" && error.code !== "ENOENT") throw error;
           }
 
           let reuseScene = false;
-          try {
+          if (phase !== "scene" && phase !== "render") try {
             await fs.access(htmlPath);
             const savedStory = await fs.readFile(storyPath, "utf8");
             if (savedStory !== storyContent) throw new Error(`A scene already exists in ${dir}, but its saved story does not match this brief. Choose a new output folder to avoid mixing productions.`);
@@ -288,23 +609,78 @@ const server = http.createServer(async (req, res) => {
             if (error.code !== "ENOENT") throw error;
           }
 
-          await fs.writeFile(storyPath, storyContent, "utf8");
-          if (voiceMode === "generate") await fs.writeFile(narrationPath, narrationContent, "utf8");
+          try { const saved = await fs.readFile(storyPath, "utf8"); if (saved !== storyContent) throw new Error("Saved story.md differs from the submitted story. Choose a new output folder; existing files are preserved."); }
+          catch (e) { if (e.code === "ENOENT") await fs.writeFile(storyPath, storyContent, { flag: "wx" }); else throw e; }
+          if (phase === "all" && voiceMode === "generate") await fs.writeFile(narrationPath, narrationContent, "utf8");
           const node = process.execPath;
-          const generateArgs = ["scripts/ollama-session.mjs", "--", "node", "scripts/generate.mjs", "--story", storyPath, "--model", model, "--out", htmlPath];
+          const planPath = path.join(dir, "visual-plan.json");
+          if (phase === "all" && reuseScene) {
+            try {
+              const savedPlan = JSON.parse(await fs.readFile(planPath, "utf8"));
+              const savedHtml = await fs.readFile(htmlPath, "utf8");
+              const storyFingerprint = crypto.createHash("sha256").update(storyContent).digest("hex");
+              const planFingerprint = crypto.createHash("sha256").update(JSON.stringify(normalizeVisualPlan(savedPlan))).digest("hex");
+              const matches = savedPlan.story_fingerprint === storyFingerprint &&
+                savedHtml.includes(`name="tdc-story-fingerprint" content="${storyFingerprint}"`) &&
+                savedHtml.includes(`name="tdc-plan-fingerprint" content="${planFingerprint}"`);
+              if (!matches) {
+                const stalePath = path.join(dir, `index.stale-fingerprint-${Date.now()}.html`);
+                await fs.rename(htmlPath, stalePath);
+                reuseScene = false;
+                log(job, `Existing scene does not match the current story/plan; archived as ${path.basename(stalePath)} and will regenerate only the scene stage.`);
+              } else log(job, "Existing scene fingerprints match the saved story and plan; reusing it without scene generation.");
+            } catch (error) {
+              if (error.code !== "ENOENT") throw error;
+              reuseScene = false;
+            }
+          }
+          if (phase === "scene" || phase === "render") {
+            const plan = JSON.parse(await fs.readFile(planPath, "utf8"));
+            const storyFingerprint = crypto.createHash("sha256").update(storyContent).digest("hex");
+            if (plan.story_fingerprint !== storyFingerprint) throw new Error("Saved visual plan is stale for this story. Run analysis again before scene generation.");
+            if (phase === "render") {
+              const source = await fs.readFile(htmlPath, "utf8");
+              const planFingerprint = crypto.createHash("sha256").update(JSON.stringify(plan)).digest("hex");
+              if (!source.includes(`name="tdc-story-fingerprint" content="${storyFingerprint}"`) || !source.includes(`name="tdc-plan-fingerprint" content="${planFingerprint}"`)) throw new Error("Saved scene does not match the current approved story/plan. Regenerate the scene first.");
+              if (voiceMode === "wav" || voiceMode === "projectWav") await fs.access(path.resolve(wavPath));
+              setStage(job, "scene", "passed"); setStage(job, "sceneValidation", "passed"); setStage(job, "audio", voiceMode === "silent" ? "skipped" : "passed"); setStage(job, "render", "running");
+            } else setStage(job, "scene", "running");
+          } else if (phase === "all") setStage(job, "analysis", "running");
+          const generateArgs = ["scripts/ollama-session.mjs", "--", "node", "scripts/generate.mjs", "--story", storyPath, "--planner-model", plannerModel, "--model", model, "--out", htmlPath, "--plan-file", planPath];
+          if (phase === "analysis") generateArgs.push("--phase", "plan");
+          else if (phase === "scene") generateArgs.push("--phase", "scene");
+          if (phase === "render") { reuseScene = true; log(job, "Rendering the saved fingerprint-matched scene; Ollama and Chatterbox will not run."); }
           if (!reuseScene) {
             try {
-              await run(node, generateArgs, root, job, "Ollama scene generation (model unload happens before narration)");
+              if (phase === "all") {
+                // Keep analysis and scene compilation as separate observable stages even
+                // in one-click mode. The approved plan is the interface between them.
+                setStage(job, "analysis", "running");
+                setStage(job, "planValidation", "running");
+                await run(node, [...generateArgs, "--phase", "plan"], root, job, "Visual analysis (plan only; planner model unload before scene compilation)");
+                const approvedPlan = JSON.parse(await fs.readFile(planPath, "utf8"));
+                setStage(job, "analysis", "passed");
+                setStage(job, "planValidation", "passed", `${approvedPlan.beats.length} beats ending at ${approvedPlan.beats.at(-1)?.end}s`);
+                setStage(job, "scene", "running");
+                await run(node, [...generateArgs, "--phase", "scene"], root, job, "Compile and validate scene from approved plan (deterministic renderer)");
+              } else {
+                const generateLabel = phase === "analysis"
+                  ? "Visual analysis (planner model only; save plan for review)"
+                  : "Compile and validate scene from approved plan (deterministic renderer)";
+                await run(node, generateArgs, root, job, generateLabel);
+              }
             } catch (error) {
-              const validationFailure = /Generated HTML uses Math\.random|Generated HTML failed export validation|Model output did not start with|Ollama returned no message content/i.test(job.logs.slice(-100).join("\n"));
-              if (!validationFailure) throw error;
+              const recentOutput = job.logs.slice(-140).join("\n");
+              const validationFailure = /Generated scene failed browser render-only validation|Generated HTML failed export validation|Model output did not start with|Ollama returned no message content|Math\.random\(\), forbidden|missing native \?render=1 render-only mode/i.test(recentOutput);
+              const internalRepairExhausted = /Scene generation failed after one targeted repair|Scene generation stopped because Ollama connectivity failed|OLLAMA_UNAVAILABLE/i.test(recentOutput);
+              if (!validationFailure || internalRepairExhausted) throw error;
               const archivedScene = path.join(dir, `index.invalid-${Date.now()}.log.html`);
               // generate.mjs validates before writing, but preserve any unexpected partial artifact safely.
               try { await fs.rename(htmlPath, archivedScene); log(job, `Archived invalid generated scene as ${path.basename(archivedScene)}.`); }
               catch (archiveError) { if (archiveError.code !== "ENOENT") throw archiveError; }
               const repairNote = [
-                "AUTOMATIC FIRST-PASS VALIDATION REPAIR. The previous model output was rejected by deterministic scene validation.",
-                "Do not use Math.random() anywhere, including initialization. Do not use timers or CSS transitions for scene state.",
+                "AUTOMATIC FIRST-PASS REPAIR. Exact validation failure: " + (summarizeSceneFailure(job.logs.slice(-100).join("\n")) || "HTML failed validation") + ". Fix this specific failure first.",
+                "If Math.random() was detected, remove every call completely. Use fixed coordinates, a seeded deterministic generator initialized once, or values derived directly from absolute time. Never use random values or accumulated state in renderAt().",
                 "Every visible value must be a pure function of absolute timestamp; renderAt(seconds) must reset the full scene state and reproduce identical pixels when called repeatedly for the same timestamp.",
                 "Return a complete HTML document beginning with <!doctype html>, include window.renderAt, window.getDuration, and render-only mode via new URLSearchParams(window.location.search).get('render').",
                 "Keep the original story and narration meaning. Do not weaken or bypass any validation."
@@ -313,20 +689,49 @@ const server = http.createServer(async (req, res) => {
               await runSceneRepair(node, generateArgs, repairNote, root, job, "Repair invalid initial scene");
             }
           }
-          if (voiceMode === "generate") {
+          if (phase === "all") {
+            const completedPlan = JSON.parse(await fs.readFile(planPath, "utf8"));
+            setStage(job, "analysis", "passed", "Story analysis completed");
+            setStage(job, "planValidation", "passed", `${completedPlan.beats.length} validated beats`);
+            setStage(job, "scene", "passed");
+            setStage(job, "sceneValidation", "passed");
+            setStage(job, "audio", voiceMode === "generate" ? "running" : "skipped", voiceMode === "generate" ? "Generating narration after scene validation" : "Narration not requested");
+            setStage(job, "render", "running");
+          }
+          if (phase === "scene") {
+            const plan = JSON.parse(await fs.readFile(planPath, "utf8"));
+            const storyFingerprint = crypto.createHash("sha256").update(storyContent).digest("hex");
+            const planFingerprint = crypto.createHash("sha256").update(JSON.stringify(plan)).digest("hex");
+            const scene = await fs.readFile(htmlPath, "utf8");
+            if (!scene.includes(`name="tdc-story-fingerprint" content="${storyFingerprint}"`) || !scene.includes(`name="tdc-plan-fingerprint" content="${planFingerprint}"`)) throw new Error("Generated scene fingerprint does not match the approved plan.");
+            setStage(job, "scene", "passed"); setStage(job, "sceneValidation", "passed");
+            job.files = { plan: `/files/${encodeURIComponent(slug)}/visual-plan.json`, scene: `/files/${encodeURIComponent(slug)}/index.html` };
+            job.status = "completed"; log(job, "SCENE STAGE VALIDATED. Rendering and narration were not started."); return;
+          }
+          if (phase === "render") {
+            if (voiceMode === "wav" || voiceMode === "projectWav") await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--audio", path.resolve(wavPath), "--fps", String(fps), "--audio-offset", String(audioOffset)], root, job, "Render and QC with approved existing WAV");
+            else await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--fps", String(fps), "--audio-offset", String(audioOffset)], root, job, "Render and QC silent video");
+            setStage(job, "render", "passed"); setStage(job, "videoQc", "passed"); setStage(job, "export", "passed");
+          } else if (voiceMode === "generate") {
             if (reuseNarration) {
               try {
-                await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--audio", finalWavPath, "--fps", String(fps)], root, job, "Render with reused narration WAV");
+                await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--audio", finalWavPath, "--fps", String(fps), "--audio-offset", String(audioOffset)], root, job, "Render with reused narration WAV");
               } catch (error) {
                 const recentLogs = job.logs.slice(-100);
                 const deterministicFailure = recentLogs.some(line => line.includes("Determinism check failed"));
                 const endingFailure = recentLogs.some(line => line.includes("Visual ending check failed"));
-                if (!deterministicFailure && !endingFailure) throw error;
+                const densityFailure = recentLogs.some(line => line.includes("Visual density QA failed"));
+                const offlineFailure = recentLogs.some(line => line.includes("Offline policy failed") || line.includes("Browser errors detected"));
+                if (!deterministicFailure && !endingFailure && !densityFailure && !offlineFailure) throw error;
                 const archivedScene = path.join(dir, `index.failed-${Date.now()}.html`);
                 await fs.rename(htmlPath, archivedScene);
-                const repairNote = endingFailure
-                  ? "The previous export failed visual-ending QA: its final frames were pixel-identical for more than 2.5 seconds. Redesign the final 5 seconds: keep meaningful narration-synchronized motion through the last explanatory beat, then resolve into a takeaway only in the final 1.5–2.5 seconds. Do not stretch or freeze an end card; keep deterministic renderAt(seconds) behavior."
-                  : "The previous export failed determinism QA. Ensure every visual property is derived from absolute timestamp and renderAt(t) resets the full scene state.";
+                const repairNote = densityFailure
+                  ? "VISUAL DENSITY REPAIR: sampled frames are too sparse. Enlarge the dominant story-specific action; preserve deterministic seeking, offline behavior and the export contract."
+                  : endingFailure
+                    ? "The previous export failed visual-ending QA. Keep meaningful narration-synchronized motion through the last explanatory beat, then resolve into a takeaway only in the final 1.5–2.5 seconds. Do not freeze an end card."
+                    : offlineFailure
+                      ? "OFFLINE / RUNTIME REPAIR: fix browser errors or external requests without changing the story. Keep the scene self-contained and deterministic."
+                      : "DETERMINISM REPAIR: derive every visual property from absolute time and reset the full scene state in renderAt(t).";
                 log(job, `${endingFailure ? "Visual ending" : "Determinism"} QA failed; archived scene as ${path.basename(archivedScene)} and attempting one targeted scene repair while preserving narration.`);
                 await runSceneRepair(node, generateArgs, repairNote, root, job, endingFailure ? "Repair frozen visual ending" : "Regenerate nondeterministic scene");
                 await retryExportWithEndingRepair(node, generateArgs, htmlPath, mp4Path, finalWavPath, fps, dir, root, job);
@@ -336,22 +741,60 @@ const server = http.createServer(async (req, res) => {
               try {
                 await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--voice-script", narrationPath, "--fps", String(fps), "--style", String(body.style || "storytelling"), "--performance", String(body.performance || "directed"), "--expression-intensity", String(body.intensity ?? 65)], root, job, "Chatterbox narration, then video render");
               } catch (error) {
-                const endingFailure = job.logs.slice(-100).some(line => line.includes("Visual ending check failed"));
-                if (!endingFailure) throw error;
+                const recent = job.logs.slice(-120).join("\n");
+                const endingFailure = recent.includes("Visual ending check failed");
+                const densityFailure = recent.includes("Visual density QA failed");
+                const deterministicFailure = recent.includes("Determinism check failed");
+                const offlineFailure = recent.includes("Offline policy failed") || recent.includes("Browser errors detected");
+                if (!endingFailure && !densityFailure && !deterministicFailure && !offlineFailure) throw error;
+                try { await fs.access(finalWavPath); }
+                catch { throw new Error("Visual export failed before narration was saved; Chatterbox will not be rerun by this visual repair."); }
                 const archivedScene = path.join(dir, `index.failed-${Date.now()}.html`);
                 await fs.rename(htmlPath, archivedScene);
-                const repairNote = "The previous export failed visual-ending QA: its final frames were pixel-identical for more than 2.5 seconds. Redesign the final 5 seconds: keep meaningful narration-synchronized motion through the last explanatory beat, then resolve into a takeaway only in the final 1.5–2.5 seconds. Do not stretch or freeze an end card; keep deterministic renderAt(seconds) behavior.";
-                log(job, `Visual ending QA failed; archived scene as ${path.basename(archivedScene)} and attempting one targeted scene repair while preserving the generated narration WAV.`);
-                await runSceneRepair(node, generateArgs, repairNote, root, job, "Repair frozen visual ending");
-                await retryExportWithEndingRepair(node, generateArgs, htmlPath, mp4Path, finalWavPath, fps, dir, root, job);
+                const repairNote = densityFailure
+                  ? "VISUAL DENSITY REPAIR: sampled frames are too sparse. Enlarge the dominant story-specific action and use the vertical frame intentionally; preserve the story, deterministic export contract and offline policy."
+                  : endingFailure
+                    ? "VISUAL ENDING REPAIR: keep meaningful causal action through the last explanatory beat; resolve into the takeaway only in the final 1.5–2.5 seconds. No frozen end card."
+                    : deterministicFailure
+                      ? "DETERMINISM REPAIR: reset visible state in renderAt(t) and derive every property from absolute time."
+                      : "OFFLINE / RUNTIME REPAIR: fix browser errors or external requests while preserving story-specific visuals and deterministic rendering."; 
+                log(job, "Visual QA failed after narration was saved; repairing only the scene and reusing final.narration.wav unchanged.");
+                await runSceneRepair(node, generateArgs, repairNote, root, job, "Repair scene with preserved Chatterbox narration");
+                if (endingFailure) await retryExportWithEndingRepair(node, generateArgs, htmlPath, mp4Path, finalWavPath, fps, dir, root, job);
+                else await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--audio", finalWavPath, "--fps", String(fps), "--audio-offset", String(audioOffset)], root, job, "Render repaired scene with preserved narration WAV");
               }
             }
           } else if (voiceMode === "wav") {
-            await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--audio", path.resolve(wavPath), "--fps", String(fps)], root, job, "Render with existing WAV narration");
+            const wavExportArgs = ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--audio", path.resolve(wavPath), "--fps", String(fps), "--audio-offset", String(audioOffset)];
+            try {
+              await run(node, wavExportArgs, root, job, "Render with existing WAV narration");
+            } catch (error) {
+              const recent = job.logs.slice(-120).join("\n");
+              const densityFailure = recent.includes("Visual density QA failed");
+              const determinismFailure = recent.includes("Determinism check failed");
+              const endingFailure = recent.includes("Visual ending check failed");
+              const offlineFailure = recent.includes("Offline policy failed") || recent.includes("Browser errors detected");
+              if (!densityFailure && !determinismFailure && !endingFailure && !offlineFailure) throw error;
+
+              const archivedScene = path.join(dir, `index.failed-visual-qa-${Date.now()}.html`);
+              await fs.rename(htmlPath, archivedScene);
+              const repairNote = densityFailure
+                ? "VISUAL DENSITY REPAIR: the renderer found that too many sampled frames are visually sparse. Recompose the dominant subject so it is recognisable and fills the vertical frame; enlarge the main mechanism and use the central visual area. Background texture and tiny labels do not count. Keep distinct story-specific beats, deterministic rendering, the offline policy, and the exact export contract."
+                : endingFailure
+                  ? "VISUAL ENDING REPAIR: the ending freezes for more than 2.5 seconds. Keep meaningful narration-synchronized action until the final 1.5–2.5 seconds, then resolve into a concise takeaway. Do not use a long static end card. Preserve the story, deterministic renderAt contract, and offline policy."
+                  : determinismFailure
+                    ? "DETERMINISM REPAIR: renderAt(t) must reset all visible state and derive every visual property from absolute timestamp t. The same timestamp must always reproduce identical pixels. Preserve the story and offline policy."
+                    : "OFFLINE / RUNTIME REPAIR: remove external network requests and fix browser runtime errors. Bundle all required dependencies locally, preserve the story, use deterministic timestamp-driven rendering, and keep the required renderAt/getDuration export contract.";
+              log(job, `Visual QA failed (${densityFailure ? "density" : endingFailure ? "ending" : determinismFailure ? "determinism" : "offline/runtime"}); archived scene as ${path.basename(archivedScene)} and attempting one targeted visual-only repair. Existing narration WAV will be reused unchanged.`);
+              await runSceneRepair(node, generateArgs, repairNote, root, job, "Repair scene using existing narration WAV");
+              await run(node, wavExportArgs, root, job, "Render repaired scene with the same WAV narration");
+            }
           } else {
-            await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--fps", String(fps)], root, job, "Silent video render");
+            await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--fps", String(fps), "--audio-offset", String(audioOffset)], root, job, "Silent video render");
           }
+          if (phase === "all") { setStage(job, "scene", "passed"); setStage(job, "sceneValidation", "passed"); setStage(job, "audio", voiceMode === "generate" ? "passed" : "skipped"); setStage(job, "render", "passed"); setStage(job, "videoQc", "passed"); setStage(job, "export", "passed"); }
           job.files = {
+            plan: `/files/${encodeURIComponent(slug)}/visual-plan.json`,
             scene: `/files/${encodeURIComponent(slug)}/index.html`,
             video: `/files/${encodeURIComponent(slug)}/${path.basename(mp4Path)}`,
             audio: voiceMode === "generate" ? `/files/${encodeURIComponent(slug)}/final.narration.wav` : voiceMode === "wav" ? `/files/${encodeURIComponent(slug)}/${path.basename(wavPath)}` : null
@@ -365,6 +808,11 @@ const server = http.createServer(async (req, res) => {
         } catch (error) {
           job.status = "failed";
           job.error = error.message;
+          const activeStage = ["analysis", "scene", "audio", "render"].find(key => job.stages?.[key]?.status === "running");
+          if (activeStage) setStage(job, activeStage, "failed", error.message);
+          else if (job.stage === "analysis") setStage(job, "analysis", "failed", error.message);
+          else if (job.stage === "scene") setStage(job, "scene", "failed", error.message);
+          else if (job.stage === "render") setStage(job, "render", "failed", error.message);
           log(job, `FAILED: ${error.message}`);
           if (job.child) { try { job.child.kill("SIGTERM"); } catch {} }
         } finally {
@@ -377,7 +825,7 @@ const server = http.createServer(async (req, res) => {
     if (req.method === "GET" && url.pathname.startsWith("/files/")) {
       const parts = url.pathname.split("/").filter(Boolean).slice(1).map(decodeURIComponent);
       if (parts.length !== 2 || parts.some(p => p.includes("/") || p === "." || p === "..")) return json(res, 400, { error: "Invalid file path." });
-      return await serveFile(res, path.join(outputRoot, parts[0], parts[1]));
+      return await serveFile(res, path.join(outputRoot, parts[0], parts[1]), url.searchParams.get("download") === "1");
     }
     json(res, 404, { error: "Not found." });
   } catch (error) {
