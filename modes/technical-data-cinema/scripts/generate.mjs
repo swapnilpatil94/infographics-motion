@@ -205,7 +205,7 @@ if (process.env.TDC_EXPERIMENTAL_LLM_SCENE !== "1") {
     process.exit(1);
   }
   await fs.mkdir(path.dirname(outPath), { recursive: true });
-  try { await fs.writeFile(outPath, compiledHtml + "\\n", { flag: "wx" }); }
+  try { await fs.writeFile(outPath, compiledHtml + "\n", { flag: "wx" }); }
   catch (error) {
     if (error.code === "EEXIST") console.error(`Output already exists: ${outPath}. Choose a new output folder; existing scene was not overwritten.`);
     else console.error(error.message);
