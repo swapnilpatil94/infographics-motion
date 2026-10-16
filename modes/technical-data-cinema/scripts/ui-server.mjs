@@ -447,7 +447,7 @@ const server = http.createServer(async (req, res) => {
               if (voiceMode === "wav") await fs.access(path.resolve(wavPath));
               setStage(job, "scene", "passed"); setStage(job, "sceneValidation", "passed"); setStage(job, "audio", voiceMode === "silent" ? "skipped" : "passed"); setStage(job, "render", "running");
             } else setStage(job, "scene", "running");
-          }
+          } else if (phase === "all") setStage(job, "analysis", "running");
           const generateArgs = ["scripts/ollama-session.mjs", "--", "node", "scripts/generate.mjs", "--story", storyPath, "--planner-model", plannerModel, "--model", model, "--out", htmlPath, "--plan-file", planPath];
           if (phase === "analysis") generateArgs.push("--phase", "plan");
           else if (phase === "scene") generateArgs.push("--phase", "scene");
@@ -592,9 +592,11 @@ const server = http.createServer(async (req, res) => {
         } catch (error) {
           job.status = "failed";
           job.error = error.message;
-          if (job.stage === "analysis") setStage(job, "analysis", "failed", error.message);
-          if (job.stage === "scene") setStage(job, "scene", "failed", error.message);
-          if (job.stage === "render") setStage(job, "render", "failed", error.message);
+          const activeStage = ["analysis", "scene", "audio", "render"].find(key => job.stages?.[key]?.status === "running");
+          if (activeStage) setStage(job, activeStage, "failed", error.message);
+          else if (job.stage === "analysis") setStage(job, "analysis", "failed", error.message);
+          else if (job.stage === "scene") setStage(job, "scene", "failed", error.message);
+          else if (job.stage === "render") setStage(job, "render", "failed", error.message);
           log(job, `FAILED: ${error.message}`);
           if (job.child) { try { job.child.kill("SIGTERM"); } catch {} }
         } finally {
