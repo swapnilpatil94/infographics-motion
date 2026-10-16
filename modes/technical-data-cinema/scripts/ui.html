@@ -12,6 +12,13 @@ main{max-width:1180px;margin:auto;padding:0 24px 40px;display:grid;grid-template
 .audio-panel{max-width:1180px;margin:0 auto 28px;padding:22px 24px;background:linear-gradient(145deg,#1b211c,#151915);border:1px solid var(--line);border-radius:16px}.audio-panel h2{font-size:16px;margin:0 0 5px}.audio-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr);gap:18px}.audio-panel textarea{min-height:240px}.audio-panel .audio-output{background:#0b0e0b;border:1px solid #2b332b;border-radius:10px;padding:14px;min-height:100px}.audio-panel audio{width:100%;margin-top:10px}.audio-panel .audio-links{display:grid;gap:8px;margin-top:12px}.audio-panel .audio-links a{display:block;border:1px solid var(--line);border-radius:9px;padding:10px 12px;color:var(--gold);text-decoration:none}.audio-panel .audio-links a:hover{border-color:var(--gold)}
 @media(max-width:850px){.audio-panel{margin:0 14px 24px;padding:17px}.audio-grid{grid-template-columns:1fr}}
 @media(max-width:850px){header{display:block}header .pill{display:inline-block;margin-top:14px}main{grid-template-columns:1fr;padding:0 14px 28px}header{padding:24px 14px 18px}.panel{padding:17px}.log{height:260px}}@media(max-width:440px){.two{grid-template-columns:1fr}.modes{grid-template-columns:1fr}.mode{align-items:center}}
+
+.scene-editor{margin-top:16px;border:1px solid var(--line);border-radius:14px;padding:18px;background:rgba(5,6,7,.48)}
+.scene-editor h2{margin:0 0 6px;font-size:18px}.scene-editor .sub{margin:0 0 12px;color:var(--muted)}
+#sceneHtml{width:100%;min-height:300px;resize:vertical;background:#050607;color:#e9ecef;border:1px solid #41474d;border-radius:10px;padding:13px;font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;tab-size:2}
+.scene-editor-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center}.scene-message{font-size:12px;color:var(--muted);flex:1;min-width:180px}
+.scene-preview{width:100%;height:min(70vh,700px);border:1px solid var(--line);border-radius:10px;background:#171715;margin-top:12px}
+
 </style>
 </head>
 <body>
@@ -84,6 +91,20 @@ Treat character artwork as illustration, not a historically verified depiction. 
 <div id="logs" class="log" aria-live="polite" style="margin-top:14px">Waiting for you to start a job…</div>
 <div id="results" class="result"></div>
 <div id="planPanel" class="plan-panel hidden"><h2>Review / edit visual plan</h2><p class="sub">Analysis is separate. Edit beat timing, visual grammar or scene direction here before rendering.</p><textarea id="planEditor" spellcheck="false" aria-label="Editable visual plan JSON"></textarea><div class="plan-actions"><button id="savePlan" class="secondary" type="button">Validate &amp; save plan</button><span id="planMessage" class="plan-message"></span></div></div>
+
+<div id="sceneEditorPanel" class="scene-editor">
+  <h2>Paste / edit custom scene HTML</h2>
+  <p class="sub">Paste a complete HTML scene, save it into this project's <code>index.html</code>, preview it, then render it using the existing production pipeline. Saving preserves a timestamped backup of the previous scene.</p>
+  <div class="field"><label for="sceneHtml">SCENE HTML FILE</label><textarea id="sceneHtml" spellcheck="false" aria-label="Custom scene HTML" placeholder="Paste the complete <!doctype html> ... </html> scene here. It must define window.renderAt(seconds) and window.getDuration()."></textarea></div>
+  <div class="scene-editor-actions">
+    <button id="loadSceneHtml" class="secondary" type="button">Load saved visuals</button>
+    <button id="saveSceneHtml" class="primary" type="button">Save visuals to project</button>
+    <button id="previewSceneHtml" class="secondary" type="button">Preview HTML</button>
+    <button id="renderSceneHtml" class="secondary" type="button">Render saved visuals</button>
+    <span id="sceneHtmlMessage" class="scene-message">Choose or load a project before saving.</span>
+  </div>
+  <iframe id="scenePreview" class="scene-preview hidden" title="Custom scene preview" sandbox="allow-scripts" referrerpolicy="no-referrer"></iframe>
+</div>
 <div class="warning">Before publishing, preview the full MP4 and listen for pronunciation, pacing, clipped words and sync. Rendering can use substantial disk space.</div>
 </section>
 </main>
@@ -159,6 +180,34 @@ catch(e){$("audioRun").disabled=false;audioStatus("Failed");$("audioLogs").textC
 $("audioForm").addEventListener("submit",async e=>{e.preventDefault();if($("audioRun").disabled)return;const payload={slug:$("audioSlug").value,script:$("audioScript").value,style:$("audioStyle").value,performance:$("audioPerformance").value,intensity:$("audioIntensity").value,pace:$("audioPace").value};if(!payload.script.trim()){alert("Paste the narration script first.");return}if(payload.script.length>25000){alert("Keep the script under 25,000 characters per audio take.");return}
 $("audioRun").disabled=true;$("audioHint").textContent="Keep this tab open while Chatterbox generates audio";$("audioLogs").textContent="Submitting audio-only job…";$("audioOutput").textContent="Generating…";$("audioLinks").replaceChildren();audioKnownLogs=0;audioStatus("Queued");
 try{const r=await fetch("/api/audio",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(payload)});const d=await r.json();if(!r.ok)throw new Error(d.error||"Could not start audio job");audioJobId=d.id;pollAudio()}catch(err){$("audioRun").disabled=false;audioStatus("Could not start");$("audioLogs").textContent=err.message;$("audioHint").textContent="Correct the issue and retry"}});
+
+async function loadSceneHtml(){
+  const slug=$("slug").value.trim();
+  if(!slug){$("sceneHtmlMessage").textContent="Enter or load a project folder first.";return}
+  $("sceneHtmlMessage").textContent="Loading saved scene…";
+  try{const r=await fetch("/files/"+encodeURIComponent(slug)+"/index.html");const d=await r.text();if(!r.ok)throw new Error(d||"No saved scene HTML found.");$("sceneHtml").value=d;$("sceneHtmlMessage").textContent="Loaded saved index.html from "+slug+"."}
+  catch(e){$("sceneHtmlMessage").textContent="Could not load scene: "+e.message}
+}
+$("loadSceneHtml").addEventListener("click",loadSceneHtml);
+$("saveSceneHtml").addEventListener("click",async()=>{
+  const button=$("saveSceneHtml");button.disabled=true;$("sceneHtmlMessage").textContent="Validating and saving HTML…";
+  try{const r=await fetch("/api/scene/save",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({slug:$("slug").value,html:$("sceneHtml").value})});const d=await r.json();if(!r.ok)throw new Error(d.error||"Could not save scene.");$("sceneHtml").value=d.html;$("sceneHtmlMessage").textContent="Saved to "+d.path+(d.backup?" · backup: "+d.backup:"")+" · duration "+d.duration.toFixed(2)+"s";sceneReady=true;analysisReady=true;loadProjects($("slug").value)}
+  catch(e){$("sceneHtmlMessage").textContent="Save failed: "+e.message}
+  finally{button.disabled=false}
+});
+$("previewSceneHtml").addEventListener("click",()=>{
+  const source=$("sceneHtml").value.trim();if(!source){$("sceneHtmlMessage").textContent="Paste or load an HTML scene first.";return}
+  const frame=$("scenePreview");frame.srcdoc=source;frame.classList.remove("hidden");$("sceneHtmlMessage").textContent="Preview loaded below. Use renderAt-compatible scenes for final export."
+});
+$("renderSceneHtml").addEventListener("click",()=>{
+  if(!$("sceneHtml").value.trim()){alert("Paste or load the scene HTML first.");return}
+  const mode=selectedMode();
+  if(mode==="generate"){alert("To render saved HTML without regenerating narration, choose Existing WAV and provide its path, or choose Silent video.");return}
+  if(mode==="wav"&&!$("wavPath").value.trim()){alert("Enter the absolute path to the approved narration WAV.");return}
+  if(!$("exportName").value.trim()){alert("Enter a new render output name.");return}
+  analysisReady=true;sceneReady=true;planDirty=false;pendingPhase="analysis";$("formHint").textContent="Rendering the saved custom HTML; story analysis and scene generation will be skipped.";$("form").requestSubmit();
+});
+
 loadModels();loadProjects();
 </script>
 </body></html>
