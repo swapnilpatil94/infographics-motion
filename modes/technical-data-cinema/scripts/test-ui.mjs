@@ -43,7 +43,7 @@ assert.ok(server.includes('setStage(job, "planValidation", "passed"'), "analysis
 assert.ok(server.includes("internalRepairExhausted"), "UI must not launch a second repair after the generator has already exhausted its repair");
 assert.ok(director.includes("LOCKED MYTHOLOGY ART DIRECTION") && director.includes("dark cinematic particle aesthetic") && director.includes("Do NOT use parchment as the default mythology background"), "mythology scenes must default to locked dark cinematic particles, not parchment");
 assert.ok(planner.includes("LOCKED MYTHOLOGY STYLE") && planner.includes("dark cinematic particle animation"), "planner must lock mythology scenes to dark cinematic particles");
-assert.ok(fallbackScene.includes('const theme=mythology?"mythology":"technical"') && fallbackScene.includes('data-theme="mythology"]{background:radial-gradient') && fallbackScene.includes('fill:"#fff0ad"'), "deterministic fallback must render mythology in a luminous dark particle style");
+assert.ok(fallbackScene.includes('const theme=mythology?"mythology":"technical"') && fallbackScene.includes('data-theme="mythology"]{background:radial-gradient') && fallbackScene.includes('?"#fff0ad":"#e7c16f"'), "deterministic fallback must render mythology in a luminous dark particle style");
 assert.ok(generatorSource.includes("locked dark cinematic particle style") && !generatorSource.includes("use parchment (#F5EBE0)"), "scene generation prompts must not override the mythology style lock with parchment");
 assert.ok(director.includes("meaningful particle contours and connecting strokes") && director.includes("timestamp-driven"), "mythology character particles must be story-driven and deterministic");
 
