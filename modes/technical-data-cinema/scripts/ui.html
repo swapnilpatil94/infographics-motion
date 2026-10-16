@@ -49,15 +49,15 @@ main{max-width:1180px;margin:auto;padding:0 24px 40px;display:grid;grid-template
 <div class="field"><label for="story">STORY / VISUAL BRIEF</label><textarea id="story" class="story" required>Create a cinematic Hindi mythology explainer about Draupadi's question in the Mahabharata assembly. Use the existing Infographics mode and HTML/CSS/JS renderer. Do not create a separate mode or use a fixed template.
 
 VISUAL DIRECTION
-- Construct Draupadi progressively from meaningful black ink dots and connecting strokes. Reveal the silhouette first, then hair, face, traditional attire and expressive gestures.
+- LOCKED MYTHOLOGY LOOK: deep black/charcoal environments, luminous antique-gold and amber particles, fine connecting trails, volumetric glow, layered 2.5D depth and restrained crimson accents. Do not use parchment as the default.
 - Keep her character design, proportions, hairstyle and costume consistent across every shot.
-- Use warm parchment/off-white backgrounds, black ink, restrained red accents and subtle muted gold.
+- Build Draupadi as a large, unmistakable character with consistent face, hair, jewellery, sari silhouette, expressive eyes and raised-hand gesture. Reveal her contours from meaningful particles, then hold a clean readable silhouette.
 - Animate dotted connectors to explain relationships, decisions, power and responsibility.
-- Transform the character into explanatory visuals: the royal assembly, sequence of events, a balance between rules and justice, and a final question.
-- Use varied compositions, close-ups, diagrams, transitions and camera movement. Do not repeat static portraits.
+- Cinematic flow: slow push into the towering royal court; morph to tumbling dice and changing stakes; particles gather into Draupadi; close-up as she raises her hand; elders fall into shadow; connecting trails transform into a justice scale; finish on the question and an expanding particle halo.
+- Use anticipation, eased acceleration/deceleration, overlapping motion in hair/sari/jewellery, particle follow-through, motivated camera moves, parallax and controlled trails. Let important gestures land with a brief dramatic hold.
 - Synchronize visual reveals with narration beats. Every dot, line and object must communicate something.
 - Use deterministic, timestamp-driven SVG/Canvas animation compatible with window.renderAt(seconds) and window.getDuration(). No Math.random(), external assets or nondeterministic animation.
-- Make the final scene visually active and memorable. Keep existing rendering, narration and quality checks enabled.
+- Each beat needs its own composition and meaningful action. Particles must form people, architecture, objects or causal links—not generic clouds. Keep silhouettes phone-readable with sound off. Reuse the existing Infographics renderer, narration, export and QC pipeline.
 
 STORY BEATS
 1. Establish the royal assembly and introduce Draupadi.
@@ -162,11 +162,13 @@ Treat character artwork as illustration, not a historically verified depiction. 
         <div class="field"><label for="customSlug">PROJECT FOLDER</label><input id="customSlug" value="draupadi-question11" required></div>
         <div class="field"><label for="customExportName">NEW MP4 NAME</label><input id="customExportName" value="draupadi-custom-v2" required></div>
       </div>
-      <div class="field"><label for="customHtmlFile">UPLOAD THE HTML FILE</label><input id="customHtmlFile" type="file" accept=".html,text/html"><span class="hint">Select draupadi_cinematic_ink_scene_v2.html, or paste the entire file into the editor below.</span></div>
+      <div class="field"><label for="customHtmlFile">UPLOAD THE HTML FILE</label><input id="customHtmlFile" type="file" accept=".html,text/html"><span class="hint">Load a complete offline-safe HTML scene. Load saved scene to reuse a project; Download HTML to export edits; Unload clears the editor without deleting saved files.</span></div>
       <div class="field"><label for="customHtml">VISUAL SCENE HTML</label><textarea id="customHtml" spellcheck="false" placeholder="Upload your HTML file above or paste the complete HTML document here."></textarea></div>
       <div class="custom-actions">
         <button id="customLoadScene" class="secondary" type="button">Load saved scene</button>
         <button id="customPreviewScene" class="secondary" type="button">Preview visuals</button>
+        <button id="customDownloadScene" class="secondary" type="button">Download HTML</button>
+        <button id="customUnloadScene" class="secondary" type="button">Unload / clear editor</button>
       </div>
     </div>
     <div>
@@ -298,6 +300,19 @@ $("customPreviewScene").addEventListener("click",()=>{
  const html=$("customHtml").value.trim();if(!html){$("customState").textContent="Upload or paste the HTML first.";return}
  $("customPreview").srcdoc=html;$("customPreview").classList.remove("hidden");$("customState").textContent="Visual preview loaded. The production button will save this HTML before rendering."
 });
+$("customDownloadScene").addEventListener("click",()=>{
+ const html=$("customHtml").value;
+ if(!html.trim()){$("customState").textContent="Nothing to download — upload or load an HTML scene first.";return}
+ const blob=new Blob([html],{type:"text/html;charset=utf-8"});
+ const url=URL.createObjectURL(blob),a=document.createElement("a");
+ a.href=url;a.download=(( $("customSlug").value||"custom-mythology-scene").trim().replace(/[^a-z0-9_-]+/gi,"-").replace(/^-|-$/g,"")||"custom-mythology-scene")+".html";
+ document.body.append(a);a.click();a.remove();URL.revokeObjectURL(url);
+ $("customState").textContent="Downloaded current editor contents. The saved project was not modified.";});
+$("customUnloadScene").addEventListener("click",()=>{
+ if(customBusy){$("customState").textContent="Wait until the active narration/render job finishes before unloading.";return}
+ $("customHtml").value="";$("customHtmlFile").value="";
+ $("customPreview").removeAttribute("srcdoc");$("customPreview").src="about:blank";$("customPreview").classList.add("hidden");
+ $("customState").textContent="Unloaded from editor. Saved project HTML and previous MP4 are untouched.";});
 async function waitForJob(id,onUpdate){
  while(true){
   const r=await fetch("/api/jobs/"+encodeURIComponent(id));const j=await r.json();if(!r.ok)throw new Error(j.error||"Could not read job status");
