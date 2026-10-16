@@ -8,7 +8,7 @@ export function buildFallbackScene({title,story,plan}) {
  const duration=clamp(Math.max(...beats.map(b=>b.end)),4,600);
  const json=JSON.stringify(beats).replace(/</g,"\\u003c").replace(/>/g,"\\u003e").replace(/&/g,"\\u0026");
  const safeTitle=clean(title).replace(/[&<>"]/g,"");
- const mythology=/draupadi|mahabharat|yudhishthir|krishna|pandava|dharma|महाभारत|द्रौपदी|युधिष्ठिर|कृष्ण|धर्म/i.test([title,story,...beats.map(b=>b.subject+" "+b.idea+" "+b.action)].join(" "));
+ const mythology=/mytholog|epic|ramayana|mahabharat|draupadi|yudhishthir|krishna|pandava|dharma|arjuna|bhima|karna|rama|sita|hanuman|shiva|parvati|durga|vishnu|lakshmi|saraswati|ravana|ganesha|पुराण|महाभारत|रामायण|द्रौपदी|युधिष्ठिर|कृष्ण|धर्म|अर्जुन|भीम|कर्ण|राम|सीता|हनुमान|शिव|पार्वती|दुर्गा|विष्णु|लक्ष्मी|सरस्वती|रावण|गणेश|देवता|देवी/i.test([title,story,...beats.map(b=>b.subject+" "+b.idea+" "+b.action)].join(" "));
  const theme=mythology?"mythology":"technical";
  return String.raw`<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>__TITLE__</title>
