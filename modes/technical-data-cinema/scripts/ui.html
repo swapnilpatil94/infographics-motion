@@ -138,7 +138,7 @@ Treat character artwork as illustration, not a historically verified depiction. 
 <div class="foot">Yantralok · Local-only interface · Ollama + your existing Chatterbox Studio + Playwright + FFmpeg</div>
 <script>
 const $=id=>document.getElementById(id);
-let pollTimer=null,currentJob=null,knownLogs=0,analysisReady=false,sceneReady=false,planDirty=false,pendingPhase="analysis";
+let pollTimer=null,currentJob=null,knownLogs=0,analysisReady=false,sceneReady=false,planDirty=false,pendingPhase="analysis",sceneHtmlSavedContent="";
 function selectedMode(){return document.querySelector('input[name="voiceMode"]:checked').value}
 function toggleVoice(){const mode=selectedMode();$("voiceScriptWrap").classList.toggle("hidden",mode!=="generate");$("wavWrap").classList.toggle("hidden",mode!=="wav");$("style").disabled=mode!=="generate"}
 document.querySelectorAll('input[name="voiceMode"]').forEach(x=>x.addEventListener("change",toggleVoice));toggleVoice();
@@ -183,18 +183,18 @@ $("audioForm").addEventListener("submit",async e=>{e.preventDefault();if($("audi
 $("audioRun").disabled=true;$("audioHint").textContent="Keep this tab open while Chatterbox generates audio";$("audioLogs").textContent="Submitting audio-only job…";$("audioOutput").textContent="Generating…";$("audioLinks").replaceChildren();audioKnownLogs=0;audioStatus("Queued");
 try{const r=await fetch("/api/audio",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(payload)});const d=await r.json();if(!r.ok)throw new Error(d.error||"Could not start audio job");audioJobId=d.id;pollAudio()}catch(err){$("audioRun").disabled=false;audioStatus("Could not start");$("audioLogs").textContent=err.message;$("audioHint").textContent="Correct the issue and retry"}});
 
-$("sceneHtmlFile").addEventListener("change",async()=>{const file=$("sceneHtmlFile").files?.[0];if(!file)return;try{$("sceneHtml").value=await file.text();$("sceneHtmlMessage").textContent="Loaded "+file.name+" into the editor. Save visuals to this project when ready."}catch(e){$("sceneHtmlMessage").textContent="Could not read file: "+e.message}});
+$("sceneHtmlFile").addEventListener("change",async()=>{const file=$("sceneHtmlFile").files?.[0];if(!file)return;try{$("sceneHtml").value=await file.text();sceneHtmlSavedContent="";$("sceneHtmlMessage").textContent="Loaded "+file.name+" into the editor. Save visuals to this project when ready."}catch(e){$("sceneHtmlMessage").textContent="Could not read file: "+e.message}});
 async function loadSceneHtml(){
   const slug=$("slug").value.trim();
   if(!slug){$("sceneHtmlMessage").textContent="Enter or load a project folder first.";return}
   $("sceneHtmlMessage").textContent="Loading saved scene…";
-  try{const r=await fetch("/files/"+encodeURIComponent(slug)+"/index.html");const d=await r.text();if(!r.ok)throw new Error(d||"No saved scene HTML found.");$("sceneHtml").value=d;$("sceneHtmlMessage").textContent="Loaded saved index.html from "+slug+"."}
+  try{const r=await fetch("/files/"+encodeURIComponent(slug)+"/index.html");const d=await r.text();if(!r.ok)throw new Error(d||"No saved scene HTML found.");$("sceneHtml").value=d;sceneHtmlSavedContent=d;$("sceneHtmlMessage").textContent="Loaded saved index.html from "+slug+"."}
   catch(e){$("sceneHtmlMessage").textContent="Could not load scene: "+e.message}
 }
 $("loadSceneHtml").addEventListener("click",loadSceneHtml);
 $("saveSceneHtml").addEventListener("click",async()=>{
   const button=$("saveSceneHtml");button.disabled=true;$("sceneHtmlMessage").textContent="Validating and saving HTML…";
-  try{const r=await fetch("/api/scene/save",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({slug:$("slug").value,html:$("sceneHtml").value})});const d=await r.json();if(!r.ok)throw new Error(d.error||"Could not save scene.");$("sceneHtml").value=d.html;$("sceneHtmlMessage").textContent="Saved to "+d.path+(d.backup?" · backup: "+d.backup:"")+" · duration "+(Number.isFinite(d.duration)?d.duration.toFixed(2)+"s":"read from getDuration()");sceneReady=true;analysisReady=true;loadProjects($("slug").value)}
+  try{const r=await fetch("/api/scene/save",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({slug:$("slug").value,html:$("sceneHtml").value})});const d=await r.json();if(!r.ok)throw new Error(d.error||"Could not save scene.");$("sceneHtml").value=d.html;sceneHtmlSavedContent=d.html;$("sceneHtmlMessage").textContent="Saved to "+d.path+(d.backup?" · backup: "+d.backup:"")+" · duration "+(Number.isFinite(d.duration)?d.duration.toFixed(2)+"s":"read from getDuration()");sceneReady=true;analysisReady=true;loadProjects($("slug").value)}
   catch(e){$("sceneHtmlMessage").textContent="Save failed: "+e.message}
   finally{button.disabled=false}
 });
@@ -204,6 +204,7 @@ $("previewSceneHtml").addEventListener("click",()=>{
 });
 $("renderSceneHtml").addEventListener("click",()=>{
   if(!$("sceneHtml").value.trim()){alert("Paste or load the scene HTML first.");return}
+  if($("sceneHtml").value!==sceneHtmlSavedContent){alert("Save visuals to the project first. Rendering always uses the saved index.html, not unsaved editor contents.");return}
   const mode=selectedMode();
   if(mode==="generate"){alert("To render saved HTML without regenerating narration, choose Project WAV to reuse this folder’s final.narration.wav, choose Existing WAV and provide its path, or choose Silent video.");return}
   if(mode==="wav"&&!$("wavPath").value.trim()){alert("Enter the absolute path to the approved narration WAV.");return}
