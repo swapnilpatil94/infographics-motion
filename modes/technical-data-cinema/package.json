@@ -21,7 +21,8 @@
     "test:narration-text": "node scripts/test-narration-text.mjs",
     "test:export-compat": "node scripts/test-export-compat.mjs",
     "test:scene-contract": "node scripts/test-export-compat.mjs",
-    "test:scene-compat": "node scripts/test-scene-compat.mjs"
+    "test:scene-compat": "node scripts/test-scene-compat.mjs",
+    "test:plan-compiler": "node scripts/test-plan-compiler.mjs"
   },
   "dependencies": {
     "playwright": "^1.63.0",
