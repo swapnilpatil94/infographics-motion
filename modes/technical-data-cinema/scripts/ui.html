@@ -205,7 +205,7 @@ $("previewSceneHtml").addEventListener("click",()=>{
 $("renderSceneHtml").addEventListener("click",()=>{
   if(!$("sceneHtml").value.trim()){alert("Paste or load the scene HTML first.");return}
   const mode=selectedMode();
-  if(mode==="generate"){alert("To render saved HTML without regenerating narration, choose Existing WAV and provide its path, or choose Silent video.");return}
+  if(mode==="generate"){alert("To render saved HTML without regenerating narration, choose Project WAV to reuse this folder’s final.narration.wav, choose Existing WAV and provide its path, or choose Silent video.");return}
   if(mode==="wav"&&!$("wavPath").value.trim()){alert("Enter the absolute path to the approved narration WAV.");return}
   if(!$("exportName").value.trim()){alert("Enter a new render output name.");return}
   analysisReady=true;sceneReady=true;planDirty=false;pendingPhase="analysis";$("formHint").textContent="Rendering the saved custom HTML; story analysis and scene generation will be skipped.";$("form").requestSubmit();
