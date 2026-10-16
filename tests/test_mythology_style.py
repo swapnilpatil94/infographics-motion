@@ -14,7 +14,7 @@ class MythologyStyleTests(unittest.TestCase):
         profile = styles.get_style("mythology_ink")
         self.assertIn("MYTHOLOGY INK MODE", profile["guidance"])
         self.assertIn("never silently replace", profile["guidance"])
-        self.assertIn("source is the source of truth", profile["guidance"].lower())
+        self.assertIn("narration is the source of truth", profile["guidance"].lower())
 
     def test_user_direction_is_preserved_after_profile_guidance(self):
         direction = styles.direct_for_style("mythology_ink", "Keep the opening close-up.")
