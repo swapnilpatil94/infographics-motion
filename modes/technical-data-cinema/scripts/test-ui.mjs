@@ -6,6 +6,8 @@ import { fileURLToPath } from "node:url";
 const here = path.dirname(fileURLToPath(import.meta.url));
 const html = await fs.readFile(path.join(here, "ui.html"), "utf8");
 const server = await fs.readFile(path.join(here, "ui-server.mjs"), "utf8");
+const generator = await fs.readFile(path.join(here, "generate.mjs"), "utf8");
+const director = await fs.readFile(path.join(here, "../prompts/visual-director.md"), "utf8");
 const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/gi)];
 assert.ok(scripts.length >= 1, "UI must include its client script");
 for (const [index, match] of scripts.entries()) {
@@ -24,6 +26,11 @@ assert.ok(html.includes("Yantralok") && html.includes("rgba(245,247,248,.12)"), 
 assert.ok(html.includes("updateStages(j.stages,j.status)"), "UI must consume actual server stage statuses");
 assert.ok(html.includes('pendingPhase==="all"?"all":(analysisReady?(sceneReady?"render":"scene"):"analysis")'), "UI must preserve staged workflow and allow one-click all-in-one production");
 assert.ok(html.includes('id="runAll"') && html.includes('pendingPhase="all"') && html.includes('pendingPhase==="all"?"all"'), "UI must expose one-click full production");
+assert.ok(generator.includes("OLLAMA_UNAVAILABLE") && generator.includes("attempt <= 3"), "generator must retry transient Ollama connection failures and stop cleanly when unavailable");
+assert.ok(generator.includes("num_ctx: context, num_predict:"), "scene generation must set an explicit context and output-token budget");
+assert.ok(server.includes("internalRepairExhausted"), "UI must not launch a second repair after the generator has already exhausted its repair");
+assert.ok(director.includes("Do NOT force the dark Yantralok palette onto mythology/history stories"), "mythology/history scenes must use their story-appropriate parchment palette in infographic mode");
+assert.ok(director.includes("a real balance/scale with two labelled pans") && director.includes("recognisable spatial environment"), "mythology scenes must contain concrete story-specific visuals, not generic dots");
 assert.ok(server.includes("stages: job.stages"), "job API must expose explicit stage statuses");
 assert.ok(server.includes('SCENE STAGE VALIDATED. Rendering and narration were not started.'), "scene phase must stop before audio/render");
 assert.ok(server.includes('phase === "render"') && server.includes("Rendering the saved fingerprint-matched scene"), "render phase must reuse saved scene without model generation");
