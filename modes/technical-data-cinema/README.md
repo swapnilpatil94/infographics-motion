@@ -133,7 +133,7 @@ Do not run a new TTS pass just to test visuals. Review the MP4 for recognisable 
 
 ## Dotted-line character storytelling (same Infographics mode)
 
-Character-led stories can use progressive dotted contours and ink-like strokes inside the existing HTML/CSS/JS infographic generator. This is **not a separate mythology mode** and does not change the narration or export pipeline. The planner/director prompts now ask the models to use dots meaningfully, preserve character identity, and transform the character into explanatory diagrams instead of repeating static portraits.
+**Locked mythology art direction:** Indian mythology, epics, sacred stories and ancient-history narratives use dark cinematic particle animation by default: near-black/charcoal environments, luminous amber and antique-gold character contours, connecting trails, volumetric glow, layered 2.5D depth and restrained crimson accents. Characters and environments form from meaningful dots and strokes; particles must enact story events rather than decorate the frame. The deterministic fallback renderer follows this same style. This remains inside the existing HTML/CSS/JS Infographics mode—not a separate mythology mode—and does not change narration or export. Tech explainers retain Yantralok's technical visual identity.
 
 ### Quick visual preview — no Ollama or TTS required
 
