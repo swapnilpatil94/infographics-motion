@@ -93,6 +93,6 @@ assert.ok(html.includes('id="customDownloadScene"') && html.includes('id="custom
 assert.ok(html.includes("Unloaded from editor. Saved project HTML and previous MP4 are untouched.") && html.includes("Downloaded current editor contents"), "load/unload controls must preserve saved artifacts and report what happened");
 assert.ok(html.includes("LOCKED MYTHOLOGY LOOK: deep black/charcoal environments") && !html.includes("Use warm parchment/off-white backgrounds"), "default mythology brief must follow the locked dark cinematic particle direction");
 assert.ok(html.includes('id="customProduce"') && html.includes("Generate narration + preview &amp; render MP4"), "custom tab must provide one primary action for narration generation and merged MP4 rendering");
-assert.ok(html.includes('url.pathname === "/api/custom/merge"'), "custom workflow must expose a server-side narration/scene merge route");
+assert.ok(server.includes('url.pathname === "/api/custom/merge"'), "custom workflow must expose a server-side narration/scene merge route");
 assert.ok(server.includes("Preview and merge custom visuals + narration") && server.includes("final.narration.backup-"), "custom merge must render with the generated WAV and preserve the previous project narration");
 assert.ok(html.includes('waitForJob(ad.id') && html.includes('waitForJob(md.id'), "custom one-button workflow must wait for narration generation before starting the merge/render stage");
