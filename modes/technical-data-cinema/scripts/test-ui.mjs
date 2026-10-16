@@ -75,3 +75,10 @@ assert.ok(server.includes('voiceMode === "projectWav"') && server.includes('fina
 assert.ok(server.includes("var)\\s+duration"), "scene saver must recognize a lowercase duration constant used by the supplied HTML file");
 
 assert.ok(html.includes("Rendering always uses the saved index.html"), "UI must block rendering unsaved editor changes");
+
+assert.ok(html.includes('id="customTab"') && html.includes('id="customWorkspace"'), "UI must expose a dedicated Custom Visuals + Narration tab");
+assert.ok(html.includes('id="customHtmlFile"') && html.includes('id="customHtml"') && html.includes('id="customNarration"'), "custom tab must accept uploaded/pasted HTML and narration text");
+assert.ok(html.includes('id="customProduce"') && html.includes("Generate narration + preview &amp; render MP4"), "custom tab must provide one primary action for narration generation and merged MP4 rendering");
+assert.ok(html.includes('url.pathname === "/api/custom/merge"'), "custom workflow must expose a server-side narration/scene merge route");
+assert.ok(server.includes("Preview and merge custom visuals + narration") && server.includes("final.narration.backup-"), "custom merge must render with the generated WAV and preserve the previous project narration");
+assert.ok(html.includes('waitForJob(ad.id') && html.includes('waitForJob(md.id'), "custom one-button workflow must wait for narration generation before starting the merge/render stage");
