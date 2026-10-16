@@ -46,6 +46,8 @@ assert.ok(planner.includes("LOCKED MYTHOLOGY STYLE") && planner.includes("dark c
 assert.ok(fallbackScene.includes('const theme=mythology?"mythology":"technical"') && fallbackScene.includes('data-theme="mythology"]{background:radial-gradient') && fallbackScene.includes('?"#fff0ad":"#e7c16f"'), "deterministic fallback must render mythology in a luminous dark particle style");
 assert.ok(generatorSource.includes("locked dark cinematic particle style") && !generatorSource.includes("use parchment (#F5EBE0)"), "scene generation prompts must not override the mythology style lock with parchment");
 assert.ok(director.includes("meaningful particle contours and connecting strokes") && director.includes("timestamp-driven"), "mythology character particles must be story-driven and deterministic");
+assert.ok(director.includes("CINEMATIC CHARACTER PERFORMANCE") && director.includes("anticipation → clear primary movement → follow-through"), "director must plan cinematic character action and follow-through");
+assert.ok(planner.includes("cinematic short-form rhythm, not a slideshow") && planner.includes("first second must contain a compelling visual event"), "planner must enforce a story-first short-form visual hook");
 
 assert.ok(planner.includes("LOCKED MYTHOLOGY STYLE") && planner.includes("dark cinematic particle animation"), "visual planner must use the locked mythology particle style");
 assert.ok(director.includes("a real balance/scale with two labelled pans") && director.includes("recognisable spatial environment"), "mythology scenes must contain concrete story-specific visuals, not generic dots");
