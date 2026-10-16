@@ -4,5 +4,9 @@ const good=`<!doctype html><html><head><style>html,body{margin:0;width:100%;heig
 assert.deepEqual(validateSceneSource(good),[]);
 assert.ok(validateSceneSource(good.replace("window.renderAt=function","Math.random();window.renderAt=function")).some(e=>e.includes("Math.random")));
 assert.ok(validateSceneSource(good.replace('new URLSearchParams(window.location.search).get("render")!=="1"',"false")).some(e=>e.includes("render-only")));
+const stubScene=good.replace("</script>", "function drawDraupadiConstruction(t) { // TODO draw later\n}\\n</script>");
+assert.ok(validateSceneSource(stubScene).some(e=>e.includes("drawDraupadiConstruction is empty/comment-only")), "scene contract must reject placeholder drawing functions");
+const arrowStubScene=good.replace("</script>", "const drawDiceGame = (t) => { /* implement */ };\\n</script>");
+assert.ok(validateSceneSource(arrowStubScene).some(e=>e.includes("drawDiceGame is empty/comment-only")), "scene contract must reject placeholder arrow renderers");
 const result=await assertSceneCandidate(good);assert.equal(result.renderOnly,true);assert.equal(result.deterministic,true);
 console.log("Strict scene source validation and browser render-only smoke test passed.");
