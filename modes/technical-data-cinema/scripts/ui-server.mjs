@@ -247,6 +247,58 @@ const server = http.createServer(async (req, res) => {
       if (!job) return json(res, 404, { error: "Job not found." });
       return json(res, 200, { id: job.id, status: job.status, stage: job.stage || null, stages: job.stages || {}, logs: job.logs, error: job.error || null, files: job.files || {} });
     }
+
+    if (req.method === "POST" && url.pathname === "/api/scene/save") {
+      if (activeJob) return json(res, 409, { error: "Wait for the active production stage to finish before saving or replacing scene HTML." });
+      const body = await readBody(req);
+      const slug = safeSlug(body.slug || "");
+      if (!slug) return json(res, 400, { error: "Enter a valid project/output folder name." });
+      let html = String(body.html || "");
+      if (!html.trim()) return json(res, 400, { error: "Paste a complete HTML scene before saving." });
+      if (Buffer.byteLength(html, "utf8") > 1_500_000) return json(res, 413, { error: "Scene HTML is larger than 1.5 MB. Keep the scene self-contained and remove unused assets." });
+      if (!/<!doctype\s+html/i.test(html) || !/<html\b/i.test(html) || !/<\/html\s*>/i.test(html)) return json(res, 400, { error: "Paste a complete HTML document beginning with <!doctype html>, not an HTML fragment." });
+      if (!/window\.renderAt\s*=/.test(html) && !/function\s+renderAt\s*\(/.test(html)) return json(res, 400, { error: "Scene HTML must define window.renderAt(seconds) for deterministic frame seeking." });
+      let duration = null;
+      const durationMatch = html.match(/(?:window\.)?sceneDuration\s*=\s*([0-9]+(?:\.[0-9]+)?)/) || html.match(/(?:const|let|var)\s+DURATION\s*=\s*([0-9]+(?:\.[0-9]+)?)/);
+      if (durationMatch) duration = Number(durationMatch[1]);
+      if (!/window\.getDuration\s*=/.test(html) && !/getDuration\s*\(\s*\)/.test(html)) {
+        if (!Number.isFinite(duration) || duration <= 0 || duration > 600) return json(res, 400, { error: "Scene must define window.getDuration(), or provide a numeric window.sceneDuration between 0 and 600 seconds." });
+        const bridge = "<script>window.getDuration = window.getDuration || function () { return Number(window.sceneDuration) || " + duration + "; };<\/script>";
+        html = html.replace(/<\/body\s*>/i, bridge + "\n</body>");
+        if (!html.includes(bridge)) html += "\n" + bridge;
+      }
+      const dir = path.join(outputRoot, slug);
+      let savedStory, plan;
+      try {
+        savedStory = await fs.readFile(path.join(dir, "story.md"), "utf8");
+        plan = JSON.parse(await fs.readFile(path.join(dir, "visual-plan.json"), "utf8"));
+      } catch (error) {
+        return json(res, 409, { error: "Load or analyze this project first. Saving custom visuals requires its existing story.md and validated visual-plan.json." });
+      }
+      const storyFingerprint = crypto.createHash("sha256").update(savedStory).digest("hex");
+      if (plan.story_fingerprint !== storyFingerprint) return json(res, 409, { error: "The saved visual plan is stale for story.md. Run story analysis again before saving a custom scene." });
+      const planFingerprint = crypto.createHash("sha256").update(JSON.stringify(plan)).digest("hex");
+      const upsertMeta = (source, name, value) => {
+        const tag = '<meta name="' + name + '" content="' + value + '">';
+        const expression = new RegExp('<meta\\s+name=["\\']' + name + '["\\'][^>]*>', "i");
+        return expression.test(source) ? source.replace(expression, tag) : source.replace(/<head\\b[^>]*>/i, match => match + "\\n  " + tag);
+      };
+      html = upsertMeta(html, "tdc-story-fingerprint", storyFingerprint);
+      html = upsertMeta(html, "tdc-plan-fingerprint", planFingerprint);
+      const scenePath = path.join(dir, "index.html");
+      let backup = null;
+      try {
+        const previous = await fs.readFile(scenePath, "utf8");
+        if (previous !== html) {
+          backup = "index.user-backup-" + Date.now() + ".html";
+          await fs.writeFile(path.join(dir, backup), previous, { flag: "wx" });
+        }
+      } catch (error) { if (error.code !== "ENOENT") throw error; }
+      await fs.writeFile(scenePath, html, "utf8");
+      const resolvedDuration = duration || Number((html.match(/(?:window\\.)?sceneDuration\\s*=\\s*([0-9]+(?:\\.[0-9]+)?)/) || [])[1]) || null;
+      return json(res, 200, { ok: true, path: "output/" + slug + "/index.html", backup, html, duration: resolvedDuration });
+    }
+
     if (req.method === "POST" && url.pathname === "/api/plan") {
       if (activeJob) return json(res, 409, { error: "Wait for the active production stage to finish before editing its plan." });
       const body = await readBody(req);
