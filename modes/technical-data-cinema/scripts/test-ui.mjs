@@ -90,11 +90,11 @@ assert.ok(html.includes("Rendering always uses the saved index.html"), "UI must 
 assert.ok(html.includes('id="customTab"') && html.includes('id="customWorkspace"'), "UI must expose a dedicated Custom Visuals + Narration tab");
 assert.ok(html.includes('id="customHtmlFile"') && html.includes('id="customHtml"') && html.includes('id="customNarration"'), "custom tab must accept uploaded/pasted HTML and narration text");
 assert.ok(html.includes('id="customDownloadScene"') && html.includes('id="customUnloadScene"'), "custom tab must export current HTML and unload the editor without deleting saved files");
-assert.ok(html.includes("Unloaded from editor. Saved project HTML and previous MP4 are untouched.") && html.includes("Downloaded current editor contents"), "load/unload controls must preserve saved artifacts and report what happened");
+assert.ok(html.includes("Unloaded from editor. Saved project HTML and previous MP4 are untouched.") && html.includes("Downloaded bundled, offline-ready HTML"), "load/unload/download controls must preserve saved artifacts and export self-contained HTML");
 assert.ok(html.includes("LOCKED MYTHOLOGY LOOK: deep black/charcoal environments") && !html.includes("Use warm parchment/off-white backgrounds"), "default mythology brief must follow the locked dark cinematic particle direction");
 assert.ok(html.includes('id="customProduce"') && html.includes("Generate narration + preview &amp; render MP4"), "custom tab must provide one primary action for narration generation and merged MP4 rendering");
 assert.ok(server.includes('url.pathname === "/api/custom/merge"'), "custom workflow must expose a server-side narration/scene merge route");
 assert.ok(server.includes('url.pathname === "/api/scene/bundle"') && server.includes("async function bundleSceneHtml") && server.includes('from "esbuild"'), "uploaded Three.js scenes must be bundled for offline preview and export");
-assert.ok(html.split('fetch("/api/scene/bundle"').length-1===2, "both scene editors must bundle Three.js before previewing");
+assert.ok(html.split('fetch("/api/scene/bundle"').length-1===3, "both scene editors and the HTML download action must bundle Three.js before use");
 assert.ok(server.includes("Preview and merge custom visuals + narration") && server.includes("final.narration.backup-"), "custom merge must render with the generated WAV and preserve the previous project narration");
 assert.ok(html.includes('waitForJob(ad.id') && html.includes('waitForJob(md.id'), "custom one-button workflow must wait for narration generation before starting the merge/render stage");
