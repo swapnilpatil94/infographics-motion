@@ -15,15 +15,15 @@ export function buildFallbackScene({title,story,plan}) {
 <style>
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:#050607;font-family:Inter,ui-sans-serif,system-ui,sans-serif;overflow:hidden}
 #stage{width:100vw;height:100vh;display:block;background:radial-gradient(ellipse at 50% 47%,#11171b 0%,#07090b 48%,#030405 100%)}
-#stage[data-theme="mythology"]{background:#F5EBE0}
-#stage[data-theme="mythology"] .panel{fill:#F5EBE0!important;stroke:#28231e!important}
-#stage[data-theme="mythology"] .rule{stroke:#393129!important}
-#stage[data-theme="mythology"] .green{stroke:#28231e!important}
-#stage[data-theme="mythology"] .gold{stroke:#9d2d22!important}
-#stage[data-theme="mythology"] .node{fill:#9d2d22!important;stroke:#F5EBE0!important}
-#stage[data-theme="mythology"] text{fill:#201c18!important}
-#stage[data-theme="mythology"] .micro,#stage[data-theme="mythology"] .kicker{fill:#9d2d22!important}
-#stage[data-theme="mythology"] #dotGrid circle{fill:#28231e!important}
+#stage[data-theme="mythology"]{background:radial-gradient(ellipse at 50% 43%,#30251b 0%,#100e0d 42%,#030303 100%)}
+#stage[data-theme="mythology"] .panel{fill:#17120e!important;stroke:#b88a43!important}
+#stage[data-theme="mythology"] .rule{stroke:#8d6a37!important}
+#stage[data-theme="mythology"] .green{stroke:#e6c477!important}
+#stage[data-theme="mythology"] .gold{stroke:#f0c56c!important}
+#stage[data-theme="mythology"] .node{fill:#df493b!important;stroke:#1b130e!important}
+#stage[data-theme="mythology"] text{fill:#f5e8c8!important}
+#stage[data-theme="mythology"] .micro,#stage[data-theme="mythology"] .kicker{fill:#e34b3d!important}
+#stage[data-theme="mythology"] #dotGrid circle{fill:#d6a84e!important;opacity:.34}
 .kicker{font-size:22px;letter-spacing:4px;fill:#e64b36;font-weight:800}.micro{font-size:22px;fill:#e64b36;font-weight:750;letter-spacing:2px}.headline{font-size:54px;fill:#fff8e9;font-weight:850}.sub{font-size:25px;fill:#c4cbd0}.action{font-size:31px;fill:#f5f7f8;font-weight:700}.label{font-size:24px;fill:#d9e3d8}.footer{font-size:19px;fill:#858d95;letter-spacing:2px}.rule{stroke:#3b4249;stroke-width:3;fill:none}.gold{stroke:#e64b36;fill:none;stroke-width:6;stroke-linecap:round;stroke-linejoin:round}.green{stroke:#f5f7f8;fill:none;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}.panel{fill:#0b0d10;stroke:#3e725b;stroke-width:3}.node{fill:#e64b36;stroke:#0b0d10;stroke-width:3}
 </style></head><body><svg id="stage" data-theme="__THEME_ATTR__" viewBox="0 0 1080 1920" role="img" aria-label="Story-driven animated explainer">
 <defs><pattern id="dotGrid" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.2" fill="#f5f7f8" opacity=".22"/></pattern><linearGradient id="panelFill" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#171c21"/><stop offset="1" stop-color="#080a0d"/></linearGradient><filter id="glow"><feGaussianBlur stdDeviation="15"/></filter></defs>
@@ -126,7 +126,7 @@ function draw(b,i,l){const g=$("sceneArt");g.replaceChildren();const semantic=(b
  else if(b.grammar==="layered_system"||/stack|layer|incentive|root_cause|hierarch/.test(semantic)){type="layered-system";stack(g,i,l)}
  else{type="transformation";transform(g,i,l)}
  g.setAttribute("data-scene",type);
- const glow=add(g,"circle",{cx:540,cy:850,r:340,fill:THEME==="mythology"?"#9d2d22":"#dba83f",opacity:.025+.025*Math.sin(l*Math.PI),filter:"url(#glow)"});g.insertBefore(glow,g.firstChild)}
+ const glow=add(g,"circle",{cx:540,cy:850,r:340,fill:THEME==="mythology"?"#f0bd58":"#dba83f",opacity:.025+.025*Math.sin(l*Math.PI),filter:"url(#glow)"});g.insertBefore(glow,g.firstChild)}
 
 function renderAt(seconds){const t=clamp(Number(seconds)||0,0,DURATION);let i=BEATS.findIndex((b,k)=>t>=b.start&&(t<b.end||k===BEATS.length-1));if(i<0)i=BEATS.length-1;const b=BEATS[i],l=clamp((t-b.start)/Math.max(.01,b.end-b.start),0,1);$("beatNo").textContent="BEAT "+String(i+1).padStart(2,"0")+" / "+String(BEATS.length).padStart(2,"0");const h=$("headline");h.replaceChildren();wrap(h,b.idea,76,265,22,64,"headline",2);$("description").textContent=b.subject.toUpperCase().slice(0,60);$("action").replaceChildren();wrap($("action"),b.action,78,1370,42,42,"action",2);$("labels").replaceChildren();b.labels.forEach((s,k)=>{const y=1480+k*66;add($("labels"),"circle",{cx:88,cy:y-8,r:7,fill:"#e64b36"});wrap($("labels"),s,112,y,48,30,"label",1)});draw(b,i,l);$("progress").setAttribute("x2",(78+924*t/DURATION).toFixed(2));$("stage").setAttribute("aria-label","Visual beat "+(i+1)+": "+b.idea)}
 window.renderAt=renderAt;window.getDuration=()=>DURATION;
