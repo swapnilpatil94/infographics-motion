@@ -50,3 +50,16 @@ Use exactly one of these seven visual_grammar values so the deterministic recove
 - transformation: state change, reveal, conversion or a physical mechanism
 
 Do not invent new grammar names. Choose the grammar based on the explanatory job, not on visual decoration. Across a suitable 40+ second story, use at least three different grammars; do not repeat the same grammar in adjacent beats unless the visual action and composition clearly transform.
+
+
+## DOTTED-LINE CHARACTER STORYTELLING (INFOGRAPHICS MODE — NOT A SEPARATE MODE)
+When a story depends on a named person or character, consider constructing the character from purposeful dots and connecting strokes inside the existing infographic visual grammar. Do not switch renderers or introduce a mythology-only mode.
+
+- Design a recognizable silhouette first: head/hair outline, shoulders/body, costume/ornaments, and one story-specific prop or gesture. The face and silhouette must read at phone size before adding detail.
+- Specify what dots mean in each beat: contour points, identity/details being revealed, relationships, motion trail, crowd/scale, or information flow. Never use an unexplained decorative dot cloud.
+- Give each character a stable visual identity across shots (silhouette, hair, costume, ornaments, proportions, prop, and palette). Reuse the same conceptual paths/point layout when the character returns.
+- Animate construction over time: sparse anchor dots appear first, contour points trace the silhouette, internal features/garments draw next, then labels/connectors identify story-relevant details. Use the narration timeline to determine reveal progress.
+- Pair the character with a causal infographic action: point toward a decision, connect to another character, reveal a power relationship, show a timeline, or transform the silhouette into a symbolic diagram. Avoid a static character portrait for every beat.
+- For cultural/historical/epic stories, use restrained ink-on-warm-paper styling with restrained red/gold accents only when useful, while staying within the same infographic mode. Do not invent costume specifics as facts; prefer clearly illustrative design when source details are uncertain.
+- In each relevant beat's implementation_notes, specify SVG path or Canvas geometry, deterministic dot placement, stroke/point reveal order, timestamp-driven animation, and how identity remains consistent. Keep every technique implementable with local code and the existing export contract.
+- Keep other stories free to use this treatment when it helps; it is an optional visual grammar, not a mandatory style for every infographic.
