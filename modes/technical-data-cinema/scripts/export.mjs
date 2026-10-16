@@ -60,7 +60,7 @@ if (scriptArg) {
     const venvPython = path.join(repoRoot, ".venv", "bin", "python");
     if (!python) { try { await fs.access(venvPython); python = venvPython; } catch { python = process.env.PYTHON || "python3"; } }
     const code = ["import json, sys", "from engine.studio.server import script_to_audio", "result = script_to_audio(json.load(sys.stdin))", "print('TDC_AUDIO_RESULT=' + json.dumps(result, ensure_ascii=False))"].join("\n");
-    const direct = spawnSync(python, ["-u", "-c", code], { cwd: repoRoot, env: { ...process.env, PYTHONPATH: repoRoot, PYTHONUNBUFFERED: "1" }, input: JSON.stringify(body), encoding: "utf8", timeout: Number(process.env.CHATTERBOX_TIMEOUT_MS || 1800000), maxBuffer: 20 * 1024 * 1024 });
+    const direct = spawnSync(python, ["-u", "-c", code], { cwd: repoRoot, env: { ...process.env, CHATTERBOX_MODEL_VARIANT: process.env.CHATTERBOX_MODEL_VARIANT || "dedicated_hindi", PYTHONPATH: repoRoot, PYTHONUNBUFFERED: "1" }, input: JSON.stringify(body), encoding: "utf8", timeout: Number(process.env.CHATTERBOX_TIMEOUT_MS || 1800000), maxBuffer: 20 * 1024 * 1024 });
     if (direct.stdout) for (const line of direct.stdout.split(/\r?\n/)) if (line && !line.startsWith("TDC_AUDIO_RESULT=")) console.log("[local voice adapter] " + line);
     if (direct.error || direct.status !== 0) { const detail = direct.error?.message || (direct.stderr || direct.stdout || "no diagnostic output").slice(-3000); fail("Chatterbox API failed (" + apiFailure.message + ") and isolated local synthesis also failed: " + detail); }
     const marker = (direct.stdout || "").split(/\r?\n/).find(line => line.startsWith("TDC_AUDIO_RESULT="));
