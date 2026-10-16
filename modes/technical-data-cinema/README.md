@@ -156,3 +156,12 @@ npm run generate -- --story examples/draupadi-question.md --planner-model qwen3.
 ```
 
 Then preview/export the generated HTML with the normal render command. Add narration with `--audio /absolute/path/to/narration.wav` when the approved WAV is ready; the renderer uses the same existing Chatterbox-produced audio rather than introducing a new TTS path. Review the generated character's costume and visual details before publication: the dotted treatment is an illustrative visual, not a claim of historically certain appearance.
+
+
+## One-click production from the local UI
+
+Start the UI with `npm run ui` and open `http://127.0.0.1:4177`. Use **Generate complete video (one click)** to run the full sequential workflow: story/plan generation, HTML/CSS/JS scene generation and validation, Chatterbox narration, then MP4 rendering and QC. Keep the staged analysis/scene/render controls when you want to inspect or approve each intermediate step. Use a new output folder for a new production; existing artifacts are preserved.
+
+Narration control markers are normalized before sending text to Chatterbox: `[PAUSE]` becomes an ellipsis/natural pause and `[END]` is removed. Existing directed performance cues such as `[HOOK]`, `[CURIOUS]`, `[SUSPENSE]`, `[EXPLAIN]`, and `[REVEAL]` remain available to the current cue adapter.
+
+Run `npm run test:ui` and `npm run test:narration-text` locally to check the UI flow and narration marker normalization.
