@@ -298,6 +298,76 @@ const server = http.createServer(async (req, res) => {
       return json(res, 200, { ok: true, path: "output/" + slug + "/index.html", backup, html, duration });
     }
 
+    if (req.method === "POST" && url.pathname === "/api/custom/merge") {
+      if (activeJob) return json(res, 409, { error: "Another production stage is running. Wait for it to finish before merging." });
+      const body = await readBody(req);
+      const slug = safeSlug(body.slug || "");
+      const audioSlug = safeSlug(body.audioSlug || "");
+      const exportName = safeSlug(body.exportName || "");
+      if (!slug || !audioSlug || !exportName) return json(res, 400, { error: "Project, generated audio take, and a new MP4 output name are required." });
+      const dir = path.join(outputRoot, slug);
+      const audioDir = path.join(outputRoot, audioSlug);
+      const htmlPath = path.join(dir, "index.html");
+      const storyPath = path.join(dir, "story.md");
+      const planPath = path.join(dir, "visual-plan.json");
+      const sourceWav = path.join(audioDir, "narration.wav");
+      const finalWav = path.join(dir, "final.narration.wav");
+      const mp4Path = path.join(dir, exportName + ".mp4");
+      for (const required of [htmlPath, storyPath, planPath, sourceWav]) {
+        try { await fs.access(required); }
+        catch { return json(res, 409, { error: "Required file is missing: " + path.relative(root, required) + ". Save the custom scene and generate narration before merging." }); }
+      }
+      try { await fs.access(mp4Path); return json(res, 409, { error: "Output already exists: " + path.basename(mp4Path) + ". Choose a new output name; existing videos are never overwritten." }); }
+      catch (error) { if (error.code !== "ENOENT") throw error; }
+      let plan;
+      try { plan = JSON.parse(await fs.readFile(planPath, "utf8")); }
+      catch { return json(res, 409, { error: "The project's visual-plan.json is invalid. Validate the existing plan before merging." }); }
+      const story = await fs.readFile(storyPath, "utf8");
+      const storyFingerprint = crypto.createHash("sha256").update(story).digest("hex");
+      const html = await fs.readFile(htmlPath, "utf8");
+      if (plan.story_fingerprint !== storyFingerprint) return json(res, 409, { error: "The saved plan no longer matches story.md. Reload/validate the project before merging." });
+      if (!html.includes('name="tdc-story-fingerprint" content="' + storyFingerprint + '"')) return json(res, 409, { error: "The saved custom scene does not match this project's story. Save it again from the Custom Scene tab." });
+      const id = crypto.randomBytes(6).toString("hex");
+      const job = { id, status: "queued", logs: [], files: {}, error: null, child: null, stage: "custom-merge", stages: freshStages() };
+      jobs.set(id, job);
+      activeJob = id;
+      log(job, "Custom scene merge queued for project " + slug + ".");
+      (async () => {
+        try {
+          job.status = "running";
+          try {
+            await fs.access(finalWav);
+            const backup = path.join(dir, "final.narration.backup-" + Date.now() + ".wav");
+            await fs.copyFile(finalWav, backup);
+            log(job, "Preserved previous narration as " + path.basename(backup) + ".");
+          } catch (error) { if (error.code !== "ENOENT") throw error; }
+          await fs.copyFile(sourceWav, finalWav);
+          log(job, "Attached generated narration from " + audioSlug + "/narration.wav.");
+          setStage(job, "audio", "passed", "New Chatterbox narration attached");
+          setStage(job, "render", "running", "Rendering saved custom HTML with generated narration");
+          await run(process.execPath, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--audio", finalWav, "--fps", "30", "--audio-offset", "0"], root, job, "Preview and merge custom visuals + narration");
+          setStage(job, "render", "passed");
+          setStage(job, "videoQc", "passed");
+          job.files = {
+            scene: "/files/" + encodeURIComponent(slug) + "/index.html",
+            audio: "/files/" + encodeURIComponent(slug) + "/final.narration.wav",
+            video: "/files/" + encodeURIComponent(slug) + "/" + path.basename(mp4Path)
+          };
+          job.status = "completed";
+          log(job, "Custom scene, generated narration and MP4 render completed.");
+        } catch (error) {
+          job.status = "failed";
+          job.error = error.message;
+          if (job.stages?.render?.status === "running") setStage(job, "render", "failed", error.message);
+          log(job, "FAILED: " + error.message);
+          if (job.child) { try { job.child.kill("SIGTERM"); } catch {} }
+        } finally {
+          activeJob = null;
+          job.child = null;
+        }
+      })();
+      return json(res, 202, { id });
+    }
     if (req.method === "POST" && url.pathname === "/api/plan") {
       if (activeJob) return json(res, 409, { error: "Wait for the active production stage to finish before editing its plan." });
       const body = await readBody(req);
