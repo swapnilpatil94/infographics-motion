@@ -4,6 +4,7 @@ import path from "node:path";
 import process from "node:process";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { normalizeNarrationForTTS } from "./narration-text.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "..");
@@ -33,8 +34,10 @@ if (audioPath) await fs.access(audioPath);
 
 if (scriptArg) {
   const scriptPath = path.resolve(process.cwd(), scriptArg);
-  const script = (await fs.readFile(scriptPath, "utf8")).trim();
-  if (!script) fail("Narration script is empty.");
+  const sourceScript = (await fs.readFile(scriptPath, "utf8")).trim();
+  const script = normalizeNarrationForTTS(sourceScript);
+  if (!script) fail("Narration script contains no spoken text after removing control markers.");
+  if (script !== sourceScript) console.log("Removed non-spoken [PAUSE]/[END] markers before sending narration to Chatterbox.");
   const studioUrl = (arg("--studio-url", process.env.CHATTERBOX_STUDIO_URL || "http://127.0.0.1:8765")).replace(/\/$/, "");
   let response;
   try {
