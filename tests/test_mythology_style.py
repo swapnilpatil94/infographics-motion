@@ -1,7 +1,8 @@
 """Regression tests for the KATHAAYA mythology style profile."""
+import tempfile
 import unittest
 
-from kathaya import styles
+from kathaya import pipeline, styles
 
 
 class MythologyStyleTests(unittest.TestCase):
@@ -24,6 +25,21 @@ class MythologyStyleTests(unittest.TestCase):
     def test_unknown_style_fails_with_supported_options(self):
         with self.assertRaisesRegex(ValueError, "kathaya_default.*mythology_ink"):
             styles.get_style("made_up_style")
+
+    def test_pipeline_accepts_mythology_profile_and_persists_it(self):
+        original_projects = pipeline.PROJECTS
+        try:
+            with tempfile.TemporaryDirectory() as tmp:
+                pipeline.PROJECTS = tmp
+                project = pipeline.create("द्रौपदी का सवाल", style="mythology_ink")
+                self.assertEqual(project["input"]["style"], "mythology_ink")
+        finally:
+            pipeline.PROJECTS = original_projects
+
+    def test_pipeline_rejects_unknown_profile_before_creating_project(self):
+        with self.assertRaises(pipeline.ProjectError) as raised:
+            pipeline.create("test story", style="made_up_style")
+        self.assertEqual(raised.exception.code, "invalid_options")
 
 
 if __name__ == "__main__":
