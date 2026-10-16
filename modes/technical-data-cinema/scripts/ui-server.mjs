@@ -454,12 +454,23 @@ const server = http.createServer(async (req, res) => {
           if (phase === "render") { reuseScene = true; log(job, "Rendering the saved fingerprint-matched scene; Ollama and Chatterbox will not run."); }
           if (!reuseScene) {
             try {
-              const generateLabel = phase === "analysis"
-                ? "Visual analysis (planner model only; save plan for review)"
-                : phase === "scene"
-                  ? "Compile and validate scene from approved plan (deterministic renderer)"
-                  : "Visual analysis and deterministic scene compilation";
-              await run(node, generateArgs, root, job, generateLabel);
+              if (phase === "all") {
+                // Keep analysis and scene compilation as separate observable stages even
+                // in one-click mode. The approved plan is the interface between them.
+                setStage(job, "analysis", "running");
+                setStage(job, "planValidation", "running");
+                await run(node, [...generateArgs, "--phase", "plan"], root, job, "Visual analysis (plan only; planner model unload before scene compilation)");
+                const approvedPlan = JSON.parse(await fs.readFile(planPath, "utf8"));
+                setStage(job, "analysis", "passed");
+                setStage(job, "planValidation", "passed", `${approvedPlan.beats.length} beats ending at ${approvedPlan.beats.at(-1)?.end}s`);
+                setStage(job, "scene", "running");
+                await run(node, [...generateArgs, "--phase", "scene"], root, job, "Compile and validate scene from approved plan (deterministic renderer)");
+              } else {
+                const generateLabel = phase === "analysis"
+                  ? "Visual analysis (planner model only; save plan for review)"
+                  : "Compile and validate scene from approved plan (deterministic renderer)";
+                await run(node, generateArgs, root, job, generateLabel);
+              }
             } catch (error) {
               const recentOutput = job.logs.slice(-140).join("\n");
               const validationFailure = /Generated scene failed browser render-only validation|Generated HTML failed export validation|Model output did not start with|Ollama returned no message content|Math\.random\(\), forbidden|missing native \?render=1 render-only mode/i.test(recentOutput);
