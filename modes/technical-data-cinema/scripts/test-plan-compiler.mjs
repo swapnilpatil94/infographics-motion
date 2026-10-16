@@ -21,7 +21,7 @@ assert.match(html, /new URLSearchParams\(window\.location\.search\)/);
 assert.doesNotMatch(html, /Math\.random\s*\(/);
 assert.match(html, /Draupadi in the royal assembly/, "scene should expose the story-specific dominant subject");
 assert.match(html, /data-theme="mythology"/, "mythology scenes should use the locked dark cinematic particle art direction");
-assert.match(html, /background:radial-gradient\\(ellipse at 50% 43%,#30251b/, "mythology scenes should use a dark cinematic background");
+assert.match(html, /background:radial-gradient\(ellipse at 50% 43%,#30251b/, "mythology scenes should use a dark cinematic background");
 assert.match(html, /#fff0ad|#e7c16f/, "mythology characters should use luminous gold particle highlights");
 assert.match(html, /function drawDraupadiConstruction\(/, "Draupadi beats should have a real deterministic silhouette renderer");
 assert.match(html, /function drawDiceGame\(/, "dice-game beats should have a dedicated visual renderer");
