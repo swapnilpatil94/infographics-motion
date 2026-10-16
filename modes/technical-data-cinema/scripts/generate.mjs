@@ -60,19 +60,32 @@ const plannerPrompt = await fs.readFile(path.join(root, "prompts", "visual-plann
 const timeoutMs = Number(process.env.OLLAMA_TIMEOUT_MS || 600000);
 async function askOllama(messages, stage, selectedModel = model, responseFormat = null) {
   let response;
-  try {
-    response = await fetch(`${ollamaUrl}/api/chat`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        model: selectedModel, stream: false, messages, keep_alive: 0,
-        ...(responseFormat ? { format: responseFormat } : {}),
-        options: { temperature: 0.25, num_ctx: context }
-      }),
-      signal: AbortSignal.timeout(timeoutMs)
-    });
-  } catch (error) {
-    throw new Error("Could not reach Ollama during " + stage + " at " + ollamaUrl + ": " + error.message, { cause: error });
+  let lastNetworkError;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      response = await fetch(`${ollamaUrl}/api/chat`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          model: selectedModel, stream: false, messages, keep_alive: 0,
+          ...(responseFormat ? { format: responseFormat } : {}),
+          options: { temperature: 0.25, num_ctx: context }
+        }),
+        signal: AbortSignal.timeout(timeoutMs)
+      });
+      lastNetworkError = null;
+      break;
+    } catch (error) {
+      lastNetworkError = error;
+      if (attempt < 3) {
+        const delayMs = attempt * 2000;
+        console.warn(`Ollama connection failed during ${stage} (attempt ${attempt}/3): ${error.message}. Retrying in ${delayMs / 1000}s without regenerating the plan or changing models.`);
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+      }
+    }
+  }
+  if (lastNetworkError) {
+    throw new Error("OLLAMA_UNAVAILABLE: Could not reach Ollama during " + stage + " at " + ollamaUrl + " after 3 attempts: " + lastNetworkError.message + ". The validated visual plan is preserved; restart Ollama if needed and retry scene generation.", { cause: lastNetworkError });
   }
   if (!response.ok) {
     throw new Error("Ollama " + stage + " returned HTTP " + response.status + ": " + await response.text());
@@ -178,6 +191,12 @@ try {
   sceneFailure = error.message || "Ollama scene generation failed";
 }
 let html = (payload || "").replace(/^\uFEFF/, "").replace(/^\`\`\`(?:html)?\s*/i, "").replace(/\s*\`\`\`\s*$/, "");
+if (sceneFailure && /OLLAMA_UNAVAILABLE|Could not reach Ollama during scene generation/i.test(sceneFailure)) {
+  console.error(`Scene generation stopped because Ollama connectivity failed: ${sceneFailure}`);
+  console.error("No scene repair was attempted, because a network failure cannot be repaired by asking the unavailable model to rewrite HTML.");
+  console.error(`Validated visual plan remains available at ${planFile}. Restore Ollama, then rerun the scene phase using this same output folder.`);
+  process.exit(1);
+}
 let compatibility = applySceneCompatibility(html);
 html = compatibility.html;
 if (compatibility.changes.length) console.warn("Applied narrow scene compatibility: " + compatibility.changes.join("; ") + ". Visual QA and browser render checks still apply.");
