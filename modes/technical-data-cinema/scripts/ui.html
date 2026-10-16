@@ -20,20 +20,30 @@ main{max-width:1180px;margin:auto;padding:0 24px 40px;display:grid;grid-template
 <section class="panel">
 <h2>01 / Build your film</h2><p class="sub">Enter the explanation brief and the narration you want spoken. Visuals are generated for this story, not from a fixed template.</p>
 <form id="form">
-<div class="field"><label for="title">VIDEO TITLE</label><input id="title" value="Why a viral moment can break a backend" required maxlength="120"></div>
-<div class="field"><label for="slug">OUTPUT FOLDER NAME</label><input id="slug" value="viral-traffic-explainer" maxlength="64" pattern="[A-Za-z0-9 _-]+" required><span class="hint">A new folder is used; existing scene files are not overwritten.</span></div>
-<div class="field"><label for="story">STORY / VISUAL BRIEF</label><textarea id="story" class="story" required>Core question: Why can a product that worked for thousands of users fail when a post suddenly goes viral?
+<div class="field"><label for="title">VIDEO TITLE</label><input id="title" value="Draupadi’s Question — The Court Falls Silent" required maxlength="120"></div>
+<div class="field"><label for="slug">OUTPUT FOLDER NAME</label><input id="slug" value="draupadi-question" maxlength="64" pattern="[A-Za-z0-9 _-]+" required><span class="hint">A new folder is used; existing scene files are not overwritten.</span></div>
+<div class="field"><label for="story">STORY / VISUAL BRIEF</label><textarea id="story" class="story" required>Create a cinematic Hindi mythology explainer about Draupadi's question in the Mahabharata assembly. Use the existing Infographics mode and HTML/CSS/JS renderer. Do not create a separate mode or use a fixed template.
 
-Narrative beats:
-1. A clip spreads quickly; show audience growth as a meaningful crowd, not decorative dots.
-2. One tap fans out into feed, media and recommendation requests.
-3. Requests converge on finite backend capacity; queue depth and latency rise.
-4. Show why reactive autoscaling arrives after demand has already spiked.
-5. Demonstrate prescaling and caching as interventions.
-6. Show retries spread out with backoff instead of creating a second spike.
-7. End with the lesson: prepare capacity, reduce work per request and control retries.
+VISUAL DIRECTION
+- Construct Draupadi progressively from meaningful black ink dots and connecting strokes. Reveal the silhouette first, then hair, face, traditional attire and expressive gestures.
+- Keep her character design, proportions, hairstyle and costume consistent across every shot.
+- Use warm parchment/off-white backgrounds, black ink, restrained red accents and subtle muted gold.
+- Animate dotted connectors to explain relationships, decisions, power and responsibility.
+- Transform the character into explanatory visuals: the royal assembly, sequence of events, a balance between rules and justice, and a final question.
+- Use varied compositions, close-ups, diagrams, transitions and camera movement. Do not repeat static portraits.
+- Synchronize visual reveals with narration beats. Every dot, line and object must communicate something.
+- Use deterministic, timestamp-driven SVG/Canvas animation compatible with window.renderAt(seconds) and window.getDuration(). No Math.random(), external assets or nondeterministic animation.
+- Make the final scene visually active and memorable. Keep existing rendering, narration and quality checks enabled.
 
-Use illustrative values only when clearly labelled. Every particle or object must explain something.</textarea></div>
+STORY BEATS
+1. Establish the royal assembly and introduce Draupadi.
+2. Explain the sequence of events in the dice game.
+3. Reveal Draupadi's central question: if Yudhishthira had already lost himself, could he then stake her?
+4. Show the assembly falling silent as a visual metaphor for the unresolved question.
+5. Contrast authority and rules with justice and responsibility.
+6. End with: “जब नियम और न्याय टकराएँ, तो धर्म किसका साथ देता है?”
+
+Treat character artwork as illustration, not a historically verified depiction. Do not invent quotations or present disputed details as established fact.</textarea></div>
 <div class="field"><label for="model">OLLAMA MODEL</label><select id="model" required><option value="qwen2.5-coder:7b">qwen2.5-coder:7b (recommended · lighter)</option><option value="qwen3-coder:30b">qwen3-coder:30b (heavier)</option></select><span class="hint" id="modelHint">Checking locally installed models…</span></div>
 <div class="field"><label>VIDEO OUTPUT</label><div class="two"><div><label class="hint" for="fps">Frame rate</label><select id="fps"><option value="30">30 fps · standard</option><option value="24">24 fps · cinematic</option><option value="25">25 fps</option><option value="60">60 fps · heavier</option></select></div><div><label class="hint" for="style">Narration style</label><select id="style"><option value="storytelling">Storytelling</option><option value="conversational">Conversational</option><option value="dramatic">Dramatic</option></select></div></div></div>
 <div class="field"><label>VOICE OPTION</label><div class="modes">
@@ -41,19 +51,23 @@ Use illustrative values only when clearly labelled. Every particle or object mus
 <label class="mode"><input type="radio" name="voiceMode" value="wav"><span><b>Existing WAV</b><br><span class="hint">Use approved audio</span></span></label>
 <label class="mode"><input type="radio" name="voiceMode" value="silent"><span><b>Silent video</b><br><span class="hint">No narration</span></span></label>
 </div></div>
-<div id="voiceScriptWrap" class="field"><label for="voiceScript">HINDI / HINGLISH NARRATION SCRIPT</label><textarea id="voiceScript" class="script">[HOOK] सोचिए, एक वीडियो अचानक वायरल हो जाता है। कुछ ही मिनटों में लाखों लोग उसे देखने पहुँच जाते हैं।
+<div id="voiceScriptWrap" class="field"><label for="voiceScript">HINDI / HINGLISH NARRATION SCRIPT</label><textarea id="voiceScript" class="script">[HOOK] महाभारत की उस सभा में, द्रौपदी ने एक ऐसा सवाल पूछा… जिसने सत्ता और धर्म, दोनों को कटघरे में खड़ा कर दिया।
 
-[CURIOUS] लेकिन हर tap सिर्फ एक request नहीं बनाता। Feed, video, recommendations—एक ही user action पीछे कई systems को काम पर लगा सकता है।
+[EXPLAIN] जुए में युधिष्ठिर पहले अपना राज्य हारे। फिर अपने भाइयों को… और आखिर में खुद को भी दाँव पर हार गए।
 
-[SUSPENSE] Requests तेज़ी से बढ़ रही हैं, लेकिन servers उतनी तेज़ी से नहीं बढ़ सकते। Queue लंबी होती है, और response धीमा पड़ने लगता है।
+[SUSPENSE] लेकिन इसके बाद द्रौपदी को भी दाँव पर लगाया गया।
 
-[EXPLAIN] Autoscaling मदद करता है, पर अक्सर demand बढ़ने के बाद। यानी problem शुरू हो चुकी होती है, तब extra capacity पहुँचती है।
+[CURIOUS] द्रौपदी ने एक सीधा सवाल पूछा—अगर युधिष्ठिर पहले ही खुद को हार चुके थे, तो क्या उन्हें मुझे दाँव पर लगाने का अधिकार था?
 
-[REVEAL] इसलिए बड़े traffic event से पहले capacity prepare करना ज़रूरी है।
+[PAUSE] सभा में बड़े-बड़े ज्ञानी और योद्धा मौजूद थे। लेकिन इस सवाल का साफ़ जवाब देना आसान नहीं था।
 
-[EXPLAIN] Caching हर request को backend तक जाने से रोक सकती है। और retries को backoff के साथ फैलाने से दूसरी traffic spike नहीं बनती।
+[EXPLAIN] एक तरफ़ सत्ता और नियम थे। दूसरी तरफ़ न्याय, अधिकार और ज़िम्मेदारी।
 
-[REVEAL] असली lesson? सिर्फ़ ज़्यादा servers नहीं। सही समय पर capacity, कम unnecessary work, और controlled retries—यही system को viral moment में भी stable रखते हैं।</textarea><span class="hint">Performance cues carry forward until the next cue, matching your existing Chatterbox branch.</span>
+[REVEAL] द्रौपदी का सवाल सिर्फ़ उस सभा के बारे में नहीं था। वह एक बड़ी समस्या सामने रखता है—क्या हर नियम सही होता है, सिर्फ़ इसलिए क्योंकि सत्ता उसे मानती है?
+
+[CURIOUS] जब नियम और न्याय टकराएँ… तो धर्म किसका साथ देता है?
+
+[END] यही वह सवाल है, जिस पर आज भी विचार किया जा सकता है।</textarea><span class="hint">Performance cues carry forward until the next cue, matching your existing Chatterbox branch.</span>
 <div class="two"><div><label class="hint" for="performance">Performance</label><select id="performance"><option value="directed">Directed cues</option><option value="uniform">Uniform delivery</option></select></div><div><label class="hint" for="intensity">Expression intensity (0–100)</label><input id="intensity" type="number" min="0" max="100" value="65"></div></div>
 </div>
 <div id="wavWrap" class="field hidden"><label for="wavPath">ABSOLUTE PATH TO APPROVED WAV FILE</label><input id="wavPath" placeholder="/Users/you/Music/approved-narration.wav"><span class="hint">Use the existing approved narration. This stage never launches Chatterbox.</span></div>
