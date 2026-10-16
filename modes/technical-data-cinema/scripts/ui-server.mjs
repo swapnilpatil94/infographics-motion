@@ -27,12 +27,12 @@ function json(res, status, data) {
 function safeSlug(value) {
   return String(value || "").toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 64);
 }
-function readBody(req) {
+function readBody(req, maxBytes = 500_000) {
   return new Promise((resolve, reject) => {
     let body = "";
     req.on("data", chunk => {
       body += chunk;
-      if (body.length > 500_000) { reject(new Error("Request too large (max 500 KB).")); req.destroy(); }
+      if (body.length > maxBytes) { reject(new Error(`Request too large (max ${Math.round(maxBytes / 1000)} KB).`)); req.destroy(); }
     });
     req.on("end", () => {
       try { resolve(JSON.parse(body || "{}")); } catch { reject(new Error("Invalid JSON request.")); }
@@ -250,7 +250,7 @@ const server = http.createServer(async (req, res) => {
 
     if (req.method === "POST" && url.pathname === "/api/scene/save") {
       if (activeJob) return json(res, 409, { error: "Wait for the active production stage to finish before saving or replacing scene HTML." });
-      const body = await readBody(req);
+      const body = await readBody(req, 1_600_000);
       const slug = safeSlug(body.slug || "");
       if (!slug) return json(res, 400, { error: "Enter a valid project/output folder name." });
       let html = String(body.html || "");
@@ -409,10 +409,11 @@ const server = http.createServer(async (req, res) => {
       const voiceMode = String(body.voiceMode || "generate");
       const phase = String(body.phase || "all");
       const voiceScript = String(body.voiceScript || "").trim();
-      const wavPath = String(body.wavPath || "").trim();
+      const suppliedWavPath = String(body.wavPath || "").trim();
       const model = String(body.model || "").trim();
       const plannerModel = String(body.plannerModel || process.env.OLLAMA_PLANNER_MODEL || "qwen3.5:9b").trim();
       const slug = safeSlug(body.slug || title);
+      const wavPath = voiceMode === "projectWav" ? path.join(outputRoot, slug, "final.narration.wav") : suppliedWavPath;
       const fps = Number(body.fps || 30);
       const requestedAudioOffset = Number(body.audioOffset ?? 0);
       const audioOffset = voiceMode === "generate" ? 0 : requestedAudioOffset;
@@ -420,9 +421,10 @@ const server = http.createServer(async (req, res) => {
       if (!title || !story) return json(res, 400, { error: "Add a title and story brief." });
       if (!slug) return json(res, 400, { error: "The output name must contain letters or numbers." });
       if (!model) return json(res, 400, { error: "Choose an installed Ollama model." });
-      if (!["generate", "wav", "silent"].includes(voiceMode)) return json(res, 400, { error: "Choose a valid voice mode." });
+      if (!["generate", "wav", "projectWav", "silent"].includes(voiceMode)) return json(res, 400, { error: "Choose a valid voice mode." });
       if (!["all", "analysis", "scene", "render"].includes(phase)) return json(res, 400, { error: "Choose analysis, scene, render, or legacy all-in-one mode." });
-      if (phase === "render" && voiceMode === "generate") return json(res, 400, { error: "Render is audio-preserving: select an existing approved WAV or silent video. Generate narration in the separate audio-only panel." });
+      if (phase === "render" && voiceMode === "generate") return json(res, 400, { error: "Render is audio-preserving: select an existing approved WAV, this project’s saved WAV, or silent video. Generate narration in the separate audio-only panel." });
+      if (voiceMode === "projectWav" && phase !== "render") return json(res, 400, { error: "Project WAV mode is only available when rendering an already-saved scene." });
       if (phase === "render" && !exportName) return json(res, 400, { error: "Enter a new export filename for a retry; existing MP4s are never overwritten." });
       if (phase !== "analysis" && voiceMode === "generate" && !voiceScript) return json(res, 400, { error: "Add the narration script for Chatterbox." });
       if (phase !== "analysis" && voiceMode === "wav" && !wavPath) return json(res, 400, { error: "Enter the absolute path to an existing WAV file." });
@@ -543,7 +545,7 @@ const server = http.createServer(async (req, res) => {
               const source = await fs.readFile(htmlPath, "utf8");
               const planFingerprint = crypto.createHash("sha256").update(JSON.stringify(plan)).digest("hex");
               if (!source.includes(`name="tdc-story-fingerprint" content="${storyFingerprint}"`) || !source.includes(`name="tdc-plan-fingerprint" content="${planFingerprint}"`)) throw new Error("Saved scene does not match the current approved story/plan. Regenerate the scene first.");
-              if (voiceMode === "wav") await fs.access(path.resolve(wavPath));
+              if (voiceMode === "wav" || voiceMode === "projectWav") await fs.access(path.resolve(wavPath));
               setStage(job, "scene", "passed"); setStage(job, "sceneValidation", "passed"); setStage(job, "audio", voiceMode === "silent" ? "skipped" : "passed"); setStage(job, "render", "running");
             } else setStage(job, "scene", "running");
           } else if (phase === "all") setStage(job, "analysis", "running");
@@ -610,7 +612,7 @@ const server = http.createServer(async (req, res) => {
             job.status = "completed"; log(job, "SCENE STAGE VALIDATED. Rendering and narration were not started."); return;
           }
           if (phase === "render") {
-            if (voiceMode === "wav") await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--audio", path.resolve(wavPath), "--fps", String(fps), "--audio-offset", String(audioOffset)], root, job, "Render and QC with approved existing WAV");
+            if (voiceMode === "wav" || voiceMode === "projectWav") await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--audio", path.resolve(wavPath), "--fps", String(fps), "--audio-offset", String(audioOffset)], root, job, "Render and QC with approved existing WAV");
             else await run(node, ["scripts/export.mjs", "--html", htmlPath, "--out", mp4Path, "--fps", String(fps), "--audio-offset", String(audioOffset)], root, job, "Render and QC silent video");
             setStage(job, "render", "passed"); setStage(job, "videoQc", "passed"); setStage(job, "export", "passed");
           } else if (voiceMode === "generate") {
