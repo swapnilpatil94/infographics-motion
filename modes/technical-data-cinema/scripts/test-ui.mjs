@@ -53,3 +53,10 @@ assert.ok(server.includes('url.pathname === "/api/audio"'), "server must expose 
 assert.ok(server.includes('atempo=') && server.includes('narration-source.wav'), "server must preserve original audio and apply pace as a separate post-process");
 assert.ok(server.includes("content-disposition") && html.includes('?download=1'), "audio downloads must be served as attachments");
 console.log("Staged UI syntax, brand palette, audio-only workflow, audio sync offset, and pace controls tests passed.");
+
+const voiceCache = await fs.readFile(path.resolve(here, "../../../engine/shorts/voice.py"), "utf8");
+const exporter = await fs.readFile(path.join(here, "export.mjs"), "utf8");
+assert.ok(voiceCache.includes("CACHE HIT: narration WAV already exists; skipping Chatterbox synthesis"), "partial TTS cache must not trigger expensive re-synthesis");
+assert.ok(voiceCache.includes("CACHE HIT: reusing existing word alignment"), "existing alignment must be reused independently");
+assert.ok(exporter.includes("isolated local synthesis also failed") && exporter.includes("from engine.studio.server import script_to_audio"), "export must fall back to the local production voice adapter if Studio disappears");
+assert.ok(exporter.includes("copyFile(cachedAudio, audioPath)"), "fallback narration must be copied to the project output without regenerating visuals");
