@@ -4,7 +4,7 @@ import { validateSceneSource } from "./scene-contract.mjs";
 
 const plan = {
   visual_thesis: "A single decision triggers a visible chain of consequences.",
-  visual_signature: ["ink edges", "red causal path", "layered paper"],
+  visual_signature: ["luminous gold particles", "crimson causal path", "layered dark depth"],
   ending_image: "The scattered causes converge into one clear insight.",
   beats: [
     { start: 0, end: 4, narration_idea: "Draupadi asks a question no one can answer", viewer_takeaway: "The assembly freezes when the question exposes a contradiction", dominant_subject: "Draupadi in the royal assembly", action_and_causal_proof: "A single raised hand stops the room and all gazes turn toward the throne", composition: "Low angle on a foreground silhouette with a deep assembly behind", camera: "Slow push toward the raised hand", transition: "The raised hand becomes the pivot for the next comparison", implementation_notes: "Layered SVG silhouettes and deterministic opacity changes", visual_grammar: "transformation", overlay_text: ["THE QUESTION"] },
@@ -20,7 +20,9 @@ assert.match(html, /window\.getDuration=\(\)=>DURATION/);
 assert.match(html, /new URLSearchParams\(window\.location\.search\)/);
 assert.doesNotMatch(html, /Math\.random\s*\(/);
 assert.match(html, /Draupadi in the royal assembly/, "scene should expose the story-specific dominant subject");
-assert.match(html, /data-theme="parchment"/, "mythology scenes should use the parchment art direction");
+assert.match(html, /data-theme="mythology"/, "mythology scenes should use the locked dark cinematic particle art direction");
+assert.match(html, /background:radial-gradient\\(ellipse at 50% 43%,#30251b/, "mythology scenes should use a dark cinematic background");
+assert.match(html, /#fff0ad|#e7c16f/, "mythology characters should use luminous gold particle highlights");
 assert.match(html, /function drawDraupadiConstruction\(/, "Draupadi beats should have a real deterministic silhouette renderer");
 assert.match(html, /function drawDiceGame\(/, "dice-game beats should have a dedicated visual renderer");
 assert.match(html, /function drawAssembly\(/, "assembly beats should have a dedicated visual renderer");
